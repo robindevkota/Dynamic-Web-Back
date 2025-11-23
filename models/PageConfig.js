@@ -31,6 +31,7 @@ const PageConfigSchema = new mongoose.Schema({
   isAnonymous: { type: Boolean, default: true },
   
   initialization: {
+    globalCSS: { type: String, default: "" },
     resources: [{
       key: String,
       url: String

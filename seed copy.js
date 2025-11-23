@@ -10,166 +10,1395 @@ mongoose.connect(
 );
 
 const websites = [
-  {
-    title: "Robin Devkota - Portfolio",
-    slug: "robin-devkota",
-    projectUUID: "portfolio",
-    taskUUID: "001",
-    status: "Active",
-    accountValidation: false,
-    otpValidation: false,
-    isAnonymous: true,
-    initialization: {
-      resources: [
-        {
-          key: "projects.api",
-          url: "https://api.github.com/users/github/repos",
-        },
-        { key: "social.github", url: "https://github.com/robindevkota" },
-      ],
+
+{
+  title: "Auth - Login & Signup",
+  slug: "auth",
+  projectUUID: "auth",
+  taskUUID: "auth001",
+  status: "Active",
+  isAnonymous: true,
+
+  initialization: { resources: [] },
+
+  components: {
+    navbar: {
+      schema: "{}",
+      uiSchema: "{}",
+      styles: "{}",
+      triggers: "[]"
     },
-    components: {
-      navbar: {
-        table: {},
-        modal: {},
-        uiSchema: {
-          logo: {
-            "ui:widget": "text",
-            "ui:content": "Robin Devkota",
-            "ui:styles": {
-              fontSize: "24px",
-              fontWeight: "bold",
-              color: "#fff",
-            },
-          },
-          links: {
-            "ui:widget": "navLinks",
-            "ui:theme": "dark",
-            "ui:links": [
-              { label: "Home", action: "navigate:/robin-devkota" },
-              { label: "About", action: "scroll:#about" },
-              { label: "Projects", action: "scroll:#projects" },
-              { label: "Skills", action: "scroll:#skills" },
-              { label: "Contact", action: "openModal:contactModal" },
-            ],
-          },
-        },
-        styles: {
-          bg: "#0f172a",
-          color: "#e2e8f0",
-          position: "fixed",
-          padding: "16px 32px",
-          shadow: true,
-          width: "100%",
-          zIndex: 1000,
-        },
-        triggers: [{ event: "scroll", action: "fadeIn", threshold: 100 }],
-      },
-      sidebar: {
-        table: {},
-        modal: {},
-        uiSchema: {
-          skills: {
-            "ui:widget": "skillRadar",
-            "ui:skills": [
-              { name: "React", level: 90 },
-              { name: "Next.js", level: 85 },
-              { name: "TypeScript", level: 80 },
-              { name: "Node.js", level: 75 },
-              { name: "MongoDB", level: 70 },
-            ],
-          },
-        },
-        styles: { width: "280px", bg: "#1e293b", padding: "24px" },
-        triggers: [],
-      },
-      main: {
-        table: {
-          columns: [
-            { title: "Name", dataIndex: "name", key: "name" },
-            {
-              title: "Description",
-              dataIndex: "description",
-              key: "description",
-            },
-          ],
-          dataKey: "projects.api",
-        },
-        modal: {},
-        uiSchema: {
-          hero: {
-            "ui:widget": "hero",
-            "ui:title": "Full Stack Developer",
-            "ui:subtitle":
-              "Building modern web applications with passion and precision",
-            "ui:cta": {
-              label: "View My Work",
-              action: "scroll:#projects",
-            },
-          },
-          projects: {
-            "ui:widget": "projectGrid",
-            "ui:animated": true,
-          },
-        },
-        styles: { padding: "80px 40px", bg: "#020617" },
-        triggers: [
-          { event: "load", action: "fetchProjects", source: "projects.api" },
-        ],
-      },
-      modals: {
-        table: {},
-        modal: {
-          contactModal: {
-            "ui:widget": "modal",
-            "ui:title": "Get In Touch",
-            "ui:theme": "dark",
-            "ui:content":
-              "I'm always open to discussing new projects, creative ideas, or opportunities to be part of your vision.",
-            "ui:fields": [
-              {
-                label: "Your Name",
-                type: "text",
-                placeholder: "John Doe",
-              },
-              {
-                label: "Email Address",
-                type: "email",
-                placeholder: "john@example.com",
-              },
-              {
-                label: "Message",
-                type: "textarea",
-                placeholder: "Tell me about your project...",
-              },
-            ],
-            "ui:actions": [
-              {
-                label: "Cancel",
-                action: "closeModal",
-                variant: "secondary",
-              },
-              {
-                label: "Send Message",
-                action: "api:/contact/send",
-                variant: "primary",
-              },
-            ],
-          },
-        },
-        uiSchema: {},
-        styles: {},
-        triggers: [],
-      },
-      footer: {
-        table: {},
-        modal: {},
-        uiSchema: {},
-        styles: {},
-        triggers: [],
-      },
+
+    page: {
+      schema: "{}",
+      uiSchema: "{}",
+      styles: JSON.stringify({
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: 20
+      }, null, 2),
+      triggers: "[]"
     },
+
+    card: {
+      schema: "{}",
+      uiSchema: "{}",
+      styles: JSON.stringify({
+        background: "white",
+        borderRadius: 16,
+        boxShadow: "0 20px 40px rgba(0,0,0, SAY0.15)",
+        width: "100%",
+        maxWidth: 420,
+        padding: 40
+      }, null, 2),
+      triggers: "[]"
+    },
+
+    form: {
+      schema: JSON.stringify({
+        type: "object",
+        properties: {
+          email: { type: "string", format: "email", title: "Email" },
+          password: { type: "string", title: "Password", minLength: 6 }
+        },
+        required: ["email", "password"]
+      }, null, 2),
+
+      uiSchema: JSON.stringify({
+        email: { "ui:placeholder": "you@example.com" },
+        password: { "ui:widget": "password" },
+        "ui:submitButton": "Login"
+      }, null, 2),
+
+      styles: JSON.stringify({
+        display: "flex",
+        flexDirection: "column",
+        gap: 16
+      }, null, 2),
+
+      triggers: "[]"
+    }
+  }
+},
+
+  
+{
+  title: "Susant Blog - Tech & Lifestyle",
+  slug: "susant-blog",
+  projectUUID: "blog-susant",
+  taskUUID: "blog001",
+  status: "Active",
+  accountValidation: false,
+  otpValidation: false,
+  isAnonymous: true,
+  
+  initialization: {
+    globalCSS: `
+      /* Susant Blog Custom Styles */
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+      
+      body {
+        font-family: 'Poppins', sans-serif;
+      }
+      
+      .blog-card {
+        transition: all 0.3s ease;
+      }
+      
+      .blog-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+      }
+      
+      .category-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 12px;
+      }
+      
+      .tech-badge { background: #3b82f6; color: white; }
+      .lifestyle-badge { background: #ec4899; color: white; }
+      .travel-badge { background: #10b981; color: white; }
+      .food-badge { background: #f59e0b; color: white; }
+    `,
+    resources: [
+      { key: "posts.api", url: "https://jsonplaceholder.typicode.com/posts" },
+      { key: "comments.api", url: "https://jsonplaceholder.typicode.com/comments" }
+    ]
   },
+  
+  pages: {
+    about: {
+      title: "About Susant",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "📝 Susant Blog",
+              "ui:styles": { 
+                fontSize: "26px", 
+                fontWeight: "700",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent"
+              }
+            },
+            links: {
+              "ui:widget": "navLinks",
+              "ui:theme": "light",
+              "ui:links": [
+                { label: "Home", action: "navigate:/susant-blog" },
+                { label: "About", action: "navigate:/susant-blog/about" },
+                { label: "Categories", action: "navigate:/susant-blog/categories" },
+                { label: "Contact", action: "navigate:/susant-blog/contact" }
+              ]
+            }
+          },
+          styles: {
+            background: "#ffffff",
+            borderBottom: "2px solid #f0f0f0",
+            padding: "20px 40px",
+            position: "fixed",
+            width: "100%",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+        main: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            hero: {
+              "ui:widget": "hero",
+              "ui:title": "Hi, I'm Susant! 👋",
+              "ui:subtitle": "Blogger | Tech Enthusiast | Digital Nomad",
+              "ui:styles": {
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                minHeight: "400px",
+                padding: "150px 40px 80px"
+              }
+            },
+            spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+            storyHeading: {
+              "ui:widget": "heading",
+              "ui:text": "My Story",
+              "ui:level": "h2",
+              "ui:styles": { textAlign: "center", marginBottom: "30px", color: "#1e293b" }
+            },
+            bio: {
+              "ui:widget": "paragraph",
+              "ui:text": "I'm a passionate blogger sharing my journey through technology, lifestyle, and travel. With over 5 years of experience in the tech industry, I love breaking down complex topics into digestible content. When I'm not writing, you'll find me exploring new coffee shops or planning my next adventure.",
+              "ui:styles": {
+                textAlign: "center",
+                maxWidth: "800px",
+                margin: "0 auto 40px",
+                fontSize: "1.15rem",
+                lineHeight: "1.8",
+                color: "#64748b"
+              }
+            },
+            spacer2: { "ui:widget": "spacer", "ui:height": 60 },
+            statsHeading: {
+              "ui:widget": "heading",
+              "ui:text": "By The Numbers",
+              "ui:level": "h2",
+              "ui:styles": { textAlign: "center", marginBottom: "50px" }
+            },
+            stat1: {
+              "ui:widget": "card",
+              "ui:title": "📝 500+ Articles",
+              "ui:description": "Published across technology, lifestyle, and travel",
+              "ui:styles": { maxWidth: "300px", margin: "0 auto 30px", textAlign: "center" }
+            },
+            stat2: {
+              "ui:widget": "card",
+              "ui:title": "👥 50K+ Readers",
+              "ui:description": "Monthly active readers from around the world",
+              "ui:styles": { maxWidth: "300px", margin: "0 auto 30px", textAlign: "center" }
+            },
+            stat3: {
+              "ui:widget": "card",
+              "ui:title": "🏆 10+ Awards",
+              "ui:description": "Recognized for quality content and engagement",
+              "ui:styles": { maxWidth: "300px", margin: "0 auto 30px", textAlign: "center" }
+            }
+          },
+          styles: {
+            padding: "100px 40px 80px",
+            background: "#f8fafc",
+            minHeight: "100vh"
+          },
+          triggers: []
+        },
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 Susant Blog. Made with ❤️",
+              "ui:styles": { textAlign: "center", color: "#94a3b8", fontSize: "15px" }
+            }
+          },
+          styles: {
+            background: "#1e293b",
+            padding: "40px",
+            borderTop: "3px solid #667eea"
+          },
+          triggers: []
+        }
+      }
+    },
+
+    categories: {
+      title: "Blog Categories",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "📝 Susant Blog",
+              "ui:styles": { 
+                fontSize: "26px", 
+                fontWeight: "700",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent"
+              }
+            },
+            links: {
+              "ui:widget": "navLinks",
+              "ui:theme": "light",
+              "ui:links": [
+                { label: "Home", action: "navigate:/susant-blog" },
+                { label: "About", action: "navigate:/susant-blog/about" },
+                { label: "Categories", action: "navigate:/susant-blog/categories" },
+                { label: "Contact", action: "navigate:/susant-blog/contact" }
+              ]
+            }
+          },
+          styles: {
+            background: "#ffffff",
+            borderBottom: "2px solid #f0f0f0",
+            padding: "20px 40px",
+            position: "fixed",
+            width: "100%",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+        main: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            hero: {
+              "ui:widget": "hero",
+              "ui:title": "Explore by Category 🗂️",
+              "ui:subtitle": "Find articles that match your interests",
+              "ui:styles": {
+                background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                minHeight: "350px"
+              }
+            },
+            spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+            techCard: {
+              "ui:widget": "card",
+              "ui:title": "💻 Technology",
+              "ui:description": "Latest in web development, AI, programming languages, and software engineering best practices.",
+              "ui:image": "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=250&fit=crop",
+              "ui:buttonLabel": "View Tech Posts",
+              "ui:action": "navigate:/susant-blog",
+              "ui:styles": { margin: "0 auto 30px", maxWidth: "600px" }
+            },
+            lifestyleCard: {
+              "ui:widget": "card",
+              "ui:title": "🌟 Lifestyle",
+              "ui:description": "Personal growth, productivity tips, wellness, and finding balance in modern life.",
+              "ui:image": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=250&fit=crop",
+              "ui:buttonLabel": "View Lifestyle Posts",
+              "ui:action": "navigate:/susant-blog",
+              "ui:styles": { margin: "0 auto 30px", maxWidth: "600px" }
+            },
+            travelCard: {
+              "ui:widget": "card",
+              "ui:title": "✈️ Travel",
+              "ui:description": "Travel guides, hidden gems, digital nomad tips, and adventures around the world.",
+              "ui:image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=250&fit=crop",
+              "ui:buttonLabel": "View Travel Posts",
+              "ui:action": "navigate:/susant-blog",
+              "ui:styles": { margin: "0 auto 30px", maxWidth: "600px" }
+            },
+            foodCard: {
+              "ui:widget": "card",
+              "ui:title": "🍜 Food & Culture",
+              "ui:description": "Restaurant reviews, recipes, food photography, and culinary adventures.",
+              "ui:image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=250&fit=crop",
+              "ui:buttonLabel": "View Food Posts",
+              "ui:action": "navigate:/susant-blog",
+              "ui:styles": { margin: "0 auto 30px", maxWidth: "600px" }
+            }
+          },
+          styles: {
+            padding: "100px 40px 80px",
+            background: "#ffffff",
+            minHeight: "100vh"
+          },
+          triggers: []
+        },
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 Susant Blog. Made with ❤️",
+              "ui:styles": { textAlign: "center", color: "#94a3b8" }
+            }
+          },
+          styles: {
+            background: "#1e293b",
+            padding: "40px",
+            borderTop: "3px solid #667eea"
+          },
+          triggers: []
+        }
+      }
+    },
+
+    contact: {
+      title: "Contact Susant",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "📝 Susant Blog",
+              "ui:styles": { 
+                fontSize: "26px", 
+                fontWeight: "700",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent"
+              }
+            },
+            links: {
+              "ui:widget": "navLinks",
+              "ui:theme": "light",
+              "ui:links": [
+                { label: "Home", action: "navigate:/susant-blog" },
+                { label: "About", action: "navigate:/susant-blog/about" },
+                { label: "Categories", action: "navigate:/susant-blog/categories" },
+                { label: "Contact", action: "navigate:/susant-blog/contact" }
+              ]
+            }
+          },
+          styles: {
+            background: "#ffffff",
+            borderBottom: "2px solid #f0f0f0",
+            padding: "20px 40px",
+            position: "fixed",
+            width: "100%",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+main: {
+  table: {},
+  modal: {},
+  uiSchema: {
+    hero: {
+      "ui:widget": "hero",
+      "ui:title": "Let's Connect! 💬",
+      "ui:subtitle": "Have a question, collaboration idea, or just want to say hi?",
+      "ui:styles": {
+        background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+        minHeight: "350px"
+      }
+    },
+    spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+    
+    formHeading: {
+      "ui:widget": "heading",
+      "ui:text": "Send Me a Message",
+      "ui:level": "h2",
+      "ui:styles": { textAlign: "center", marginBottom: "40px" }
+    },
+    
+    // ✅ Name, Subject, and Email in same row with proper gap
+    nameSubjectEmailRow: {
+      "ui:widget": "formRow",
+      "ui:gap": "20px", // Fixed gap between fields
+      "ui:fields": [
+        {
+          "ui:widget": "inputField",
+          "ui:label": "Your Name",
+          "ui:name": "name",
+          "ui:placeholder": "John Doe",
+          "ui:type": "text",
+          "ui:required": true
+        },
+        {
+          "ui:widget": "selectField",
+          "ui:label": "Subject",
+          "ui:name": "subject",
+          "ui:required": true,
+          "ui:options": [
+            { value: "collaboration", label: "Collaboration" },
+            { value: "guest-post", label: "Guest Post" },
+            { value: "feedback", label: "Feedback" },
+            { value: "question", label: "Question" },
+            { value: "other", label: "Other" }
+          ]
+        },
+        {
+          "ui:widget": "inputField",
+          "ui:label": "Email Address",
+          "ui:name": "email",
+          "ui:placeholder": "john@example.com",
+          "ui:type": "email",
+          "ui:required": true
+        }
+      ],
+      "ui:styles": { maxWidth: "1000px", margin: "0 auto" }
+    },
+    
+    // Message field (full width)
+    messageField: {
+      "ui:widget": "textareaField",
+      "ui:label": "Your Message",
+      "ui:name": "message",
+      "ui:placeholder": "Tell me what's on your mind...",
+      "ui:rows": 6,
+      "ui:required": true,
+      "ui:styles": { maxWidth: "1000px", margin: "0 auto" }
+    },
+    
+    submitBtn: {
+      "ui:widget": "button",
+      "ui:label": "Send Message 🚀",
+      "ui:variant": "primary",
+      "ui:size": "large",
+      "ui:action": "api:/contact/send",
+      "ui:styles": {
+        maxWidth: "1000px",
+        width: "100%",
+        margin: "20px auto",
+        display: "block"
+      }
+    },
+    
+    spacer2: { "ui:widget": "spacer", "ui:height": 60 },
+    
+    socialHeading: {
+      "ui:widget": "heading",
+      "ui:text": "Follow My Journey",
+      "ui:level": "h3",
+      "ui:styles": { textAlign: "center", marginBottom: "30px" }
+    },
+    
+    socialIcons: {
+      "ui:widget": "socialIcons",
+      "ui:size": "large",
+      "ui:icons": [
+        { emoji: "🐦", url: "https://twitter.com/susant" },
+        { emoji: "📷", url: "https://instagram.com/susant" },
+        { emoji: "💼", url: "https://linkedin.com/in/susant" },
+        { emoji: "📧", url: "mailto:susant@example.com" }
+      ]
+    }
+  },
+  styles: {
+    padding: "100px 40px 80px",
+    background: "#f8fafc",
+    minHeight: "100vh"
+  },
+  triggers: []
+},
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 Susant Blog. Made with ❤️",
+              "ui:styles": { textAlign: "center", color: "#94a3b8" }
+            }
+          },
+          styles: {
+            background: "#1e293b",
+            padding: "40px",
+            borderTop: "3px solid #667eea"
+          },
+          triggers: []
+        }
+      }
+    }
+  },
+
+  components: {
+    navbar: {
+      table: {},
+      modal: {
+        subscribeModal: {
+          "ui:widget": "modal",
+          "ui:title": "📬 Subscribe to Susant Blog",
+          "ui:theme": "light",
+          "ui:content": "Get the latest posts delivered straight to your inbox. No spam, unsubscribe anytime!",
+          "ui:fields": [
+            { label: "Your Name", type: "text", placeholder: "Jane Doe" },
+            { label: "Email Address", type: "email", placeholder: "jane@example.com" }
+          ],
+          "ui:actions": [
+            { label: "Maybe Later", action: "closeModal", variant: "secondary" },
+            { label: "Subscribe", action: "api:/newsletter/subscribe", variant: "primary" }
+          ]
+        }
+      },
+      uiSchema: {
+        logo: {
+          "ui:widget": "text",
+          "ui:content": "📝 Susant Blog",
+          "ui:styles": { 
+            fontSize: "26px", 
+            fontWeight: "700",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent"
+          }
+        },
+        links: {
+          "ui:widget": "navLinks",
+          "ui:theme": "light",
+          "ui:links": [
+            { label: "Home", action: "navigate:/susant-blog" },
+            { label: "About", action: "navigate:/susant-blog/about" },
+            { label: "Categories", action: "navigate:/susant-blog/categories" },
+            { label: "Contact", action: "navigate:/susant-blog/contact" },
+            { label: "Subscribe", action: "openModal:subscribeModal" }
+          ]
+        }
+      },
+      styles: {
+        background: "#ffffff",
+        borderBottom: "2px solid #f0f0f0",
+        padding: "20px 40px",
+        position: "fixed",
+        width: "100%",
+        zIndex: 1000,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
+      },
+      triggers: []
+    },
+
+    sidebar: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        authorCard: {
+          "ui:widget": "card",
+          "ui:title": "👨‍💻 About Author",
+          "ui:description": "Hi! I'm Susant, sharing my journey through tech, lifestyle, and travel.",
+          "ui:image": "https://i.pravatar.cc/150?img=12",
+          "ui:styles": { marginBottom: "30px" }
+        },
+        categories: {
+          "ui:widget": "heading",
+          "ui:text": "📂 Categories",
+          "ui:level": "h3",
+          "ui:styles": { marginBottom: "20px", fontSize: "1.2rem" }
+        },
+        categoryList: {
+          "ui:widget": "list",
+          "ui:ordered": false,
+          "ui:icon": "📌",
+          "ui:items": [
+            "Technology (45)",
+            "Lifestyle (32)",
+            "Travel (28)",
+            "Food & Culture (21)"
+          ]
+        },
+        popularHeading: {
+          "ui:widget": "heading",
+          "ui:text": "🔥 Popular Posts",
+          "ui:level": "h3",
+          "ui:styles": { marginTop: "40px", marginBottom: "20px" }
+        },
+        popularList: {
+          "ui:widget": "list",
+          "ui:ordered": true,
+          "ui:items": [
+            "10 Tips for Remote Work Success",
+            "Best Coffee Shops in Kathmandu",
+            "React Hooks Deep Dive"
+          ]
+        }
+      },
+      styles: {
+        width: "320px",
+        background: "#f8fafc",
+        padding: "120px 24px 24px",
+        minHeight: "100vh",
+        borderRight: "1px solid #e2e8f0"
+      },
+      triggers: []
+    },
+
+    main: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        hero: {
+          "ui:widget": "hero",
+          "ui:title": "Welcome to Susant Blog ✨",
+          "ui:subtitle": "Exploring technology, lifestyle, and everything in between. Join me on this journey!",
+          "ui:cta": {
+            label: "Read Latest Posts",
+            action: "scroll:#posts"
+          },
+          "ui:styles": {
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            minHeight: "500px",
+            padding: "150px 40px 100px"
+          }
+        },
+        
+        spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+        
+        featuredHeading: {
+          "ui:widget": "heading",
+          "ui:text": "⭐ Featured Articles",
+          "ui:level": "h2",
+          "ui:styles": { 
+            textAlign: "center", 
+            marginBottom: "50px",
+            fontSize: "2.5rem",
+            color: "#1e293b"
+          }
+        },
+
+        latestPosts: {
+          "ui:widget": "projectGrid",
+          "ui:animated": true
+        },
+
+        spacer2: { "ui:widget": "spacer", "ui:height": 80 },
+
+        newsletterSection: {
+          "ui:widget": "card",
+          "ui:title": "📬 Never Miss a Post",
+          "ui:description": "Subscribe to get notified about new articles, tips, and exclusive content delivered to your inbox.",
+          "ui:action": "openModal:subscribeModal",
+          "ui:buttonLabel": "Subscribe Now",
+          "ui:styles": {
+            maxWidth: "700px",
+            margin: "0 auto",
+            textAlign: "center",
+            padding: "40px",
+            background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+            color: "white",
+            border: "none"
+          }
+        },
+
+        spacer3: { "ui:widget": "spacer", "ui:height": 60 },
+
+        testimonialsHeading: {
+          "ui:widget": "heading",
+          "ui:text": "💬 What Readers Say",
+          "ui:level": "h2",
+          "ui:styles": { textAlign: "center", marginBottom: "50px" }
+        },
+
+        testimonial1: {
+          "ui:widget": "testimonial",
+          "ui:quote": "Susant's blog has been my go-to resource for tech insights. Clear, concise, and always valuable!",
+          "ui:author": "Priya Sharma",
+          "ui:role": "Software Developer",
+          "ui:avatar": "https://i.pravatar.cc/100?img=5",
+          "ui:rating": 5,
+          "ui:styles": { maxWidth: "600px", margin: "0 auto 30px" }
+        },
+
+        testimonial2: {
+          "ui:widget": "testimonial",
+          "ui:quote": "Love the lifestyle content! It's refreshing to see tech and personal growth combined so well.",
+          "ui:author": "Rajesh Kumar",
+          "ui:role": "Product Manager",
+          "ui:avatar": "https://i.pravatar.cc/100?img=8",
+          "ui:rating": 5,
+          "ui:styles": { maxWidth: "600px", margin: "0 auto 30px" }
+        }
+      },
+      styles: {
+        padding: "100px 40px 80px",
+        background: "#ffffff",
+        flex: 1,
+        minHeight: "100vh"
+      },
+      triggers: [
+        { event: "load", action: "fetchProjects", source: "posts.api" }
+      ]
+    },
+
+    modals: {
+      table: {},
+      modal: {},
+      uiSchema: {},
+      styles: {},
+      triggers: []
+    },
+
+    footer: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        footerHeading: {
+          "ui:widget": "heading",
+          "ui:text": "📝 Susant Blog",
+          "ui:level": "h3",
+          "ui:styles": { 
+            textAlign: "center", 
+            color: "#e2e8f0",
+            marginBottom: "20px"
+          }
+        },
+        footerDesc: {
+          "ui:widget": "paragraph",
+          "ui:text": "Sharing insights on technology, lifestyle, and travel. Join thousands of readers worldwide.",
+          "ui:styles": {
+            textAlign: "center",
+            color: "#94a3b8",
+            maxWidth: "600px",
+            margin: "0 auto 30px"
+          }
+        },
+        socialIcons: {
+          "ui:widget": "socialIcons",
+          "ui:size": "medium",
+          "ui:icons": [
+            { emoji: "🐦", url: "https://twitter.com/susant" },
+            { emoji: "📷", url: "https://instagram.com/susant" },
+            { emoji: "💼", url: "https://linkedin.com/in/susant" },
+            { emoji: "📧", url: "mailto:susant@example.com" }
+          ]
+        },
+        divider: {
+          "ui:widget": "divider",
+          "ui:variant": "solid",
+          "ui:color": "#475569",
+          "ui:spacing": "large"
+        },
+        footerText: {
+          "ui:widget": "text",
+          "ui:content": "© 2024 Susant Blog. Made with ❤️ and lots of ☕",
+          "ui:styles": { 
+            textAlign: "center", 
+            color: "#94a3b8", 
+            fontSize: "14px"
+          }
+        }
+      },
+      styles: {
+        background: "#1e293b",
+        padding: "60px 40px 40px",
+        borderTop: "3px solid #667eea"
+      },
+      triggers: []
+    }
+  }
+},
+
+{
+  title: "Robin Devkota - Portfolio",
+  slug: "robin-devkota",
+  projectUUID: "portfolio",
+  taskUUID: "001",
+  status: "Active",
+  accountValidation: false,
+  otpValidation: false,
+  isAnonymous: true,
+  
+  initialization: {
+    resources: [
+      { key: "projects.api", url: "https://api.github.com/users/github/repos" }
+    ]
+  },
+  
+  // 🔥 SUB-PAGES DEFINITION
+  pages: {
+    about: {
+      title: "About Robin Devkota",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "Robin Devkota",
+              "ui:styles": { fontSize: "24px", fontWeight: "bold", color: "#fff" }
+            },
+            links: {
+              "ui:widget": "navLinks",
+              "ui:theme": "dark",
+              "ui:links": [
+                { label: "Home", action: "navigate:/robin-devkota" },
+                { label: "About", action: "navigate:/robin-devkota/about" },
+                { label: "Projects", action: "navigate:/robin-devkota/projects" },
+                { label: "Contact", action: "navigate:/robin-devkota/contact" }
+              ]
+            }
+          },
+          styles: {
+            background: "#0f172a",
+            color: "#e2e8f0",
+            position: "fixed",
+            padding: "16px 32px",
+            width: "100%",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+        main: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            hero: {
+              "ui:widget": "hero",
+              "ui:title": "About Me 👨‍💻",
+              "ui:subtitle": "Passionate developer building the future of web",
+              "ui:styles": {
+                background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+                minHeight: "500px"
+              }
+            },
+            spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+            bioHeading: {
+              "ui:widget": "heading",
+              "ui:text": "My Story",
+              "ui:level": "h2",
+              "ui:styles": { textAlign: "center", marginBottom: "30px", color: "#1e293b" }
+            },
+            bio: {
+              "ui:widget": "paragraph",
+              "ui:text": "I'm a full-stack developer with 5+ years of experience building scalable web applications. I specialize in React, Next.js, TypeScript, and Node.js. My passion lies in creating elegant solutions to complex problems and mentoring junior developers.",
+              "ui:styles": {
+                textAlign: "center",
+                maxWidth: "800px",
+                margin: "0 auto 40px",
+                fontSize: "1.1rem",
+                lineHeight: "1.8",
+                color: "#64748b"
+              }
+            },
+            spacer2: { "ui:widget": "spacer", "ui:height": 60 },
+            skillsHeading: {
+              "ui:widget": "heading",
+              "ui:text": "Technical Skills",
+              "ui:level": "h2",
+              "ui:styles": { textAlign: "center", marginBottom: "40px" }
+            },
+            skillsProgress: {
+              "ui:widget": "progressBar",
+              "ui:label": "JavaScript/TypeScript",
+              "ui:value": 95,
+              "ui:color": "#f0db4f",
+              "ui:styles": { maxWidth: "600px", margin: "0 auto" }
+            },
+            reactProgress: {
+              "ui:widget": "progressBar",
+              "ui:label": "React & Next.js",
+              "ui:value": 90,
+              "ui:color": "#61dafb",
+              "ui:styles": { maxWidth: "600px", margin: "0 auto" }
+            },
+            nodeProgress: {
+              "ui:widget": "progressBar",
+              "ui:label": "Node.js & Express",
+              "ui:value": 85,
+              "ui:color": "#68a063",
+              "ui:styles": { maxWidth: "600px", margin: "0 auto" }
+            }
+          },
+          styles: {
+            padding: "100px 40px 80px",
+            background: "#f8fafc",
+            minHeight: "100vh"
+          },
+          triggers: []
+        },
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 Robin Devkota. All rights reserved.",
+              "ui:styles": { textAlign: "center", color: "#94a3b8", fontSize: "15px" }
+            }
+          },
+          styles: {
+            background: "#0f172a",
+            padding: "40px",
+            borderTop: "3px solid #667eea"
+          },
+          triggers: []
+        }
+      }
+    },
+
+    contact: {
+      title: "Contact Robin",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "Robin Devkota",
+              "ui:styles": { fontSize: "24px", fontWeight: "bold", color: "#fff" }
+            },
+            links: {
+              "ui:widget": "navLinks",
+              "ui:theme": "dark",
+              "ui:links": [
+                { label: "Home", action: "navigate:/robin-devkota" },
+                { label: "About", action: "navigate:/robin-devkota/about" },
+                { label: "Projects", action: "navigate:/robin-devkota/projects" },
+                { label: "Contact", action: "navigate:/robin-devkota/contact" }
+              ]
+            }
+          },
+          styles: {
+            background: "#0f172a",
+            color: "#e2e8f0",
+            position: "fixed",
+            padding: "16px 32px",
+            width: "100%",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+        main: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            hero: {
+              "ui:widget": "hero",
+              "ui:title": "Get In Touch 📧",
+              "ui:subtitle": "Let's build something amazing together",
+              "ui:styles": {
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                minHeight: "400px"
+              }
+            },
+            spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+            formHeading: {
+              "ui:widget": "heading",
+              "ui:text": "Send Me a Message",
+              "ui:level": "h2",
+              "ui:styles": { textAlign: "center", marginBottom: "40px" }
+            },
+            nameField: {
+              "ui:widget": "inputField",
+              "ui:label": "Your Name",
+              "ui:name": "name",
+              "ui:placeholder": "John Doe",
+              "ui:type": "text",
+              "ui:required": true,
+              "ui:styles": { maxWidth: "600px", margin: "0 auto" }
+            },
+            emailField: {
+              "ui:widget": "inputField",
+              "ui:label": "Email Address",
+              "ui:name": "email",
+              "ui:placeholder": "john@example.com",
+              "ui:type": "email",
+              "ui:required": true,
+              "ui:styles": { maxWidth: "600px", margin: "0 auto" }
+            },
+            messageField: {
+              "ui:widget": "textareaField",
+              "ui:label": "Your Message",
+              "ui:name": "message",
+              "ui:rows": 6,
+              "ui:required": true,
+              "ui:styles": { maxWidth: "600px", margin: "0 auto" }
+            },
+            submitBtn: {
+              "ui:widget": "button",
+              "ui:label": "Send Message 🚀",
+              "ui:variant": "primary",
+              "ui:size": "large",
+              "ui:action": "api:/contact/send",
+              "ui:styles": {
+                maxWidth: "600px",
+                width: "100%",
+                margin: "20px auto",
+                display: "block"
+              }
+            },
+            spacer2: { "ui:widget": "spacer", "ui:height": 60 },
+            contactInfo: {
+              "ui:widget": "heading",
+              "ui:text": "Other Ways to Reach Me",
+              "ui:level": "h3",
+              "ui:styles": { textAlign: "center", marginBottom: "30px" }
+            },
+            socialIcons: {
+              "ui:widget": "socialIcons",
+              "ui:size": "large",
+              "ui:icons": [
+                { emoji: "📧", url: "mailto:robin@example.com" },
+                { emoji: "💼", url: "https://linkedin.com/in/robindevkota" },
+                { emoji: "🐙", url: "https://github.com/robindevkota" },
+                { emoji: "🐦", url: "https://twitter.com/robindevkota" }
+              ]
+            }
+          },
+          styles: {
+            padding: "100px 40px 80px",
+            background: "#f8fafc",
+            minHeight: "100vh"
+          },
+          triggers: []
+        },
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 Robin Devkota. All rights reserved.",
+              "ui:styles": { textAlign: "center", color: "#94a3b8" }
+            }
+          },
+          styles: {
+            background: "#0f172a",
+            padding: "40px",
+            borderTop: "3px solid #667eea"
+          },
+          triggers: []
+        }
+      }
+    },
+
+    projects: {
+      title: "My Projects",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "Robin Devkota",
+              "ui:styles": { fontSize: "24px", fontWeight: "bold", color: "#fff" }
+            },
+            links: {
+              "ui:widget": "navLinks",
+              "ui:theme": "dark",
+              "ui:links": [
+                { label: "Home", action: "navigate:/robin-devkota" },
+                { label: "About", action: "navigate:/robin-devkota/about" },
+                { label: "Projects", action: "navigate:/robin-devkota/projects" },
+                { label: "Contact", action: "navigate:/robin-devkota/contact" }
+              ]
+            }
+          },
+          styles: {
+            background: "#0f172a",
+            color: "#e2e8f0",
+            position: "fixed",
+            padding: "16px 32px",
+            width: "100%",
+            zIndex: 1000,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+        main: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            hero: {
+              "ui:widget": "hero",
+              "ui:title": "My Work 🚀",
+              "ui:subtitle": "Check out my latest projects and contributions",
+              "ui:styles": {
+                background: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
+                minHeight: "400px"
+              }
+            },
+            spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+            projectsGrid: {
+              "ui:widget": "projectGrid",
+              "ui:animated": true
+            }
+          },
+          styles: {
+            padding: "100px 40px 80px",
+            background: "#f8fafc",
+            minHeight: "100vh"
+          },
+          triggers: [
+            { event: "load", action: "fetchProjects", source: "projects.api" }
+          ]
+        },
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 Robin Devkota. All rights reserved.",
+              "ui:styles": { textAlign: "center", color: "#94a3b8" }
+            }
+          },
+          styles: {
+            background: "#0f172a",
+            padding: "40px",
+            borderTop: "3px solid #667eea"
+          },
+          triggers: []
+        }
+      }
+    }
+  },
+
+  // 🔥 MAIN PAGE (robin-devkota/)
+  components: {
+    navbar: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        logo: {
+          "ui:widget": "text",
+          "ui:content": "Robin Devkota",
+          "ui:styles": { fontSize: "24px", fontWeight: "bold", color: "#fff" }
+        },
+        links: {
+          "ui:widget": "navLinks",
+          "ui:theme": "dark",
+          "ui:links": [
+            { label: "Home", action: "navigate:/robin-devkota" },
+            { label: "About", action: "navigate:/robin-devkota/about" },
+            { label: "Projects", action: "navigate:/robin-devkota/projects" },
+            { label: "Contact", action: "navigate:/robin-devkota/contact" }
+          ]
+        }
+      },
+      styles: {
+        background: "#0f172a",
+        color: "#e2e8f0",
+        position: "fixed",
+        padding: "16px 32px",
+        width: "100%",
+        zIndex: 1000,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+      },
+      triggers: []
+    },
+    sidebar: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        skills: {
+          "ui:widget": "skillRadar",
+          "ui:skills": [
+            { name: "React", level: 90 },
+            { name: "Next.js", level: 85 },
+            { name: "TypeScript", level: 80 },
+            { name: "Node.js", level: 75 },
+            { name: "MongoDB", level: 70 }
+          ]
+        }
+      },
+      styles: {
+        width: "280px",
+        background: "#1e293b",
+        padding: "24px",
+        minHeight: "100vh",
+        paddingTop: "100px"
+      },
+      triggers: []
+    },
+    main: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        hero: {
+          "ui:widget": "hero",
+          "ui:title": "Full Stack Developer",
+          "ui:subtitle": "Building modern web applications with passion and precision",
+          "ui:cta": {
+            label: "View My Work",
+            action: "navigate:/robin-devkota/projects"
+          },
+          "ui:styles": {
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            minHeight: "600px",
+            padding: "150px 40px 100px"
+          }
+        },
+        spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+        featuresHeading: {
+          "ui:widget": "heading",
+          "ui:text": "What I Do Best",
+          "ui:level": "h2",
+          "ui:styles": { textAlign: "center", marginBottom: "50px" }
+        },
+        feature1: {
+          "ui:widget": "card",
+          "ui:title": "🎨 Frontend Development",
+          "ui:description": "Creating beautiful, responsive user interfaces with React, Next.js, and modern CSS",
+          "ui:styles": { maxWidth: "350px", margin: "0 auto 30px" }
+        },
+        feature2: {
+          "ui:widget": "card",
+          "ui:title": "⚙️ Backend Development",
+          "ui:description": "Building scalable APIs and services with Node.js, Express, and MongoDB",
+          "ui:styles": { maxWidth: "350px", margin: "0 auto 30px" }
+        },
+        feature3: {
+          "ui:widget": "card",
+          "ui:title": "🚀 Full-Stack Solutions",
+          "ui:description": "End-to-end web application development from concept to deployment",
+          "ui:styles": { maxWidth: "350px", margin: "0 auto 30px" }
+        }
+      },
+      styles: {
+        padding: "100px 40px 80px",
+        background: "#f8fafc",
+        flex: 1,
+        minHeight: "100vh"
+      },
+      triggers: []
+    },
+    modals: {
+      table: {},
+      modal: {},
+      uiSchema: {},
+      styles: {},
+      triggers: []
+    },
+    footer: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        footerText: {
+          "ui:widget": "text",
+          "ui:content": "© 2024 Robin Devkota. All rights reserved.",
+          "ui:styles": {
+            textAlign: "center",
+            color: "#94a3b8",
+            fontSize: "15px",
+            marginBottom: "20px"
+          }
+        },
+        socialIcons: {
+          "ui:widget": "socialIcons",
+          "ui:size": "medium",
+          "ui:icons": [
+            { emoji: "💼", url: "https://linkedin.com/in/robindevkota" },
+            { emoji: "🐙", url: "https://github.com/robindevkota" },
+            { emoji: "🐦", url: "https://twitter.com/robindevkota" },
+            { emoji: "📧", url: "mailto:robin@example.com" }
+          ]
+        }
+      },
+      styles: {
+        background: "#0f172a",
+        padding: "60px 40px 40px",
+        borderTop: "3px solid #667eea"
+      },
+      triggers: []
+    }
+  }
+},
+
   {
     title: "TechVibe - Modern Tech Blog",
     slug: "techvibe-blog",
