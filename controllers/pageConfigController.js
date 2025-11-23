@@ -19,6 +19,15 @@ exports.getPageBySlug = async (req, res) => {
   try {
     const page = await PageConfig.findOne({ slug: req.params.slug });
     if (!page) return res.status(404).json({ message: 'Page not found' });
+    
+    // Log what we're sending
+    console.log(`📤 Sending page config for: ${page.slug}`);
+    console.log(`   - Has navbar: ${!!page.components?.navbar}`);
+    console.log(`   - Has sidebar: ${!!page.components?.sidebar}`);
+    console.log(`   - Has main: ${!!page.components?.main}`);
+    console.log(`   - Has modals: ${!!page.components?.modals}`);
+    console.log(`   - Has footer: ${!!page.components?.footer}`);
+    
     res.json(page);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -28,13 +37,37 @@ exports.getPageBySlug = async (req, res) => {
 // CREATE new page config
 exports.createPage = async (req, res) => {
   try {
-    const page = new PageConfig(req.body);
+    // Ensure all components have required fields
+    const components = req.body.components || {};
+    const processedComponents = {};
+    
+    ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
+      if (components[compName]) {
+        processedComponents[compName] = {
+          table: components[compName].table || {},
+          modal: components[compName].modal || {},
+          uiSchema: components[compName].uiSchema || {},
+          styles: components[compName].styles || {},
+          triggers: components[compName].triggers || []
+        };
+      }
+    });
+    
+    const pageData = {
+      ...req.body,
+      components: processedComponents
+    };
+    
+    const page = new PageConfig(pageData);
     await page.save();
+    
+    console.log(`✅ Created page: ${page.slug}`);
     res.status(201).json(page);
   } catch (err) {
     if (err.code === 11000) {
       return res.status(400).json({ message: 'Slug already exists' });
     }
+    console.error('❌ Create error:', err);
     res.status(400).json({ message: err.message });
   }
 };
@@ -42,7 +75,26 @@ exports.createPage = async (req, res) => {
 // UPDATE page config
 exports.updatePage = async (req, res) => {
   try {
-    const updateData = { ...req.body };
+    // Ensure all components have required fields
+    const components = req.body.components || {};
+    const processedComponents = {};
+    
+    ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
+      if (components[compName]) {
+        processedComponents[compName] = {
+          table: components[compName].table || {},
+          modal: components[compName].modal || {},
+          uiSchema: components[compName].uiSchema || {},
+          styles: components[compName].styles || {},
+          triggers: components[compName].triggers || []
+        };
+      }
+    });
+
+    const updateData = {
+      ...req.body,
+      components: processedComponents
+    };
 
     const page = await PageConfig.findOneAndUpdate(
       { slug: req.params.slug },
@@ -57,10 +109,11 @@ exports.updatePage = async (req, res) => {
       return res.status(404).json({ message: "Page not found" });
     }
 
+    console.log(`✅ Updated page: ${page.slug} (v${page.version})`);
     res.json(page);
 
   } catch (err) {
-    console.error("Update Error:", err);
+    console.error("❌ Update Error:", err);
     res.status(400).json({ message: err.message });
   }
 };
@@ -74,6 +127,8 @@ exports.deletePage = async (req, res) => {
       { new: true }
     );
     if (!page) return res.status(404).json({ message: 'Page not found' });
+    
+    console.log(`🗑️  Deleted page: ${page.slug}`);
     res.json({ message: 'Page deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
