@@ -1,11 +1,23 @@
 const mongoose = require('mongoose');
 
 const ComponentSchema = new mongoose.Schema({
-  table: { type: Object, default: {} },      // 🆕 Table configuration
-  modal: { type: Object, default: {} },      // 🆕 Modal configuration
-  uiSchema: { type: Object, default: {} },   // UI widgets config
-  styles: { type: Object, default: {} },     // Component styles
-  triggers: { type: Array, default: [] }     // Event triggers
+  table: { type: Object, default: {} },
+  modal: { type: Object, default: {} },
+  uiSchema: { type: Object, default: {} },
+  styles: { type: Object, default: {} },
+  triggers: { type: Array, default: [] }
+}, { _id: false });
+
+// 🆕 Sub-page Schema
+const SubPageSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  components: {
+    navbar: ComponentSchema,
+    sidebar: ComponentSchema,
+    main: ComponentSchema,
+    modals: ComponentSchema,
+    footer: ComponentSchema
+  }
 }, { _id: false });
 
 const PageConfigSchema = new mongoose.Schema({
@@ -25,6 +37,14 @@ const PageConfigSchema = new mongoose.Schema({
     }]
   },
   
+  // 🆕 ADD THIS: Sub-pages
+  pages: {
+    type: Map,
+    of: SubPageSchema,
+    default: {}
+  },
+  
+  // Main page components
   components: {
     navbar: ComponentSchema,
     sidebar: ComponentSchema,
