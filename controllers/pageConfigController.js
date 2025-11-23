@@ -15,25 +15,84 @@ exports.getAllPages = async (req, res) => {
 };
 
 // GET single page config by slug (for renderer)
+// GET single page config by slug (for renderer)
+// GET single page config by slug (for renderer)
+// GET single page config by slug (for renderer)
 exports.getPageBySlug = async (req, res) => {
   try {
-    const page = await PageConfig.findOne({ slug: req.params.slug });
+    const APIConfig = require('../models/APIConfig');
+    
+    const page = await PageConfig.findOne({ 
+      slug: req.params.slug,
+      status: { $ne: 'Deleted' } 
+    });
+    
     if (!page) return res.status(404).json({ message: 'Page not found' });
     
-    // Log what we're sending
     console.log(`📤 Sending page config for: ${page.slug}`);
-    console.log(`   - Has navbar: ${!!page.components?.navbar}`);
-    console.log(`   - Has sidebar: ${!!page.components?.sidebar}`);
-    console.log(`   - Has main: ${!!page.components?.main}`);
-    console.log(`   - Has modals: ${!!page.components?.modals}`);
-    console.log(`   - Has footer: ${!!page.components?.footer}`);
     
-    res.json(page);
+    // 🔥 FIX: Convert Mongoose Map to plain object
+    const pageObject = page.toObject();
+    
+    // 🔥 Convert pages Map to regular object
+    if (pageObject.pages && pageObject.pages instanceof Map) {
+      pageObject.pages = Object.fromEntries(pageObject.pages);
+    }
+    
+    console.log(`   - Sub-pages available:`, Object.keys(pageObject.pages || {}));
+    
+    // 🆕 RESOLVE API REFERENCES
+    if (pageObject.initialization?.resources && Array.isArray(pageObject.initialization.resources)) {
+      const firstResource = pageObject.initialization.resources[0];
+      
+      // If resources are strings (API keys), resolve them
+      if (typeof firstResource === "string") {
+        console.log(`🔍 Resolving ${pageObject.initialization.resources.length} API keys...`);
+        
+        const apiKeys = pageObject.initialization.resources;
+        const apis = await APIConfig.find({
+          key: { $in: apiKeys },
+          isActive: true,
+        });
+        
+        console.log(`✅ Found ${apis.length} API configurations`);
+        
+        // Convert to object map for easy lookup
+        const apisMap = {};
+        apis.forEach(api => {
+          apisMap[api.key] = {
+            key: api.key,
+            url: api.url,
+            method: api.method,
+            headers: api.headers,
+            transformPayload: api.transformPayload,
+            successNotification: api.successNotification,
+            errorNotification: api.errorNotification,
+            closeModalOnSuccess: api.closeModalOnSuccess,
+            storeResponse: api.storeResponse,
+            storeKey: api.storeKey,
+            onSuccess: api.onSuccess,
+            onError: api.onError,
+            onNetworkError: api.onNetworkError,
+          };
+        });
+        
+        // Return page with resolved APIs
+        return res.json({
+          ...pageObject,
+          resolvedAPIs: apisMap,
+        });
+      }
+    }
+    
+    // If old format (full objects) or no resources, return as-is
+    res.json(pageObject);
+    
   } catch (err) {
+    console.error('❌ Error fetching page:', err);
     res.status(500).json({ message: err.message });
   }
 };
-
 // CREATE new page config
 exports.createPage = async (req, res) => {
   try {

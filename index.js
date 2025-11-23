@@ -34,8 +34,9 @@ mongoose.connect(MONGO_URI, {
 
 // Routes
 const pageRoutes = require("./routes/pageConfigRoutes");
+const apiConfigRoutes = require("./routes/apiConfigRoutes");
 app.use("/api/pages", pageRoutes);
-
+app.use("/api/api-configs", apiConfigRoutes);
 // Health check
 app.get("/", (req, res) => {
   res.json({ message: "Dynamic Website Engine API Running" });
