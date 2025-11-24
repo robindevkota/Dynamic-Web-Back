@@ -10,7 +10,7 @@ mongoose.connect(
 );
 
 const websites = [
-  {
+   {
     title: "ShopZone - Modern E-commerce",
     slug: "shopzone",
     projectUUID: "ecom-shopzone",
@@ -144,15 +144,16 @@ input:focus, textarea:focus, select:focus {
 .mb-4 {
   margin-bottom: 2rem;
 }
+
   `,
       resources: [
-    // 🆕 NEW FORMAT: Just reference the keys!
-    "auth.login",
-    "auth.signup", 
-    "auth.forgot",
-    "products.api",
-    "checkout.complete"
-  ],
+        // 🆕 NEW FORMAT: Just reference the keys!
+        "auth.login",
+        "auth.signup",
+        "auth.forgot",
+        "products.api",
+        "checkout.complete",
+      ],
     },
 
     pages: {
@@ -162,11 +163,12 @@ input:focus, textarea:focus, select:focus {
           navbar: {
             table: {},
             modal: {
-              // ✅ AUTH MODAL WITH VALIDATION
+              // ✅ ADD ALL MODALS HERE TOO
               authModal: {
                 "ui:title": "🔐 Welcome to ShopZone",
                 "ui:theme": "light",
-                "ui:content": "Sign in to access your account and start shopping!",
+                "ui:content":
+                  "Sign in to access your account and start shopping!",
                 "ui:minHeight": "400px",
                 "ui:fields": [
                   {
@@ -179,7 +181,7 @@ input:focus, textarea:focus, select:focus {
                       required: true,
                       requiredMessage: "Email is required",
                       email: true,
-                      emailMessage: "Please enter a valid email address",
+                      emailMessage: "Please enter a valid email",
                     },
                   },
                   {
@@ -192,7 +194,8 @@ input:focus, textarea:focus, select:focus {
                       required: true,
                       requiredMessage: "Password is required",
                       minLength: 6,
-                      minLengthMessage: "Password must be at least 6 characters",
+                      minLengthMessage:
+                        "Password must be at least 6 characters",
                     },
                   },
                 ],
@@ -216,7 +219,6 @@ input:focus, textarea:focus, select:focus {
                 ],
               },
 
-              // ✅ SIGNUP MODAL WITH VALIDATION
               signupModal: {
                 "ui:title": "✨ Create Your Account",
                 "ui:theme": "light",
@@ -224,30 +226,11 @@ input:focus, textarea:focus, select:focus {
                 "ui:minHeight": "500px",
                 "ui:fields": [
                   {
-                    label: "Full Name",
-                    type: "text",
-                    placeholder: "John Doe",
-                    name: "fullName",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Full name is required",
-                      minLength: 3,
-                      minLengthMessage: "Name must be at least 3 characters",
-                    },
-                  },
-                  {
                     label: "Email Address",
                     type: "email",
                     placeholder: "you@example.com",
                     name: "email",
                     required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Email is required",
-                      email: true,
-                      emailMessage: "Please enter a valid email address",
-                    },
                   },
                   {
                     label: "Password",
@@ -255,14 +238,6 @@ input:focus, textarea:focus, select:focus {
                     placeholder: "Create a strong password",
                     name: "password",
                     required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Password is required",
-                      minLength: 8,
-                      minLengthMessage: "Password must be at least 8 characters",
-                      pattern: "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*#?&]{8,}$",
-                      patternMessage: "Password must contain letters and numbers",
-                    },
                   },
                   {
                     label: "Confirm Password",
@@ -270,12 +245,6 @@ input:focus, textarea:focus, select:focus {
                     placeholder: "Re-enter your password",
                     name: "confirmPassword",
                     required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Please confirm your password",
-                      match: "password",
-                      matchMessage: "Passwords do not match",
-                    },
                   },
                 ],
                 "ui:actions": [
@@ -293,11 +262,11 @@ input:focus, textarea:focus, select:focus {
                 ],
               },
 
-              // ✅ FORGOT PASSWORD MODAL WITH VALIDATION
               forgotModal: {
-                "ui:title": "🔒 Reset Your Password",
+                "ui:title": "🔑 Reset Your Password",
                 "ui:theme": "light",
-                "ui:content": "Enter your email address and we'll send you an OTP to reset your password.",
+                "ui:content":
+                  "Enter your email address and we'll send you an OTP to reset your password.",
                 "ui:minHeight": "350px",
                 "ui:fields": [
                   {
@@ -306,12 +275,6 @@ input:focus, textarea:focus, select:focus {
                     placeholder: "you@example.com",
                     name: "email",
                     required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Email is required",
-                      email: true,
-                      emailMessage: "Please enter a valid email address",
-                    },
                   },
                 ],
                 "ui:actions": [
@@ -328,140 +291,16 @@ input:focus, textarea:focus, select:focus {
                   },
                 ],
               },
-
-              // ✅ NEW: OTP VERIFICATION MODAL
-              otpModal: {
-                "ui:title": "📱 Verify OTP",
-                "ui:theme": "light",
-                "ui:content": "Enter the 6-digit OTP sent to your email address.",
-                "ui:minHeight": "350px",
-                "ui:fields": [
-                  {
-                    label: "Email Address",
-                    type: "email",
-                    placeholder: "you@example.com",
-                    name: "email",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Email is required",
-                      email: true,
-                      emailMessage: "Please enter a valid email address",
-                    },
-                  },
-                  {
-                    label: "OTP Code",
-                    type: "text",
-                    placeholder: "123456",
-                    name: "otp",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "OTP is required",
-                      pattern: "^[0-9]{6}$",
-                      patternMessage: "OTP must be 6 digits",
-                    },
-                  },
-                ],
-                "ui:actions": [
-                  {
-                    label: "Resend OTP",
-                    action: "api:auth.forgot",
-                    variant: "secondary",
-                    apiKey: "auth.forgot",
-                  },
-                  {
-                    label: "Verify OTP",
-                    action: "api:auth.verifyOtp",
-                    variant: "primary",
-                    apiKey: "auth.verifyOtp",
-                  },
-                ],
-              },
-
-              // ✅ CHECKOUT MODAL WITH VALIDATION
-              checkoutModal: {
-                "ui:title": "💳 Checkout",
-                "ui:theme": "light",
-                "ui:content": "Complete your purchase securely. Total: $520.30",
-                "ui:minHeight": "500px",
-                "ui:fields": [
-                  {
-                    label: "Card Number",
-                    type: "text",
-                    placeholder: "1234 5678 9012 3456",
-                    name: "cardNumber",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Card number is required",
-                      pattern: "^[0-9]{16}$",
-                      patternMessage: "Card number must be 16 digits",
-                    },
-                  },
-                  {
-                    label: "Cardholder Name",
-                    type: "text",
-                    placeholder: "John Doe",
-                    name: "cardName",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Cardholder name is required",
-                      minLength: 3,
-                      minLengthMessage: "Name must be at least 3 characters",
-                    },
-                  },
-                  {
-                    label: "Expiry Date (MM/YY)",
-                    type: "text",
-                    placeholder: "12/25",
-                    name: "expiry",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Expiry date is required",
-                      pattern: "^(0[1-9]|1[0-2])\\/[0-9]{2}$",
-                      patternMessage: "Format must be MM/YY",
-                    },
-                  },
-                  {
-                    label: "CVV",
-                    type: "password",
-                    placeholder: "123",
-                    name: "cvv",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "CVV is required",
-                      pattern: "^[0-9]{3,4}$",
-                      patternMessage: "CVV must be 3 or 4 digits",
-                    },
-                  },
-                ],
-                "ui:actions": [
-                  {
-                    label: "Cancel",
-                    action: "closeModal",
-                    variant: "secondary",
-                  },
-                  {
-                    label: "Complete Purchase $520.30",
-                    action: "api:checkout.complete",
-                    variant: "primary",
-                    apiKey: "checkout.complete",
-                  },
-                ],
-              },
             },
             uiSchema: {
               logo: {
                 "ui:widget": "text",
-                "ui:content": "🛒️ ShopZone",
+                "ui:content": "🛍️ ShopZone",
                 "ui:styles": {
                   fontSize: "28px",
                   fontWeight: "800",
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   cursor: "pointer",
@@ -472,7 +311,10 @@ input:focus, textarea:focus, select:focus {
                 "ui:theme": "light",
                 "ui:links": [
                   { label: "Home", action: "navigate:/shopzone" },
-                  { label: "Categories", action: "navigate:/shopzone/categories" },
+                  {
+                    label: "Categories",
+                    action: "navigate:/shopzone/categories",
+                  },
                   { label: "Cart (3)", action: "navigate:/shopzone/cart" },
                   { label: "Login", action: "openModal:authModal" },
                 ],
@@ -518,8 +360,10 @@ input:focus, textarea:focus, select:focus {
               cartItem1: {
                 "ui:widget": "card",
                 "ui:title": "Wireless Headphones",
-                "ui:description": "Premium noise-cancelling headphones with 30-hour battery life. Quantity: 1",
-                "ui:image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+                "ui:description":
+                  "Premium noise-cancelling headphones with 30-hour battery life. Quantity: 1",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
                 "ui:styles": {
                   display: "flex",
                   flexDirection: "row",
@@ -533,8 +377,10 @@ input:focus, textarea:focus, select:focus {
               cartItem2: {
                 "ui:widget": "card",
                 "ui:title": "Smart Watch Series 7",
-                "ui:description": "Fitness tracker with heart rate monitor and GPS. Quantity: 1",
-                "ui:image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
+                "ui:description":
+                  "Fitness tracker with heart rate monitor and GPS. Quantity: 1",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
                 "ui:styles": {
                   display: "flex",
                   flexDirection: "row",
@@ -548,8 +394,10 @@ input:focus, textarea:focus, select:focus {
               cartItem3: {
                 "ui:widget": "card",
                 "ui:title": "Laptop Stand Aluminum",
-                "ui:description": "Ergonomic adjustable laptop stand for desk. Quantity: 2",
-                "ui:image": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop",
+                "ui:description":
+                  "Ergonomic adjustable laptop stand for desk. Quantity: 2",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop",
                 "ui:styles": {
                   display: "flex",
                   flexDirection: "row",
@@ -569,14 +417,16 @@ input:focus, textarea:focus, select:focus {
               totalCard: {
                 "ui:widget": "card",
                 "ui:title": "Order Summary",
-                "ui:description": "Subtotal: $458.00 | Shipping: $15.00 | Tax: $47.30 | Total: $520.30",
+                "ui:description":
+                  "Subtotal: $458.00 | Shipping: $15.00 | Tax: $47.30 | Total: $520.30",
                 "ui:action": "openModal:checkoutModal",
                 "ui:buttonLabel": "Proceed to Checkout 💳",
                 "ui:styles": {
                   maxWidth: "900px",
                   margin: "0 auto",
                   padding: "30px",
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  background:
+                    "linear-gradient(135deg, #47b81aff 0%, #764ba2 100%)",
                   color: "white",
                   textAlign: "center",
                 },
@@ -585,6 +435,168 @@ input:focus, textarea:focus, select:focus {
             styles: {
               padding: "120px 40px 80px",
               background: "#f8fafc",
+              minHeight: "100vh",
+              color: "#00ff2aff",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 ShopZone. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "40px",
+              borderTop: "3px solid #667eea",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      categories: {
+        title: "Product Categories",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🛍️ ShopZone",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/shopzone" },
+                  {
+                    label: "Categories",
+                    action: "navigate:/shopzone/categories",
+                  },
+                  { label: "Cart (3)", action: "navigate:/shopzone/cart" },
+                  { label: "Login", action: "openModal:authModal" },
+                ],
+              },
+            },
+
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #f0f0f0",
+              padding: "20px 50px",
+              position: "sticky", // Changed from "fixed"
+              top: 0,
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              hero: {
+                "ui:widget": "hero",
+                "ui:title": "Shop by Category 🏷️",
+                "ui:subtitle":
+                  "Discover amazing products across our curated collections",
+                "ui:styles": {
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  minHeight: "400px",
+                },
+              },
+
+              spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+
+              electronicsCard: {
+                "ui:widget": "card",
+                "ui:title": "💻 Electronics",
+                "ui:description":
+                  "Latest gadgets, smartphones, laptops, and tech accessories",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=600&h=400&fit=crop",
+                "ui:action": "navigate:/shopzone",
+                "ui:buttonLabel": "Browse Electronics",
+                "ui:styles": {
+                  maxWidth: "800px",
+                  margin: "0 auto 40px",
+                  minHeight: "280px",
+                },
+                "ui:imageStyles": {
+                  height: "250px",
+                  objectFit: "cover",
+                },
+              },
+
+              fashionCard: {
+                "ui:widget": "card",
+                "ui:title": "👗 Fashion & Apparel",
+                "ui:description":
+                  "Trending clothing, shoes, and accessories for every style",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=400&fit=crop",
+                "ui:action": "navigate:/shopzone",
+                "ui:buttonLabel": "Browse Fashion",
+                "ui:styles": {
+                  maxWidth: "800px",
+                  margin: "0 auto 40px",
+                  minHeight: "280px",
+                },
+                "ui:imageStyles": {
+                  height: "250px",
+                  objectFit: "cover",
+                },
+              },
+
+              homeCard: {
+                "ui:widget": "card",
+                "ui:title": "🏠 Home & Living",
+                "ui:description":
+                  "Furniture, decor, kitchen essentials, and more for your space",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=400&fit=crop",
+                "ui:action": "navigate:/shopzone",
+                "ui:buttonLabel": "Browse Home & Living",
+                "ui:styles": {
+                  maxWidth: "800px",
+                  margin: "0 auto 40px",
+                  minHeight: "280px",
+                },
+                "ui:imageStyles": {
+                  height: "250px",
+                  objectFit: "cover",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#ffffff",
               minHeight: "100vh",
             },
             triggers: [],
@@ -624,24 +636,12 @@ input:focus, textarea:focus, select:focus {
                 type: "email",
                 placeholder: "you@example.com",
                 name: "email",
-                validation: {
-                  required: true,
-                  requiredMessage: "Email is required",
-                  email: true,
-                  emailMessage: "Please enter a valid email address",
-                },
               },
               {
                 label: "Password",
                 type: "password",
                 placeholder: "Enter your password",
                 name: "password",
-                validation: {
-                  required: true,
-                  requiredMessage: "Password is required",
-                  minLength: 6,
-                  minLengthMessage: "Password must be at least 6 characters",
-                },
               },
             ],
             "ui:actions": [
@@ -673,48 +673,24 @@ input:focus, textarea:focus, select:focus {
                 type: "text",
                 placeholder: "John Doe",
                 name: "fullName",
-                validation: {
-                  required: true,
-                  requiredMessage: "Full name is required",
-                  minLength: 3,
-                  minLengthMessage: "Name must be at least 3 characters",
-                },
               },
               {
                 label: "Email Address",
                 type: "email",
                 placeholder: "you@example.com",
                 name: "email",
-                validation: {
-                  required: true,
-                  requiredMessage: "Email is required",
-                  email: true,
-                  emailMessage: "Please enter a valid email address",
-                },
               },
               {
                 label: "Password",
                 type: "password",
                 placeholder: "Create a strong password",
                 name: "password",
-                validation: {
-                  required: true,
-                  requiredMessage: "Password is required",
-                  minLength: 8,
-                  minLengthMessage: "Password must be at least 8 characters",
-                },
               },
               {
                 label: "Confirm Password",
                 type: "password",
                 placeholder: "Re-enter your password",
                 name: "confirmPassword",
-                validation: {
-                  required: true,
-                  requiredMessage: "Please confirm your password",
-                  match: "password",
-                  matchMessage: "Passwords do not match",
-                },
               },
             ],
             "ui:actions": [
@@ -732,21 +708,16 @@ input:focus, textarea:focus, select:focus {
           },
 
           forgotModal: {
-            "ui:title": "🔒 Reset Your Password",
+            "ui:title": "🔑 Reset Your Password",
             "ui:theme": "light",
-            "ui:content": "Enter your email address and we'll send you a password reset link.",
+            "ui:content":
+              "Enter your email address and we'll send you a password reset link.",
             "ui:fields": [
               {
                 label: "Email Address",
                 type: "email",
                 placeholder: "you@example.com",
                 name: "email",
-                validation: {
-                  required: true,
-                  requiredMessage: "Email is required",
-                  email: true,
-                  emailMessage: "Please enter a valid email address",
-                },
               },
             ],
             "ui:actions": [
@@ -773,46 +744,24 @@ input:focus, textarea:focus, select:focus {
                 type: "text",
                 placeholder: "1234 5678 9012 3456",
                 name: "cardNumber",
-                validation: {
-                  required: true,
-                  requiredMessage: "Card number is required",
-                  pattern: "^[0-9]{16}$",
-                  patternMessage: "Card number must be 16 digits",
-                },
               },
               {
                 label: "Cardholder Name",
                 type: "text",
                 placeholder: "John Doe",
                 name: "cardName",
-                validation: {
-                  required: true,
-                  requiredMessage: "Cardholder name is required",
-                },
               },
               {
                 label: "Expiry Date",
                 type: "text",
                 placeholder: "MM/YY",
                 name: "expiry",
-                validation: {
-                  required: true,
-                  requiredMessage: "Expiry date is required",
-                  pattern: "^(0[1-9]|1[0-2])\\/[0-9]{2}$",
-                  patternMessage: "Format must be MM/YY",
-                },
               },
               {
                 label: "CVV",
                 type: "text",
                 placeholder: "123",
                 name: "cvv",
-                validation: {
-                  required: true,
-                  requiredMessage: "CVV is required",
-                  pattern: "^[0-9]{3,4}$",
-                  patternMessage: "CVV must be 3 or 4 digits",
-                },
               },
             ],
             "ui:actions": [
@@ -832,7 +781,7 @@ input:focus, textarea:focus, select:focus {
         uiSchema: {
           logo: {
             "ui:widget": "text",
-            "ui:content": "🛒️ ShopZone",
+            "ui:content": "🛍️ ShopZone",
             "ui:styles": {
               fontSize: "28px",
               fontWeight: "800",
@@ -989,7 +938,8 @@ input:focus, textarea:focus, select:focus {
           hero: {
             "ui:widget": "hero",
             "ui:title": "Summer Sale 🔥",
-            "ui:subtitle": "Up to 50% OFF on selected items. Limited time offer!",
+            "ui:subtitle":
+              "Up to 50% OFF on selected items. Limited time offer!",
             "ui:cta": {
               label: "Shop Now",
               action: "scroll:#products",
@@ -1024,8 +974,10 @@ input:focus, textarea:focus, select:focus {
           dealSection: {
             "ui:widget": "card",
             "ui:title": "⚡ Deal of the Day",
-            "ui:description": "Premium Wireless Earbuds - Now at $79.99 (was $149.99). Hurry, only 12 left in stock!",
-            "ui:image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=400&fit=crop",
+            "ui:description":
+              "Premium Wireless Earbuds - Now at $79.99 (was $149.99). Hurry, only 12 left in stock!",
+            "ui:image":
+              "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=400&fit=crop",
             "ui:action": "openModal:authModal",
             "ui:buttonLabel": "Grab This Deal",
             "ui:styles": {
@@ -1049,7 +1001,8 @@ input:focus, textarea:focus, select:focus {
 
           testimonial1: {
             "ui:widget": "testimonial",
-            "ui:quote": "Amazing quality and fast shipping! Will definitely order again.",
+            "ui:quote":
+              "Amazing quality and fast shipping! Will definitely order again.",
             "ui:author": "Sarah Johnson",
             "ui:role": "Verified Buyer",
             "ui:avatar": "https://i.pravatar.cc/100?img=1",
@@ -1059,7 +1012,8 @@ input:focus, textarea:focus, select:focus {
 
           testimonial2: {
             "ui:widget": "testimonial",
-            "ui:quote": "Best online shopping experience ever. Highly recommend ShopZone!",
+            "ui:quote":
+              "Best online shopping experience ever. Highly recommend ShopZone!",
             "ui:author": "Michael Chen",
             "ui:role": "Verified Buyer",
             "ui:avatar": "https://i.pravatar.cc/100?img=3",
@@ -1084,7 +1038,7 @@ input:focus, textarea:focus, select:focus {
         uiSchema: {
           footerHeading: {
             "ui:widget": "heading",
-            "ui:text": "🛒️ ShopZone",
+            "ui:text": "🛍️ ShopZone",
             "ui:level": "h3",
             "ui:styles": {
               textAlign: "center",
@@ -1094,7 +1048,8 @@ input:focus, textarea:focus, select:focus {
           },
           footerDesc: {
             "ui:widget": "paragraph",
-            "ui:text": "Your one-stop destination for quality products at unbeatable prices. Shop with confidence!",
+            "ui:text":
+              "Your one-stop destination for quality products at unbeatable prices. Shop with confidence!",
             "ui:styles": {
               textAlign: "center",
               color: "#94a3b8",
@@ -1148,7 +1103,7 @@ input:focus, textarea:focus, select:focus {
                 url: "https://facebook.com/shopzone",
               },
               {
-                emoji: "🦋",
+                emoji: "🐦",
                 platform: "twitter",
                 url: "https://twitter.com/shopzone",
               },
