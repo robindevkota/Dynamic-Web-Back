@@ -10,18 +10,19 @@ mongoose.connect(
 );
 
 const apiConfigs = [
+  // ✅ LOGIN API - Using JSONPlaceholder (always returns success)
   {
     key: "auth.login",
     name: "User Login",
     description: "Authenticates user and returns JWT token",
-    url: "https://jsonplaceholder.typicode.com/posts", // ✅ Correct endpoint
+    url: "https://jsonplaceholder.typicode.com/posts",  // ✅ Changed to JSONPlaceholder
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    // 🔥 FIX: ReqRes expects just { email, password }
-    transformPayload:
-      "(payload) => ({ email: payload.email, password: payload.password })",
+    // ✅ JSONPlaceholder accepts any payload and returns success with id
+    transformPayload: "(payload) => ({ email: payload.email, password: payload.password })",
+    
     successNotification: {
       type: "toast",
       message: "Welcome back! Login successful!",
@@ -30,54 +31,63 @@ const apiConfigs = [
     },
     errorNotification: {
       type: "toast",
-      message: "Invalid credentials. Use eve.holt@reqres.in",
+      message: "Invalid credentials. Please try again.",
       background: "#ef4444",
       duration: 3000,
     },
     closeModalOnSuccess: true,
     storeResponse: true,
-    storeKey: "user",
-    onSuccess: ["console:Login successful!"], // Changed to console for testing
+    storeKey: "authResponse",
+    
+    // ✅ Store mock token and user in localStorage
+    onSuccess: [
+      "setAuth:token=mock-jwt-token-{{authResponse.id}}",  // ✅ Generate fake token
+      "setAuth:user={{email}}",
+      "reload" // Reload to update navbar
+    ],
     onError: ["console:Login failed"],
     onNetworkError: "console:Network error occurred",
     tags: ["auth", "login", "authentication"],
     projectUUID: "global",
   },
 
+  // ✅ SIGNUP API - Using JSONPlaceholder
   {
     key: "auth.signup",
     name: "User Registration",
     description: "Creates new user account",
-    url: "https://jsonplaceholder.typicode.com/posts", // ✅ Correct endpoint
+    url: "https://jsonplaceholder.typicode.com/users",  // ✅ Changed to JSONPlaceholder
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    // 🔥 FIX: ReqRes expects just { email, password }
-    transformPayload:
-      "(payload) => ({ email: payload.email, password: payload.password })",
+    transformPayload: "(payload) => ({ email: payload.email, password: payload.password, name: payload.email.split('@')[0] })",
+    
     successNotification: {
       type: "toast",
-      message: "Account created successfully!",
+      message: "Account created successfully! Please login.",
       background: "#10b981",
       duration: 3000,
     },
     errorNotification: {
       type: "toast",
-      message: "Signup failed. Use eve.holt@reqres.in",
+      message: "Signup failed. Please try again.",
       background: "#ef4444",
       duration: 4000,
     },
     closeModalOnSuccess: true,
     storeResponse: true,
-    storeKey: "user",
-    onSuccess: ["console:Signup successful!"],
+    storeKey: "signupResponse",
+    
+    // ✅ After signup, open login modal
+    onSuccess: ["openModal:authModal"],
     onError: ["console:Signup failed"],
     onNetworkError: "console:Network error during signup",
     tags: ["auth", "signup", "registration"],
     projectUUID: "global",
   },
 
+  // ✅ FORGOT PASSWORD API
   {
     key: "auth.forgot",
     name: "Forgot Password",
@@ -88,28 +98,31 @@ const apiConfigs = [
       "Content-Type": "application/json",
     },
     transformPayload: "(payload) => ({ email: payload.email })",
+    
     successNotification: {
       type: "toast",
-      message: "OTP sent to your email!",
+      message: "Password reset instructions sent to your email!",
       background: "#10b981",
-      duration: 2500,
+      duration: 3000,
     },
     errorNotification: {
       type: "toast",
-      message: "Failed to send OTP. Please try again.",
+      message: "Failed to send reset email. Please try again.",
       background: "#ef4444",
       duration: 3000,
     },
     closeModalOnSuccess: true,
     storeResponse: true,
-    storeKey: "otpSession",
-    onSuccess: ["openModal:otpModal"],
-    onError: ["console:Failed to send OTP"],
-    onNetworkError: "console:Network error while sending OTP",
+    storeKey: "forgotResponse",
+    
+    onSuccess: ["console:Reset email sent"],
+    onError: ["console:Failed to send reset email"],
+    onNetworkError: "console:Network error while sending reset email",
     tags: ["auth", "password", "reset"],
     projectUUID: "global",
   },
 
+  // ✅ PRODUCTS API
   {
     key: "products.api",
     name: "Get Products",
@@ -118,6 +131,7 @@ const apiConfigs = [
     method: "GET",
     headers: {},
     transformPayload: "",
+    
     successNotification: {
       type: "none",
     },
@@ -137,34 +151,34 @@ const apiConfigs = [
     projectUUID: "global",
   },
 
+  // ✅ CHECKOUT API
   {
     key: "checkout.complete",
     name: "Complete Checkout",
     description: "Processes payment and creates order",
-    url: "https://api.example.com/checkout/complete",
+    url: "https://jsonplaceholder.typicode.com/posts",
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer {{token}}",
     },
-    transformPayload:
-      "(payload) => ({ cardNumber: payload.cardNumber, cardName: payload.cardName, expiry: payload.expiry, cvv: payload.cvv, amount: 520.30 })",
+    transformPayload: "(payload) => ({ cardNumber: payload.cardNumber, cardName: payload.cardName, expiry: payload.expiry, cvv: payload.cvv, amount: 520.30 })",
+    
     successNotification: {
-      type: "alert",
-      message: "Payment successful! Your order has been placed.",
+      type: "toast",
+      message: "Payment successful! Order placed.",
       background: "#10b981",
       duration: 4000,
     },
     errorNotification: {
-      type: "alert",
-      message: "Payment failed. Please check your card details.",
+      type: "toast",
+      message: "Payment failed. Please check your details.",
       background: "#ef4444",
       duration: 3000,
     },
     closeModalOnSuccess: true,
     storeResponse: true,
     storeKey: "order",
-    onSuccess: ["navigate:/order-confirmation", "console:Order placed"],
+    onSuccess: ["console:Order placed"],
     onError: ["console:Payment failed"],
     onNetworkError: "console:Network error during checkout",
     tags: ["ecommerce", "checkout", "payment"],
@@ -179,6 +193,10 @@ const seed = async () => {
 
     await APIConfig.insertMany(apiConfigs);
     console.log("✅ Seeded", apiConfigs.length, "API configurations");
+    
+    console.log("\n📝 TEST INFO:");
+    console.log("   Using JSONPlaceholder - any email/password works!");
+    console.log("   Example: user@example.com / password123\n");
 
     mongoose.disconnect();
   } catch (err) {
