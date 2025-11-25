@@ -1,0 +1,172 @@
+const mongoose = require("mongoose");
+const APIConfig = require("./models/APIConfig");
+
+mongoose.connect(
+  "mongodb+srv://admin:sjITV8nazkocOrCX@cluster0.sunkcl4.mongodb.net/",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
+
+const apiConfigs = [
+  // ✅ LOGIN API
+  {
+    key: "auth.login",
+    name: "User Login",
+    description: "Authenticates user and returns token",
+    url: "https://jsonplaceholder.typicode.com/posts",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformPayload: "(payload) => ({ email: payload.email, password: payload.password })",
+    
+    successNotification: {
+      type: "toast",
+      message: "Welcome back! Login successful!",
+      background: "#10b981",
+      duration: 2000,
+    },
+    errorNotification: {
+      type: "toast",
+      message: "Invalid credentials. Please try again.",
+      background: "#ef4444",
+      duration: 3000,
+    },
+    closeModalOnSuccess: false,
+    storeResponse: true,
+    storeKey: "authResponse",
+    
+    onSuccess: [
+      "setAuth:token=mock-jwt-token-{{authResponse.id}}",
+      "setAuth:user={{email}}",
+      "navigate:/bloghub/home"
+    ],
+    onError: ["console:Login failed"],
+    onNetworkError: "console:Network error occurred",
+    tags: ["auth", "login"],
+    projectUUID: "global",
+  },
+
+  // ✅ SIGNUP API
+  {
+    key: "auth.signup",
+    name: "User Registration",
+    description: "Creates new user account",
+    url: "https://jsonplaceholder.typicode.com/users",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformPayload: "(payload) => ({ name: payload.name, email: payload.email, password: payload.password })",
+    
+    successNotification: {
+      type: "toast",
+      message: "Account created successfully! Please login.",
+      background: "#10b981",
+      duration: 3000,
+    },
+    errorNotification: {
+      type: "toast",
+      message: "Signup failed. Please try again.",
+      background: "#ef4444",
+      duration: 4000,
+    },
+    closeModalOnSuccess: false,
+    storeResponse: true,
+    storeKey: "signupResponse",
+    
+    onSuccess: ["navigate:/bloghub/login"],
+    onError: ["console:Signup failed"],
+    onNetworkError: "console:Network error during signup",
+    tags: ["auth", "signup"],
+    projectUUID: "global",
+  },
+
+  // ✅ CREATE BLOG API
+  {
+    key: "blog.create",
+    name: "Create Blog Post",
+    description: "Creates a new blog post",
+    url: "https://jsonplaceholder.typicode.com/posts",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformPayload: "(payload) => ({ title: payload.title, body: payload.content, userId: 1, category: payload.category })",
+    
+    successNotification: {
+      type: "toast",
+      message: "Blog published successfully! 🎉",
+      background: "#10b981",
+      duration: 3000,
+    },
+    errorNotification: {
+      type: "toast",
+      message: "Failed to publish blog. Please try again.",
+      background: "#ef4444",
+      duration: 3000,
+    },
+    closeModalOnSuccess: true,
+    storeResponse: true,
+    storeKey: "newBlog",
+    
+    onSuccess: ["reload"],
+    onError: ["console:Blog creation failed"],
+    onNetworkError: "console:Network error while creating blog",
+    tags: ["blog", "create"],
+    projectUUID: "global",
+  },
+
+  // ✅ GET BLOGS API
+  {
+    key: "blog.list",
+    name: "Get Blog Posts",
+    description: "Fetches all blog posts",
+    url: "https://jsonplaceholder.typicode.com/posts",
+    method: "GET",
+    headers: {},
+    transformPayload: "",
+    
+    successNotification: {
+      type: "none",
+    },
+    errorNotification: {
+      type: "toast",
+      message: "Failed to load blogs",
+      background: "#ef4444",
+      duration: 3000,
+    },
+    closeModalOnSuccess: false,
+    storeResponse: true,
+    storeKey: "blogs",
+    
+    onSuccess: [],
+    onError: ["console:Failed to fetch blogs"],
+    onNetworkError: "console:Network error while fetching blogs",
+    tags: ["blog", "list"],
+    projectUUID: "global",
+  },
+];
+
+const seed = async () => {
+  try {
+    await APIConfig.deleteMany({});
+    console.log("🗑️  Cleared old API configs");
+
+    await APIConfig.insertMany(apiConfigs);
+    console.log("✅ Seeded", apiConfigs.length, "API configurations");
+    
+    console.log("\n🔐 TEST INFO:");
+    console.log("   Using JSONPlaceholder - any email/password works!");
+    console.log("   Example: user@example.com / password123\n");
+
+    mongoose.disconnect();
+  } catch (err) {
+    console.error("❌ Seed failed:", err);
+    mongoose.disconnect();
+  }
+};
+
+seed();

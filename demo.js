@@ -10,7 +10,7 @@ mongoose.connect(
 );
 
 const websites = [
-   {
+  {
     title: "ShopZone - Modern E-commerce",
     slug: "shopzone",
     projectUUID: "ecom-shopzone",
@@ -634,14 +634,28 @@ input:focus, textarea:focus, select:focus {
               {
                 label: "Email Address",
                 type: "email",
-                placeholder: "you@example.com",
+                placeholder: "eve.holt@reqres.in",
                 name: "email",
+                required: true,
+                validation: {
+                  required: true,
+                  requiredMessage: "Email is required",
+                  email: true,
+                  emailMessage: "Please enter a valid email",
+                },
               },
               {
                 label: "Password",
                 type: "password",
-                placeholder: "Enter your password",
+                placeholder: "cityslicka",
                 name: "password",
+                required: true,
+                validation: {
+                  required: true,
+                  requiredMessage: "Password is required",
+                  minLength: 6,
+                  minLengthMessage: "Password must be at least 6 characters",
+                },
               },
             ],
             "ui:actions": [
@@ -654,6 +668,7 @@ input:focus, textarea:focus, select:focus {
                 label: "Sign In",
                 action: "api:auth.login",
                 variant: "primary",
+                apiKey: "auth.login",
               },
               {
                 label: "Create Account",
@@ -669,28 +684,38 @@ input:focus, textarea:focus, select:focus {
             "ui:content": "Join ShopZone and start shopping today!",
             "ui:fields": [
               {
-                label: "Full Name",
-                type: "text",
-                placeholder: "John Doe",
-                name: "fullName",
-              },
-              {
                 label: "Email Address",
                 type: "email",
-                placeholder: "you@example.com",
+                placeholder: "eve.holt@reqres.in",
                 name: "email",
+                required: true,
+                validation: {
+                  required: true,
+                  email: true,
+                },
               },
               {
                 label: "Password",
                 type: "password",
                 placeholder: "Create a strong password",
                 name: "password",
+                required: true,
+                validation: {
+                  required: true,
+                  minLength: 6,
+                },
               },
               {
                 label: "Confirm Password",
                 type: "password",
                 placeholder: "Re-enter your password",
                 name: "confirmPassword",
+                required: true,
+                validation: {
+                  required: true,
+                  match: "password",
+                  matchMessage: "Passwords must match",
+                },
               },
             ],
             "ui:actions": [
@@ -703,6 +728,7 @@ input:focus, textarea:focus, select:focus {
                 label: "Sign Up",
                 action: "api:auth.signup",
                 variant: "primary",
+                apiKey: "auth.signup",
               },
             ],
           },
@@ -711,13 +737,18 @@ input:focus, textarea:focus, select:focus {
             "ui:title": "🔑 Reset Your Password",
             "ui:theme": "light",
             "ui:content":
-              "Enter your email address and we'll send you a password reset link.",
+              "Enter your email address and we'll send you reset instructions.",
             "ui:fields": [
               {
                 label: "Email Address",
                 type: "email",
-                placeholder: "you@example.com",
+                placeholder: "eve.holt@reqres.in",
                 name: "email",
+                required: true,
+                validation: {
+                  required: true,
+                  email: true,
+                },
               },
             ],
             "ui:actions": [
@@ -730,58 +761,16 @@ input:focus, textarea:focus, select:focus {
                 label: "Send Reset Link",
                 action: "api:auth.forgot",
                 variant: "primary",
-              },
-            ],
-          },
-
-          checkoutModal: {
-            "ui:title": "💳 Checkout",
-            "ui:theme": "light",
-            "ui:content": "Complete your purchase securely",
-            "ui:fields": [
-              {
-                label: "Card Number",
-                type: "text",
-                placeholder: "1234 5678 9012 3456",
-                name: "cardNumber",
-              },
-              {
-                label: "Cardholder Name",
-                type: "text",
-                placeholder: "John Doe",
-                name: "cardName",
-              },
-              {
-                label: "Expiry Date",
-                type: "text",
-                placeholder: "MM/YY",
-                name: "expiry",
-              },
-              {
-                label: "CVV",
-                type: "text",
-                placeholder: "123",
-                name: "cvv",
-              },
-            ],
-            "ui:actions": [
-              {
-                label: "Cancel",
-                action: "closeModal",
-                variant: "secondary",
-              },
-              {
-                label: "Complete Purchase $520.30",
-                action: "api:/checkout/complete",
-                variant: "primary",
+                apiKey: "auth.forgot",
               },
             ],
           },
         },
+
         uiSchema: {
           logo: {
             "ui:widget": "text",
-            "ui:content": "🛍️ ShopZone",
+            "ui:content": "🛒 ShopZone",
             "ui:styles": {
               fontSize: "28px",
               fontWeight: "800",
@@ -791,6 +780,7 @@ input:focus, textarea:focus, select:focus {
               cursor: "pointer",
             },
           },
+
           searchBar: {
             "ui:widget": "inputField",
             "ui:placeholder": "Search products...",
@@ -803,6 +793,8 @@ input:focus, textarea:focus, select:focus {
             },
             "ui:styles": { marginBottom: "0" },
           },
+
+          // ✅ NAV LINKS WITH AUTH CONDITIONAL
           links: {
             "ui:widget": "navLinks",
             "ui:theme": "light",
@@ -810,10 +802,25 @@ input:focus, textarea:focus, select:focus {
               { label: "Home", action: "navigate:/shopzone" },
               { label: "Categories", action: "navigate:/shopzone/categories" },
               { label: "Cart (3)", action: "navigate:/shopzone/cart" },
-              { label: "Login", action: "openModal:authModal" },
+
+              // ✅ Show "Welcome, User" if logged in, else "Login"
+              {
+                label:
+                  "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+                action:
+                  "{{auth.token ? 'openModal:profileModal' : 'openModal:authModal'}}",
+              },
+
+              // ✅ Show Logout button if logged in
+              {
+                label: "{{auth.token ? 'Logout' : ''}}",
+                action: "clearAuth+reload",
+                // This will only show when logged in
+              },
             ],
           },
         },
+
         styles: {
           background: "#ffffff",
           borderBottom: "2px solid #f0f0f0",
@@ -1146,6 +1153,871 @@ input:focus, textarea:focus, select:focus {
       },
     },
   },
+  {
+    title: "BlogHub - Share Your Stories",
+    slug: "bloghub",
+    projectUUID: "blog-platform",
+    taskUUID: "blog001",
+    status: "Active",
+    accountValidation: true,
+    otpValidation: false,
+    isAnonymous: false,
+
+    initialization: {
+      globalCSS: `
+    /* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1e293b;
+  background: #f8fafc;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better Button Styles */
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: inherit;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Better Link Styles */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+/* Responsive Typography */
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 1.4;
+}
+
+/* Card Shadows */
+.card, article {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  background: white;
+  border-radius: 12px;
+}
+
+.card:hover, article:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Better Form Inputs */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: border-color 0.2s ease;
+  width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Responsive Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-4 {
+  margin-top: 2rem;
+}
+
+.mb-4 {
+  margin-bottom: 2rem;
+}
+      `,
+      resources: [
+        "auth.login",
+        "auth.signup",
+        "blog.create",
+        "blog.list",
+      ],
+    },
+
+    pages: {
+      // 🔹 LOGIN PAGE
+      login: {
+        title: "Login - BlogHub",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "📝 BlogHub",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/bloghub" },
+                  { label: "Sign Up", action: "navigate:/bloghub/signup" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e2e8f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              loginContainer: {
+                "ui:widget": "card",
+                "ui:title": "🔐 Welcome Back",
+                "ui:description": "Sign in to continue to your account",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                },
+              },
+
+              emailField: {
+                "ui:widget": "inputField",
+                "ui:label": "Email Address",
+                "ui:placeholder": "you@example.com",
+                "ui:type": "email",
+                "ui:name": "email",
+                "ui:required": true,
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+
+              passwordField: {
+                "ui:widget": "inputField",
+                "ui:label": "Password",
+                "ui:placeholder": "Enter your password",
+                "ui:type": "password",
+                "ui:name": "password",
+                "ui:required": true,
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+
+              loginButton: {
+                "ui:widget": "button",
+                "ui:label": "Sign In",
+                "ui:action": "api:auth.login",
+                "ui:variant": "primary",
+                "ui:apiKey": "auth.login",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "30px auto",
+                  padding: "14px 0",
+                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                  color: "white",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  borderRadius: "8px",
+                  width: "100%",
+                  display: "block",
+                },
+              },
+
+              signupLink: {
+                "ui:widget": "text",
+                "ui:content": "Don't have an account? <a href='/bloghub/signup' style='color: #3b82f6; font-weight: 600;'>Sign Up</a>",
+                "ui:styles": {
+                  textAlign: "center",
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                  color: "#64748b",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#f8fafc",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 BlogHub. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 SIGNUP PAGE
+      signup: {
+        title: "Sign Up - BlogHub",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "📝 BlogHub",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/bloghub" },
+                  { label: "Login", action: "navigate:/bloghub/login" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e2e8f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              signupContainer: {
+                "ui:widget": "card",
+                "ui:title": "✨ Create Your Account",
+                "ui:description": "Join BlogHub and start sharing your stories",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                },
+              },
+
+              nameField: {
+                "ui:widget": "inputField",
+                "ui:label": "Full Name",
+                "ui:placeholder": "John Doe",
+                "ui:type": "text",
+                "ui:name": "name",
+                "ui:required": true,
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+
+              emailField: {
+                "ui:widget": "inputField",
+                "ui:label": "Email Address",
+                "ui:placeholder": "you@example.com",
+                "ui:type": "email",
+                "ui:name": "email",
+                "ui:required": true,
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+
+              passwordField: {
+                "ui:widget": "inputField",
+                "ui:label": "Password",
+                "ui:placeholder": "Create a strong password",
+                "ui:type": "password",
+                "ui:name": "password",
+                "ui:required": true,
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+
+              confirmPasswordField: {
+                "ui:widget": "inputField",
+                "ui:label": "Confirm Password",
+                "ui:placeholder": "Re-enter your password",
+                "ui:type": "password",
+                "ui:name": "confirmPassword",
+                "ui:required": true,
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+
+              signupButton: {
+                "ui:widget": "button",
+                "ui:label": "Create Account",
+                "ui:action": "api:auth.signup",
+                "ui:variant": "primary",
+                "ui:apiKey": "auth.signup",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "30px auto",
+                  padding: "14px 0",
+                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                  color: "white",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  borderRadius: "8px",
+                  width: "100%",
+                  display: "block",
+                },
+              },
+
+              loginLink: {
+                "ui:widget": "text",
+                "ui:content": "Already have an account? <a href='/bloghub/login' style='color: #3b82f6; font-weight: 600;'>Login</a>",
+                "ui:styles": {
+                  textAlign: "center",
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                  color: "#64748b",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#f8fafc",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 BlogHub. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 HOME PAGE (After Login - Blog Feed)
+      home: {
+        title: "Home - BlogHub",
+        components: {
+          navbar: {
+            table: {},
+            modal: {
+              createBlogModal: {
+                "ui:title": "✍️ Create New Blog Post",
+                "ui:theme": "light",
+                "ui:content": "Share your thoughts with the world",
+                "ui:minHeight": "500px",
+                "ui:fields": [
+                  {
+                    label: "Blog Title",
+                    type: "text",
+                    placeholder: "Enter an engaging title",
+                    name: "title",
+                    required: true,
+                    validation: {
+                      required: true,
+                      requiredMessage: "Title is required",
+                      minLength: 5,
+                      minLengthMessage: "Title must be at least 5 characters",
+                    },
+                  },
+                  {
+                    label: "Blog Content",
+                    type: "textarea",
+                    placeholder: "Write your story here...",
+                    name: "content",
+                    required: true,
+                    validation: {
+                      required: true,
+                      requiredMessage: "Content is required",
+                      minLength: 20,
+                      minLengthMessage: "Content must be at least 20 characters",
+                    },
+                  },
+                  {
+                    label: "Category",
+                    type: "select",
+                    name: "category",
+                    required: true,
+                    options: [
+                      { value: "technology", label: "Technology" },
+                      { value: "lifestyle", label: "Lifestyle" },
+                      { value: "travel", label: "Travel" },
+                      { value: "food", label: "Food" },
+                      { value: "business", label: "Business" },
+                      { value: "other", label: "Other" },
+                    ],
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Cancel",
+                    action: "closeModal",
+                    variant: "secondary",
+                  },
+                  {
+                    label: "Publish Blog",
+                    action: "api:blog.create",
+                    variant: "primary",
+                    apiKey: "blog.create",
+                  },
+                ],
+              },
+            },
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "📝 BlogHub",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "My Blogs", action: "navigate:/bloghub/home" },
+                  { label: "Create Post", action: "openModal:createBlogModal" },
+                  { label: "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}", action: "{{auth.token ? '' : 'navigate:/bloghub/login'}}" },
+                  { label: "{{auth.token ? 'Logout' : ''}}", action: "clearAuth+reload" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e2e8f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              hero: {
+                "ui:widget": "hero",
+                "ui:title": "Welcome to Your Blog Feed 📚",
+                "ui:subtitle": "Discover and share amazing stories",
+                "ui:cta": {
+                  label: "Write a Post",
+                  action: "openModal:createBlogModal",
+                },
+                "ui:styles": {
+                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+                  minHeight: "350px",
+                  padding: "120px 40px 80px",
+                },
+              },
+
+              spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+
+              blogsHeading: {
+                "ui:widget": "heading",
+                "ui:text": "📖 Latest Blog Posts",
+                "ui:level": "h2",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "50px",
+                  fontSize: "2rem",
+                },
+              },
+
+              blogsGrid: {
+                "ui:widget": "projectGrid",
+                "ui:animated": true,
+              },
+
+              spacer2: { "ui:widget": "spacer", "ui:height": 60 },
+
+              noBlogsMessage: {
+                "ui:widget": "card",
+                "ui:title": "No Blogs Yet",
+                "ui:description": "Be the first to share your story! Click 'Create Post' to get started.",
+                "ui:action": "openModal:createBlogModal",
+                "ui:buttonLabel": "Write Your First Blog",
+                "ui:styles": {
+                  maxWidth: "600px",
+                  margin: "0 auto",
+                  padding: "40px",
+                  textAlign: "center",
+                  background: "#f8fafc",
+                  border: "2px dashed #cbd5e1",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#ffffff",
+              minHeight: "100vh",
+            },
+            triggers: [
+              { event: "load", action: "fetchBlogs", source: "blog.list" },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerHeading: {
+                "ui:widget": "heading",
+                "ui:text": "📝 BlogHub",
+                "ui:level": "h3",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#e2e8f0",
+                  marginBottom: "20px",
+                },
+              },
+              footerDesc: {
+                "ui:widget": "paragraph",
+                "ui:text": "Your platform for sharing stories, ideas, and inspiration with the world.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#94a3b8",
+                  maxWidth: "600px",
+                  margin: "0 auto 30px",
+                },
+              },
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 BlogHub. All rights reserved. Made with ❤️",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#94a3b8",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "60px 40px 40px",
+              borderTop: "3px solid #3b82f6",
+            },
+            triggers: [],
+          },
+        },
+      },
+    },
+
+    components: {
+      navbar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "📝 BlogHub",
+            "ui:styles": {
+              fontSize: "28px",
+              fontWeight: "800",
+              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              cursor: "pointer",
+            },
+          },
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:links": [
+              { label: "Home", action: "navigate:/bloghub" },
+              { label: "Login", action: "navigate:/bloghub/login" },
+              { label: "Sign Up", action: "navigate:/bloghub/signup" },
+            ],
+          },
+        },
+        styles: {
+          background: "#ffffff",
+          borderBottom: "2px solid #e2e8f0",
+          padding: "20px 50px",
+          position: "fixed",
+          width: "100%",
+          zIndex: 1000,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+        },
+        triggers: [],
+      },
+      sidebar: {
+        table: {},
+        modal: {},
+        uiSchema: {},
+        styles: { display: "none" },
+        triggers: [],
+      },
+      main: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          hero: {
+            "ui:widget": "hero",
+            "ui:title": "Share Your Voice 🎯",
+            "ui:subtitle": "Join thousands of writers sharing their stories on BlogHub",
+            "ui:cta": {
+              label: "Get Started",
+              action: "navigate:/bloghub/signup",
+            },
+            "ui:styles": {
+              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              minHeight: "600px",
+              padding: "180px 40px 100px",
+            },
+          },
+
+          spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+
+          featuresHeading: {
+            "ui:widget": "heading",
+            "ui:text": "✨ Why Choose BlogHub?",
+            "ui:level": "h2",
+            "ui:styles": {
+              textAlign: "center",
+              marginBottom: "50px",
+              fontSize: "2.5rem",
+            },
+          },
+
+          feature1: {
+            "ui:widget": "card",
+            "ui:title": "✍️ Easy Publishing",
+            "ui:description": "Write and publish your blogs with our intuitive editor. No technical skills required.",
+            "ui:styles": {
+              maxWidth: "800px",
+              margin: "0 auto 30px",
+              padding: "30px",
+              textAlign: "center",
+            },
+          },
+
+          feature2: {
+            "ui:widget": "card",
+            "ui:title": "🌐 Reach Readers",
+            "ui:description": "Share your content with a growing community of passionate readers worldwide.",
+            "ui:styles": {
+              maxWidth: "800px",
+              margin: "0 auto 30px",
+              padding: "30px",
+              textAlign: "center",
+            },
+          },
+
+          feature3: {
+            "ui:widget": "card",
+            "ui:title": "📊 Track Engagement",
+            "ui:description": "Monitor your blog's performance and see how readers interact with your content.",
+            "ui:styles": {
+              maxWidth: "800px",
+              margin: "0 auto 30px",
+              padding: "30px",
+              textAlign: "center",
+            },
+          },
+
+          spacer2: { "ui:widget": "spacer", "ui:height": 80 },
+
+          ctaSection: {
+            "ui:widget": "card",
+            "ui:title": "Ready to Start Blogging? 🚀",
+            "ui:description": "Join BlogHub today and share your stories with the world. It's free and takes less than a minute!",
+            "ui:action": "navigate:/bloghub/signup",
+            "ui:buttonLabel": "Create Your Account",
+            "ui:styles": {
+              maxWidth: "900px",
+              margin: "0 auto",
+              padding: "50px",
+              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              color: "white",
+              textAlign: "center",
+              border: "none",
+            },
+          },
+        },
+        styles: {
+          padding: "100px 40px 80px",
+          background: "#ffffff",
+          minHeight: "100vh",
+        },
+        triggers: [],
+      },
+      footer: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          footerHeading: {
+            "ui:widget": "heading",
+            "ui:text": "📝 BlogHub",
+            "ui:level": "h3",
+            "ui:styles": {
+              textAlign: "center",
+              color: "#e2e8f0",
+              marginBottom: "20px",
+            },
+          },
+          footerDesc: {
+            "ui:widget": "paragraph",
+            "ui:text": "Your platform for sharing stories, ideas, and inspiration with the world.",
+            "ui:styles": {
+              textAlign: "center",
+              color: "#94a3b8",
+              maxWidth: "600px",
+              margin: "0 auto 30px",
+            },
+          },
+          footerText: {
+            "ui:widget": "text",
+            "ui:content": "© 2024 BlogHub. All rights reserved. Made with ❤️",
+            "ui:styles": {
+              textAlign: "center",
+              color: "#94a3b8",
+              fontSize: "14px",
+            },
+          },
+        },
+        styles: {
+          background: "#1e293b",
+          padding: "60px 40px 40px",
+          borderTop: "3px solid #3b82f6",
+        },
+        triggers: [],
+      },
+    },
+  }
 ];
 
 const seed = async () => {
