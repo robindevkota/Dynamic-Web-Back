@@ -21,8 +21,20 @@ const websites = [
     isAnonymous: false,
 
     initialization: {
-      globalCSS:
-        "* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: 'Inter', -apple-system, sans-serif; color: #1e293b; background: #ffffff; overflow-x: hidden; } @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } } @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } } @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } } @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } } @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } } .animate-fade-in { animation: fadeInUp 0.8s ease-out forwards; } .animate-slide-left { animation: slideInLeft 0.8s ease-out forwards; } .animate-slide-right { animation: slideInRight 0.8s ease-out forwards; } button:hover { transform: translateY(-2px); transition: all 0.3s ease; } section { animation: fadeInUp 1s ease-out; } html { scroll-behavior: smooth; }",
+      globalCSS: `@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+* { margin: 0; padding: 0; box-sizing: border-box; } 
+body { font-family: 'Inter', -apple-system, sans-serif; color: #1e293b; background: #ffffff; overflow-x: hidden; } 
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } } 
+@keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } } 
+@keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } } 
+@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } } 
+@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } } 
+.animate-fade-in { animation: fadeInUp 0.8s ease-out forwards; } 
+.animate-slide-left { animation: slideInLeft 0.8s ease-out forwards; } 
+.animate-slide-right { animation: slideInRight 0.8s ease-out forwards; } 
+button:hover { transform: translateY(-2px); transition: all 0.3s ease; } 
+section { animation: fadeInUp 1s ease-out; } 
+html { scroll-behavior: smooth; }`,
       resources: ["auth.login", "auth.signup", "auth.forgot"],
     },
 
@@ -173,18 +185,94 @@ const websites = [
               links: {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
+                "ui:iconStyles": {
+                  transition: "all 0.3s ease",
+                  fontSize: "14px",
+                  width: "16px",
+                  textAlign: "center",
+                },
+                "ui:linkStyles": {
+                  transition: "all 0.3s ease",
+                  borderRadius: "8px",
+                },
                 "ui:links": [
-                  { label: "Home", action: "navigate:/devfolio" },
-                  { label: "About", action: "navigate:/devfolio/about" },
-                  { label: "Projects", action: "navigate:/devfolio/projects" },
+                  {
+                    label: "Home",
+                    action: "navigate:/devfolio",
+                    fontAwesome: "fas fa-home",
+                    iconStyles: {
+                      color: "#64748b",
+                    },
+                    iconHoverStyles: {
+                      color: "#667eea",
+                      transform: "scale(1.2)",
+                    },
+                    linkHoverStyles: {
+                      background: "rgba(102, 126, 234, 0.1)",
+                    },
+                  },
+                  {
+                    label: "About",
+                    action: "navigate:/devfolio/about",
+                    fontAwesome: "fas fa-user",
+                    iconStyles: {
+                      color: "#64748b",
+                    },
+                    iconHoverStyles: {
+                      color: "#764ba2",
+                      transform: "scale(1.2)",
+                    },
+                    linkHoverStyles: {
+                      background: "rgba(118, 75, 162, 0.1)",
+                    },
+                  },
+                  {
+                    label: "Projects",
+                    action: "navigate:/devfolio/projects",
+                    fontAwesome: "fas fa-briefcase",
+                    iconStyles: {
+                      color: "#64748b",
+                    },
+                    iconHoverStyles: {
+                      color: "#f093fb",
+                      transform: "scale(1.2)",
+                    },
+                    linkHoverStyles: {
+                      background: "rgba(240, 147, 251, 0.1)",
+                    },
+                  },
                   {
                     label: "{{auth.token ? 'Dashboard' : 'Login'}}",
                     action:
                       "{{auth.token ? 'navigate:/dashboard' : 'openModal:authModal'}}",
+                    fontAwesome:
+                      "{{auth.token ? 'fas fa-tachometer-alt' : 'fas fa-sign-in-alt'}}",
+                    iconStyles: {
+                      color: "#64748b",
+                    },
+                    iconHoverStyles: {
+                      color: "{{auth.token ? '#10b981' : '#667eea'}}",
+                      transform: "scale(1.2)",
+                    },
+                    linkHoverStyles: {
+                      background:
+                        "{{auth.token ? 'rgba(16, 185, 129, 0.1)' : 'rgba(102, 126, 234, 0.1)'}}",
+                    },
                   },
                   {
                     label: "{{auth.token ? 'Logout' : ''}}",
                     action: "clearAuth+reload",
+                    fontAwesome: "{{auth.token ? 'fas fa-sign-out-alt' : ''}}",
+                    iconStyles: {
+                      color: "#64748b",
+                    },
+                    iconHoverStyles: {
+                      color: "#ef4444",
+                      transform: "scale(1.2)",
+                    },
+                    linkHoverStyles: {
+                      background: "rgba(239, 68, 68, 0.1)",
+                    },
                   },
                 ],
               },
@@ -402,10 +490,33 @@ const websites = [
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  { label: "Home", action: "navigate:/devfolio" },
-                  { label: "About", action: "navigate:/devfolio/about" },
-                  { label: "Projects", action: "navigate:/devfolio/projects" },
-                  { label: "Login", action: "openModal:authModal" },
+                  {
+                    label: "Home",
+                    action: "navigate:/devfolio",
+                    fontAwesome: "fas fa-home",
+                  },
+                  {
+                    label: "About",
+                    action: "navigate:/devfolio/about",
+                    fontAwesome: "fas fa-user",
+                  },
+                  {
+                    label: "Projects",
+                    action: "navigate:/devfolio/projects",
+                    fontAwesome: "fas fa-briefcase",
+                  },
+                  {
+                    label: "{{auth.token ? 'Dashboard' : 'Login'}}",
+                    action:
+                      "{{auth.token ? 'navigate:/dashboard' : 'openModal:authModal'}}",
+                    fontAwesome:
+                      "{{auth.token ? 'fas fa-tachometer-alt' : 'fas fa-sign-in-alt'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                    fontAwesome: "{{auth.token ? 'fas fa-sign-out-alt' : ''}}",
+                  },
                 ],
               },
             },
@@ -709,19 +820,94 @@ const websites = [
           links: {
             "ui:widget": "navLinks",
             "ui:theme": "light",
+            "ui:iconStyles": {
+              transition: "all 0.3s ease",
+              fontSize: "14px",
+              width: "16px",
+              textAlign: "center",
+            },
+            "ui:linkStyles": {
+              transition: "all 0.3s ease",
+              borderRadius: "8px",
+            },
             "ui:links": [
-              { label: "Home", action: "navigate:/devfolio" },
-              { label: "About", action: "navigate:/devfolio/about" },
-              { label: "Projects", action: "navigate:/devfolio/projects" },
               {
-                label:
-                  "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+                label: "Home",
+                action: "navigate:/devfolio",
+                fontAwesome: "fas fa-home",
+                iconStyles: {
+                  color: "#64748b",
+                },
+                iconHoverStyles: {
+                  color: "#667eea",
+                  transform: "scale(1.2)",
+                },
+                linkHoverStyles: {
+                  background: "rgba(102, 126, 234, 0.1)",
+                },
+              },
+              {
+                label: "About",
+                action: "navigate:/devfolio/about",
+                fontAwesome: "fas fa-user",
+                iconStyles: {
+                  color: "#64748b",
+                },
+                iconHoverStyles: {
+                  color: "#764ba2",
+                  transform: "scale(1.2)",
+                },
+                linkHoverStyles: {
+                  background: "rgba(118, 75, 162, 0.1)",
+                },
+              },
+              {
+                label: "Projects",
+                action: "navigate:/devfolio/projects",
+                fontAwesome: "fas fa-briefcase",
+                iconStyles: {
+                  color: "#64748b",
+                },
+                iconHoverStyles: {
+                  color: "#f093fb",
+                  transform: "scale(1.2)",
+                },
+                linkHoverStyles: {
+                  background: "rgba(240, 147, 251, 0.1)",
+                },
+              },
+              {
+                label: "{{auth.token ? 'Dashboard' : 'Login'}}",
                 action:
-                  "{{auth.token ? 'console:logged-in' : 'openModal:authModal'}}",
+                  "{{auth.token ? 'navigate:/dashboard' : 'openModal:authModal'}}",
+                fontAwesome:
+                  "{{auth.token ? 'fas fa-tachometer-alt' : 'fas fa-sign-in-alt'}}",
+                iconStyles: {
+                  color: "#64748b",
+                },
+                iconHoverStyles: {
+                  color: "{{auth.token ? '#10b981' : '#667eea'}}",
+                  transform: "scale(1.2)",
+                },
+                linkHoverStyles: {
+                  background:
+                    "{{auth.token ? 'rgba(16, 185, 129, 0.1)' : 'rgba(102, 126, 234, 0.1)'}}",
+                },
               },
               {
                 label: "{{auth.token ? 'Logout' : ''}}",
                 action: "clearAuth+reload",
+                fontAwesome: "{{auth.token ? 'fas fa-sign-out-alt' : ''}}",
+                iconStyles: {
+                  color: "#64748b",
+                },
+                iconHoverStyles: {
+                  color: "#ef4444",
+                  transform: "scale(1.2)",
+                },
+                linkHoverStyles: {
+                  background: "rgba(239, 68, 68, 0.1)",
+                },
               },
             ],
           },
@@ -775,7 +961,6 @@ const websites = [
             "ui:widget": "columns",
             "ui:ratio": "1:1:1",
             "ui:gap": "40px",
-            "ui:responsive": { tablet: 2, mobile: 1 },
             "ui:columns": [
               {
                 "ui:widget": "container",
@@ -785,8 +970,11 @@ const websites = [
                 "ui:children": [
                   {
                     "ui:widget": "icon",
-                    "ui:emoji": "⚡",
-                    "ui:size": "large",
+                    "ui:fontAwesome": "fas fa-bolt",
+                    "ui:styles": {
+                      fontSize: "3rem",
+                      color: "#667eea",
+                    },
                   },
                   {
                     "ui:widget": "heading",
@@ -808,8 +996,11 @@ const websites = [
                 "ui:children": [
                   {
                     "ui:widget": "icon",
-                    "ui:emoji": "🎨",
-                    "ui:size": "large",
+                    "ui:fontAwesome": "fas fa-palette",
+                    "ui:styles": {
+                      fontSize: "3rem",
+                      color: "#764ba2",
+                    },
                   },
                   {
                     "ui:widget": "heading",
@@ -831,8 +1022,11 @@ const websites = [
                 "ui:children": [
                   {
                     "ui:widget": "icon",
-                    "ui:emoji": "🔧",
-                    "ui:size": "large",
+                    "ui:fontAwesome": "fas fa-code",
+                    "ui:styles": {
+                      fontSize: "3rem",
+                      color: "#f093fb",
+                    },
                   },
                   {
                     "ui:widget": "heading",
@@ -1085,11 +1279,23 @@ const websites = [
             "ui:size": "medium",
             "ui:variant": "colored",
             "ui:icons": [
-              { emoji: "💼", platform: "linkedin", url: "#" },
-              { emoji: "🐙", platform: "github", url: "#" },
-              { emoji: "🐦", platform: "twitter", url: "#" },
               {
-                emoji: "📧",
+                fontAwesome: "fab fa-linkedin-in",
+                platform: "linkedin",
+                url: "#",
+              },
+              {
+                fontAwesome: "fab fa-github",
+                platform: "github",
+                url: "#",
+              },
+              {
+                fontAwesome: "fab fa-twitter",
+                platform: "twitter",
+                url: "#",
+              },
+              {
+                fontAwesome: "fas fa-envelope",
                 platform: "email",
                 url: "mailto:alex@devfolio.com",
               },
