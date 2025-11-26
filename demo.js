@@ -11,170 +11,38 @@ mongoose.connect(
 
 const websites = [
   {
-    title: "ShopZone - Modern E-commerce",
-    slug: "shopzone",
-    projectUUID: "ecom-shopzone",
-    taskUUID: "ecom001",
+    title: "DevFolio - Creative Portfolio",
+    slug: "devfolio",
+    projectUUID: "portfolio-devfolio",
+    taskUUID: "port001",
     status: "Active",
     accountValidation: true,
     otpValidation: false,
     isAnonymous: false,
 
     initialization: {
-      globalCSS: `
-    /* Reset and Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #1e293b;
-  background: #ffffff;
-}
-
-/* Fix Navbar Spacing - Prevent Text Cutoff */
-nav {
-  display: flex !important;
-  align-items: center !important;
-  gap: 16px !important;
-  flex-wrap: wrap !important;
-  padding: 16px 32px !important;
-}
-
-nav button {
-  white-space: nowrap !important;
-  min-width: fit-content !important;
-  padding: 8px 16px !important;
-  flex-shrink: 0 !important;
-}
-
-/* Ensure navbar container has enough space */
-header {
-  min-height: 70px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-/* Smooth Scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Better Button Styles */
-button {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Better Link Styles */
-a {
-  text-decoration: none;
-  color: inherit;
-  transition: color 0.2s ease;
-}
-
-/* Responsive Typography */
-h1 {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  line-height: 1.2;
-}
-
-h2 {
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  line-height: 1.3;
-}
-
-h3 {
-  font-size: clamp(1.2rem, 3vw, 1.8rem);
-  line-height: 1.4;
-}
-
-/* Card Shadows */
-.card, article {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-.card:hover, article:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-/* Better Form Inputs */
-input, textarea, select {
-  font-family: inherit;
-  font-size: inherit;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 12px 16px;
-  transition: border-color 0.2s ease;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Responsive Container */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* Utility Classes */
-.text-center {
-  text-align: center;
-}
-
-.mt-4 {
-  margin-top: 2rem;
-}
-
-.mb-4 {
-  margin-bottom: 2rem;
-}
-
-  `,
-      resources: [
-        // 🆕 NEW FORMAT: Just reference the keys!
-        "auth.login",
-        "auth.signup",
-        "auth.forgot",
-        "products.api",
-        "checkout.complete",
-      ],
+      globalCSS:
+        "* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: 'Inter', -apple-system, sans-serif; color: #1e293b; background: #ffffff; overflow-x: hidden; } @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } } @keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } } @keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } } @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } } @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } } .animate-fade-in { animation: fadeInUp 0.8s ease-out forwards; } .animate-slide-left { animation: slideInLeft 0.8s ease-out forwards; } .animate-slide-right { animation: slideInRight 0.8s ease-out forwards; } button:hover { transform: translateY(-2px); transition: all 0.3s ease; } section { animation: fadeInUp 1s ease-out; } html { scroll-behavior: smooth; }",
+      resources: ["auth.login", "auth.signup", "auth.forgot"],
     },
 
     pages: {
-      cart: {
-        title: "Shopping Cart",
+      about: {
+        title: "About Me",
         components: {
           navbar: {
             table: {},
             modal: {
-              // ✅ ADD ALL MODALS HERE TOO
               authModal: {
-                "ui:title": "🔐 Welcome to ShopZone",
+                "ui:title": "🔐 Welcome Back",
                 "ui:theme": "light",
                 "ui:content":
-                  "Sign in to access your account and start shopping!",
-                "ui:minHeight": "400px",
+                  "Sign in to access your dashboard and saved projects!",
                 "ui:fields": [
                   {
                     label: "Email Address",
                     type: "email",
-                    placeholder: "you@example.com",
+                    placeholder: "eve.holt@reqres.in",
                     name: "email",
                     required: true,
                     validation: {
@@ -187,7 +55,7 @@ input:focus, textarea:focus, select:focus {
                   {
                     label: "Password",
                     type: "password",
-                    placeholder: "Enter your password",
+                    placeholder: "cityslicka",
                     name: "password",
                     required: true,
                     validation: {
@@ -218,17 +86,16 @@ input:focus, textarea:focus, select:focus {
                   },
                 ],
               },
-
               signupModal: {
-                "ui:title": "✨ Create Your Account",
+                "ui:title": "✨ Join DevFolio",
                 "ui:theme": "light",
-                "ui:content": "Join ShopZone and start shopping today!",
-                "ui:minHeight": "500px",
+                "ui:content":
+                  "Create your account and start building your portfolio!",
                 "ui:fields": [
                   {
                     label: "Email Address",
                     type: "email",
-                    placeholder: "you@example.com",
+                    placeholder: "eve.holt@reqres.in",
                     name: "email",
                     required: true,
                   },
@@ -261,18 +128,15 @@ input:focus, textarea:focus, select:focus {
                   },
                 ],
               },
-
               forgotModal: {
-                "ui:title": "🔑 Reset Your Password",
+                "ui:title": "🔑 Reset Password",
                 "ui:theme": "light",
-                "ui:content":
-                  "Enter your email address and we'll send you an OTP to reset your password.",
-                "ui:minHeight": "350px",
+                "ui:content": "Enter your email to receive reset instructions.",
                 "ui:fields": [
                   {
                     label: "Email Address",
                     type: "email",
-                    placeholder: "you@example.com",
+                    placeholder: "eve.holt@reqres.in",
                     name: "email",
                     required: true,
                   },
@@ -284,7 +148,7 @@ input:focus, textarea:focus, select:focus {
                     variant: "secondary",
                   },
                   {
-                    label: "Send OTP",
+                    label: "Send Reset Link",
                     action: "api:auth.forgot",
                     variant: "primary",
                     apiKey: "auth.forgot",
@@ -295,9 +159,9 @@ input:focus, textarea:focus, select:focus {
             uiSchema: {
               logo: {
                 "ui:widget": "text",
-                "ui:content": "🛍️ ShopZone",
+                "ui:content": "💼 DevFolio",
                 "ui:styles": {
-                  fontSize: "28px",
+                  fontSize: "26px",
                   fontWeight: "800",
                   background:
                     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -310,18 +174,24 @@ input:focus, textarea:focus, select:focus {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  { label: "Home", action: "navigate:/shopzone" },
+                  { label: "Home", action: "navigate:/devfolio" },
+                  { label: "About", action: "navigate:/devfolio/about" },
+                  { label: "Projects", action: "navigate:/devfolio/projects" },
                   {
-                    label: "Categories",
-                    action: "navigate:/shopzone/categories",
+                    label: "{{auth.token ? 'Dashboard' : 'Login'}}",
+                    action:
+                      "{{auth.token ? 'navigate:/dashboard' : 'openModal:authModal'}}",
                   },
-                  { label: "Cart (3)", action: "navigate:/shopzone/cart" },
-                  { label: "Login", action: "openModal:authModal" },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
                 ],
               },
             },
             styles: {
-              background: "#ffffff",
+              background: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(10px)",
               borderBottom: "2px solid #f0f0f0",
               padding: "20px 50px",
               position: "fixed",
@@ -330,7 +200,7 @@ input:focus, textarea:focus, select:focus {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
             },
             triggers: [],
           },
@@ -347,96 +217,112 @@ input:focus, textarea:focus, select:focus {
             uiSchema: {
               pageTitle: {
                 "ui:widget": "heading",
-                "ui:text": "🛒 Your Shopping Cart",
+                "ui:text": "👨‍💻 About Me",
                 "ui:level": "h1",
                 "ui:styles": {
                   textAlign: "center",
+                  marginBottom: "60px",
+                  marginTop: "140px",
+                  fontSize: "3.5rem",
+                  animation: "fadeInUp 0.8s ease-out",
+                },
+              },
+              aboutCard: {
+                "ui:widget": "card",
+                "ui:title": "Full Stack Developer & Designer",
+                "ui:description":
+                  "I'm a passionate developer with 5+ years of experience building beautiful, functional web applications. I specialize in React, Node.js, and modern UI/UX design. My goal is to create digital experiences that make people's lives easier and more enjoyable.",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+                "ui:styles": {
+                  maxWidth: "900px",
+                  margin: "0 auto 60px",
+                  padding: "40px",
+                  animation: "slideInLeft 0.8s ease-out",
+                  minHeight: "300px",
+                },
+                "ui:imageStyles": {
+                  borderRadius: "50%",
+                  width: "200px",
+                  height: "200px",
+                  objectFit: "cover",
+                  border: "5px solid #667eea",
+                },
+              },
+              skillsHeading: {
+                "ui:widget": "heading",
+                "ui:text": "🚀 My Skills",
+                "ui:level": "h2",
+                "ui:styles": {
+                  textAlign: "center",
                   marginBottom: "50px",
-                  marginTop: "40px",
+                  fontSize: "2.5rem",
+                  animation: "fadeInUp 1s ease-out",
+                },
+              },
+              skillsCard: {
+                "ui:widget": "skillRadar",
+                "ui:skills": [
+                  { name: "React & Next.js", level: 95 },
+                  { name: "Node.js & Express", level: 90 },
+                  { name: "UI/UX Design", level: 85 },
+                  { name: "TypeScript", level: 88 },
+                  { name: "MongoDB & PostgreSQL", level: 82 },
+                  { name: "AWS & DevOps", level: 75 },
+                ],
+                "ui:styles": {
+                  maxWidth: "800px",
+                  margin: "0 auto",
+                  background: "white",
+                  borderRadius: "16px",
+                  boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
+                  animation: "slideInRight 0.8s ease-out",
+                },
+              },
+              spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+              testimonialsHeading: {
+                "ui:widget": "heading",
+                "ui:text": "💬 What People Say",
+                "ui:level": "h2",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "50px",
                   fontSize: "2.5rem",
                 },
               },
-
-              cartItem1: {
-                "ui:widget": "card",
-                "ui:title": "Wireless Headphones",
-                "ui:description":
-                  "Premium noise-cancelling headphones with 30-hour battery life. Quantity: 1",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+              testimonial1: {
+                "ui:widget": "testimonial",
+                "ui:quote":
+                  "Incredible developer! Delivered our project ahead of schedule with exceptional quality. Highly recommended!",
+                "ui:author": "Sarah Johnson",
+                "ui:role": "CEO, TechStart",
+                "ui:avatar": "https://i.pravatar.cc/100?img=1",
+                "ui:rating": 5,
                 "ui:styles": {
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  maxWidth: "900px",
-                  margin: "0 auto 20px",
-                  padding: "25px",
+                  maxWidth: "700px",
+                  margin: "0 auto 30px",
+                  animation: "fadeInUp 0.8s ease-out 0.2s both",
                 },
               },
-
-              cartItem2: {
-                "ui:widget": "card",
-                "ui:title": "Smart Watch Series 7",
-                "ui:description":
-                  "Fitness tracker with heart rate monitor and GPS. Quantity: 1",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
+              testimonial2: {
+                "ui:widget": "testimonial",
+                "ui:quote":
+                  "Working with them was a game-changer for our business. Creative, professional, and always available.",
+                "ui:author": "Michael Chen",
+                "ui:role": "Product Manager, InnovateCo",
+                "ui:avatar": "https://i.pravatar.cc/100?img=3",
+                "ui:rating": 5,
                 "ui:styles": {
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  maxWidth: "900px",
-                  margin: "0 auto 20px",
-                  padding: "25px",
-                },
-              },
-
-              cartItem3: {
-                "ui:widget": "card",
-                "ui:title": "Laptop Stand Aluminum",
-                "ui:description":
-                  "Ergonomic adjustable laptop stand for desk. Quantity: 2",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop",
-                "ui:styles": {
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  maxWidth: "900px",
-                  margin: "0 auto 20px",
-                  padding: "25px",
-                },
-              },
-
-              divider: {
-                "ui:widget": "divider",
-                "ui:spacing": "large",
-                "ui:styles": { maxWidth: "900px", margin: "40px auto" },
-              },
-
-              totalCard: {
-                "ui:widget": "card",
-                "ui:title": "Order Summary",
-                "ui:description":
-                  "Subtotal: $458.00 | Shipping: $15.00 | Tax: $47.30 | Total: $520.30",
-                "ui:action": "openModal:checkoutModal",
-                "ui:buttonLabel": "Proceed to Checkout 💳",
-                "ui:styles": {
-                  maxWidth: "900px",
+                  maxWidth: "700px",
                   margin: "0 auto",
-                  padding: "30px",
-                  background:
-                    "linear-gradient(135deg, #47b81aff 0%, #764ba2 100%)",
-                  color: "white",
-                  textAlign: "center",
+                  animation: "fadeInUp 0.8s ease-out 0.4s both",
                 },
               },
             },
             styles: {
               padding: "120px 40px 80px",
-              background: "#f8fafc",
+              background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)",
               minHeight: "100vh",
-              color: "#00ff2aff",
             },
             triggers: [],
           },
@@ -446,8 +332,12 @@ input:focus, textarea:focus, select:focus {
             uiSchema: {
               footerText: {
                 "ui:widget": "text",
-                "ui:content": "© 2024 ShopZone. All rights reserved.",
-                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+                "ui:content": "© 2024 DevFolio. Crafted with ❤️",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#94a3b8",
+                  fontSize: "14px",
+                },
               },
             },
             styles: {
@@ -459,19 +349,48 @@ input:focus, textarea:focus, select:focus {
           },
         },
       },
-
-      categories: {
-        title: "Product Categories",
+      projects: {
+        title: "My Projects",
         components: {
           navbar: {
             table: {},
-            modal: {},
+            modal: {
+              authModal: {
+                "ui:title": "🔐 Welcome Back",
+                "ui:theme": "light",
+                "ui:content": "Sign in to access your dashboard!",
+                "ui:fields": [
+                  {
+                    label: "Email Address",
+                    type: "email",
+                    placeholder: "eve.holt@reqres.in",
+                    name: "email",
+                    required: true,
+                  },
+                  {
+                    label: "Password",
+                    type: "password",
+                    placeholder: "cityslicka",
+                    name: "password",
+                    required: true,
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Sign In",
+                    action: "api:auth.login",
+                    variant: "primary",
+                    apiKey: "auth.login",
+                  },
+                ],
+              },
+            },
             uiSchema: {
               logo: {
                 "ui:widget": "text",
-                "ui:content": "🛍️ ShopZone",
+                "ui:content": "💼 DevFolio",
                 "ui:styles": {
-                  fontSize: "28px",
+                  fontSize: "26px",
                   fontWeight: "800",
                   background:
                     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -483,29 +402,25 @@ input:focus, textarea:focus, select:focus {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  { label: "Home", action: "navigate:/shopzone" },
-                  {
-                    label: "Categories",
-                    action: "navigate:/shopzone/categories",
-                  },
-                  { label: "Cart (3)", action: "navigate:/shopzone/cart" },
+                  { label: "Home", action: "navigate:/devfolio" },
+                  { label: "About", action: "navigate:/devfolio/about" },
+                  { label: "Projects", action: "navigate:/devfolio/projects" },
                   { label: "Login", action: "openModal:authModal" },
                 ],
               },
             },
-
             styles: {
-              background: "#ffffff",
+              background: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(10px)",
               borderBottom: "2px solid #f0f0f0",
               padding: "20px 50px",
-              position: "sticky", // Changed from "fixed"
-              top: 0,
+              position: "fixed",
               width: "100%",
               zIndex: 1000,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
             },
             triggers: [],
           },
@@ -520,83 +435,101 @@ input:focus, textarea:focus, select:focus {
             table: {},
             modal: {},
             uiSchema: {
-              hero: {
-                "ui:widget": "hero",
-                "ui:title": "Shop by Category 🏷️",
-                "ui:subtitle":
-                  "Discover amazing products across our curated collections",
+              pageTitle: {
+                "ui:widget": "heading",
+                "ui:text": "🎨 Featured Projects",
+                "ui:level": "h1",
                 "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "70px",
+                  marginTop: "140px",
+                  fontSize: "3.5rem",
+                  animation: "fadeInUp 0.8s ease-out",
+                },
+              },
+              project1: {
+                "ui:widget": "card",
+                "ui:title": "🚀 SaaS Dashboard Platform",
+                "ui:description":
+                  "A comprehensive analytics dashboard built with React, Node.js, and PostgreSQL. Features real-time data visualization, user management, and API integrations. Served 10,000+ active users.",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop",
+                "ui:buttonLabel": "View Case Study",
+                "ui:styles": {
+                  maxWidth: "900px",
+                  margin: "0 auto 50px",
+                  padding: "35px",
+                  animation: "fadeInUp 0.8s ease-out 0.2s both",
+                  transform: "translateY(0)",
+                  transition: "all 0.3s ease",
+                },
+                "ui:imageStyles": {
+                  height: "300px",
+                  objectFit: "cover",
+                },
+              },
+              project2: {
+                "ui:widget": "card",
+                "ui:title": "🎵 Music Streaming App",
+                "ui:description":
+                  "Full-stack music streaming application with user authentication, playlist management, and social features. Built using Next.js, MongoDB, and AWS S3 for audio storage.",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=600&h=400&fit=crop",
+                "ui:buttonLabel": "Explore Project",
+                "ui:styles": {
+                  maxWidth: "900px",
+                  margin: "0 auto 50px",
+                  padding: "35px",
+                  animation: "fadeInUp 0.8s ease-out 0.4s both",
+                },
+                "ui:imageStyles": {
+                  height: "300px",
+                  objectFit: "cover",
+                },
+              },
+              project3: {
+                "ui:widget": "card",
+                "ui:title": "🛒 E-commerce Mobile App",
+                "ui:description":
+                  "React Native mobile app with seamless checkout experience, push notifications, and offline mode. Integrated with Stripe for payments and Firebase for real-time updates.",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&h=400&fit=crop",
+                "ui:buttonLabel": "See Details",
+                "ui:styles": {
+                  maxWidth: "900px",
+                  margin: "0 auto 50px",
+                  padding: "35px",
+                  animation: "fadeInUp 0.8s ease-out 0.6s both",
+                },
+                "ui:imageStyles": {
+                  height: "300px",
+                  objectFit: "cover",
+                },
+              },
+              spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+              ctaCard: {
+                "ui:widget": "card",
+                "ui:title": "💡 Have a Project in Mind?",
+                "ui:description":
+                  "Let's collaborate and bring your ideas to life! I'm available for freelance projects and consulting.",
+                "ui:action": "openModal:authModal",
+                "ui:buttonLabel": "Get in Touch",
+                "ui:styles": {
+                  maxWidth: "700px",
+                  margin: "0 auto",
+                  padding: "50px",
                   background:
                     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  minHeight: "400px",
-                },
-              },
-
-              spacer1: { "ui:widget": "spacer", "ui:height": 80 },
-
-              electronicsCard: {
-                "ui:widget": "card",
-                "ui:title": "💻 Electronics",
-                "ui:description":
-                  "Latest gadgets, smartphones, laptops, and tech accessories",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=600&h=400&fit=crop",
-                "ui:action": "navigate:/shopzone",
-                "ui:buttonLabel": "Browse Electronics",
-                "ui:styles": {
-                  maxWidth: "800px",
-                  margin: "0 auto 40px",
-                  minHeight: "280px",
-                },
-                "ui:imageStyles": {
-                  height: "250px",
-                  objectFit: "cover",
-                },
-              },
-
-              fashionCard: {
-                "ui:widget": "card",
-                "ui:title": "👗 Fashion & Apparel",
-                "ui:description":
-                  "Trending clothing, shoes, and accessories for every style",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1445205170230-053b83016050?w=600&h=400&fit=crop",
-                "ui:action": "navigate:/shopzone",
-                "ui:buttonLabel": "Browse Fashion",
-                "ui:styles": {
-                  maxWidth: "800px",
-                  margin: "0 auto 40px",
-                  minHeight: "280px",
-                },
-                "ui:imageStyles": {
-                  height: "250px",
-                  objectFit: "cover",
-                },
-              },
-
-              homeCard: {
-                "ui:widget": "card",
-                "ui:title": "🏠 Home & Living",
-                "ui:description":
-                  "Furniture, decor, kitchen essentials, and more for your space",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&h=400&fit=crop",
-                "ui:action": "navigate:/shopzone",
-                "ui:buttonLabel": "Browse Home & Living",
-                "ui:styles": {
-                  maxWidth: "800px",
-                  margin: "0 auto 40px",
-                  minHeight: "280px",
-                },
-                "ui:imageStyles": {
-                  height: "250px",
-                  objectFit: "cover",
+                  color: "white",
+                  textAlign: "center",
+                  border: "none",
+                  animation: "pulse 2s ease-in-out infinite",
                 },
               },
             },
             styles: {
-              padding: "100px 40px 80px",
-              background: "#ffffff",
+              padding: "120px 40px 80px",
+              background: "#f8fafc",
               minHeight: "100vh",
             },
             triggers: [],
@@ -607,8 +540,11 @@ input:focus, textarea:focus, select:focus {
             uiSchema: {
               footerText: {
                 "ui:widget": "text",
-                "ui:content": "© 2024 ShopZone. All rights reserved.",
-                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+                "ui:content": "© 2024 DevFolio. Crafted with ❤️",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#94a3b8",
+                },
               },
             },
             styles: {
@@ -627,9 +563,10 @@ input:focus, textarea:focus, select:focus {
         table: {},
         modal: {
           authModal: {
-            "ui:title": "🔐 Welcome to ShopZone",
+            "ui:title": "🔐 Welcome Back",
             "ui:theme": "light",
-            "ui:content": "Sign in to access your account and start shopping!",
+            "ui:content":
+              "Sign in to access your dashboard and manage your portfolio!",
             "ui:fields": [
               {
                 label: "Email Address",
@@ -677,22 +614,25 @@ input:focus, textarea:focus, select:focus {
               },
             ],
           },
-
           signupModal: {
-            "ui:title": "✨ Create Your Account",
+            "ui:title": "✨ Join DevFolio",
             "ui:theme": "light",
-            "ui:content": "Join ShopZone and start shopping today!",
+            "ui:content":
+              "Create your account and start building your professional portfolio!",
             "ui:fields": [
+              {
+                label: "Full Name",
+                type: "text",
+                placeholder: "John Doe",
+                name: "name",
+                required: true,
+              },
               {
                 label: "Email Address",
                 type: "email",
                 placeholder: "eve.holt@reqres.in",
                 name: "email",
                 required: true,
-                validation: {
-                  required: true,
-                  email: true,
-                },
               },
               {
                 label: "Password",
@@ -700,10 +640,6 @@ input:focus, textarea:focus, select:focus {
                 placeholder: "Create a strong password",
                 name: "password",
                 required: true,
-                validation: {
-                  required: true,
-                  minLength: 6,
-                },
               },
               {
                 label: "Confirm Password",
@@ -711,11 +647,6 @@ input:focus, textarea:focus, select:focus {
                 placeholder: "Re-enter your password",
                 name: "confirmPassword",
                 required: true,
-                validation: {
-                  required: true,
-                  match: "password",
-                  matchMessage: "Passwords must match",
-                },
               },
             ],
             "ui:actions": [
@@ -732,12 +663,11 @@ input:focus, textarea:focus, select:focus {
               },
             ],
           },
-
           forgotModal: {
             "ui:title": "🔑 Reset Your Password",
             "ui:theme": "light",
             "ui:content":
-              "Enter your email address and we'll send you reset instructions.",
+              "Enter your email address and we'll send you instructions to reset your password.",
             "ui:fields": [
               {
                 label: "Email Address",
@@ -745,10 +675,6 @@ input:focus, textarea:focus, select:focus {
                 placeholder: "eve.holt@reqres.in",
                 name: "email",
                 required: true,
-                validation: {
-                  required: true,
-                  email: true,
-                },
               },
             ],
             "ui:actions": [
@@ -766,63 +692,43 @@ input:focus, textarea:focus, select:focus {
             ],
           },
         },
-
         uiSchema: {
           logo: {
             "ui:widget": "text",
-            "ui:content": "🛒 ShopZone",
+            "ui:content": "💼 DevFolio",
             "ui:styles": {
-              fontSize: "28px",
+              fontSize: "26px",
               fontWeight: "800",
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               cursor: "pointer",
+              animation: "slideInLeft 0.6s ease-out",
             },
           },
-
-          searchBar: {
-            "ui:widget": "inputField",
-            "ui:placeholder": "Search products...",
-            "ui:type": "text",
-            "ui:inputStyles": {
-              border: "2px solid #e2e8f0",
-              borderRadius: "25px",
-              padding: "10px 20px",
-              width: "400px",
-            },
-            "ui:styles": { marginBottom: "0" },
-          },
-
-          // ✅ NAV LINKS WITH AUTH CONDITIONAL
           links: {
             "ui:widget": "navLinks",
             "ui:theme": "light",
             "ui:links": [
-              { label: "Home", action: "navigate:/shopzone" },
-              { label: "Categories", action: "navigate:/shopzone/categories" },
-              { label: "Cart (3)", action: "navigate:/shopzone/cart" },
-
-              // ✅ Show "Welcome, User" if logged in, else "Login"
+              { label: "Home", action: "navigate:/devfolio" },
+              { label: "About", action: "navigate:/devfolio/about" },
+              { label: "Projects", action: "navigate:/devfolio/projects" },
               {
                 label:
                   "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
                 action:
-                  "{{auth.token ? 'openModal:profileModal' : 'openModal:authModal'}}",
+                  "{{auth.token ? 'console:logged-in' : 'openModal:authModal'}}",
               },
-
-              // ✅ Show Logout button if logged in
               {
                 label: "{{auth.token ? 'Logout' : ''}}",
                 action: "clearAuth+reload",
-                // This will only show when logged in
               },
             ],
           },
         },
-
         styles: {
-          background: "#ffffff",
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(10px)",
           borderBottom: "2px solid #f0f0f0",
           padding: "20px 50px",
           position: "fixed",
@@ -831,1046 +737,7 @@ input:focus, textarea:focus, select:focus {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
-        },
-        triggers: [],
-      },
-
-      sidebar: {
-        table: {},
-        modal: {},
-        uiSchema: {
-          categoriesHeading: {
-            "ui:widget": "heading",
-            "ui:text": "📂 Categories",
-            "ui:level": "h3",
-            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
-          },
-          categoryList: {
-            "ui:widget": "list",
-            "ui:ordered": false,
-            "ui:icon": "›",
-            "ui:items": [
-              "Electronics",
-              "Fashion & Apparel",
-              "Home & Living",
-              "Sports & Outdoors",
-              "Books & Media",
-              "Beauty & Health",
-            ],
-            "ui:itemStyles": {
-              cursor: "pointer",
-              padding: "12px 0",
-              transition: "all 0.2s",
-            },
-          },
-
-          divider: {
-            "ui:widget": "divider",
-            "ui:spacing": "large",
-          },
-
-          priceHeading: {
-            "ui:widget": "heading",
-            "ui:text": "💰 Price Range",
-            "ui:level": "h3",
-            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
-          },
-
-          priceFilter: {
-            "ui:widget": "checkbox",
-            "ui:label": "Under $50",
-            "ui:styles": { marginBottom: "12px" },
-          },
-          priceFilter2: {
-            "ui:widget": "checkbox",
-            "ui:label": "$50 - $100",
-            "ui:styles": { marginBottom: "12px" },
-          },
-          priceFilter3: {
-            "ui:widget": "checkbox",
-            "ui:label": "$100 - $200",
-            "ui:styles": { marginBottom: "12px" },
-          },
-          priceFilter4: {
-            "ui:widget": "checkbox",
-            "ui:label": "Above $200",
-            "ui:styles": { marginBottom: "12px" },
-          },
-
-          divider2: {
-            "ui:widget": "divider",
-            "ui:spacing": "large",
-          },
-
-          ratingHeading: {
-            "ui:widget": "heading",
-            "ui:text": "⭐ Rating",
-            "ui:level": "h3",
-            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
-          },
-
-          rating5: {
-            "ui:widget": "checkbox",
-            "ui:label": "⭐⭐⭐⭐⭐ (5 stars)",
-            "ui:styles": { marginBottom: "12px" },
-          },
-          rating4: {
-            "ui:widget": "checkbox",
-            "ui:label": "⭐⭐⭐⭐ (4+ stars)",
-            "ui:styles": { marginBottom: "12px" },
-          },
-          rating3: {
-            "ui:widget": "checkbox",
-            "ui:label": "⭐⭐⭐ (3+ stars)",
-            "ui:styles": { marginBottom: "12px" },
-          },
-        },
-        styles: {
-          width: "280px",
-          background: "#f8fafc",
-          padding: "120px 24px 24px",
-          minHeight: "100vh",
-          borderRight: "1px solid #e2e8f0",
-          position: "sticky",
-          top: 0,
-        },
-        triggers: [],
-      },
-
-      main: {
-        table: {},
-        modal: {},
-        uiSchema: {
-          hero: {
-            "ui:widget": "hero",
-            "ui:title": "Summer Sale 🔥",
-            "ui:subtitle":
-              "Up to 50% OFF on selected items. Limited time offer!",
-            "ui:cta": {
-              label: "Shop Now",
-              action: "scroll:#products",
-            },
-            "ui:styles": {
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              minHeight: "500px",
-              padding: "150px 40px 100px",
-            },
-          },
-
-          spacer1: { "ui:widget": "spacer", "ui:height": 60 },
-
-          featuredHeading: {
-            "ui:widget": "heading",
-            "ui:text": "✨ Featured Products",
-            "ui:level": "h2",
-            "ui:styles": {
-              textAlign: "center",
-              marginBottom: "50px",
-              fontSize: "2.5rem",
-            },
-          },
-
-          productsGrid: {
-            "ui:widget": "projectGrid",
-            "ui:animated": true,
-          },
-
-          spacer2: { "ui:widget": "spacer", "ui:height": 80 },
-
-          dealSection: {
-            "ui:widget": "card",
-            "ui:title": "⚡ Deal of the Day",
-            "ui:description":
-              "Premium Wireless Earbuds - Now at $79.99 (was $149.99). Hurry, only 12 left in stock!",
-            "ui:image":
-              "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=400&fit=crop",
-            "ui:action": "openModal:authModal",
-            "ui:buttonLabel": "Grab This Deal",
-            "ui:styles": {
-              maxWidth: "900px",
-              margin: "0 auto",
-              padding: "40px",
-              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-              color: "white",
-              border: "none",
-            },
-          },
-
-          spacer3: { "ui:widget": "spacer", "ui:height": 60 },
-
-          testimonialsHeading: {
-            "ui:widget": "heading",
-            "ui:text": "💬 Customer Reviews",
-            "ui:level": "h2",
-            "ui:styles": { textAlign: "center", marginBottom: "50px" },
-          },
-
-          testimonial1: {
-            "ui:widget": "testimonial",
-            "ui:quote":
-              "Amazing quality and fast shipping! Will definitely order again.",
-            "ui:author": "Sarah Johnson",
-            "ui:role": "Verified Buyer",
-            "ui:avatar": "https://i.pravatar.cc/100?img=1",
-            "ui:rating": 5,
-            "ui:styles": { maxWidth: "600px", margin: "0 auto 30px" },
-          },
-
-          testimonial2: {
-            "ui:widget": "testimonial",
-            "ui:quote":
-              "Best online shopping experience ever. Highly recommend ShopZone!",
-            "ui:author": "Michael Chen",
-            "ui:role": "Verified Buyer",
-            "ui:avatar": "https://i.pravatar.cc/100?img=3",
-            "ui:rating": 5,
-            "ui:styles": { maxWidth: "600px", margin: "0 auto 30px" },
-          },
-        },
-        styles: {
-          padding: "100px 40px 80px",
-          background: "#ffffff",
-          flex: 1,
-          minHeight: "100vh",
-        },
-        triggers: [
-          { event: "load", action: "fetchProducts", source: "products.api" },
-        ],
-      },
-
-      footer: {
-        table: {},
-        modal: {},
-        uiSchema: {
-          footerHeading: {
-            "ui:widget": "heading",
-            "ui:text": "🛍️ ShopZone",
-            "ui:level": "h3",
-            "ui:styles": {
-              textAlign: "center",
-              color: "#e2e8f0",
-              marginBottom: "20px",
-            },
-          },
-          footerDesc: {
-            "ui:widget": "paragraph",
-            "ui:text":
-              "Your one-stop destination for quality products at unbeatable prices. Shop with confidence!",
-            "ui:styles": {
-              textAlign: "center",
-              color: "#94a3b8",
-              maxWidth: "600px",
-              margin: "0 auto 30px",
-            },
-          },
-
-          quickLinksHeading: {
-            "ui:widget": "heading",
-            "ui:text": "Quick Links",
-            "ui:level": "h4",
-            "ui:styles": {
-              textAlign: "center",
-              color: "#cbd5e1",
-              marginBottom: "15px",
-              fontSize: "1.1rem",
-            },
-          },
-
-          quickLinks: {
-            "ui:widget": "list",
-            "ui:ordered": false,
-            "ui:icon": "→",
-            "ui:items": [
-              "Track Order",
-              "Return Policy",
-              "Privacy Policy",
-              "Terms & Conditions",
-              "Contact Support",
-            ],
-            "ui:styles": {
-              maxWidth: "300px",
-              margin: "0 auto 30px",
-            },
-            "ui:itemStyles": {
-              color: "#94a3b8",
-              textAlign: "center",
-              justifyContent: "center",
-            },
-          },
-
-          socialIcons: {
-            "ui:widget": "socialIcons",
-            "ui:size": "medium",
-            "ui:variant": "colored",
-            "ui:icons": [
-              {
-                emoji: "📘",
-                platform: "facebook",
-                url: "https://facebook.com/shopzone",
-              },
-              {
-                emoji: "🐦",
-                platform: "twitter",
-                url: "https://twitter.com/shopzone",
-              },
-              {
-                emoji: "📷",
-                platform: "instagram",
-                url: "https://instagram.com/shopzone",
-              },
-              {
-                emoji: "💼",
-                platform: "linkedin",
-                url: "https://linkedin.com/company/shopzone",
-              },
-            ],
-          },
-
-          divider: {
-            "ui:widget": "divider",
-            "ui:variant": "solid",
-            "ui:color": "#475569",
-            "ui:spacing": "large",
-          },
-
-          footerText: {
-            "ui:widget": "text",
-            "ui:content": "© 2024 ShopZone. All rights reserved. Made with ❤️",
-            "ui:styles": {
-              textAlign: "center",
-              color: "#94a3b8",
-              fontSize: "14px",
-            },
-          },
-        },
-        styles: {
-          background: "#1e293b",
-          padding: "60px 40px 40px",
-          borderTop: "3px solid #667eea",
-        },
-        triggers: [],
-      },
-    },
-  },
-  {
-    title: "BlogHub - Share Your Stories",
-    slug: "bloghub",
-    projectUUID: "blog-platform",
-    taskUUID: "blog001",
-    status: "Active",
-    accountValidation: true,
-    otpValidation: false,
-    isAnonymous: false,
-
-    initialization: {
-      globalCSS: `
-    /* Reset and Base Styles */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #1e293b;
-  background: #f8fafc;
-}
-
-/* Smooth Scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Better Button Styles */
-button {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  font-family: inherit;
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Better Link Styles */
-a {
-  text-decoration: none;
-  color: inherit;
-  transition: color 0.2s ease;
-}
-
-/* Responsive Typography */
-h1 {
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  line-height: 1.2;
-}
-
-h2 {
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  line-height: 1.3;
-}
-
-h3 {
-  font-size: clamp(1.2rem, 3vw, 1.8rem);
-  line-height: 1.4;
-}
-
-/* Card Shadows */
-.card, article {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-  background: white;
-  border-radius: 12px;
-}
-
-.card:hover, article:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-/* Better Form Inputs */
-input, textarea, select {
-  font-family: inherit;
-  font-size: inherit;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 12px 16px;
-  transition: border-color 0.2s ease;
-  width: 100%;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-/* Responsive Container */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-/* Utility Classes */
-.text-center {
-  text-align: center;
-}
-
-.mt-4 {
-  margin-top: 2rem;
-}
-
-.mb-4 {
-  margin-bottom: 2rem;
-}
-      `,
-      resources: [
-        "auth.login",
-        "auth.signup",
-        "blog.create",
-        "blog.list",
-      ],
-    },
-
-    pages: {
-      // 🔹 LOGIN PAGE
-      login: {
-        title: "Login - BlogHub",
-        components: {
-          navbar: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              logo: {
-                "ui:widget": "text",
-                "ui:content": "📝 BlogHub",
-                "ui:styles": {
-                  fontSize: "28px",
-                  fontWeight: "800",
-                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  cursor: "pointer",
-                },
-              },
-              links: {
-                "ui:widget": "navLinks",
-                "ui:theme": "light",
-                "ui:links": [
-                  { label: "Home", action: "navigate:/bloghub" },
-                  { label: "Sign Up", action: "navigate:/bloghub/signup" },
-                ],
-              },
-            },
-            styles: {
-              background: "#ffffff",
-              borderBottom: "2px solid #e2e8f0",
-              padding: "20px 50px",
-              position: "fixed",
-              width: "100%",
-              zIndex: 1000,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
-            },
-            triggers: [],
-          },
-          sidebar: {
-            table: {},
-            modal: {},
-            uiSchema: {},
-            styles: { display: "none" },
-            triggers: [],
-          },
-          main: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              loginContainer: {
-                "ui:widget": "card",
-                "ui:title": "🔐 Welcome Back",
-                "ui:description": "Sign in to continue to your account",
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "150px auto 0",
-                  padding: "40px",
-                  background: "white",
-                },
-              },
-
-              emailField: {
-                "ui:widget": "inputField",
-                "ui:label": "Email Address",
-                "ui:placeholder": "you@example.com",
-                "ui:type": "email",
-                "ui:name": "email",
-                "ui:required": true,
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "20px auto",
-                },
-              },
-
-              passwordField: {
-                "ui:widget": "inputField",
-                "ui:label": "Password",
-                "ui:placeholder": "Enter your password",
-                "ui:type": "password",
-                "ui:name": "password",
-                "ui:required": true,
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "20px auto",
-                },
-              },
-
-              loginButton: {
-                "ui:widget": "button",
-                "ui:label": "Sign In",
-                "ui:action": "api:auth.login",
-                "ui:variant": "primary",
-                "ui:apiKey": "auth.login",
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "30px auto",
-                  padding: "14px 0",
-                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                  color: "white",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  borderRadius: "8px",
-                  width: "100%",
-                  display: "block",
-                },
-              },
-
-              signupLink: {
-                "ui:widget": "text",
-                "ui:content": "Don't have an account? <a href='/bloghub/signup' style='color: #3b82f6; font-weight: 600;'>Sign Up</a>",
-                "ui:styles": {
-                  textAlign: "center",
-                  maxWidth: "450px",
-                  margin: "20px auto",
-                  color: "#64748b",
-                },
-              },
-            },
-            styles: {
-              padding: "100px 40px 80px",
-              background: "#f8fafc",
-              minHeight: "100vh",
-            },
-            triggers: [],
-          },
-          footer: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              footerText: {
-                "ui:widget": "text",
-                "ui:content": "© 2024 BlogHub. All rights reserved.",
-                "ui:styles": { textAlign: "center", color: "#94a3b8" },
-              },
-            },
-            styles: {
-              background: "#1e293b",
-              padding: "30px",
-              textAlign: "center",
-            },
-            triggers: [],
-          },
-        },
-      },
-
-      // 🔹 SIGNUP PAGE
-      signup: {
-        title: "Sign Up - BlogHub",
-        components: {
-          navbar: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              logo: {
-                "ui:widget": "text",
-                "ui:content": "📝 BlogHub",
-                "ui:styles": {
-                  fontSize: "28px",
-                  fontWeight: "800",
-                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  cursor: "pointer",
-                },
-              },
-              links: {
-                "ui:widget": "navLinks",
-                "ui:theme": "light",
-                "ui:links": [
-                  { label: "Home", action: "navigate:/bloghub" },
-                  { label: "Login", action: "navigate:/bloghub/login" },
-                ],
-              },
-            },
-            styles: {
-              background: "#ffffff",
-              borderBottom: "2px solid #e2e8f0",
-              padding: "20px 50px",
-              position: "fixed",
-              width: "100%",
-              zIndex: 1000,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
-            },
-            triggers: [],
-          },
-          sidebar: {
-            table: {},
-            modal: {},
-            uiSchema: {},
-            styles: { display: "none" },
-            triggers: [],
-          },
-          main: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              signupContainer: {
-                "ui:widget": "card",
-                "ui:title": "✨ Create Your Account",
-                "ui:description": "Join BlogHub and start sharing your stories",
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "150px auto 0",
-                  padding: "40px",
-                  background: "white",
-                },
-              },
-
-              nameField: {
-                "ui:widget": "inputField",
-                "ui:label": "Full Name",
-                "ui:placeholder": "John Doe",
-                "ui:type": "text",
-                "ui:name": "name",
-                "ui:required": true,
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "20px auto",
-                },
-              },
-
-              emailField: {
-                "ui:widget": "inputField",
-                "ui:label": "Email Address",
-                "ui:placeholder": "you@example.com",
-                "ui:type": "email",
-                "ui:name": "email",
-                "ui:required": true,
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "20px auto",
-                },
-              },
-
-              passwordField: {
-                "ui:widget": "inputField",
-                "ui:label": "Password",
-                "ui:placeholder": "Create a strong password",
-                "ui:type": "password",
-                "ui:name": "password",
-                "ui:required": true,
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "20px auto",
-                },
-              },
-
-              confirmPasswordField: {
-                "ui:widget": "inputField",
-                "ui:label": "Confirm Password",
-                "ui:placeholder": "Re-enter your password",
-                "ui:type": "password",
-                "ui:name": "confirmPassword",
-                "ui:required": true,
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "20px auto",
-                },
-              },
-
-              signupButton: {
-                "ui:widget": "button",
-                "ui:label": "Create Account",
-                "ui:action": "api:auth.signup",
-                "ui:variant": "primary",
-                "ui:apiKey": "auth.signup",
-                "ui:styles": {
-                  maxWidth: "450px",
-                  margin: "30px auto",
-                  padding: "14px 0",
-                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                  color: "white",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  borderRadius: "8px",
-                  width: "100%",
-                  display: "block",
-                },
-              },
-
-              loginLink: {
-                "ui:widget": "text",
-                "ui:content": "Already have an account? <a href='/bloghub/login' style='color: #3b82f6; font-weight: 600;'>Login</a>",
-                "ui:styles": {
-                  textAlign: "center",
-                  maxWidth: "450px",
-                  margin: "20px auto",
-                  color: "#64748b",
-                },
-              },
-            },
-            styles: {
-              padding: "100px 40px 80px",
-              background: "#f8fafc",
-              minHeight: "100vh",
-            },
-            triggers: [],
-          },
-          footer: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              footerText: {
-                "ui:widget": "text",
-                "ui:content": "© 2024 BlogHub. All rights reserved.",
-                "ui:styles": { textAlign: "center", color: "#94a3b8" },
-              },
-            },
-            styles: {
-              background: "#1e293b",
-              padding: "30px",
-              textAlign: "center",
-            },
-            triggers: [],
-          },
-        },
-      },
-
-      // 🔹 HOME PAGE (After Login - Blog Feed)
-      home: {
-        title: "Home - BlogHub",
-        components: {
-          navbar: {
-            table: {},
-            modal: {
-              createBlogModal: {
-                "ui:title": "✍️ Create New Blog Post",
-                "ui:theme": "light",
-                "ui:content": "Share your thoughts with the world",
-                "ui:minHeight": "500px",
-                "ui:fields": [
-                  {
-                    label: "Blog Title",
-                    type: "text",
-                    placeholder: "Enter an engaging title",
-                    name: "title",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Title is required",
-                      minLength: 5,
-                      minLengthMessage: "Title must be at least 5 characters",
-                    },
-                  },
-                  {
-                    label: "Blog Content",
-                    type: "textarea",
-                    placeholder: "Write your story here...",
-                    name: "content",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Content is required",
-                      minLength: 20,
-                      minLengthMessage: "Content must be at least 20 characters",
-                    },
-                  },
-                  {
-                    label: "Category",
-                    type: "select",
-                    name: "category",
-                    required: true,
-                    options: [
-                      { value: "technology", label: "Technology" },
-                      { value: "lifestyle", label: "Lifestyle" },
-                      { value: "travel", label: "Travel" },
-                      { value: "food", label: "Food" },
-                      { value: "business", label: "Business" },
-                      { value: "other", label: "Other" },
-                    ],
-                  },
-                ],
-                "ui:actions": [
-                  {
-                    label: "Cancel",
-                    action: "closeModal",
-                    variant: "secondary",
-                  },
-                  {
-                    label: "Publish Blog",
-                    action: "api:blog.create",
-                    variant: "primary",
-                    apiKey: "blog.create",
-                  },
-                ],
-              },
-            },
-            uiSchema: {
-              logo: {
-                "ui:widget": "text",
-                "ui:content": "📝 BlogHub",
-                "ui:styles": {
-                  fontSize: "28px",
-                  fontWeight: "800",
-                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  cursor: "pointer",
-                },
-              },
-              links: {
-                "ui:widget": "navLinks",
-                "ui:theme": "light",
-                "ui:links": [
-                  { label: "My Blogs", action: "navigate:/bloghub/home" },
-                  { label: "Create Post", action: "openModal:createBlogModal" },
-                  { label: "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}", action: "{{auth.token ? '' : 'navigate:/bloghub/login'}}" },
-                  { label: "{{auth.token ? 'Logout' : ''}}", action: "clearAuth+reload" },
-                ],
-              },
-            },
-            styles: {
-              background: "#ffffff",
-              borderBottom: "2px solid #e2e8f0",
-              padding: "20px 50px",
-              position: "fixed",
-              width: "100%",
-              zIndex: 1000,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
-            },
-            triggers: [],
-          },
-          sidebar: {
-            table: {},
-            modal: {},
-            uiSchema: {},
-            styles: { display: "none" },
-            triggers: [],
-          },
-          main: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              hero: {
-                "ui:widget": "hero",
-                "ui:title": "Welcome to Your Blog Feed 📚",
-                "ui:subtitle": "Discover and share amazing stories",
-                "ui:cta": {
-                  label: "Write a Post",
-                  action: "openModal:createBlogModal",
-                },
-                "ui:styles": {
-                  background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-                  minHeight: "350px",
-                  padding: "120px 40px 80px",
-                },
-              },
-
-              spacer1: { "ui:widget": "spacer", "ui:height": 60 },
-
-              blogsHeading: {
-                "ui:widget": "heading",
-                "ui:text": "📖 Latest Blog Posts",
-                "ui:level": "h2",
-                "ui:styles": {
-                  textAlign: "center",
-                  marginBottom: "50px",
-                  fontSize: "2rem",
-                },
-              },
-
-              blogsGrid: {
-                "ui:widget": "projectGrid",
-                "ui:animated": true,
-              },
-
-              spacer2: { "ui:widget": "spacer", "ui:height": 60 },
-
-              noBlogsMessage: {
-                "ui:widget": "card",
-                "ui:title": "No Blogs Yet",
-                "ui:description": "Be the first to share your story! Click 'Create Post' to get started.",
-                "ui:action": "openModal:createBlogModal",
-                "ui:buttonLabel": "Write Your First Blog",
-                "ui:styles": {
-                  maxWidth: "600px",
-                  margin: "0 auto",
-                  padding: "40px",
-                  textAlign: "center",
-                  background: "#f8fafc",
-                  border: "2px dashed #cbd5e1",
-                },
-              },
-            },
-            styles: {
-              padding: "100px 40px 80px",
-              background: "#ffffff",
-              minHeight: "100vh",
-            },
-            triggers: [
-              { event: "load", action: "fetchBlogs", source: "blog.list" },
-            ],
-          },
-          footer: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              footerHeading: {
-                "ui:widget": "heading",
-                "ui:text": "📝 BlogHub",
-                "ui:level": "h3",
-                "ui:styles": {
-                  textAlign: "center",
-                  color: "#e2e8f0",
-                  marginBottom: "20px",
-                },
-              },
-              footerDesc: {
-                "ui:widget": "paragraph",
-                "ui:text": "Your platform for sharing stories, ideas, and inspiration with the world.",
-                "ui:styles": {
-                  textAlign: "center",
-                  color: "#94a3b8",
-                  maxWidth: "600px",
-                  margin: "0 auto 30px",
-                },
-              },
-              footerText: {
-                "ui:widget": "text",
-                "ui:content": "© 2024 BlogHub. All rights reserved. Made with ❤️",
-                "ui:styles": {
-                  textAlign: "center",
-                  color: "#94a3b8",
-                  fontSize: "14px",
-                },
-              },
-            },
-            styles: {
-              background: "#1e293b",
-              padding: "60px 40px 40px",
-              borderTop: "3px solid #3b82f6",
-            },
-            triggers: [],
-          },
-        },
-      },
-    },
-
-    components: {
-      navbar: {
-        table: {},
-        modal: {},
-        uiSchema: {
-          logo: {
-            "ui:widget": "text",
-            "ui:content": "📝 BlogHub",
-            "ui:styles": {
-              fontSize: "28px",
-              fontWeight: "800",
-              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              cursor: "pointer",
-            },
-          },
-          links: {
-            "ui:widget": "navLinks",
-            "ui:theme": "light",
-            "ui:links": [
-              { label: "Home", action: "navigate:/bloghub" },
-              { label: "Login", action: "navigate:/bloghub/login" },
-              { label: "Sign Up", action: "navigate:/bloghub/signup" },
-            ],
-          },
-        },
-        styles: {
-          background: "#ffffff",
-          borderBottom: "2px solid #e2e8f0",
-          padding: "20px 50px",
-          position: "fixed",
-          width: "100%",
-          zIndex: 1000,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
         },
         triggers: [],
       },
@@ -1887,24 +754,157 @@ textarea {
         uiSchema: {
           hero: {
             "ui:widget": "hero",
-            "ui:title": "Share Your Voice 🎯",
-            "ui:subtitle": "Join thousands of writers sharing their stories on BlogHub",
+            "ui:title": "Hi, I'm Alex 👋",
+            "ui:subtitle":
+              "Full Stack Developer | UI/UX Enthusiast | Problem Solver",
             "ui:cta": {
-              label: "Get Started",
-              action: "navigate:/bloghub/signup",
+              label: "View My Work",
+              action: "navigate:/devfolio/projects",
             },
             "ui:styles": {
-              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               minHeight: "600px",
-              padding: "180px 40px 100px",
+              padding: "150px 40px 100px",
+              animation: "fadeInUp 1s ease-out",
+            },
+          },
+          spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+
+          // 🆕 NEW COLUMNS WIDGET SHOWCASE
+          servicesShowcase: {
+            "ui:widget": "columns",
+            "ui:ratio": "1:1:1",
+            "ui:gap": "40px",
+            "ui:responsive": { tablet: 2, mobile: 1 },
+            "ui:columns": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:align": "center",
+                "ui:gap": "20px",
+                "ui:children": [
+                  {
+                    "ui:widget": "icon",
+                    "ui:emoji": "⚡",
+                    "ui:size": "large",
+                  },
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "Fast Development",
+                    "ui:level": "h3",
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content":
+                      "Quick turnaround without compromising quality",
+                  },
+                ],
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:align": "center",
+                "ui:gap": "20px",
+                "ui:children": [
+                  {
+                    "ui:widget": "icon",
+                    "ui:emoji": "🎨",
+                    "ui:size": "large",
+                  },
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "Modern Design",
+                    "ui:level": "h3",
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content":
+                      "Clean, responsive designs that work everywhere",
+                  },
+                ],
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:align": "center",
+                "ui:gap": "20px",
+                "ui:children": [
+                  {
+                    "ui:widget": "icon",
+                    "ui:emoji": "🔧",
+                    "ui:size": "large",
+                  },
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "Full Stack",
+                    "ui:level": "h3",
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content":
+                      "End-to-end solutions from frontend to backend",
+                  },
+                ],
+              },
+            ],
+          },
+
+          spacer2: { "ui:widget": "spacer", "ui:height": 80 },
+
+          statsHeading: {
+            "ui:widget": "heading",
+            "ui:text": "📊 By The Numbers",
+            "ui:level": "h2",
+            "ui:styles": {
+              textAlign: "center",
+              marginBottom: "60px",
+              fontSize: "2.5rem",
+              animation: "fadeInUp 0.8s ease-out 0.2s both",
             },
           },
 
-          spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+          // 🆕 USING COLUMNS FOR STATS INSTEAD OF FLEXLAYOUT
+          statsContainer: {
+            "ui:widget": "columns",
+            "ui:ratio": "1:1:1",
+            "ui:gap": "40px",
+            "ui:align": "center",
+            "ui:columns": [
+              {
+                "ui:widget": "statsCounter",
+                "ui:value": "50+",
+                "ui:label": "Projects Completed",
+                "ui:color": "#667eea",
+                "ui:styles": {
+                  animation: "float 3s ease-in-out infinite",
+                },
+              },
+              {
+                "ui:widget": "statsCounter",
+                "ui:value": "30+",
+                "ui:label": "Happy Clients",
+                "ui:color": "#764ba2",
+                "ui:styles": {
+                  animation: "float 3s ease-in-out infinite 0.5s",
+                },
+              },
+              {
+                "ui:widget": "statsCounter",
+                "ui:value": "5+",
+                "ui:label": "Years Experience",
+                "ui:color": "#f093fb",
+                "ui:styles": {
+                  animation: "float 3s ease-in-out infinite 1s",
+                },
+              },
+            ],
+          },
 
-          featuresHeading: {
+          spacer3: { "ui:widget": "spacer", "ui:height": 60 },
+
+          featuredHeading: {
             "ui:widget": "heading",
-            "ui:text": "✨ Why Choose BlogHub?",
+            "ui:text": "🌟 Featured Work",
             "ui:level": "h2",
             "ui:styles": {
               textAlign: "center",
@@ -1913,64 +913,144 @@ textarea {
             },
           },
 
-          feature1: {
-            "ui:widget": "card",
-            "ui:title": "✍️ Easy Publishing",
-            "ui:description": "Write and publish your blogs with our intuitive editor. No technical skills required.",
-            "ui:styles": {
-              maxWidth: "800px",
-              margin: "0 auto 30px",
-              padding: "30px",
-              textAlign: "center",
+          // 🆕 USING RESPONSIVE GRID FOR PROJECTS
+          projectsGrid: {
+            "ui:widget": "responsiveGrid",
+            "ui:columns": { desktop: 3, tablet: 2, mobile: 1 },
+            "ui:gap": "30px",
+            "ui:items": [
+              {
+                "ui:widget": "card",
+                "ui:title": "SaaS Dashboard",
+                "ui:description":
+                  "Real-time analytics platform serving 10K+ users",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop",
+                "ui:action": "navigate:/devfolio/projects",
+                "ui:buttonLabel": "View Project",
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "Music Streaming App",
+                "ui:description": "Full-stack app with social features",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=250&fit=crop",
+                "ui:action": "navigate:/devfolio/projects",
+                "ui:buttonLabel": "View Project",
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "E-commerce Mobile",
+                "ui:description": "React Native app with offline mode",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=250&fit=crop",
+                "ui:action": "navigate:/devfolio/projects",
+                "ui:buttonLabel": "View Project",
+              },
+            ],
+          },
+
+          spacer4: { "ui:widget": "spacer", "ui:height": 80 },
+
+          // 🆕 SIDEBAR LAYOUT FOR ABOUT PREVIEW
+          aboutPreview: {
+            "ui:widget": "sidebarLayout",
+            "ui:sidebarWidth": "300px",
+            "ui:gap": "50px",
+            "ui:sidebar": {
+              "ui:widget": "image",
+              "ui:src":
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+              "ui:styles": {
+                borderRadius: "20px",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+              },
+            },
+            "ui:main": {
+              "ui:widget": "container",
+              "ui:direction": "column",
+              "ui:gap": "20px",
+              "ui:children": [
+                {
+                  "ui:widget": "heading",
+                  "ui:text": "Why Work With Me?",
+                  "ui:level": "h2",
+                },
+                {
+                  "ui:widget": "text",
+                  "ui:content":
+                    "I combine technical expertise with creative problem-solving to deliver solutions that not only work flawlessly but also provide exceptional user experiences.",
+                },
+                {
+                  "ui:widget": "columns",
+                  "ui:ratio": "1:1",
+                  "ui:gap": "30px",
+                  "ui:columns": [
+                    {
+                      "ui:widget": "container",
+                      "ui:direction": "column",
+                      "ui:gap": "10px",
+                      "ui:children": [
+                        {
+                          "ui:widget": "heading",
+                          "ui:text": "Clean Code",
+                          "ui:level": "h4",
+                        },
+                        {
+                          "ui:widget": "text",
+                          "ui:content":
+                            "Maintainable, scalable, and well-documented",
+                        },
+                      ],
+                    },
+                    {
+                      "ui:widget": "container",
+                      "ui:direction": "column",
+                      "ui:gap": "10px",
+                      "ui:children": [
+                        {
+                          "ui:widget": "heading",
+                          "ui:text": "User-Focused",
+                          "ui:level": "h4",
+                        },
+                        {
+                          "ui:widget": "text",
+                          "ui:content":
+                            "Designs that prioritize user experience",
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
             },
           },
 
-          feature2: {
-            "ui:widget": "card",
-            "ui:title": "🌐 Reach Readers",
-            "ui:description": "Share your content with a growing community of passionate readers worldwide.",
-            "ui:styles": {
-              maxWidth: "800px",
-              margin: "0 auto 30px",
-              padding: "30px",
-              textAlign: "center",
-            },
-          },
-
-          feature3: {
-            "ui:widget": "card",
-            "ui:title": "📊 Track Engagement",
-            "ui:description": "Monitor your blog's performance and see how readers interact with your content.",
-            "ui:styles": {
-              maxWidth: "800px",
-              margin: "0 auto 30px",
-              padding: "30px",
-              textAlign: "center",
-            },
-          },
-
-          spacer2: { "ui:widget": "spacer", "ui:height": 80 },
+          spacer5: { "ui:widget": "spacer", "ui:height": 80 },
 
           ctaSection: {
             "ui:widget": "card",
-            "ui:title": "Ready to Start Blogging? 🚀",
-            "ui:description": "Join BlogHub today and share your stories with the world. It's free and takes less than a minute!",
-            "ui:action": "navigate:/bloghub/signup",
-            "ui:buttonLabel": "Create Your Account",
+            "ui:title": "Let's Work Together! 🤝",
+            "ui:description":
+              "I'm currently available for freelance projects and consulting opportunities. Let's create something amazing!",
+            "ui:action": "openModal:authModal",
+            "ui:buttonLabel": "Get Started",
             "ui:styles": {
-              maxWidth: "900px",
+              maxWidth: "800px",
               margin: "0 auto",
-              padding: "50px",
-              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              padding: "60px 40px",
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               color: "white",
               textAlign: "center",
               border: "none",
+              animation: "pulse 2s ease-in-out infinite",
             },
           },
         },
         styles: {
           padding: "100px 40px 80px",
-          background: "#ffffff",
+          background:
+            "linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%)",
           minHeight: "100vh",
         },
         triggers: [],
@@ -1981,7 +1061,7 @@ textarea {
         uiSchema: {
           footerHeading: {
             "ui:widget": "heading",
-            "ui:text": "📝 BlogHub",
+            "ui:text": "💼 DevFolio",
             "ui:level": "h3",
             "ui:styles": {
               textAlign: "center",
@@ -1991,17 +1071,39 @@ textarea {
           },
           footerDesc: {
             "ui:widget": "paragraph",
-            "ui:text": "Your platform for sharing stories, ideas, and inspiration with the world.",
+            "ui:text":
+              "Building digital experiences that inspire and deliver results.",
             "ui:styles": {
               textAlign: "center",
               color: "#94a3b8",
-              maxWidth: "600px",
+              maxWidth: "500px",
               margin: "0 auto 30px",
             },
           },
+          socialIcons: {
+            "ui:widget": "socialIcons",
+            "ui:size": "medium",
+            "ui:variant": "colored",
+            "ui:icons": [
+              { emoji: "💼", platform: "linkedin", url: "#" },
+              { emoji: "🐙", platform: "github", url: "#" },
+              { emoji: "🐦", platform: "twitter", url: "#" },
+              {
+                emoji: "📧",
+                platform: "email",
+                url: "mailto:alex@devfolio.com",
+              },
+            ],
+          },
+          divider: {
+            "ui:widget": "divider",
+            "ui:variant": "solid",
+            "ui:color": "#475569",
+            "ui:spacing": "large",
+          },
           footerText: {
             "ui:widget": "text",
-            "ui:content": "© 2024 BlogHub. All rights reserved. Made with ❤️",
+            "ui:content": "© 2024 DevFolio. Crafted with ❤️ and ☕",
             "ui:styles": {
               textAlign: "center",
               color: "#94a3b8",
@@ -2012,12 +1114,12 @@ textarea {
         styles: {
           background: "#1e293b",
           padding: "60px 40px 40px",
-          borderTop: "3px solid #3b82f6",
+          borderTop: "3px solid #667eea",
         },
         triggers: [],
       },
     },
-  }
+  },
 ];
 
 const seed = async () => {
@@ -2029,10 +1131,11 @@ const seed = async () => {
     console.log("✅ Seeded", websites.length, "websites");
 
     mongoose.disconnect();
+    console.log("📡 Database disconnected");
   } catch (err) {
     console.error("❌ Seed failed:", err);
     mongoose.disconnect();
   }
 };
 
-seed
+seed();

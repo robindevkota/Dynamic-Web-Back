@@ -10,6 +10,40 @@ mongoose.connect(
 );
 
 const apiConfigs = [
+
+   {
+    key: "contact.send",
+    name: "Contact Form Submission",
+    description: "Sends contact form message",
+    url: "https://jsonplaceholder.typicode.com/posts",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformPayload: "(payload) => ({ name: payload.name, email: payload.email, subject: payload.subject, message: payload.message })",
+    
+    successNotification: {
+      type: "toast",
+      message: "Message sent successfully! We'll get back to you soon.",
+      background: "#10b981",
+      duration: 3000,
+    },
+    errorNotification: {
+      type: "toast",
+      message: "Failed to send message. Please try again.",
+      background: "#ef4444",
+      duration: 3000,
+    },
+    closeModalOnSuccess: false, // Keep on same page
+    storeResponse: true,
+    storeKey: "contactResponse",
+    
+    onSuccess: ["console:Message sent successfully"],
+    onError: ["console:Failed to send message"],
+    onNetworkError: "console:Network error while sending message",
+    tags: ["contact", "form", "support"],
+    projectUUID: "global",
+  },
   // ✅ LOGIN API - Using JSONPlaceholder (always returns success)
   {
     key: "auth.login",
