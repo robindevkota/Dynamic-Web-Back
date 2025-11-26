@@ -19,15 +19,8 @@ const apiConfigs = [
     headers: {
       "Content-Type": "application/json",
     },
-    transformPayload: `
-      (payload) => ({
-        name: payload.name,
-        email: payload.email, 
-        subject: payload.subject,
-        message: payload.message,
-        userId: 1
-      })
-    `,
+    transformPayload: "(payload) => ({ name: payload.name, email: payload.email, subject: payload.subject, message: payload.message })",
+    
     successNotification: {
       type: "toast",
       message: "Message sent successfully! We'll get back to you soon.",
@@ -43,6 +36,7 @@ const apiConfigs = [
     closeModalOnSuccess: false,
     storeResponse: true,
     storeKey: "contactResponse",
+    
     onSuccess: ["console:Message sent successfully"],
     onError: ["console:Failed to send message"],
     onNetworkError: "console:Network error while sending message",
@@ -50,7 +44,7 @@ const apiConfigs = [
     projectUUID: "global",
   },
   
-  // ✅ FIXED: LOGIN API - Now sends email and password correctly
+  // ✅ LOGIN API - Navigate to home on success
   {
     key: "auth.login",
     name: "User Login",
@@ -60,12 +54,8 @@ const apiConfigs = [
     headers: {
       "Content-Type": "application/json",
     },
-    transformPayload: `
-      (payload) => ({
-        email: payload.email,
-        password: payload.password
-      })
-    `,
+    transformPayload: "(payload) => ({ email: payload.email, password: payload.password })",
+    
     successNotification: {
       type: "toast",
       message: "Welcome back! Login successful!",
@@ -78,13 +68,15 @@ const apiConfigs = [
       background: "#ef4444",
       duration: 3000,
     },
-    closeModalOnSuccess: false,
+    closeModalOnSuccess: false, // No modals to close
     storeResponse: true,
     storeKey: "authResponse",
+    
+    // ✅ Navigate to home page and set auth
     onSuccess: [
-      "setAuth:token=mock-jwt-token-{{$random}}",
+      "setAuth:token=mock-jwt-token-{{authResponse.id}}",
       "setAuth:user={{email}}",
-      "navigate:/shopzone"
+      "navigate:/shopzone" // Navigate to home page
     ],
     onError: ["console:Login failed"],
     onNetworkError: "console:Network error occurred",
@@ -92,7 +84,7 @@ const apiConfigs = [
     projectUUID: "global",
   },
 
-  // ✅ FIXED: SIGNUP API - Now sends name, email, and password correctly
+  // ✅ SIGNUP API - Navigate to login on success
   {
     key: "auth.signup",
     name: "User Registration",
@@ -102,14 +94,8 @@ const apiConfigs = [
     headers: {
       "Content-Type": "application/json",
     },
-    transformPayload: `
-      (payload) => ({
-        name: payload.name,
-        email: payload.email,
-        password: payload.password,
-        username: payload.email.split('@')[0]
-      })
-    `,
+    transformPayload: "(payload) => ({ email: payload.email, password: payload.password, name: payload.email.split('@')[0] })",
+    
     successNotification: {
       type: "toast",
       message: "Account created successfully! Please login.",
@@ -122,9 +108,11 @@ const apiConfigs = [
       background: "#ef4444",
       duration: 4000,
     },
-    closeModalOnSuccess: false,
+    closeModalOnSuccess: false, // No modals to close
     storeResponse: true,
     storeKey: "signupResponse",
+    
+    // ✅ After signup, navigate to login page
     onSuccess: ["navigate:/shopzone/login"],
     onError: ["console:Signup failed"],
     onNetworkError: "console:Network error during signup",
@@ -132,7 +120,7 @@ const apiConfigs = [
     projectUUID: "global",
   },
 
-  // ✅ FIXED: FORGOT PASSWORD API - Now sends email correctly
+  // ✅ FORGOT PASSWORD API - Navigate to login on success
   {
     key: "auth.forgot",
     name: "Forgot Password",
@@ -142,11 +130,8 @@ const apiConfigs = [
     headers: {
       "Content-Type": "application/json",
     },
-    transformPayload: `
-      (payload) => ({
-        email: payload.email
-      })
-    `,
+    transformPayload: "(payload) => ({ email: payload.email })",
+    
     successNotification: {
       type: "toast",
       message: "Password reset instructions sent to your email!",
@@ -159,9 +144,11 @@ const apiConfigs = [
       background: "#ef4444",
       duration: 3000,
     },
-    closeModalOnSuccess: false,
+    closeModalOnSuccess: false, // No modals to close
     storeResponse: true,
     storeKey: "forgotResponse",
+    
+    // ✅ Navigate to login page after sending reset email
     onSuccess: ["navigate:/shopzone/login"],
     onError: ["console:Failed to send reset email"],
     onNetworkError: "console:Network error while sending reset email",
@@ -178,6 +165,7 @@ const apiConfigs = [
     method: "GET",
     headers: {},
     transformPayload: "",
+    
     successNotification: {
       type: "none",
     },
@@ -197,7 +185,7 @@ const apiConfigs = [
     projectUUID: "global",
   },
 
-  // ✅ CHECKOUT API - Fixed payload structure
+  // ✅ CHECKOUT API - Navigate to confirmation page
   {
     key: "checkout.complete",
     name: "Complete Checkout",
@@ -207,20 +195,8 @@ const apiConfigs = [
     headers: {
       "Content-Type": "application/json",
     },
-    transformPayload: `
-      (payload) => ({
-        cardNumber: payload.cardNumber,
-        cardName: payload.cardName, 
-        expiry: payload.expiry,
-        cvv: payload.cvv,
-        amount: 520.30,
-        items: [
-          { id: 1, name: "Wireless Headphones", quantity: 1, price: 199.99 },
-          { id: 2, name: "Smart Watch", quantity: 1, price: 259.99 },
-          { id: 3, name: "Laptop Stand", quantity: 2, price: 59.99 }
-        ]
-      })
-    `,
+    transformPayload: "(payload) => ({ cardNumber: payload.cardNumber, cardName: payload.cardName, expiry: payload.expiry, cvv: payload.cvv, amount: 520.30 })",
+    
     successNotification: {
       type: "toast",
       message: "Payment successful! Order placed.",
@@ -242,83 +218,6 @@ const apiConfigs = [
     tags: ["ecommerce", "checkout", "payment"],
     projectUUID: "global",
   },
-
-  // ✅ NEW: GET USER PROFILE
-  {
-    key: "user.profile",
-    name: "Get User Profile", 
-    description: "Fetches current user profile data",
-    url: "https://jsonplaceholder.typicode.com/users/1",
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    transformPayload: "",
-    successNotification: {
-      type: "none",
-    },
-    errorNotification: {
-      type: "toast", 
-      message: "Failed to load profile",
-      background: "#ef4444",
-      duration: 3000,
-    },
-    closeModalOnSuccess: false,
-    storeResponse: true,
-    storeKey: "userProfile",
-    onSuccess: ["console:User profile loaded successfully"],
-    onError: ["console:Failed to load user profile"],
-    onNetworkError: "console:Network error while loading profile", 
-    tags: ["user", "profile", "account"],
-    projectUUID: "global",
-  },
-
-  // ✅ NEW: UPDATE USER PROFILE
-  {
-    key: "user.update",
-    name: "Update User Profile",
-    description: "Updates user profile information", 
-    url: "https://jsonplaceholder.typicode.com/users/1",
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    transformPayload: `
-      (payload) => ({
-        name: payload.name,
-        email: payload.email,
-        phone: payload.phone,
-        address: {
-          street: payload.street,
-          city: payload.city,
-          zipcode: payload.zipcode
-        }
-      })
-    `,
-    successNotification: {
-      type: "toast",
-      message: "Profile updated successfully!",
-      background: "#10b981", 
-      duration: 3000,
-    },
-    errorNotification: {
-      type: "toast",
-      message: "Failed to update profile",
-      background: "#ef4444",
-      duration: 3000,
-    },
-    closeModalOnSuccess: false,
-    storeResponse: true,
-    storeKey: "updatedProfile",
-    onSuccess: [
-      "setAuth:user={{updatedProfile}}",
-      "console:Profile updated successfully"
-    ],
-    onError: ["console:Failed to update profile"],
-    onNetworkError: "console:Network error while updating profile",
-    tags: ["user", "profile", "update"],
-    projectUUID: "global",
-  }
 ];
 
 const seed = async () => {
@@ -329,15 +228,11 @@ const seed = async () => {
     await APIConfig.insertMany(apiConfigs);
     console.log("✅ Seeded", apiConfigs.length, "API configurations");
     
-    console.log("\n📝 AUTH API PAYLOAD INFO:");
-    console.log("   🔐 LOGIN (auth.login):");
-    console.log("      Sends: { email: payload.email, password: payload.password }");
-    console.log("   👤 SIGNUP (auth.signup):"); 
-    console.log("      Sends: { name: payload.name, email: payload.email, password: payload.password, username: ... }");
-    console.log("   🔑 FORGOT PASSWORD (auth.forgot):");
-    console.log("      Sends: { email: payload.email }");
-    console.log("\n💡 Using JSONPlaceholder - any email/password will work!");
-    console.log("💡 Form field names must match payload keys (email, password, name, etc.)");
+    console.log("\n📝 AUTH PAGES INFO:");
+    console.log("   Login: /shopzone/login");
+    console.log("   Signup: /shopzone/signup"); 
+    console.log("   Forgot Password: /shopzone/forgot");
+    console.log("   Using JSONPlaceholder - any email/password works!\n");
 
     mongoose.disconnect();
   } catch (err) {
