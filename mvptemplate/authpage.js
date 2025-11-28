@@ -4964,6 +4964,1508 @@ input:focus, textarea:focus, select:focus {
       },
     },
   },
+  {
+    title: "TastyBites - Premium Restaurant",
+    slug: "tastybites",
+    projectUUID: "restaurant-tastybites",
+    taskUUID: "rest001",
+    status: "Active",
+    accountValidation: true,
+    otpValidation: false,
+    isAnonymous: false,
+
+    initialization: {
+      globalCSS: `
+/* Font Awesome CDN */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #2d3748;
+  background: #fffaf0;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better Button Styles */
+button {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Better Link Styles */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+/* Responsive Typography */
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 1.4;
+}
+
+/* Card Styles */
+.card, article {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card:hover, article:hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+}
+
+/* Better Form Inputs */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
+
+/* Responsive Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s infinite;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.mt-4 { margin-top: 2rem; }
+.mb-4 { margin-bottom: 2rem; }
+.p-4 { padding: 2rem; }
+
+/* Restaurant Specific Styles */
+.food-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.food-card:hover {
+  transform: translateY(-8px);
+}
+
+.price-tag {
+  background: linear-gradient(135deg, #e53e3e, #ed8936);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.category-badge {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+  `,
+      resources: [
+        "auth.login",
+        "auth.signup",
+        "auth.forgot",
+        "menu.api",
+        "cart.api",
+      ],
+    },
+
+    pages: {
+      // 🔹 LOGIN PAGE
+      login: {
+        title: "Login - TastyBites",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍽️ TastyBites",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/tastybites" },
+                  { label: "Sign Up", action: "navigate:/tastybites/signup" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #fed7d7",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(229, 62, 62, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              loginForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "👨‍🍳 Welcome Back Foodie!",
+                "ui:description": "Sign in to continue your culinary journey",
+                "ui:id": "loginForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "20px",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                  animation: "fadeInUp 0.8s ease-out",
+                },
+
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "foodie@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-envelope",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Enter your secret recipe",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-lock",
+                  },
+                ],
+
+                "ui:actions": [
+                  {
+                    label: "Sign In & Feast 🍴",
+                    action: "api:auth.login",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "16px 0",
+                      background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                      color: "white",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                      borderRadius: "12px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:direction": "column",
+                "ui:links": [
+                  {
+                    label: "Forgot Password?",
+                    action: "navigate:/tastybites/forgot-password",
+                  },
+                  {
+                    prefix: "New food explorer?",
+                    label: "Join TastyBites",
+                    action: "navigate:/tastybites/signup",
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "25px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "linear-gradient(135deg, #fed7d7 0%, #feebc8 100%)",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 TastyBites Restaurant. Crafted with ❤️ and 🍳",
+                "ui:styles": { textAlign: "center", color: "#718096" },
+              },
+            },
+            styles: {
+              background: "#2d3748",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 SIGNUP PAGE
+      signup: {
+        title: "Join TastyBites - Create Account",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍽️ TastyBites",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/tastybites" },
+                  { label: "Login", action: "navigate:/tastybites/login" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #fed7d7",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(229, 62, 62, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              signupForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🎉 Join Our Food Family!",
+                "ui:description": "Create your account and discover amazing dishes",
+                "ui:id": "signupForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "20px",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                  animation: "fadeInUp 0.8s ease-out",
+                },
+
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Full Name",
+                    "ui:placeholder": "Gordon Ramsay",
+                    "ui:type": "text",
+                    "ui:name": "name",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-user",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "gordon@tastybites.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-envelope",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Create your secret recipe",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-lock",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Confirm Password",
+                    "ui:placeholder": "Repeat your secret recipe",
+                    "ui:type": "password",
+                    "ui:name": "confirmPassword",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-lock",
+                  },
+                ],
+
+                "ui:actions": [
+                  {
+                    label: "Create Account & Explore 🍕",
+                    action: "api:auth.signup",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "16px 0",
+                      background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                      color: "white",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                      borderRadius: "12px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    prefix: "Already a food lover?",
+                    label: "Sign In",
+                    action: "navigate:/tastybites/login",
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "25px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "linear-gradient(135deg, #fed7d7 0%, #feebc8 100%)",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 TastyBites Restaurant. Crafted with ❤️ and 🍳",
+                "ui:styles": { textAlign: "center", color: "#718096" },
+              },
+            },
+            styles: {
+              background: "#2d3748",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 FORGOT PASSWORD PAGE
+      "forgot-password": {
+        title: "Reset Password - TastyBites",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍽️ TastyBites",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/tastybites" },
+                  { label: "Login", action: "navigate:/tastybites/login" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #fed7d7",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(229, 62, 62, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              forgotForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🔐 Reset Your Password",
+                "ui:description": "Enter your email to receive reset instructions",
+                "ui:id": "forgotForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "20px",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                  animation: "fadeInUp 0.8s ease-out",
+                },
+
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "foodie@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-envelope",
+                  },
+                ],
+
+                "ui:actions": [
+                  {
+                    label: "Send Reset Link 📧",
+                    action: "api:auth.forgot",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "16px 0",
+                      background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                      color: "white",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                      borderRadius: "12px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    label: "← Back to Login",
+                    action: "navigate:/tastybites/login",
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "25px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "linear-gradient(135deg, #fed7d7 0%, #feebc8 100%)",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 TastyBites Restaurant. Crafted with ❤️ and 🍳",
+                "ui:styles": { textAlign: "center", color: "#718096" },
+              },
+            },
+            styles: {
+              background: "#2d3748",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 MAIN LANDING PAGE (After Login)
+      home: {
+        title: "TastyBites - Premium Restaurant",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍽️ TastyBites",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/tastybites/home" },
+                  { label: "Menu", action: "navigate:/tastybites/menu" },
+                  { label: "Cart (2)", action: "navigate:/tastybites/cart" },
+                  {
+                    label: "{{auth.token ? '👤 ' + auth.user.name : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate:/tastybites/login'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #fed7d7",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(229, 62, 62, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              hero: {
+                "ui:widget": "hero",
+                "ui:title": "Savor Every Bite 🍴",
+                "ui:subtitle": "Premium dining experience with authentic flavors crafted by master chefs",
+                "ui:cta": {
+                  label: "Explore Menu 🍕",
+                  action: "navigate:/tastybites/menu",
+                },
+                "ui:styles": {
+                  background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                  minHeight: "600px",
+                  padding: "180px 40px 100px",
+                  textAlign: "center",
+                  color: "white",
+                },
+              },
+
+              spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+
+              featuredHeading: {
+                "ui:widget": "heading",
+                "ui:text": "✨ Today's Specials",
+                "ui:level": "h2",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "50px",
+                  fontSize: "2.5rem",
+                  color: "#2d3748",
+                },
+              },
+
+              specialsGrid: {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "30px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Truffle Pasta 🍝",
+                    "ui:description": "Creamy pasta with black truffle and parmesan",
+                    "ui:image": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&h=300&fit=crop",
+                    "ui:action": "addToCart:truffle-pasta",
+                    "ui:buttonLabel": "Add to Cart - $24",
+                    "ui:styles": {
+                      textAlign: "center",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Wagyu Steak 🥩",
+                    "ui:description": "Premium A5 wagyu with roasted vegetables",
+                    "ui:image": "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&h=300&fit=crop",
+                    "ui:action": "addToCart:wagyu-steak",
+                    "ui:buttonLabel": "Add to Cart - $48",
+                    "ui:styles": {
+                      textAlign: "center",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Seafood Platter 🦞",
+                    "ui:description": "Fresh lobster, shrimp, and scallops",
+                    "ui:image": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
+                    "ui:action": "addToCart:seafood-platter",
+                    "ui:buttonLabel": "Add to Cart - $36",
+                    "ui:styles": {
+                      textAlign: "center",
+                    },
+                  },
+                ],
+                "ui:styles": {
+                  marginBottom: "60px",
+                },
+              },
+
+              promoCard: {
+                "ui:widget": "card",
+                "ui:title": "🎉 Weekend Special!",
+                "ui:description": "Get 20% OFF on all desserts this weekend. Use code: SWEET20",
+                "ui:action": "navigate:/tastybites/menu",
+                "ui:buttonLabel": "View Desserts 🍰",
+                "ui:styles": {
+                  maxWidth: "800px",
+                  margin: "0 auto 60px",
+                  padding: "40px",
+                  background: "linear-gradient(135deg, #f6ad55 0%, #ed8936 100%)",
+                  color: "white",
+                  textAlign: "center",
+                },
+              },
+
+              testimonialsHeading: {
+                "ui:widget": "heading",
+                "ui:text": "💬 Foodie Reviews",
+                "ui:level": "h2",
+                "ui:styles": { textAlign: "center", marginBottom: "50px" },
+              },
+
+              testimonial1: {
+                "ui:widget": "testimonial",
+                "ui:quote": "The best dining experience I've had this year! The wagyu steak was absolutely perfect.",
+                "ui:author": "Sarah Johnson",
+                "ui:role": "Food Critic",
+                "ui:avatar": "https://i.pravatar.cc/100?img=1",
+                "ui:rating": 5,
+                "ui:styles": { maxWidth: "600px", margin: "0 auto 30px" },
+              },
+
+              testimonial2: {
+                "ui:widget": "testimonial",
+                "ui:quote": "Authentic flavors and exceptional service. TastyBites never disappoints!",
+                "ui:author": "Michael Chen",
+                "ui:role": "Regular Customer",
+                "ui:avatar": "https://i.pravatar.cc/100?img=3",
+                "ui:rating": 5,
+                "ui:styles": { maxWidth: "600px", margin: "0 auto 30px" },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#fffaf0",
+              minHeight: "100vh",
+            },
+            triggers: [
+              { event: "load", action: "fetchSpecials", source: "menu.api" },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerContent: {
+                "ui:widget": "columns",
+                "ui:columns": [
+                  {
+                    "ui:widget": "text",
+                    "ui:content": "🍽️ TastyBites<br>Premium Restaurant Experience",
+                    "ui:styles": { color: "#e2e8f0", fontSize: "1.2rem", fontWeight: "bold" },
+                  },
+                  {
+                    "ui:widget": "list",
+                    "ui:items": ["About Us", "Contact", "Careers", "Press"],
+                    "ui:styles": { color: "#cbd5e0" },
+                  },
+                  {
+                    "ui:widget": "list",
+                    "ui:items": ["Privacy Policy", "Terms of Service", "FAQ"],
+                    "ui:styles": { color: "#cbd5e0" },
+                  },
+                ],
+                "ui:ratio": "1:1:1",
+                "ui:gap": "40px",
+              },
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 TastyBites Restaurant. Crafted with ❤️ and 🍳",
+                "ui:styles": { textAlign: "center", color: "#a0aec0", marginTop: "40px" },
+              },
+            },
+            styles: {
+              background: "#2d3748",
+              padding: "60px 40px 40px",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 MENU PAGE
+      menu: {
+        title: "Menu - TastyBites",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍽️ TastyBites",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/tastybites/home" },
+                  { label: "Menu", action: "navigate:/tastybites/menu" },
+                  { label: "Cart (2)", action: "navigate:/tastybites/cart" },
+                  {
+                    label: "{{auth.token ? '👤 ' + auth.user.name : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate:/tastybites/login'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #fed7d7",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(229, 62, 62, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              categoriesHeading: {
+                "ui:widget": "heading",
+                "ui:text": "📋 Categories",
+                "ui:level": "h3",
+                "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+              },
+              categoryList: {
+                "ui:widget": "list",
+                "ui:ordered": false,
+                "ui:icon": "›",
+                "ui:items": [
+                  "Appetizers 🍤",
+                  "Main Course 🍝", 
+                  "Desserts 🍰",
+                  "Drinks 🍹",
+                  "Specials 🔥"
+                ],
+                "ui:itemStyles": {
+                  cursor: "pointer",
+                  padding: "12px 0",
+                  transition: "all 0.2s",
+                  fontSize: "1.1rem",
+                },
+              },
+            },
+            styles: {
+              width: "280px",
+              background: "#fff5f5",
+              padding: "120px 24px 24px",
+              minHeight: "100vh",
+              borderRight: "1px solid #fed7d7",
+              position: "sticky",
+              top: 0,
+            },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              menuHeading: {
+                "ui:widget": "heading",
+                "ui:text": "🍽️ Our Delicious Menu",
+                "ui:level": "h1",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "50px",
+                  marginTop: "40px",
+                  fontSize: "2.8rem",
+                  color: "#2d3748",
+                },
+              },
+
+              appetizersSection: {
+                "ui:widget": "heading",
+                "ui:text": "🍤 Appetizers",
+                "ui:level": "h2",
+                "ui:styles": { marginBottom: "30px", color: "#e53e3e" },
+              },
+
+              appetizersGrid: {
+                "ui:widget": "gridLayout",
+                "ui:columns": 2,
+                "ui:gap": "25px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Garlic Bread 🥖",
+                    "ui:description": "Freshly baked bread with garlic butter and herbs",
+                    "ui:image": "https://images.unsplash.com/photo-1573140247632-f8fd74997d5c?w=300&h=200&fit=crop",
+                    "ui:action": "addToCart:garlic-bread",
+                    "ui:buttonLabel": "Add - $8",
+                    "ui:styles": { textAlign: "center" },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Bruschetta 🍅",
+                    "ui:description": "Toasted bread topped with tomatoes and basil",
+                    "ui:image": "https://images.unsplash.com/photo-1572695157356-3c18847db648?w=300&h=200&fit=crop",
+                    "ui:action": "addToCart:bruschetta",
+                    "ui:buttonLabel": "Add - $10",
+                    "ui:styles": { textAlign: "center" },
+                  },
+                ],
+                "ui:styles": { marginBottom: "50px" },
+              },
+
+              mainCourseSection: {
+                "ui:widget": "heading",
+                "ui:text": "🍝 Main Course",
+                "ui:level": "h2",
+                "ui:styles": { marginBottom: "30px", color: "#e53e3e" },
+              },
+
+              mainCourseGrid: {
+                "ui:widget": "gridLayout",
+                "ui:columns": 2,
+                "ui:gap": "25px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Margherita Pizza 🍕",
+                    "ui:description": "Classic pizza with fresh mozzarella and basil",
+                    "ui:image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300&h=200&fit=crop",
+                    "ui:action": "addToCart:margherita-pizza",
+                    "ui:buttonLabel": "Add - $18",
+                    "ui:styles": { textAlign: "center" },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Beef Burger 🍔",
+                    "ui:description": "Juicy beef patty with cheese and vegetables",
+                    "ui:image": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&h=200&fit=crop",
+                    "ui:action": "addToCart:beef-burger",
+                    "ui:buttonLabel": "Add - $16",
+                    "ui:styles": { textAlign: "center" },
+                  },
+                ],
+                "ui:styles": { marginBottom: "50px" },
+              },
+            },
+            styles: {
+              padding: "120px 40px 80px",
+              background: "#fffaf0",
+              minHeight: "100vh",
+            },
+            triggers: [
+              { event: "load", action: "fetchMenu", source: "menu.api" },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 TastyBites Restaurant. Crafted with ❤️ and 🍳",
+                "ui:styles": { textAlign: "center", color: "#718096" },
+              },
+            },
+            styles: {
+              background: "#2d3748",
+              padding: "40px",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 CART PAGE
+      cart: {
+        title: "Your Cart - TastyBites",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍽️ TastyBites",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/tastybites/home" },
+                  { label: "Menu", action: "navigate:/tastybites/menu" },
+                  { label: "Cart (2)", action: "navigate:/tastybites/cart" },
+                  {
+                    label: "{{auth.token ? '👤 ' + auth.user.name : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate:/tastybites/login'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #fed7d7",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(229, 62, 62, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              cartTitle: {
+                "ui:widget": "heading",
+                "ui:text": "🛒 Your Food Cart",
+                "ui:level": "h1",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "50px",
+                  marginTop: "40px",
+                  fontSize: "2.5rem",
+                },
+              },
+
+              cartItem1: {
+                "ui:widget": "card",
+                "ui:title": "Truffle Pasta 🍝",
+                "ui:description": "Creamy pasta with black truffle and parmesan. Quantity: 1",
+                "ui:image": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=200&h=200&fit=crop",
+                "ui:styles": {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto 20px",
+                  padding: "25px",
+                },
+              },
+
+              cartItem2: {
+                "ui:widget": "card",
+                "ui:title": "Wagyu Steak 🥩",
+                "ui:description": "Premium A5 wagyu with roasted vegetables. Quantity: 1",
+                "ui:image": "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=200&h=200&fit=crop",
+                "ui:styles": {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto 20px",
+                  padding: "25px",
+                },
+              },
+
+              divider: {
+                "ui:widget": "divider",
+                "ui:spacing": "large",
+                "ui:styles": { maxWidth: "900px", margin: "40px auto" },
+              },
+
+              totalCard: {
+                "ui:widget": "card",
+                "ui:title": "Order Summary",
+                "ui:description": "Subtotal: $72.00 | Tax: $7.20 | Total: $79.20",
+                "ui:action": "navigate:/tastybites/checkout",
+                "ui:buttonLabel": "Proceed to Checkout 💳",
+                "ui:styles": {
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                  padding: "30px",
+                  background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+                  color: "white",
+                  textAlign: "center",
+                },
+              },
+            },
+            styles: {
+              padding: "120px 40px 80px",
+              background: "#fffaf0",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 TastyBites Restaurant. Crafted with ❤️ and 🍳",
+                "ui:styles": { textAlign: "center", color: "#718096" },
+              },
+            },
+            styles: {
+              background: "#2d3748",
+              padding: "40px",
+            },
+            triggers: [],
+          },
+        },
+      },
+    },
+
+    components: {
+      navbar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "🍽️ TastyBites",
+            "ui:styles": {
+              fontSize: "32px",
+              fontWeight: "800",
+              background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              cursor: "pointer",
+            },
+          },
+
+          searchBar: {
+            "ui:widget": "inputField",
+            "ui:placeholder": "Search dishes...",
+            "ui:type": "text",
+            "ui:inputStyles": {
+              border: "2px solid #fed7d7",
+              borderRadius: "25px",
+              padding: "12px 20px",
+              width: "300px",
+            },
+            "ui:styles": { marginBottom: "0" },
+          },
+
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:links": [
+              { label: "Home", action: "navigate:/tastybites/home" },
+              { label: "Menu", action: "navigate:/tastybites/menu" },
+              { label: "Cart (2)", action: "navigate:/tastybites/cart" },
+              {
+                label: "{{auth.token ? '👤 ' + auth.user.name : 'Login'}}",
+                action: "{{auth.token ? '' : 'navigate:/tastybites/login'}}",
+              },
+              {
+                label: "{{auth.token ? 'Logout' : ''}}",
+                action: "clearAuth+reload",
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "#ffffff",
+          borderBottom: "2px solid #fed7d7",
+          padding: "20px 50px",
+          position: "fixed",
+          width: "100%",
+          zIndex: 1000,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 2px 20px rgba(229, 62, 62, 0.1)",
+        },
+        triggers: [],
+      },
+
+      sidebar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          categoriesHeading: {
+            "ui:widget": "heading",
+            "ui:text": "📋 Categories",
+            "ui:level": "h3",
+            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+          },
+          categoryList: {
+            "ui:widget": "list",
+            "ui:ordered": false,
+            "ui:icon": "›",
+            "ui:items": [
+              "Appetizers 🍤",
+              "Main Course 🍝", 
+              "Desserts 🍰",
+              "Drinks 🍹",
+              "Specials 🔥"
+            ],
+            "ui:itemStyles": {
+              cursor: "pointer",
+              padding: "12px 0",
+              transition: "all 0.2s",
+              fontSize: "1.1rem",
+            },
+          },
+
+          divider: {
+            "ui:widget": "divider",
+            "ui:spacing": "large",
+          },
+
+          filtersHeading: {
+            "ui:widget": "heading",
+            "ui:text": "🔍 Filters",
+            "ui:level": "h3",
+            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+          },
+
+          dietaryFilter: {
+            "ui:widget": "checkbox",
+            "ui:label": "Vegetarian 🌱",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          glutenFreeFilter: {
+            "ui:widget": "checkbox",
+            "ui:label": "Gluten Free 🌾",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          spicyFilter: {
+            "ui:widget": "checkbox",
+            "ui:label": "Spicy 🌶️",
+            "ui:styles": { marginBottom: "12px" },
+          },
+        },
+        styles: {
+          width: "280px",
+          background: "#fff5f5",
+          padding: "120px 24px 24px",
+          minHeight: "100vh",
+          borderRight: "1px solid #fed7d7",
+          position: "sticky",
+          top: 0,
+        },
+        triggers: [],
+      },
+
+      main: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          hero: {
+            "ui:widget": "hero",
+            "ui:title": "Savor Every Bite 🍴",
+            "ui:subtitle": "Premium dining experience with authentic flavors crafted by master chefs",
+            "ui:cta": {
+              label: "Explore Menu 🍕",
+              action: "navigate:/tastybites/menu",
+            },
+            "ui:styles": {
+              background: "linear-gradient(135deg, #e53e3e 0%, #ed8936 100%)",
+              minHeight: "600px",
+              padding: "180px 40px 100px",
+              textAlign: "center",
+              color: "white",
+            },
+          },
+
+          spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+
+          featuredHeading: {
+            "ui:widget": "heading",
+            "ui:text": "✨ Chef's Specials",
+            "ui:level": "h2",
+            "ui:styles": {
+              textAlign: "center",
+              marginBottom: "50px",
+              fontSize: "2.5rem",
+              color: "#2d3748",
+            },
+          },
+
+          specialsGrid: {
+            "ui:widget": "gridLayout",
+            "ui:columns": 3,
+            "ui:gap": "30px",
+            "ui:children": [
+              {
+                "ui:widget": "card",
+                "ui:title": "Truffle Pasta 🍝",
+                "ui:description": "Creamy pasta with black truffle and parmesan",
+                "ui:image": "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&h=300&fit=crop",
+                "ui:action": "addToCart:truffle-pasta",
+                "ui:buttonLabel": "Add to Cart - $24",
+                "ui:styles": {
+                  textAlign: "center",
+                },
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "Wagyu Steak 🥩",
+                "ui:description": "Premium A5 wagyu with roasted vegetables",
+                "ui:image": "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&h=300&fit=crop",
+                "ui:action": "addToCart:wagyu-steak",
+                "ui:buttonLabel": "Add to Cart - $48",
+                "ui:styles": {
+                  textAlign: "center",
+                },
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "Seafood Platter 🦞",
+                "ui:description": "Fresh lobster, shrimp, and scallops",
+                "ui:image": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop",
+                "ui:action": "addToCart:seafood-platter",
+                "ui:buttonLabel": "Add to Cart - $36",
+                "ui:styles": {
+                  textAlign: "center",
+                },
+              },
+            ],
+            "ui:styles": {
+              marginBottom: "60px",
+            },
+          },
+        },
+        styles: {
+          padding: "100px 40px 80px",
+          background: "#fffaf0",
+          flex: 1,
+          minHeight: "100vh",
+        },
+        triggers: [
+          { event: "load", action: "fetchSpecials", source: "menu.api" },
+        ],
+      },
+
+      footer: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          footerContent: {
+            "ui:widget": "columns",
+            "ui:columns": [
+              {
+                "ui:widget": "text",
+                "ui:content": "🍽️ TastyBites<br>Premium Restaurant Experience",
+                "ui:styles": { color: "#e2e8f0", fontSize: "1.2rem", fontWeight: "bold" },
+              },
+              {
+                "ui:widget": "list",
+                "ui:items": ["About Us", "Contact", "Careers", "Press"],
+                "ui:styles": { color: "#cbd5e0" },
+              },
+              {
+                "ui:widget": "list",
+                "ui:items": ["Privacy Policy", "Terms of Service", "FAQ"],
+                "ui:styles": { color: "#cbd5e0" },
+              },
+            ],
+            "ui:ratio": "1:1:1",
+            "ui:gap": "40px",
+          },
+          footerText: {
+            "ui:widget": "text",
+            "ui:content": "© 2024 TastyBites Restaurant. Crafted with ❤️ and 🍳",
+            "ui:styles": { textAlign: "center", color: "#a0aec0", marginTop: "40px" },
+          },
+        },
+        styles: {
+          background: "#2d3748",
+          padding: "60px 40px 40px",
+        },
+        triggers: [],
+      },
+    },
+  }
 ];
 
 const seed = async () => {

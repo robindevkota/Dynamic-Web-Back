@@ -41,7 +41,7 @@ const apiConfigs = [
     onSuccess: [
       "setAuth:token=mock-jwt-token-{{authResponse.id}}",
       "setAuth:user={{email}}",
-      "navigate:/bloghub/home"
+      "navigate:/tastybites/home"
     ],
     onError: ["console:Login failed"],
     onNetworkError: "console:Network error occurred",
