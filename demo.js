@@ -11,169 +11,162 @@ mongoose.connect(
 
 const websites = [
   {
-    title: "DevFolio - Creative Portfolio",
-    slug: "devfolio",
-    projectUUID: "portfolio-devfolio",
-    taskUUID: "port001",
+    title: "ShopZone - Modern E-commerce",
+    slug: "shopzone",
+    projectUUID: "ecom-shopzone",
+    taskUUID: "ecom001",
     status: "Active",
     accountValidation: true,
     otpValidation: false,
     isAnonymous: false,
 
     initialization: {
-      globalCSS: `@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
-* { margin: 0; padding: 0; box-sizing: border-box; } 
-body { font-family: 'Inter', -apple-system, sans-serif; color: #1e293b; background: #ffffff; overflow-x: hidden; } 
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } } 
-@keyframes slideInLeft { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } } 
-@keyframes slideInRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } } 
-@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } } 
-@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } } 
-.animate-fade-in { animation: fadeInUp 0.8s ease-out forwards; } 
-.animate-slide-left { animation: slideInLeft 0.8s ease-out forwards; } 
-.animate-slide-right { animation: slideInRight 0.8s ease-out forwards; } 
-button:hover { transform: translateY(-2px); transition: all 0.3s ease; } 
-section { animation: fadeInUp 1s ease-out; } 
-html { scroll-behavior: smooth; }`,
-      resources: ["auth.login", "auth.signup", "auth.forgot"],
+      globalCSS: `
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1e293b;
+  background: #ffffff;
+}
+
+/* Fix Navbar Spacing - Prevent Text Cutoff */
+nav {
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+  padding: 16px 32px !important;
+}
+
+nav button {
+  white-space: nowrap !important;
+  min-width: fit-content !important;
+  padding: 8px 16px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Ensure navbar container has enough space */
+header {
+  min-height: 70px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better Button Styles */
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Better Link Styles */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+/* Responsive Typography */
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 1.4;
+}
+
+/* Card Shadows */
+.card, article {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover, article:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Better Form Inputs */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Responsive Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-4 {
+  margin-top: 2rem;
+}
+
+.mb-4 {
+  margin-bottom: 2rem;
+}
+  `,
+      resources: [
+        "auth.login",
+        "auth.signup",
+        "auth.forgot",
+        "products.api"
+      ],
     },
 
     pages: {
-      about: {
-        title: "About Me",
+      // 🔹 LOGIN PAGE
+      login: {
+        title: "Login - ShopZone",
         components: {
           navbar: {
             table: {},
-            modal: {
-              authModal: {
-                "ui:title": "🔐 Welcome Back",
-                "ui:theme": "light",
-                "ui:content":
-                  "Sign in to access your dashboard and saved projects!",
-                "ui:fields": [
-                  {
-                    label: "Email Address",
-                    type: "email",
-                    placeholder: "eve.holt@reqres.in",
-                    name: "email",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Email is required",
-                      email: true,
-                      emailMessage: "Please enter a valid email",
-                    },
-                  },
-                  {
-                    label: "Password",
-                    type: "password",
-                    placeholder: "cityslicka",
-                    name: "password",
-                    required: true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "Password is required",
-                      minLength: 6,
-                      minLengthMessage:
-                        "Password must be at least 6 characters",
-                    },
-                  },
-                ],
-                "ui:actions": [
-                  {
-                    label: "Forgot Password?",
-                    action: "openModal:forgotModal",
-                    variant: "secondary",
-                  },
-                  {
-                    label: "Sign In",
-                    action: "api:auth.login",
-                    variant: "primary",
-                    apiKey: "auth.login",
-                  },
-                  {
-                    label: "Create Account",
-                    action: "openModal:signupModal",
-                    variant: "secondary",
-                  },
-                ],
-              },
-              signupModal: {
-                "ui:title": "✨ Join DevFolio",
-                "ui:theme": "light",
-                "ui:content":
-                  "Create your account and start building your portfolio!",
-                "ui:fields": [
-                  {
-                    label: "Email Address",
-                    type: "email",
-                    placeholder: "eve.holt@reqres.in",
-                    name: "email",
-                    required: true,
-                  },
-                  {
-                    label: "Password",
-                    type: "password",
-                    placeholder: "Create a strong password",
-                    name: "password",
-                    required: true,
-                  },
-                  {
-                    label: "Confirm Password",
-                    type: "password",
-                    placeholder: "Re-enter your password",
-                    name: "confirmPassword",
-                    required: true,
-                  },
-                ],
-                "ui:actions": [
-                  {
-                    label: "Already have an account?",
-                    action: "openModal:authModal",
-                    variant: "secondary",
-                  },
-                  {
-                    label: "Sign Up",
-                    action: "api:auth.signup",
-                    variant: "primary",
-                    apiKey: "auth.signup",
-                  },
-                ],
-              },
-              forgotModal: {
-                "ui:title": "🔑 Reset Password",
-                "ui:theme": "light",
-                "ui:content": "Enter your email to receive reset instructions.",
-                "ui:fields": [
-                  {
-                    label: "Email Address",
-                    type: "email",
-                    placeholder: "eve.holt@reqres.in",
-                    name: "email",
-                    required: true,
-                  },
-                ],
-                "ui:actions": [
-                  {
-                    label: "Back to Login",
-                    action: "openModal:authModal",
-                    variant: "secondary",
-                  },
-                  {
-                    label: "Send Reset Link",
-                    action: "api:auth.forgot",
-                    variant: "primary",
-                    apiKey: "auth.forgot",
-                  },
-                ],
-              },
-            },
+            modal: {},
             uiSchema: {
               logo: {
                 "ui:widget": "text",
-                "ui:content": "💼 DevFolio",
+                "ui:content": "🛍️ ShopZone",
                 "ui:styles": {
-                  fontSize: "26px",
+                  fontSize: "28px",
                   fontWeight: "800",
                   background:
                     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
@@ -185,101 +178,14 @@ html { scroll-behavior: smooth; }`,
               links: {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
-                "ui:iconStyles": {
-                  transition: "all 0.3s ease",
-                  fontSize: "14px",
-                  width: "16px",
-                  textAlign: "center",
-                },
-                "ui:linkStyles": {
-                  transition: "all 0.3s ease",
-                  borderRadius: "8px",
-                },
                 "ui:links": [
-                  {
-                    label: "Home",
-                    action: "navigate:/devfolio",
-                    fontAwesome: "fas fa-home",
-                    iconStyles: {
-                      color: "#64748b",
-                    },
-                    iconHoverStyles: {
-                      color: "#667eea",
-                      transform: "scale(1.2)",
-                    },
-                    linkHoverStyles: {
-                      background: "rgba(102, 126, 234, 0.1)",
-                    },
-                  },
-                  {
-                    label: "About",
-                    action: "navigate:/devfolio/about",
-                    fontAwesome: "fas fa-user",
-                    iconStyles: {
-                      color: "#64748b",
-                    },
-                    iconHoverStyles: {
-                      color: "#764ba2",
-                      transform: "scale(1.2)",
-                    },
-                    linkHoverStyles: {
-                      background: "rgba(118, 75, 162, 0.1)",
-                    },
-                  },
-                  {
-                    label: "Projects",
-                    action: "navigate:/devfolio/projects",
-                    fontAwesome: "fas fa-briefcase",
-                    iconStyles: {
-                      color: "#64748b",
-                    },
-                    iconHoverStyles: {
-                      color: "#f093fb",
-                      transform: "scale(1.2)",
-                    },
-                    linkHoverStyles: {
-                      background: "rgba(240, 147, 251, 0.1)",
-                    },
-                  },
-                  {
-                    label: "{{auth.token ? 'Dashboard' : 'Login'}}",
-                    action:
-                      "{{auth.token ? 'navigate:/dashboard' : 'openModal:authModal'}}",
-                    fontAwesome:
-                      "{{auth.token ? 'fas fa-tachometer-alt' : 'fas fa-sign-in-alt'}}",
-                    iconStyles: {
-                      color: "#64748b",
-                    },
-                    iconHoverStyles: {
-                      color: "{{auth.token ? '#10b981' : '#667eea'}}",
-                      transform: "scale(1.2)",
-                    },
-                    linkHoverStyles: {
-                      background:
-                        "{{auth.token ? 'rgba(16, 185, 129, 0.1)' : 'rgba(102, 126, 234, 0.1)'}}",
-                    },
-                  },
-                  {
-                    label: "{{auth.token ? 'Logout' : ''}}",
-                    action: "clearAuth+reload",
-                    fontAwesome: "{{auth.token ? 'fas fa-sign-out-alt' : ''}}",
-                    iconStyles: {
-                      color: "#64748b",
-                    },
-                    iconHoverStyles: {
-                      color: "#ef4444",
-                      transform: "scale(1.2)",
-                    },
-                    linkHoverStyles: {
-                      background: "rgba(239, 68, 68, 0.1)",
-                    },
-                  },
+                  { label: "Home", action: "navigate:/shopzone" },
+                  { label: "Sign Up", action: "navigate:/shopzone/signup" },
                 ],
               },
             },
             styles: {
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(10px)",
+              background: "#ffffff",
               borderBottom: "2px solid #f0f0f0",
               padding: "20px 50px",
               position: "fixed",
@@ -288,7 +194,7 @@ html { scroll-behavior: smooth; }`,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
             },
             triggers: [],
           },
@@ -303,113 +209,83 @@ html { scroll-behavior: smooth; }`,
             table: {},
             modal: {},
             uiSchema: {
-              pageTitle: {
-                "ui:widget": "heading",
-                "ui:text": "👨‍💻 About Me",
-                "ui:level": "h1",
+              loginForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🔐 Welcome Back",
+                "ui:description": "Sign in to continue shopping",
+                "ui:id": "loginForm",
                 "ui:styles": {
-                  textAlign: "center",
-                  marginBottom: "60px",
-                  marginTop: "140px",
-                  fontSize: "3.5rem",
-                  animation: "fadeInUp 0.8s ease-out",
-                },
-              },
-              aboutCard: {
-                "ui:widget": "card",
-                "ui:title": "Full Stack Developer & Designer",
-                "ui:description":
-                  "I'm a passionate developer with 5+ years of experience building beautiful, functional web applications. I specialize in React, Node.js, and modern UI/UX design. My goal is to create digital experiences that make people's lives easier and more enjoyable.",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-                "ui:styles": {
-                  maxWidth: "900px",
-                  margin: "0 auto 60px",
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
                   padding: "40px",
-                  animation: "slideInLeft 0.8s ease-out",
-                  minHeight: "300px",
-                },
-                "ui:imageStyles": {
-                  borderRadius: "50%",
-                  width: "200px",
-                  height: "200px",
-                  objectFit: "cover",
-                  border: "5px solid #667eea",
-                },
-              },
-              skillsHeading: {
-                "ui:widget": "heading",
-                "ui:text": "🚀 My Skills",
-                "ui:level": "h2",
-                "ui:styles": {
-                  textAlign: "center",
-                  marginBottom: "50px",
-                  fontSize: "2.5rem",
-                  animation: "fadeInUp 1s ease-out",
-                },
-              },
-              skillsCard: {
-                "ui:widget": "skillRadar",
-                "ui:skills": [
-                  { name: "React & Next.js", level: 95 },
-                  { name: "Node.js & Express", level: 90 },
-                  { name: "UI/UX Design", level: 85 },
-                  { name: "TypeScript", level: 88 },
-                  { name: "MongoDB & PostgreSQL", level: 82 },
-                  { name: "AWS & DevOps", level: 75 },
-                ],
-                "ui:styles": {
-                  maxWidth: "800px",
-                  margin: "0 auto",
                   background: "white",
                   borderRadius: "16px",
-                  boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
-                  animation: "slideInRight 0.8s ease-out",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
                 },
+
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "you@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Enter your password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                  },
+                ],
+
+                "ui:actions": [
+                  {
+                    label: "Sign In",
+                    action: "api:auth.login",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                    },
+                  },
+                ],
               },
-              spacer1: { "ui:widget": "spacer", "ui:height": 80 },
-              testimonialsHeading: {
-                "ui:widget": "heading",
-                "ui:text": "💬 What People Say",
-                "ui:level": "h2",
+
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:direction": "column",
+                "ui:links": [
+                  {
+                    label: "Forgot Password?",
+                    action: "navigate:/shopzone/forgot-password",
+                  },
+                  {
+                    prefix: "Don't have an account?",
+                    label: "Sign Up",
+                    action: "navigate:/shopzone/signup",
+                  },
+                ],
                 "ui:styles": {
-                  textAlign: "center",
-                  marginBottom: "50px",
-                  fontSize: "2.5rem",
-                },
-              },
-              testimonial1: {
-                "ui:widget": "testimonial",
-                "ui:quote":
-                  "Incredible developer! Delivered our project ahead of schedule with exceptional quality. Highly recommended!",
-                "ui:author": "Sarah Johnson",
-                "ui:role": "CEO, TechStart",
-                "ui:avatar": "https://i.pravatar.cc/100?img=1",
-                "ui:rating": 5,
-                "ui:styles": {
-                  maxWidth: "700px",
-                  margin: "0 auto 30px",
-                  animation: "fadeInUp 0.8s ease-out 0.2s both",
-                },
-              },
-              testimonial2: {
-                "ui:widget": "testimonial",
-                "ui:quote":
-                  "Working with them was a game-changer for our business. Creative, professional, and always available.",
-                "ui:author": "Michael Chen",
-                "ui:role": "Product Manager, InnovateCo",
-                "ui:avatar": "https://i.pravatar.cc/100?img=3",
-                "ui:rating": 5,
-                "ui:styles": {
-                  maxWidth: "700px",
-                  margin: "0 auto",
-                  animation: "fadeInUp 0.8s ease-out 0.4s both",
+                  maxWidth: "450px",
+                  margin: "20px auto",
                 },
               },
             },
             styles: {
-              padding: "120px 40px 80px",
-              background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)",
+              padding: "100px 40px 80px",
+              background: "#f8fafc",
               minHeight: "100vh",
             },
             triggers: [],
@@ -420,109 +296,52 @@ html { scroll-behavior: smooth; }`,
             uiSchema: {
               footerText: {
                 "ui:widget": "text",
-                "ui:content": "© 2024 DevFolio. Crafted with ❤️",
-                "ui:styles": {
-                  textAlign: "center",
-                  color: "#94a3b8",
-                  fontSize: "14px",
-                },
+                "ui:content": "© 2024 ShopZone. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
               },
             },
             styles: {
               background: "#1e293b",
-              padding: "40px",
-              borderTop: "3px solid #667eea",
+              padding: "30px",
+              textAlign: "center",
             },
             triggers: [],
           },
         },
       },
-      projects: {
-        title: "My Projects",
+
+      // 🔹 SIGNUP PAGE
+      signup: {
+        title: "Sign Up - ShopZone",
         components: {
           navbar: {
             table: {},
-            modal: {
-              authModal: {
-                "ui:title": "🔐 Welcome Back",
-                "ui:theme": "light",
-                "ui:content": "Sign in to access your dashboard!",
-                "ui:fields": [
-                  {
-                    label: "Email Address",
-                    type: "email",
-                    placeholder: "eve.holt@reqres.in",
-                    name: "email",
-                    required: true,
-                  },
-                  {
-                    label: "Password",
-                    type: "password",
-                    placeholder: "cityslicka",
-                    name: "password",
-                    required: true,
-                  },
-                ],
-                "ui:actions": [
-                  {
-                    label: "Sign In",
-                    action: "api:auth.login",
-                    variant: "primary",
-                    apiKey: "auth.login",
-                  },
-                ],
-              },
-            },
+            modal: {},
             uiSchema: {
               logo: {
                 "ui:widget": "text",
-                "ui:content": "💼 DevFolio",
+                "ui:content": "🛍️ ShopZone",
                 "ui:styles": {
-                  fontSize: "26px",
+                  fontSize: "28px",
                   fontWeight: "800",
                   background:
                     "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
                 },
               },
               links: {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  {
-                    label: "Home",
-                    action: "navigate:/devfolio",
-                    fontAwesome: "fas fa-home",
-                  },
-                  {
-                    label: "About",
-                    action: "navigate:/devfolio/about",
-                    fontAwesome: "fas fa-user",
-                  },
-                  {
-                    label: "Projects",
-                    action: "navigate:/devfolio/projects",
-                    fontAwesome: "fas fa-briefcase",
-                  },
-                  {
-                    label: "{{auth.token ? 'Dashboard' : 'Login'}}",
-                    action:
-                      "{{auth.token ? 'navigate:/dashboard' : 'openModal:authModal'}}",
-                    fontAwesome:
-                      "{{auth.token ? 'fas fa-tachometer-alt' : 'fas fa-sign-in-alt'}}",
-                  },
-                  {
-                    label: "{{auth.token ? 'Logout' : ''}}",
-                    action: "clearAuth+reload",
-                    fontAwesome: "{{auth.token ? 'fas fa-sign-out-alt' : ''}}",
-                  },
+                  { label: "Home", action: "navigate:/shopzone" },
+                  { label: "Login", action: "navigate:/shopzone/login" },
                 ],
               },
             },
             styles: {
-              background: "rgba(255, 255, 255, 0.95)",
-              backdropFilter: "blur(10px)",
+              background: "#ffffff",
               borderBottom: "2px solid #f0f0f0",
               padding: "20px 50px",
               position: "fixed",
@@ -531,7 +350,330 @@ html { scroll-behavior: smooth; }`,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              signupForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "✨ Create Your Account",
+                "ui:description": "Join ShopZone and start shopping today!",
+                "ui:id": "signupForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                },
+
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Full Name",
+                    "ui:placeholder": "John Doe",
+                    "ui:type": "text",
+                    "ui:name": "name",
+                    "ui:required": true,
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "you@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Create a strong password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Confirm Password",
+                    "ui:placeholder": "Re-enter your password",
+                    "ui:type": "password",
+                    "ui:name": "confirmPassword",
+                    "ui:required": true,
+                  },
+                ],
+
+                "ui:actions": [
+                  {
+                    label: "Create Account",
+                    action: "api:auth.signup",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    prefix: "Already have an account?",
+                    label: "Login",
+                    action: "navigate:/shopzone/login",
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#f8fafc",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 ShopZone. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 FORGOT PASSWORD PAGE
+      "forgot-password": {
+        title: "Reset Password - ShopZone",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🛍️ ShopZone",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/shopzone" },
+                  { label: "Login", action: "navigate:/shopzone/login" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #f0f0f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              forgotForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🔑 Reset Your Password",
+                "ui:description":
+                  "Enter your email to receive reset instructions",
+                "ui:id": "forgotForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                },
+
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "you@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                  },
+                ],
+
+                "ui:actions": [
+                  {
+                    label: "Send Reset Link",
+                    action: "api:auth.forgot",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    label: "← Back to Login",
+                    action: "navigate:/shopzone/login",
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#f8fafc",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 ShopZone. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 EXISTING PAGES (Cart, Categories) remain the same but with updated navbar
+      cart: {
+        title: "Shopping Cart",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🛍️ ShopZone",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/shopzone" },
+                  {
+                    label: "Categories",
+                    action: "navigate:/shopzone/categories",
+                  },
+                  { label: "Cart (3)", action: "navigate:/shopzone/cart" },
+                  {
+                    label:
+                      "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #f0f0f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
             },
             triggers: [],
           },
@@ -548,93 +690,88 @@ html { scroll-behavior: smooth; }`,
             uiSchema: {
               pageTitle: {
                 "ui:widget": "heading",
-                "ui:text": "🎨 Featured Projects",
+                "ui:text": "🛒 Your Shopping Cart",
                 "ui:level": "h1",
                 "ui:styles": {
                   textAlign: "center",
-                  marginBottom: "70px",
-                  marginTop: "140px",
-                  fontSize: "3.5rem",
-                  animation: "fadeInUp 0.8s ease-out",
+                  marginBottom: "50px",
+                  marginTop: "40px",
+                  fontSize: "2.5rem",
                 },
               },
-              project1: {
+
+              cartItem1: {
                 "ui:widget": "card",
-                "ui:title": "🚀 SaaS Dashboard Platform",
+                "ui:title": "Wireless Headphones",
                 "ui:description":
-                  "A comprehensive analytics dashboard built with React, Node.js, and PostgreSQL. Features real-time data visualization, user management, and API integrations. Served 10,000+ active users.",
+                  "Premium noise-cancelling headphones with 30-hour battery life. Quantity: 1",
                 "ui:image":
-                  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop",
-                "ui:buttonLabel": "View Case Study",
+                  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+                "ui:styles": {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto 20px",
+                  padding: "25px",
+                },
+              },
+
+              cartItem2: {
+                "ui:widget": "card",
+                "ui:title": "Smart Watch Series 7",
+                "ui:description":
+                  "Fitness tracker with heart rate monitor and GPS. Quantity: 1",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
+                "ui:styles": {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto 20px",
+                  padding: "25px",
+                },
+              },
+
+              cartItem3: {
+                "ui:widget": "card",
+                "ui:title": "Laptop Stand Aluminum",
+                "ui:description":
+                  "Ergonomic adjustable laptop stand for desk. Quantity: 2",
+                "ui:image":
+                  "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop",
+                "ui:styles": {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto 20px",
+                  padding: "25px",
+                },
+              },
+
+              divider: {
+                "ui:widget": "divider",
+                "ui:spacing": "large",
+                "ui:styles": { maxWidth: "900px", margin: "40px auto" },
+              },
+
+              totalCard: {
+                "ui:widget": "card",
+                "ui:title": "Order Summary",
+                "ui:description":
+                  "Subtotal: $458.00 | Shipping: $15.00 | Tax: $47.30 | Total: $520.30",
+                "ui:action": "navigate:/shopzone/checkout",
+                "ui:buttonLabel": "Proceed to Checkout 💳",
                 "ui:styles": {
                   maxWidth: "900px",
-                  margin: "0 auto 50px",
-                  padding: "35px",
-                  animation: "fadeInUp 0.8s ease-out 0.2s both",
-                  transform: "translateY(0)",
-                  transition: "all 0.3s ease",
-                },
-                "ui:imageStyles": {
-                  height: "300px",
-                  objectFit: "cover",
-                },
-              },
-              project2: {
-                "ui:widget": "card",
-                "ui:title": "🎵 Music Streaming App",
-                "ui:description":
-                  "Full-stack music streaming application with user authentication, playlist management, and social features. Built using Next.js, MongoDB, and AWS S3 for audio storage.",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=600&h=400&fit=crop",
-                "ui:buttonLabel": "Explore Project",
-                "ui:styles": {
-                  maxWidth: "900px",
-                  margin: "0 auto 50px",
-                  padding: "35px",
-                  animation: "fadeInUp 0.8s ease-out 0.4s both",
-                },
-                "ui:imageStyles": {
-                  height: "300px",
-                  objectFit: "cover",
-                },
-              },
-              project3: {
-                "ui:widget": "card",
-                "ui:title": "🛒 E-commerce Mobile App",
-                "ui:description":
-                  "React Native mobile app with seamless checkout experience, push notifications, and offline mode. Integrated with Stripe for payments and Firebase for real-time updates.",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&h=400&fit=crop",
-                "ui:buttonLabel": "See Details",
-                "ui:styles": {
-                  maxWidth: "900px",
-                  margin: "0 auto 50px",
-                  padding: "35px",
-                  animation: "fadeInUp 0.8s ease-out 0.6s both",
-                },
-                "ui:imageStyles": {
-                  height: "300px",
-                  objectFit: "cover",
-                },
-              },
-              spacer1: { "ui:widget": "spacer", "ui:height": 60 },
-              ctaCard: {
-                "ui:widget": "card",
-                "ui:title": "💡 Have a Project in Mind?",
-                "ui:description":
-                  "Let's collaborate and bring your ideas to life! I'm available for freelance projects and consulting.",
-                "ui:action": "openModal:authModal",
-                "ui:buttonLabel": "Get in Touch",
-                "ui:styles": {
-                  maxWidth: "700px",
                   margin: "0 auto",
-                  padding: "50px",
+                  padding: "30px",
                   background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    "linear-gradient(135deg, #47b81aff 0%, #764ba2 100%)",
                   color: "white",
                   textAlign: "center",
-                  border: "none",
-                  animation: "pulse 2s ease-in-out infinite",
                 },
               },
             },
@@ -651,11 +788,8 @@ html { scroll-behavior: smooth; }`,
             uiSchema: {
               footerText: {
                 "ui:widget": "text",
-                "ui:content": "© 2024 DevFolio. Crafted with ❤️",
-                "ui:styles": {
-                  textAlign: "center",
-                  color: "#94a3b8",
-                },
+                "ui:content": "© 2024 ShopZone. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
               },
             },
             styles: {
@@ -667,254 +801,389 @@ html { scroll-behavior: smooth; }`,
           },
         },
       },
+
+      // COMPLETE FIXED CATEGORIES PAGE - Replace in demo.js
+
+// FINAL FIXED CATEGORIES PAGE
+// Replace ONLY the categories section in demo.js
+
+categories: {
+  title: "Product Categories",
+  components: {
+    navbar: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        logo: {
+          "ui:widget": "text",
+          "ui:content": "🛒 ShopZone",
+          "ui:styles": {
+            fontSize: "28px",
+            fontWeight: "800",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          },
+        },
+        links: {
+          "ui:widget": "navLinks",
+          "ui:theme": "light",
+          "ui:links": [
+            { label: "Home", action: "navigate:/shopzone" },
+            { label: "Categories", action: "navigate:/shopzone/categories" },
+            { label: "Cart (3)", action: "navigate:/shopzone/cart" },
+            {
+              label: "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+              action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
+            },
+            {
+              label: "{{auth.token ? 'Logout' : ''}}",
+              action: "clearAuth+reload",
+            },
+          ],
+        },
+      },
+      styles: {
+        background: "#ffffff",
+        borderBottom: "2px solid #f0f0f0",
+        padding: "20px 50px",
+        position: "sticky",
+        top: 0,
+        width: "100%",
+        zIndex: 1000,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+      },
+      triggers: [],
+    },
+
+    sidebar: {
+      table: {},
+      modal: {},
+      uiSchema: {},
+      styles: { display: "none" },
+      triggers: [],
+    },
+
+    main: {
+      table: {},
+      modal: {
+        productDetail: {
+          "ui:title": "Product Details",
+          "ui:theme": "light",
+          "ui:styles": {
+            maxWidth: "700px",
+          },
+          "ui:fields": [
+            {
+              name: "quantity",
+              label: "Quantity",
+              type: "number",
+              placeholder: "1",
+              required: true,
+            },
+          ],
+          "ui:actions": [
+            {
+              label: "Add to Cart",
+              action: "api:cart.add",
+              variant: "primary",
+            },
+            {
+              label: "Close",
+              action: "closeModal",
+              variant: "outline",
+            },
+          ],
+        },
+      },
+      uiSchema: {
+        hero: {
+          "ui:widget": "hero",
+          "ui:title": "Shop by Category 🏷️",
+          "ui:subtitle": "Discover amazing products across our curated collections",
+          "ui:styles": {
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            minHeight: "400px",
+          },
+        },
+
+        spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+
+        // ✅ FIXED: Filter Section with CORRECT source keys
+        filterSection: {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "20px",
+          "ui:styles": {
+            padding: "30px 40px",
+            marginBottom: "40px",
+            background: "#f8fafc",
+            borderRadius: "12px",
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:level": "h3",
+              "ui:text": "Filter Products",
+              "ui:styles": {
+                marginBottom: "20px",
+                color: "#1f2937",
+              },
+            },
+            {
+              "ui:widget": "flexLayout",
+              "ui:direction": "row",
+              "ui:gap": "20px",
+              "ui:wrap": true,
+              "ui:children": [
+                {
+                  "ui:widget": "selectField",
+                  "ui:name": "category",
+                  "ui:label": "Category",
+                  "ui:placeholder": "All Categories",
+                  "ui:options": [
+                    { label: "All Products", value: "" },
+                    { label: "Electronics", value: "electronics" },
+                    { label: "Jewelery", value: "jewelery" },
+                    { label: "Men's Clothing", value: "men's clothing" },
+                    { label: "Women's Clothing", value: "women's clothing" },
+                  ],
+                  "ui:styles": {
+                    minWidth: "200px",
+                    flex: "1",
+                  },
+                  // ✅ CRITICAL FIX: Use "products.api" not "products"
+                  "ui:triggers": [
+                    {
+                      event: "change",
+                      source: "products.api",  // Match the actual data key
+                      updateData: "products.api_filtered",
+                      filters: {
+                        category: "{{value}}",
+                      },
+                    },
+                  ],
+                },
+                {
+                  "ui:widget": "inputField",
+                  "ui:name": "search",
+                  "ui:label": "Search Products",
+                  "ui:type": "text",
+                  "ui:placeholder": "Search by name...",
+                  "ui:styles": {
+                    minWidth: "250px",
+                    flex: "2",
+                  },
+                  // ✅ CRITICAL FIX: Search from "products.api_filtered"
+                  "ui:triggers": [
+                    {
+                      event: "search",
+                      source: "products.api_filtered",  // Match filtered data key
+                      params: {
+                        searchFields: ["title", "description", "category"],
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+
+        productsHeader: {
+          "ui:widget": "heading",
+          "ui:level": "h2",
+          "ui:text": "All Products 🔥",
+          "ui:styles": {
+            textAlign: "center",
+            marginBottom: "20px",
+            color: "#1f2937",
+            padding: "0 40px",
+          },
+        },
+
+        productsSubtitle: {
+          "ui:widget": "paragraph",
+          "ui:text": "Browse our complete collection",
+          "ui:styles": {
+            textAlign: "center",
+            marginBottom: "40px",
+            color: "#6b7280",
+            fontSize: "1.1rem",
+            padding: "0 40px",
+          },
+        },
+
+        // ✅ CRITICAL FIX: Use correct dataPath
+        featuredProducts: {
+          "ui:widget": "projectGrid",
+          "ui:animated": true,
+          "ui:dataPath": "products.api_filtered",  // Match filtered data key
+          "ui:styles": {
+            padding: "0 40px",
+            marginBottom: "60px",
+          },
+        },
+
+        spacer2: { "ui:widget": "spacer", "ui:height": 60 },
+
+        // Static category cards
+        categoriesHeader: {
+          "ui:widget": "heading",
+          "ui:level": "h2",
+          "ui:text": "Browse by Category",
+          "ui:styles": {
+            textAlign: "center",
+            marginBottom: "30px",
+            color: "#1f2937",
+            padding: "0 40px",
+          },
+        },
+
+        categoriesGrid: {
+          "ui:widget": "gridLayout",
+          "ui:columns": 3,
+          "ui:gap": "20px",
+          "ui:styles": {
+            padding: "0 40px",
+          },
+          "ui:children": [
+            {
+              "ui:widget": "card",
+              "ui:title": "💻 Electronics",
+              "ui:description": "Latest gadgets, smartphones & tech",
+              "ui:image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=250&fit=crop",
+              "ui:buttonLabel": "Browse Electronics",
+              "ui:styles": { minHeight: "200px" },
+              "ui:imageStyles": { height: "120px", objectFit: "cover" },
+            },
+            {
+              "ui:widget": "card",
+              "ui:title": "💎 Jewelery",
+              "ui:description": "Beautiful jewelry & accessories",
+              "ui:image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=250&fit=crop",
+              "ui:buttonLabel": "Browse Jewelery",
+              "ui:styles": { minHeight: "200px" },
+              "ui:imageStyles": { height: "120px", objectFit: "cover" },
+            },
+            {
+              "ui:widget": "card",
+              "ui:title": "👔 Men's Fashion",
+              "ui:description": "Clothing, shoes & accessories",
+              "ui:image": "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&h=250&fit=crop",
+              "ui:buttonLabel": "Browse Men's",
+              "ui:styles": { minHeight: "200px" },
+              "ui:imageStyles": { height: "120px", objectFit: "cover" },
+            },
+            {
+              "ui:widget": "card",
+              "ui:title": "👗 Women's Fashion",
+              "ui:description": "Latest trends & styles",
+              "ui:image": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=250&fit=crop",
+              "ui:buttonLabel": "Browse Women's",
+              "ui:styles": { minHeight: "200px" },
+              "ui:imageStyles": { height: "120px", objectFit: "cover" },
+            },
+          ],
+        },
+      },
+      styles: {
+        padding: "0",
+        background: "#ffffff",
+        minHeight: "100vh",
+      },
+      
+      // ✅ This loads products on page mount
+      triggers: [
+        {
+          event: "load",
+          source: "products.api",  // This matches your API key
+        },
+      ],
+    },
+
+    footer: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        footerText: {
+          "ui:widget": "text",
+          "ui:content": "© 2024 ShopZone. All rights reserved.",
+          "ui:styles": { textAlign: "center", color: "#94a3b8" },
+        },
+      },
+      styles: {
+        background: "#1e293b",
+        padding: "40px",
+        borderTop: "3px solid #667eea",
+      },
+      triggers: [],
+    },
+  },
+}
+      
     },
 
     components: {
       navbar: {
         table: {},
-        modal: {
-          authModal: {
-            "ui:title": "🔐 Welcome Back",
-            "ui:theme": "light",
-            "ui:content":
-              "Sign in to access your dashboard and manage your portfolio!",
-            "ui:fields": [
-              {
-                label: "Email Address",
-                type: "email",
-                placeholder: "eve.holt@reqres.in",
-                name: "email",
-                required: true,
-                validation: {
-                  required: true,
-                  requiredMessage: "Email is required",
-                  email: true,
-                  emailMessage: "Please enter a valid email",
-                },
-              },
-              {
-                label: "Password",
-                type: "password",
-                placeholder: "cityslicka",
-                name: "password",
-                required: true,
-                validation: {
-                  required: true,
-                  requiredMessage: "Password is required",
-                  minLength: 6,
-                  minLengthMessage: "Password must be at least 6 characters",
-                },
-              },
-            ],
-            "ui:actions": [
-              {
-                label: "Forgot Password?",
-                action: "openModal:forgotModal",
-                variant: "secondary",
-              },
-              {
-                label: "Sign In",
-                action: "api:auth.login",
-                variant: "primary",
-                apiKey: "auth.login",
-              },
-              {
-                label: "Create Account",
-                action: "openModal:signupModal",
-                variant: "secondary",
-              },
-            ],
-          },
-          signupModal: {
-            "ui:title": "✨ Join DevFolio",
-            "ui:theme": "light",
-            "ui:content":
-              "Create your account and start building your professional portfolio!",
-            "ui:fields": [
-              {
-                label: "Full Name",
-                type: "text",
-                placeholder: "John Doe",
-                name: "name",
-                required: true,
-              },
-              {
-                label: "Email Address",
-                type: "email",
-                placeholder: "eve.holt@reqres.in",
-                name: "email",
-                required: true,
-              },
-              {
-                label: "Password",
-                type: "password",
-                placeholder: "Create a strong password",
-                name: "password",
-                required: true,
-              },
-              {
-                label: "Confirm Password",
-                type: "password",
-                placeholder: "Re-enter your password",
-                name: "confirmPassword",
-                required: true,
-              },
-            ],
-            "ui:actions": [
-              {
-                label: "Already have an account?",
-                action: "openModal:authModal",
-                variant: "secondary",
-              },
-              {
-                label: "Sign Up",
-                action: "api:auth.signup",
-                variant: "primary",
-                apiKey: "auth.signup",
-              },
-            ],
-          },
-          forgotModal: {
-            "ui:title": "🔑 Reset Your Password",
-            "ui:theme": "light",
-            "ui:content":
-              "Enter your email address and we'll send you instructions to reset your password.",
-            "ui:fields": [
-              {
-                label: "Email Address",
-                type: "email",
-                placeholder: "eve.holt@reqres.in",
-                name: "email",
-                required: true,
-              },
-            ],
-            "ui:actions": [
-              {
-                label: "Back to Login",
-                action: "openModal:authModal",
-                variant: "secondary",
-              },
-              {
-                label: "Send Reset Link",
-                action: "api:auth.forgot",
-                variant: "primary",
-                apiKey: "auth.forgot",
-              },
-            ],
-          },
-        },
+        modal: {}, // REMOVED ALL MODALS
         uiSchema: {
           logo: {
             "ui:widget": "text",
-            "ui:content": "💼 DevFolio",
+            "ui:content": "🛒 ShopZone",
             "ui:styles": {
-              fontSize: "26px",
+              fontSize: "28px",
               fontWeight: "800",
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               cursor: "pointer",
-              animation: "slideInLeft 0.6s ease-out",
             },
           },
+
+          searchBar: {
+            "ui:widget": "inputField",
+            "ui:placeholder": "Search products...",
+            "ui:type": "text",
+            "ui:inputStyles": {
+              border: "2px solid #e2e8f0",
+              borderRadius: "25px",
+              padding: "10px 20px",
+              width: "400px",
+            },
+            "ui:styles": { marginBottom: "0" },
+          },
+
+          // ✅ NAV LINKS WITH AUTH CONDITIONAL
           links: {
             "ui:widget": "navLinks",
             "ui:theme": "light",
-            "ui:iconStyles": {
-              transition: "all 0.3s ease",
-              fontSize: "14px",
-              width: "16px",
-              textAlign: "center",
-            },
-            "ui:linkStyles": {
-              transition: "all 0.3s ease",
-              borderRadius: "8px",
-            },
             "ui:links": [
+              { label: "Home", action: "navigate:/shopzone" },
+              { label: "Categories", action: "navigate:/shopzone/categories" },
+              { label: "Cart (3)", action: "navigate:/shopzone/cart" },
+
+              // ✅ Show "Welcome, User" if logged in, else "Login"
               {
-                label: "Home",
-                action: "navigate:/devfolio",
-                fontAwesome: "fas fa-home",
-                iconStyles: {
-                  color: "#64748b",
-                },
-                iconHoverStyles: {
-                  color: "#667eea",
-                  transform: "scale(1.2)",
-                },
-                linkHoverStyles: {
-                  background: "rgba(102, 126, 234, 0.1)",
-                },
+                label:
+                  "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+                action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
               },
-              {
-                label: "About",
-                action: "navigate:/devfolio/about",
-                fontAwesome: "fas fa-user",
-                iconStyles: {
-                  color: "#64748b",
-                },
-                iconHoverStyles: {
-                  color: "#764ba2",
-                  transform: "scale(1.2)",
-                },
-                linkHoverStyles: {
-                  background: "rgba(118, 75, 162, 0.1)",
-                },
-              },
-              {
-                label: "Projects",
-                action: "navigate:/devfolio/projects",
-                fontAwesome: "fas fa-briefcase",
-                iconStyles: {
-                  color: "#64748b",
-                },
-                iconHoverStyles: {
-                  color: "#f093fb",
-                  transform: "scale(1.2)",
-                },
-                linkHoverStyles: {
-                  background: "rgba(240, 147, 251, 0.1)",
-                },
-              },
-              {
-                label: "{{auth.token ? 'Dashboard' : 'Login'}}",
-                action:
-                  "{{auth.token ? 'navigate:/dashboard' : 'openModal:authModal'}}",
-                fontAwesome:
-                  "{{auth.token ? 'fas fa-tachometer-alt' : 'fas fa-sign-in-alt'}}",
-                iconStyles: {
-                  color: "#64748b",
-                },
-                iconHoverStyles: {
-                  color: "{{auth.token ? '#10b981' : '#667eea'}}",
-                  transform: "scale(1.2)",
-                },
-                linkHoverStyles: {
-                  background:
-                    "{{auth.token ? 'rgba(16, 185, 129, 0.1)' : 'rgba(102, 126, 234, 0.1)'}}",
-                },
-              },
+
+              // ✅ Show Logout button if logged in
               {
                 label: "{{auth.token ? 'Logout' : ''}}",
                 action: "clearAuth+reload",
-                fontAwesome: "{{auth.token ? 'fas fa-sign-out-alt' : ''}}",
-                iconStyles: {
-                  color: "#64748b",
-                },
-                iconHoverStyles: {
-                  color: "#ef4444",
-                  transform: "scale(1.2)",
-                },
-                linkHoverStyles: {
-                  background: "rgba(239, 68, 68, 0.1)",
-                },
               },
             ],
           },
         },
         styles: {
-          background: "rgba(255, 255, 255, 0.95)",
-          backdropFilter: "blur(10px)",
+          background: "#ffffff",
           borderBottom: "2px solid #f0f0f0",
           padding: "20px 50px",
           position: "fixed",
@@ -923,182 +1192,139 @@ html { scroll-behavior: smooth; }`,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
         },
         triggers: [],
       },
+
+      // ... rest of your existing components (sidebar, main, footer) remain exactly the same
       sidebar: {
         table: {},
         modal: {},
-        uiSchema: {},
-        styles: { display: "none" },
+        uiSchema: {
+          categoriesHeading: {
+            "ui:widget": "heading",
+            "ui:text": "📂 Categories",
+            "ui:level": "h3",
+            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+          },
+          categoryList: {
+            "ui:widget": "list",
+            "ui:ordered": false,
+            "ui:icon": "›",
+            "ui:items": [
+              "Electronics",
+              "Fashion & Apparel",
+              "Home & Living",
+              "Sports & Outdoors",
+              "Books & Media",
+              "Beauty & Health",
+            ],
+            "ui:itemStyles": {
+              cursor: "pointer",
+              padding: "12px 0",
+              transition: "all 0.2s",
+            },
+          },
+
+          divider: {
+            "ui:widget": "divider",
+            "ui:spacing": "large",
+          },
+
+          priceHeading: {
+            "ui:widget": "heading",
+            "ui:text": "💰 Price Range",
+            "ui:level": "h3",
+            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+          },
+
+          priceFilter: {
+            "ui:widget": "checkbox",
+            "ui:label": "Under $50",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          priceFilter2: {
+            "ui:widget": "checkbox",
+            "ui:label": "$50 - $100",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          priceFilter3: {
+            "ui:widget": "checkbox",
+            "ui:label": "$100 - $200",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          priceFilter4: {
+            "ui:widget": "checkbox",
+            "ui:label": "Above $200",
+            "ui:styles": { marginBottom: "12px" },
+          },
+
+          divider2: {
+            "ui:widget": "divider",
+            "ui:spacing": "large",
+          },
+
+          ratingHeading: {
+            "ui:widget": "heading",
+            "ui:text": "⭐ Rating",
+            "ui:level": "h3",
+            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+          },
+
+          rating5: {
+            "ui:widget": "checkbox",
+            "ui:label": "⭐⭐⭐⭐⭐ (5 stars)",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          rating4: {
+            "ui:widget": "checkbox",
+            "ui:label": "⭐⭐⭐⭐ (4+ stars)",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          rating3: {
+            "ui:widget": "checkbox",
+            "ui:label": "⭐⭐⭐ (3+ stars)",
+            "ui:styles": { marginBottom: "12px" },
+          },
+        },
+        styles: {
+          width: "280px",
+          background: "#f8fafc",
+          padding: "120px 24px 24px",
+          minHeight: "100vh",
+          borderRight: "1px solid #e2e8f0",
+          position: "sticky",
+          top: 0,
+        },
         triggers: [],
       },
+
       main: {
         table: {},
         modal: {},
         uiSchema: {
           hero: {
             "ui:widget": "hero",
-            "ui:title": "Hi, I'm Alex 👋",
+            "ui:title": "Summer Sale 🔥",
             "ui:subtitle":
-              "Full Stack Developer | UI/UX Enthusiast | Problem Solver",
+              "Up to 50% OFF on selected items. Limited time offer!",
             "ui:cta": {
-              label: "View My Work",
-              action: "navigate:/devfolio/projects",
+              label: "Shop Now",
+              action: "scroll:#products",
             },
             "ui:styles": {
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              minHeight: "600px",
+              minHeight: "500px",
               padding: "150px 40px 100px",
-              animation: "fadeInUp 1s ease-out",
-            },
-          },
-          spacer1: { "ui:widget": "spacer", "ui:height": 80 },
-
-          // 🆕 NEW COLUMNS WIDGET SHOWCASE
-          servicesShowcase: {
-            "ui:widget": "columns",
-            "ui:ratio": "1:1:1",
-            "ui:gap": "40px",
-            "ui:columns": [
-              {
-                "ui:widget": "container",
-                "ui:direction": "column",
-                "ui:align": "center",
-                "ui:gap": "20px",
-                "ui:children": [
-                  {
-                    "ui:widget": "icon",
-                    "ui:fontAwesome": "fas fa-bolt",
-                    "ui:styles": {
-                      fontSize: "3rem",
-                      color: "#667eea",
-                    },
-                  },
-                  {
-                    "ui:widget": "heading",
-                    "ui:text": "Fast Development",
-                    "ui:level": "h3",
-                  },
-                  {
-                    "ui:widget": "text",
-                    "ui:content":
-                      "Quick turnaround without compromising quality",
-                  },
-                ],
-              },
-              {
-                "ui:widget": "container",
-                "ui:direction": "column",
-                "ui:align": "center",
-                "ui:gap": "20px",
-                "ui:children": [
-                  {
-                    "ui:widget": "icon",
-                    "ui:fontAwesome": "fas fa-palette",
-                    "ui:styles": {
-                      fontSize: "3rem",
-                      color: "#764ba2",
-                    },
-                  },
-                  {
-                    "ui:widget": "heading",
-                    "ui:text": "Modern Design",
-                    "ui:level": "h3",
-                  },
-                  {
-                    "ui:widget": "text",
-                    "ui:content":
-                      "Clean, responsive designs that work everywhere",
-                  },
-                ],
-              },
-              {
-                "ui:widget": "container",
-                "ui:direction": "column",
-                "ui:align": "center",
-                "ui:gap": "20px",
-                "ui:children": [
-                  {
-                    "ui:widget": "icon",
-                    "ui:fontAwesome": "fas fa-code",
-                    "ui:styles": {
-                      fontSize: "3rem",
-                      color: "#f093fb",
-                    },
-                  },
-                  {
-                    "ui:widget": "heading",
-                    "ui:text": "Full Stack",
-                    "ui:level": "h3",
-                  },
-                  {
-                    "ui:widget": "text",
-                    "ui:content":
-                      "End-to-end solutions from frontend to backend",
-                  },
-                ],
-              },
-            ],
-          },
-
-          spacer2: { "ui:widget": "spacer", "ui:height": 80 },
-
-          statsHeading: {
-            "ui:widget": "heading",
-            "ui:text": "📊 By The Numbers",
-            "ui:level": "h2",
-            "ui:styles": {
-              textAlign: "center",
-              marginBottom: "60px",
-              fontSize: "2.5rem",
-              animation: "fadeInUp 0.8s ease-out 0.2s both",
             },
           },
 
-          // 🆕 USING COLUMNS FOR STATS INSTEAD OF FLEXLAYOUT
-          statsContainer: {
-            "ui:widget": "columns",
-            "ui:ratio": "1:1:1",
-            "ui:gap": "40px",
-            "ui:align": "center",
-            "ui:columns": [
-              {
-                "ui:widget": "statsCounter",
-                "ui:value": "50+",
-                "ui:label": "Projects Completed",
-                "ui:color": "#667eea",
-                "ui:styles": {
-                  animation: "float 3s ease-in-out infinite",
-                },
-              },
-              {
-                "ui:widget": "statsCounter",
-                "ui:value": "30+",
-                "ui:label": "Happy Clients",
-                "ui:color": "#764ba2",
-                "ui:styles": {
-                  animation: "float 3s ease-in-out infinite 0.5s",
-                },
-              },
-              {
-                "ui:widget": "statsCounter",
-                "ui:value": "5+",
-                "ui:label": "Years Experience",
-                "ui:color": "#f093fb",
-                "ui:styles": {
-                  animation: "float 3s ease-in-out infinite 1s",
-                },
-              },
-            ],
-          },
-
-          spacer3: { "ui:widget": "spacer", "ui:height": 60 },
+          spacer1: { "ui:widget": "spacer", "ui:height": 60 },
 
           featuredHeading: {
             "ui:widget": "heading",
-            "ui:text": "🌟 Featured Work",
+            "ui:text": "✨ Featured Products",
             "ui:level": "h2",
             "ui:styles": {
               textAlign: "center",
@@ -1107,155 +1333,81 @@ html { scroll-behavior: smooth; }`,
             },
           },
 
-          // 🆕 USING RESPONSIVE GRID FOR PROJECTS
-          projectsGrid: {
-            "ui:widget": "responsiveGrid",
-            "ui:columns": { desktop: 3, tablet: 2, mobile: 1 },
-            "ui:gap": "30px",
-            "ui:items": [
-              {
-                "ui:widget": "card",
-                "ui:title": "SaaS Dashboard",
-                "ui:description":
-                  "Real-time analytics platform serving 10K+ users",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=250&fit=crop",
-                "ui:action": "navigate:/devfolio/projects",
-                "ui:buttonLabel": "View Project",
-              },
-              {
-                "ui:widget": "card",
-                "ui:title": "Music Streaming App",
-                "ui:description": "Full-stack app with social features",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=250&fit=crop",
-                "ui:action": "navigate:/devfolio/projects",
-                "ui:buttonLabel": "View Project",
-              },
-              {
-                "ui:widget": "card",
-                "ui:title": "E-commerce Mobile",
-                "ui:description": "React Native app with offline mode",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=250&fit=crop",
-                "ui:action": "navigate:/devfolio/projects",
-                "ui:buttonLabel": "View Project",
-              },
-            ],
+          productsGrid: {
+            "ui:widget": "projectGrid",
+            "ui:animated": true,
           },
 
-          spacer4: { "ui:widget": "spacer", "ui:height": 80 },
+          spacer2: { "ui:widget": "spacer", "ui:height": 80 },
 
-          // 🆕 SIDEBAR LAYOUT FOR ABOUT PREVIEW
-          aboutPreview: {
-            "ui:widget": "sidebarLayout",
-            "ui:sidebarWidth": "300px",
-            "ui:gap": "50px",
-            "ui:sidebar": {
-              "ui:widget": "image",
-              "ui:src":
-                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-              "ui:styles": {
-                borderRadius: "20px",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
-              },
-            },
-            "ui:main": {
-              "ui:widget": "container",
-              "ui:direction": "column",
-              "ui:gap": "20px",
-              "ui:children": [
-                {
-                  "ui:widget": "heading",
-                  "ui:text": "Why Work With Me?",
-                  "ui:level": "h2",
-                },
-                {
-                  "ui:widget": "text",
-                  "ui:content":
-                    "I combine technical expertise with creative problem-solving to deliver solutions that not only work flawlessly but also provide exceptional user experiences.",
-                },
-                {
-                  "ui:widget": "columns",
-                  "ui:ratio": "1:1",
-                  "ui:gap": "30px",
-                  "ui:columns": [
-                    {
-                      "ui:widget": "container",
-                      "ui:direction": "column",
-                      "ui:gap": "10px",
-                      "ui:children": [
-                        {
-                          "ui:widget": "heading",
-                          "ui:text": "Clean Code",
-                          "ui:level": "h4",
-                        },
-                        {
-                          "ui:widget": "text",
-                          "ui:content":
-                            "Maintainable, scalable, and well-documented",
-                        },
-                      ],
-                    },
-                    {
-                      "ui:widget": "container",
-                      "ui:direction": "column",
-                      "ui:gap": "10px",
-                      "ui:children": [
-                        {
-                          "ui:widget": "heading",
-                          "ui:text": "User-Focused",
-                          "ui:level": "h4",
-                        },
-                        {
-                          "ui:widget": "text",
-                          "ui:content":
-                            "Designs that prioritize user experience",
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-
-          spacer5: { "ui:widget": "spacer", "ui:height": 80 },
-
-          ctaSection: {
+          dealSection: {
             "ui:widget": "card",
-            "ui:title": "Let's Work Together! 🤝",
+            "ui:title": "⚡ Deal of the Day",
             "ui:description":
-              "I'm currently available for freelance projects and consulting opportunities. Let's create something amazing!",
-            "ui:action": "openModal:authModal",
-            "ui:buttonLabel": "Get Started",
+              "Premium Wireless Earbuds - Now at $79.99 (was $149.99). Hurry, only 12 left in stock!",
+            "ui:image":
+              "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&h=400&fit=crop",
+            "ui:action": "navigate:/shopzone/login",
+            "ui:buttonLabel": "Grab This Deal",
             "ui:styles": {
-              maxWidth: "800px",
+              maxWidth: "900px",
               margin: "0 auto",
-              padding: "60px 40px",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              padding: "40px",
+              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
               color: "white",
-              textAlign: "center",
               border: "none",
-              animation: "pulse 2s ease-in-out infinite",
             },
+          },
+
+          spacer3: { "ui:widget": "spacer", "ui:height": 60 },
+
+          testimonialsHeading: {
+            "ui:widget": "heading",
+            "ui:text": "💬 Customer Reviews",
+            "ui:level": "h2",
+            "ui:styles": { textAlign: "center", marginBottom: "50px" },
+          },
+
+          testimonial1: {
+            "ui:widget": "testimonial",
+            "ui:quote":
+              "Amazing quality and fast shipping! Will definitely order again.",
+            "ui:author": "Sarah Johnson",
+            "ui:role": "Verified Buyer",
+            "ui:avatar": "https://i.pravatar.cc/100?img=1",
+            "ui:rating": 5,
+            "ui:styles": { maxWidth: "600px", margin: "0 auto 30px" },
+          },
+
+          testimonial2: {
+            "ui:widget": "testimonial",
+            "ui:quote":
+              "Best online shopping experience ever. Highly recommend ShopZone!",
+            "ui:author": "Michael Chen",
+            "ui:role": "Verified Buyer",
+            "ui:avatar": "https://i.pravatar.cc/100?img=3",
+            "ui:rating": 5,
+            "ui:styles": { maxWidth: "600px", margin: "0 auto 30px" },
           },
         },
         styles: {
           padding: "100px 40px 80px",
-          background:
-            "linear-gradient(180deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%)",
+          background: "#ffffff",
+          flex: 1,
           minHeight: "100vh",
         },
-        triggers: [],
+        triggers: [
+          { event: "load", action: "fetchProducts", source: "products.api" },
+        ],
       },
+
       footer: {
         table: {},
         modal: {},
         uiSchema: {
           footerHeading: {
             "ui:widget": "heading",
-            "ui:text": "💼 DevFolio",
+            "ui:text": "🛍️ ShopZone",
             "ui:level": "h3",
             "ui:styles": {
               textAlign: "center",
@@ -1266,50 +1418,87 @@ html { scroll-behavior: smooth; }`,
           footerDesc: {
             "ui:widget": "paragraph",
             "ui:text":
-              "Building digital experiences that inspire and deliver results.",
+              "Your one-stop destination for quality products at unbeatable prices. Shop with confidence!",
             "ui:styles": {
               textAlign: "center",
               color: "#94a3b8",
-              maxWidth: "500px",
+              maxWidth: "600px",
               margin: "0 auto 30px",
             },
           },
+
+          quickLinksHeading: {
+            "ui:widget": "heading",
+            "ui:text": "Quick Links",
+            "ui:level": "h4",
+            "ui:styles": {
+              textAlign: "center",
+              color: "#cbd5e1",
+              marginBottom: "15px",
+              fontSize: "1.1rem",
+            },
+          },
+
+          quickLinks: {
+            "ui:widget": "list",
+            "ui:ordered": false,
+            "ui:icon": "→",
+            "ui:items": [
+              "Track Order",
+              "Return Policy",
+              "Privacy Policy",
+              "Terms & Conditions",
+              "Contact Support",
+            ],
+            "ui:styles": {
+              maxWidth: "300px",
+              margin: "0 auto 30px",
+            },
+            "ui:itemStyles": {
+              color: "#94a3b8",
+              textAlign: "center",
+              justifyContent: "center",
+            },
+          },
+
           socialIcons: {
             "ui:widget": "socialIcons",
             "ui:size": "medium",
             "ui:variant": "colored",
             "ui:icons": [
               {
-                fontAwesome: "fab fa-linkedin-in",
-                platform: "linkedin",
-                url: "#",
+                emoji: "📘",
+                platform: "facebook",
+                url: "https://facebook.com/shopzone",
               },
               {
-                fontAwesome: "fab fa-github",
-                platform: "github",
-                url: "#",
-              },
-              {
-                fontAwesome: "fab fa-twitter",
+                emoji: "🐦",
                 platform: "twitter",
-                url: "#",
+                url: "https://twitter.com/shopzone",
               },
               {
-                fontAwesome: "fas fa-envelope",
-                platform: "email",
-                url: "mailto:alex@devfolio.com",
+                emoji: "📷",
+                platform: "instagram",
+                url: "https://instagram.com/shopzone",
+              },
+              {
+                emoji: "💼",
+                platform: "linkedin",
+                url: "https://linkedin.com/company/shopzone",
               },
             ],
           },
+
           divider: {
             "ui:widget": "divider",
             "ui:variant": "solid",
             "ui:color": "#475569",
             "ui:spacing": "large",
           },
+
           footerText: {
             "ui:widget": "text",
-            "ui:content": "© 2024 DevFolio. Crafted with ❤️ and ☕",
+            "ui:content": "© 2024 ShopZone. All rights reserved. Made with ❤️",
             "ui:styles": {
               textAlign: "center",
               color: "#94a3b8",

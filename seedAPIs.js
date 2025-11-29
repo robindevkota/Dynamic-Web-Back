@@ -319,34 +319,7 @@ const apiConfigs = [
     tags: ["user", "profile", "update"],
     projectUUID: "global",
   },
-   {
-    key: "products",
-    name: "Get Products",
-    description: "Fetches product list from database",
-    url: "http://localhost:5000/api/products",
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    transformPayload: "",
-    successNotification: {
-      type: "none",
-    },
-    errorNotification: {
-      type: "toast",
-      message: "Failed to load products",
-      background: "#ef4444",
-      duration: 3000,
-    },
-    closeModalOnSuccess: false,
-    storeResponse: true,
-    storeKey: "products",
-    onSuccess: ["console:Products loaded successfully"],
-    onError: ["console:Failed to fetch products"],
-    onNetworkError: "console:Network error while fetching products",
-    tags: ["ecommerce", "products", "catalog"],
-    projectUUID: "global",
-  },
+ 
 
 
   {
