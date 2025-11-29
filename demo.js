@@ -149,7 +149,8 @@ input:focus, textarea:focus, select:focus {
         "auth.login",
         "auth.signup",
         "auth.forgot",
-        "products.api"
+        "products.api",
+        "products.filter",
       ],
     },
 
@@ -802,330 +803,365 @@ input:focus, textarea:focus, select:focus {
         },
       },
 
-      // COMPLETE FIXED CATEGORIES PAGE - Replace in demo.js
+   
 
-// FINAL FIXED CATEGORIES PAGE
-// Replace ONLY the categories section in demo.js
-
-categories: {
-  title: "Product Categories",
-  components: {
-    navbar: {
-      table: {},
-      modal: {},
-      uiSchema: {
-        logo: {
-          "ui:widget": "text",
-          "ui:content": "🛒 ShopZone",
-          "ui:styles": {
-            fontSize: "28px",
-            fontWeight: "800",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          },
-        },
-        links: {
-          "ui:widget": "navLinks",
-          "ui:theme": "light",
-          "ui:links": [
-            { label: "Home", action: "navigate:/shopzone" },
-            { label: "Categories", action: "navigate:/shopzone/categories" },
-            { label: "Cart (3)", action: "navigate:/shopzone/cart" },
-            {
-              label: "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
-              action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
-            },
-            {
-              label: "{{auth.token ? 'Logout' : ''}}",
-              action: "clearAuth+reload",
-            },
-          ],
-        },
-      },
-      styles: {
-        background: "#ffffff",
-        borderBottom: "2px solid #f0f0f0",
-        padding: "20px 50px",
-        position: "sticky",
-        top: 0,
-        width: "100%",
-        zIndex: 1000,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
-      },
-      triggers: [],
-    },
-
-    sidebar: {
-      table: {},
-      modal: {},
-      uiSchema: {},
-      styles: { display: "none" },
-      triggers: [],
-    },
-
-    main: {
-      table: {},
-      modal: {
-        productDetail: {
-          "ui:title": "Product Details",
-          "ui:theme": "light",
-          "ui:styles": {
-            maxWidth: "700px",
-          },
-          "ui:fields": [
-            {
-              name: "quantity",
-              label: "Quantity",
-              type: "number",
-              placeholder: "1",
-              required: true,
-            },
-          ],
-          "ui:actions": [
-            {
-              label: "Add to Cart",
-              action: "api:cart.add",
-              variant: "primary",
-            },
-            {
-              label: "Close",
-              action: "closeModal",
-              variant: "outline",
-            },
-          ],
-        },
-      },
-      uiSchema: {
-        hero: {
-          "ui:widget": "hero",
-          "ui:title": "Shop by Category 🏷️",
-          "ui:subtitle": "Discover amazing products across our curated collections",
-          "ui:styles": {
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            minHeight: "400px",
-          },
-        },
-
-        spacer1: { "ui:widget": "spacer", "ui:height": 60 },
-
-        // ✅ FIXED: Filter Section with CORRECT source keys
-        filterSection: {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "20px",
-          "ui:styles": {
-            padding: "30px 40px",
-            marginBottom: "40px",
-            background: "#f8fafc",
-            borderRadius: "12px",
-          },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:level": "h3",
-              "ui:text": "Filter Products",
-              "ui:styles": {
-                marginBottom: "20px",
-                color: "#1f2937",
+      categories: {
+        title: "Product Categories",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🛒 ShopZone",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/shopzone" },
+                  {
+                    label: "Categories",
+                    action: "navigate:/shopzone/categories",
+                  },
+                  { label: "Cart (3)", action: "navigate:/shopzone/cart" },
+                  {
+                    label:
+                      "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
+                ],
               },
             },
-            {
-              "ui:widget": "flexLayout",
-              "ui:direction": "row",
-              "ui:gap": "20px",
-              "ui:wrap": true,
-              "ui:children": [
-                {
-                  "ui:widget": "selectField",
-                  "ui:name": "category",
-                  "ui:label": "Category",
-                  "ui:placeholder": "All Categories",
-                  "ui:options": [
-                    { label: "All Products", value: "" },
-                    { label: "Electronics", value: "electronics" },
-                    { label: "Jewelery", value: "jewelery" },
-                    { label: "Men's Clothing", value: "men's clothing" },
-                    { label: "Women's Clothing", value: "women's clothing" },
-                  ],
-                  "ui:styles": {
-                    minWidth: "200px",
-                    flex: "1",
-                  },
-                  // ✅ CRITICAL FIX: Use "products.api" not "products"
-                  "ui:triggers": [
-                    {
-                      event: "change",
-                      source: "products.api", 
-                      params: "{{ value ? '?category=' + value : '' }}",
-                      updateData: "products.api_filtered",
-                      filters: {
-                        category: "{{value}}",
-                      },
-                    },
-                  ],
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #f0f0f0",
+              padding: "20px 50px",
+              position: "sticky",
+              top: 0,
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+
+          main: {
+            table: {},
+            modal: {
+              productDetail: {
+                "ui:title": "Product Details",
+                "ui:theme": "light",
+                "ui:styles": {
+                  maxWidth: "700px",
                 },
-                {
-                  "ui:widget": "inputField",
-                  "ui:name": "search",
-                  "ui:label": "Search Products",
-                  "ui:type": "text",
-                  "ui:placeholder": "Search by name...",
-                  "ui:styles": {
-                    minWidth: "250px",
-                    flex: "2",
+                "ui:fields": [
+                  {
+                    name: "quantity",
+                    label: "Quantity",
+                    type: "number",
+                    placeholder: "1",
+                    required: true,
                   },
-                  // ✅ CRITICAL FIX: Search from "products.api_filtered"
-                  "ui:triggers": [
-                    {
-                      event: "search",
-                      source: "products.api_filtered",  // Match filtered data key
-                      params: {
-                        searchFields: ["title", "description", "category"],
-                      },
-                    },
-                  ],
+                ],
+                "ui:actions": [
+                  {
+                    label: "Add to Cart",
+                    action: "api:cart.add",
+                    variant: "primary",
+                  },
+                  {
+                    label: "Close",
+                    action: "closeModal",
+                    variant: "outline",
+                  },
+                ],
+              },
+            },
+            uiSchema: {
+              hero: {
+                "ui:widget": "hero",
+                "ui:title": "Shop by Category 🏷️",
+                "ui:subtitle":
+                  "Discover amazing products across our curated collections",
+                "ui:styles": {
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  minHeight: "400px",
                 },
-              ],
+              },
+
+              spacer1: { "ui:widget": "spacer", "ui:height": 60 },
+
+              // ✅ FIXED: Filter Section with CORRECT source keys
+              filterSection: {
+                "ui:widget": "filterWidget", // ✅ Use dedicated filter widget
+                "ui:title": "Filter Products",
+                "ui:filterOnChange": true, // Apply on button click
+                "ui:styles": {
+                  padding: "30px 40px",
+                  marginBottom: "40px",
+                  background: "#f8fafc",
+                  borderRadius: "12px",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "selectField",
+                    "ui:name": "category",
+                    "ui:label": "Category",
+                    "ui:placeholder": "All Categories",
+                    "ui:options": [
+                      { label: "All Products", value: "" },
+                      { label: "Electronics", value: "electronics" },
+                      { label: "Jewelery", value: "jewelery" },
+                      { label: "Men's Clothing", value: "men's clothing" },
+                      { label: "Women's Clothing", value: "women's clothing" },
+                    ],
+                    "ui:styles": {
+                      minWidth: "200px",
+                      marginBottom: "0", // ✅ No bottom margin for horizontal layout
+                    },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:name": "search",
+                    "ui:label": "Search Products",
+                    "ui:type": "text",
+                    "ui:placeholder": "Search by name...",
+                    "ui:styles": {
+                      minWidth: "250px",
+                      marginBottom: "0", // ✅ No bottom margin
+                    },
+                  },
+                  {
+                    "ui:widget": "dateField",
+                    "ui:name": "fromDate",
+                    "ui:label": "From Date",
+                    "ui:styles": {
+                      minWidth: "150px",
+                      marginBottom: "0", // ✅ No bottom margin
+                    },
+                  },
+                  {
+                    "ui:widget": "dateField",
+                    "ui:name": "toDate",
+                    "ui:label": "To Date",
+                    "ui:styles": {
+                      minWidth: "150px",
+                      marginBottom: "0", // ✅ No bottom margin
+                    },
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Apply Filters",
+                    action: "api:products.filter",
+                    variant: "filter",
+                    styles: {
+                      background: "#667eea",
+                      color: "white",
+                      padding: "12px 24px",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      minWidth: "120px",
+                      height: "44px", // ✅ Match field height
+                    },
+                  },
+                  {
+                    label: "Reset",
+                    action: "resetForm",
+                    variant: "reset",
+                    styles: {
+                      background: "#e2e8f0",
+                      color: "#64748b",
+                      padding: "12px 24px",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      minWidth: "100px",
+                      height: "44px", // ✅ Match field height
+                    },
+                  },
+                  {
+                    label: "🔄",
+                    action: "reload",
+                    variant: "refresh",
+                    styles: {
+                      background: "transparent",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "8px",
+                      padding: "10px",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                      height: "44px", // ✅ Match field height
+                      width: "44px",
+                    },
+                  },
+                ],
+              },
+
+              productsHeader: {
+                "ui:widget": "heading",
+                "ui:level": "h2",
+                "ui:text": "All Products 🔥",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "20px",
+                  color: "#1f2937",
+                  padding: "0 40px",
+                },
+              },
+
+              productsSubtitle: {
+                "ui:widget": "paragraph",
+                "ui:text": "Browse our complete collection",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "40px",
+                  color: "#6b7280",
+                  fontSize: "1.1rem",
+                  padding: "0 40px",
+                },
+              },
+
+              // ✅ CRITICAL FIX: Use correct dataPath
+              featuredProducts: {
+                "ui:widget": "projectGrid",
+                "ui:animated": true,
+                "ui:dataPath": "products.api_filtered", // Match filtered data key
+                "ui:styles": {
+                  padding: "0 40px",
+                  marginBottom: "60px",
+                },
+              },
+
+              spacer2: { "ui:widget": "spacer", "ui:height": 60 },
+
+              // Static category cards
+              categoriesHeader: {
+                "ui:widget": "heading",
+                "ui:level": "h2",
+                "ui:text": "Browse by Category",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "30px",
+                  color: "#1f2937",
+                  padding: "0 40px",
+                },
+              },
+
+              categoriesGrid: {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "20px",
+                "ui:styles": {
+                  padding: "0 40px",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "💻 Electronics",
+                    "ui:description": "Latest gadgets, smartphones & tech",
+                    "ui:image":
+                      "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=250&fit=crop",
+                    "ui:buttonLabel": "Browse Electronics",
+                    "ui:styles": { minHeight: "200px" },
+                    "ui:imageStyles": { height: "120px", objectFit: "cover" },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "💎 Jewelery",
+                    "ui:description": "Beautiful jewelry & accessories",
+                    "ui:image":
+                      "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=250&fit=crop",
+                    "ui:buttonLabel": "Browse Jewelery",
+                    "ui:styles": { minHeight: "200px" },
+                    "ui:imageStyles": { height: "120px", objectFit: "cover" },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "👔 Men's Fashion",
+                    "ui:description": "Clothing, shoes & accessories",
+                    "ui:image":
+                      "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&h=250&fit=crop",
+                    "ui:buttonLabel": "Browse Men's",
+                    "ui:styles": { minHeight: "200px" },
+                    "ui:imageStyles": { height: "120px", objectFit: "cover" },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "👗 Women's Fashion",
+                    "ui:description": "Latest trends & styles",
+                    "ui:image":
+                      "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=250&fit=crop",
+                    "ui:buttonLabel": "Browse Women's",
+                    "ui:styles": { minHeight: "200px" },
+                    "ui:imageStyles": { height: "120px", objectFit: "cover" },
+                  },
+                ],
+              },
             },
-          ],
-        },
-
-        productsHeader: {
-          "ui:widget": "heading",
-          "ui:level": "h2",
-          "ui:text": "All Products 🔥",
-          "ui:styles": {
-            textAlign: "center",
-            marginBottom: "20px",
-            color: "#1f2937",
-            padding: "0 40px",
-          },
-        },
-
-        productsSubtitle: {
-          "ui:widget": "paragraph",
-          "ui:text": "Browse our complete collection",
-          "ui:styles": {
-            textAlign: "center",
-            marginBottom: "40px",
-            color: "#6b7280",
-            fontSize: "1.1rem",
-            padding: "0 40px",
-          },
-        },
-
-        // ✅ CRITICAL FIX: Use correct dataPath
-        featuredProducts: {
-          "ui:widget": "projectGrid",
-          "ui:animated": true,
-          "ui:dataPath": "products.api_filtered",  // Match filtered data key
-          "ui:styles": {
-            padding: "0 40px",
-            marginBottom: "60px",
-          },
-        },
-
-        spacer2: { "ui:widget": "spacer", "ui:height": 60 },
-
-        // Static category cards
-        categoriesHeader: {
-          "ui:widget": "heading",
-          "ui:level": "h2",
-          "ui:text": "Browse by Category",
-          "ui:styles": {
-            textAlign: "center",
-            marginBottom: "30px",
-            color: "#1f2937",
-            padding: "0 40px",
-          },
-        },
-
-        categoriesGrid: {
-          "ui:widget": "gridLayout",
-          "ui:columns": 3,
-          "ui:gap": "20px",
-          "ui:styles": {
-            padding: "0 40px",
-          },
-          "ui:children": [
-            {
-              "ui:widget": "card",
-              "ui:title": "💻 Electronics",
-              "ui:description": "Latest gadgets, smartphones & tech",
-              "ui:image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=250&fit=crop",
-              "ui:buttonLabel": "Browse Electronics",
-              "ui:styles": { minHeight: "200px" },
-              "ui:imageStyles": { height: "120px", objectFit: "cover" },
+            styles: {
+              padding: "0",
+              background: "#ffffff",
+              minHeight: "100vh",
             },
-            {
-              "ui:widget": "card",
-              "ui:title": "💎 Jewelery",
-              "ui:description": "Beautiful jewelry & accessories",
-              "ui:image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=250&fit=crop",
-              "ui:buttonLabel": "Browse Jewelery",
-              "ui:styles": { minHeight: "200px" },
-              "ui:imageStyles": { height: "120px", objectFit: "cover" },
+
+            // ✅ This loads products on page mount
+            triggers: [
+              {
+                event: "load",
+                source: "products.api", // This matches your API key
+              },
+            ],
+          },
+
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 ShopZone. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
             },
-            {
-              "ui:widget": "card",
-              "ui:title": "👔 Men's Fashion",
-              "ui:description": "Clothing, shoes & accessories",
-              "ui:image": "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&h=250&fit=crop",
-              "ui:buttonLabel": "Browse Men's",
-              "ui:styles": { minHeight: "200px" },
-              "ui:imageStyles": { height: "120px", objectFit: "cover" },
+            styles: {
+              background: "#1e293b",
+              padding: "40px",
+              borderTop: "3px solid #667eea",
             },
-            {
-              "ui:widget": "card",
-              "ui:title": "👗 Women's Fashion",
-              "ui:description": "Latest trends & styles",
-              "ui:image": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=250&fit=crop",
-              "ui:buttonLabel": "Browse Women's",
-              "ui:styles": { minHeight: "200px" },
-              "ui:imageStyles": { height: "120px", objectFit: "cover" },
-            },
-          ],
+            triggers: [],
+          },
         },
       },
-      styles: {
-        padding: "0",
-        background: "#ffffff",
-        minHeight: "100vh",
-      },
-      
-      // ✅ This loads products on page mount
-      triggers: [
-        {
-          event: "load",
-          source: "products.api",  // This matches your API key
-        },
-      ],
-    },
-
-    footer: {
-      table: {},
-      modal: {},
-      uiSchema: {
-        footerText: {
-          "ui:widget": "text",
-          "ui:content": "© 2024 ShopZone. All rights reserved.",
-          "ui:styles": { textAlign: "center", color: "#94a3b8" },
-        },
-      },
-      styles: {
-        background: "#1e293b",
-        padding: "40px",
-        borderTop: "3px solid #667eea",
-      },
-      triggers: [],
-    },
-  },
-}
-      
     },
 
     components: {

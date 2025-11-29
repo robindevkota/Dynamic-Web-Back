@@ -10,47 +10,59 @@ mongoose.connect(
 );
 
 const apiConfigs = [
-  // {
-  //   key: "contact.send",
-  //   name: "Contact Form Submission",
-  //   description: "Sends contact form message",
-  //   url: "https://jsonplaceholder.typicode.com/posts",
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   transformPayload: `
-  //     (payload) => ({
-  //       name: payload.name,
-  //       email: payload.email, 
-  //       subject: payload.subject,
-  //       message: payload.message,
-  //       userId: 1
-  //     })
-  //   `,
-  //   successNotification: {
-  //     type: "toast",
-  //     message: "Message sent successfully! We'll get back to you soon.",
-  //     background: "#10b981",
-  //     duration: 3000,
-  //   },
-  //   errorNotification: {
-  //     type: "toast",
-  //     message: "Failed to send message. Please try again.",
-  //     background: "#ef4444",
-  //     duration: 3000,
-  //   },
-  //   closeModalOnSuccess: false,
-  //   storeResponse: true,
-  //   storeKey: "contactResponse",
-  //   onSuccess: ["console:Message sent successfully"],
-  //   onError: ["console:Failed to send message"],
-  //   onNetworkError: "console:Network error while sending message",
-  //   tags: ["contact", "form", "support"],
-  //   projectUUID: "global",
-  // },
+{
+  key: "products.filter",
+  name: "Filter Products",
+  description: "Filter products with multiple criteria",
+  url: "https://fakestoreapi.com/products",
+  method: "GET",
+  transformPayload: `(function(payload) {
+    console.log("=== TRANSFORM_PAYLOAD DEBUG ===");
+    console.log("📦 Payload received:", payload);
+    
+    const baseUrl = "https://fakestoreapi.com/products";
+    const params = new URLSearchParams();
+    
+    if (payload.category && payload.category !== "") {
+      console.log("✅ Adding category:", payload.category);
+      params.append('category', payload.category);
+    }
+    if (payload.search && payload.search !== "") {
+      console.log("✅ Adding search:", payload.search);
+      params.append('title', payload.search);
+    }
+    if (payload.fromDate) {
+      console.log("✅ Adding fromDate:", payload.fromDate);
+      params.append('from_date', payload.fromDate);
+    }
+    if (payload.toDate) {
+      console.log("✅ Adding toDate:", payload.toDate);
+      params.append('to_date', payload.toDate);
+    }
+    
+    const queryString = params.toString();
+    console.log("🔗 Query string built:", queryString);
+    
+    let finalUrl = baseUrl;
+    if (queryString) {
+      finalUrl = baseUrl + '?' + queryString;
+    }
+    
+    console.log("🚀 Final URL to return:", finalUrl);
+    console.log("=== TRANSFORM_PAYLOAD END ===\\n");
+    
+    return finalUrl;
+  })`,
+  successNotification: {
+    type: "toast", 
+    message: "Filters applied successfully",
+    background: "#10b981",
+  },
+  storeResponse: true,
+  storeKey: "products.api_filtered",
+},
+
   
-  // ✅ FIXED: LOGIN API - Now sends email and password correctly
   {
     key: "auth.login",
     name: "User Login",
@@ -322,37 +334,7 @@ const apiConfigs = [
  
 
 
-  {
-    key: "products.seed",
-    name: "Seed Products",
-    description: "Adds sample products to database",
-    url: "http://localhost:5000/api/products/seed",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    transformPayload: "",
-    successNotification: {
-      type: "toast",
-      message: "Products seeded successfully!",
-      background: "#10b981",
-      duration: 3000,
-    },
-    errorNotification: {
-      type: "toast",
-      message: "Failed to seed products",
-      background: "#ef4444",
-      duration: 3000,
-    },
-    closeModalOnSuccess: false,
-    storeResponse: true,
-    storeKey: "seedResponse",
-    onSuccess: ["console:Products seeded successfully"],
-    onError: ["console:Failed to seed products"],
-    onNetworkError: "console:Network error while seeding products",
-    tags: ["admin", "products", "seed"],
-    projectUUID: "global",
-  }
+ 
 ];
 
 const seed = async () => {
