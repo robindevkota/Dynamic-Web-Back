@@ -10,45 +10,45 @@ mongoose.connect(
 );
 
 const apiConfigs = [
-  {
-    key: "contact.send",
-    name: "Contact Form Submission",
-    description: "Sends contact form message",
-    url: "https://jsonplaceholder.typicode.com/posts",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    transformPayload: `
-      (payload) => ({
-        name: payload.name,
-        email: payload.email, 
-        subject: payload.subject,
-        message: payload.message,
-        userId: 1
-      })
-    `,
-    successNotification: {
-      type: "toast",
-      message: "Message sent successfully! We'll get back to you soon.",
-      background: "#10b981",
-      duration: 3000,
-    },
-    errorNotification: {
-      type: "toast",
-      message: "Failed to send message. Please try again.",
-      background: "#ef4444",
-      duration: 3000,
-    },
-    closeModalOnSuccess: false,
-    storeResponse: true,
-    storeKey: "contactResponse",
-    onSuccess: ["console:Message sent successfully"],
-    onError: ["console:Failed to send message"],
-    onNetworkError: "console:Network error while sending message",
-    tags: ["contact", "form", "support"],
-    projectUUID: "global",
-  },
+  // {
+  //   key: "contact.send",
+  //   name: "Contact Form Submission",
+  //   description: "Sends contact form message",
+  //   url: "https://jsonplaceholder.typicode.com/posts",
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   transformPayload: `
+  //     (payload) => ({
+  //       name: payload.name,
+  //       email: payload.email, 
+  //       subject: payload.subject,
+  //       message: payload.message,
+  //       userId: 1
+  //     })
+  //   `,
+  //   successNotification: {
+  //     type: "toast",
+  //     message: "Message sent successfully! We'll get back to you soon.",
+  //     background: "#10b981",
+  //     duration: 3000,
+  //   },
+  //   errorNotification: {
+  //     type: "toast",
+  //     message: "Failed to send message. Please try again.",
+  //     background: "#ef4444",
+  //     duration: 3000,
+  //   },
+  //   closeModalOnSuccess: false,
+  //   storeResponse: true,
+  //   storeKey: "contactResponse",
+  //   onSuccess: ["console:Message sent successfully"],
+  //   onError: ["console:Failed to send message"],
+  //   onNetworkError: "console:Network error while sending message",
+  //   tags: ["contact", "form", "support"],
+  //   projectUUID: "global",
+  // },
   
   // ✅ FIXED: LOGIN API - Now sends email and password correctly
   {
@@ -317,6 +317,67 @@ const apiConfigs = [
     onError: ["console:Failed to update profile"],
     onNetworkError: "console:Network error while updating profile",
     tags: ["user", "profile", "update"],
+    projectUUID: "global",
+  },
+   {
+    key: "products",
+    name: "Get Products",
+    description: "Fetches product list from database",
+    url: "http://localhost:5000/api/products",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformPayload: "",
+    successNotification: {
+      type: "none",
+    },
+    errorNotification: {
+      type: "toast",
+      message: "Failed to load products",
+      background: "#ef4444",
+      duration: 3000,
+    },
+    closeModalOnSuccess: false,
+    storeResponse: true,
+    storeKey: "products",
+    onSuccess: ["console:Products loaded successfully"],
+    onError: ["console:Failed to fetch products"],
+    onNetworkError: "console:Network error while fetching products",
+    tags: ["ecommerce", "products", "catalog"],
+    projectUUID: "global",
+  },
+
+
+  {
+    key: "products.seed",
+    name: "Seed Products",
+    description: "Adds sample products to database",
+    url: "http://localhost:5000/api/products/seed",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformPayload: "",
+    successNotification: {
+      type: "toast",
+      message: "Products seeded successfully!",
+      background: "#10b981",
+      duration: 3000,
+    },
+    errorNotification: {
+      type: "toast",
+      message: "Failed to seed products",
+      background: "#ef4444",
+      duration: 3000,
+    },
+    closeModalOnSuccess: false,
+    storeResponse: true,
+    storeKey: "seedResponse",
+    onSuccess: ["console:Products seeded successfully"],
+    onError: ["console:Failed to seed products"],
+    onNetworkError: "console:Network error while seeding products",
+    tags: ["admin", "products", "seed"],
     projectUUID: "global",
   }
 ];

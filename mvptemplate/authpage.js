@@ -6465,6 +6465,1550 @@ input:focus, textarea:focus, select:focus {
         triggers: [],
       },
     },
+  },
+    {
+    title: "GreenHaven - Premium Plant Store",
+    slug: "greenhaven",
+    projectUUID: "plantstore-greenhaven",
+    taskUUID: "plant001",
+    status: "Active",
+    accountValidation: true,
+    otpValidation: false,
+    isAnonymous: false,
+
+    initialization: {
+      globalCSS: `
+/* Font Awesome CDN */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #2d4a3a;
+  background: #f8fdf9;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better Button Styles */
+button {
+  cursor: pointer;
+  transition: all 0.4s ease;
+  border: none;
+  outline: none;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Better Link Styles */
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s ease;
+}
+
+/* Responsive Typography */
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 1.4;
+}
+
+/* Card Styles with Plant Theme */
+.card, article {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s ease;
+  border-radius: 16px;
+  overflow: hidden;
+  background: white;
+}
+
+.card:hover, article:hover {
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px) scale(1.02);
+}
+
+/* Better Form Inputs */
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: 2px solid #c8e6c9;
+  border-radius: 12px;
+  padding: 14px 18px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* Responsive Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes leafShake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  75% { transform: rotate(-2deg); }
+}
+
+@keyframes grow {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-leaf {
+  animation: leafShake 4s ease-in-out infinite;
+}
+
+.animate-grow {
+  animation: grow 0.6s ease-out;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.mt-4 { margin-top: 2rem; }
+.mb-4 { margin-bottom: 2rem; }
+.p-4 { padding: 2rem; }
+
+/* Plant Store Specific Styles */
+.plant-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  border: 2px solid #e8f5e9;
+}
+
+.plant-card:hover {
+  border-color: #4caf50;
+  transform: translateY(-10px) scale(1.03);
+}
+
+.price-tag {
+  background: linear-gradient(135deg, #4caf50, #8bc34a);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.category-badge {
+  background: #e8f5e9;
+  color: #2e7d32;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.plant-grid {
+  display: grid;
+  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Table Styles */
+.plant-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.plant-table th,
+.plant-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid #e8f5e9;
+}
+
+.plant-table th {
+  background: linear-gradient(135deg, #4caf50, #8bc34a);
+  color: white;
+  font-weight: 600;
+}
+
+.plant-table tr:hover {
+  background: #f1f8e9;
+  transform: scale(1.01);
+  transition: all 0.3s ease;
+}
+
+/* Care Level Badges */
+.care-easy { background: #e8f5e9; color: #2e7d32; }
+.care-medium { background: #fff3e0; color: #ef6c00; }
+.care-hard { background: #ffebee; color: #c62828; }
+  `,
+      resources: [
+        "auth.login",
+        "auth.signup",
+        "auth.forgot",
+        "plants.api",
+        "cart.api",
+      ],
+    },
+
+    pages: {
+      // 🔹 LOGIN PAGE
+      login: {
+        title: "Login - GreenHaven",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🌿 GreenHaven",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/greenhaven" },
+                  { label: "Sign Up", action: "navigate:/greenhaven/signup" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e8f5e9",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(76, 175, 80, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              loginForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🌱 Welcome Back Plant Lover!",
+                "ui:description": "Sign in to continue your green journey",
+                "ui:id": "loginForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "20px",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                  animation: "fadeInUp 0.8s ease-out",
+                },
+
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "plantlover@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-envelope",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Enter your secret garden key",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-lock",
+                  },
+                ],
+
+                "ui:actions": [
+                  {
+                    label: "Sign In & Grow 🌿",
+                    action: "api:auth.login",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "16px 0",
+                      background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                      color: "white",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                      borderRadius: "12px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:direction": "column",
+                "ui:links": [
+                  {
+                    label: "Forgot Password?",
+                    action: "navigate:/greenhaven/forgot-password",
+                  },
+                  {
+                    prefix: "New plant parent?",
+                    label: "Join GreenHaven",
+                    action: "navigate:/greenhaven/signup",
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "25px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%)",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 GreenHaven Plant Store. Cultivated with ❤️ and 🌱",
+                "ui:styles": { textAlign: "center", color: "#689f38" },
+              },
+            },
+            styles: {
+              background: "#2d4a3a",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 SIGNUP PAGE
+      signup: {
+        title: "Join GreenHaven - Create Account",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🌿 GreenHaven",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/greenhaven" },
+                  { label: "Login", action: "navigate:/greenhaven/login" },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e8f5e9",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(76, 175, 80, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              signupForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🌻 Join Our Plant Family!",
+                "ui:description": "Create your account and discover amazing plants",
+                "ui:id": "signupForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "20px",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                  animation: "fadeInUp 0.8s ease-out",
+                },
+
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Full Name",
+                    "ui:placeholder": "Leafy Greens",
+                    "ui:type": "text",
+                    "ui:name": "name",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-user",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "leafy@greenhaven.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-envelope",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Create your garden password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-lock",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Confirm Password",
+                    "ui:placeholder": "Repeat your garden password",
+                    "ui:type": "password",
+                    "ui:name": "confirmPassword",
+                    "ui:required": true,
+                    "ui:icon": "fas fa-lock",
+                  },
+                ],
+
+                "ui:actions": [
+                  {
+                    label: "Create Account & Explore 🌸",
+                    action: "api:auth.signup",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "16px 0",
+                      background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                      color: "white",
+                      fontSize: "18px",
+                      fontWeight: "700",
+                      borderRadius: "12px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    prefix: "Already a plant parent?",
+                    label: "Sign In",
+                    action: "navigate:/greenhaven/login",
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "25px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%)",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 GreenHaven Plant Store. Cultivated with ❤️ and 🌱",
+                "ui:styles": { textAlign: "center", color: "#689f38" },
+              },
+            },
+            styles: {
+              background: "#2d4a3a",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 MAIN LANDING PAGE (After Login)
+      home: {
+        title: "GreenHaven - Premium Plant Store",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🌿 GreenHaven",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/greenhaven/home" },
+                  { label: "Plants", action: "navigate:/greenhaven/plants" },
+                  { label: "Cart (3)", action: "navigate:/greenhaven/cart" },
+                  {
+                    label: "{{auth.token ? '👤 ' + auth.user.name : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate:/greenhaven/login'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e8f5e9",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(76, 175, 80, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              hero: {
+                "ui:widget": "hero",
+                "ui:title": "Grow Your Indoor Jungle 🌿",
+                "ui:subtitle": "Discover rare and beautiful plants to transform your space into a green paradise",
+                "ui:cta": {
+                  label: "Explore Plants 🌸",
+                  action: "navigate:/greenhaven/plants",
+                },
+                "ui:styles": {
+                  background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                  minHeight: "600px",
+                  padding: "180px 40px 100px",
+                  textAlign: "center",
+                  color: "white",
+                },
+              },
+
+              spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+
+              featuredHeading: {
+                "ui:widget": "heading",
+                "ui:text": "✨ Featured Plants",
+                "ui:level": "h2",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "50px",
+                  fontSize: "2.5rem",
+                  color: "#2d4a3a",
+                },
+              },
+
+              featuredGrid: {
+                "ui:widget": "responsiveGrid",
+                "ui:items": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Monstera Deliciosa 🍃",
+                    "ui:description": "Large tropical plant with unique leaf patterns. Perfect for bright spaces.",
+                    "ui:image": "https://images.unsplash.com/photo-1525498128493-380d1990a112?w=400&h=300&fit=crop",
+                    "ui:action": "addToCart:monstera",
+                    "ui:buttonLabel": "Add to Cart - $45",
+                    "ui:styles": {
+                      textAlign: "center",
+                      animation: "grow 0.6s ease-out",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Fiddle Leaf Fig 🎻",
+                    "ui:description": "Elegant tree with large violin-shaped leaves. Statement piece for any room.",
+                    "ui:image": "https://images.unsplash.com/photo-1593482892290-9d013abb8a22?w=400&h=300&fit=crop",
+                    "ui:action": "addToCart:fiddle-leaf",
+                    "ui:buttonLabel": "Add to Cart - $65",
+                    "ui:styles": {
+                      textAlign: "center",
+                      animation: "grow 0.8s ease-out",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Snake Plant 🐍",
+                    "ui:description": "Low maintenance, air-purifying plant. Thrives in low light conditions.",
+                    "ui:image": "https://images.unsplash.com/photo-1585350927251-3ab67c4d4e5a?w=400&h=300&fit=crop",
+                    "ui:action": "addToCart:snake-plant",
+                    "ui:buttonLabel": "Add to Cart - $28",
+                    "ui:styles": {
+                      textAlign: "center",
+                      animation: "grow 1s ease-out",
+                    },
+                  },
+                ],
+                "ui:columns": {
+                  desktop: 3,
+                  tablet: 2,
+                  mobile: 1,
+                },
+                "ui:gap": "30px",
+                "ui:styles": {
+                  marginBottom: "60px",
+                },
+              },
+
+              promotionCard: {
+                "ui:widget": "card",
+                "ui:title": "🌱 New Plant Parent?",
+                "ui:description": "Get 15% OFF your first plant purchase! Use code: FIRSTPLANT15",
+                "ui:action": "navigate:/greenhaven/plants",
+                "ui:buttonLabel": "Shop Beginner Plants 🌿",
+                "ui:styles": {
+                  maxWidth: "800px",
+                  margin: "0 auto 60px",
+                  padding: "40px",
+                  background: "linear-gradient(135deg, #8bc34a 0%, #cddc39 100%)",
+                  color: "white",
+                  textAlign: "center",
+                  animation: "float 3s ease-in-out infinite",
+                },
+              },
+
+              statsSection: {
+                "ui:widget": "flexLayout",
+                "ui:direction": "row",
+                "ui:justify": "space-around",
+                "ui:align": "center",
+                "ui:wrap": true,
+                "ui:children": [
+                  {
+                    "ui:widget": "statsCounter",
+                    "ui:value": "500+",
+                    "ui:label": "Plant Varieties",
+                    "ui:color": "#4caf50",
+                    "ui:styles": { textAlign: "center", padding: "20px" },
+                  },
+                  {
+                    "ui:widget": "statsCounter",
+                    "ui:value": "10K+",
+                    "ui:label": "Happy Customers",
+                    "ui:color": "#8bc34a",
+                    "ui:styles": { textAlign: "center", padding: "20px" },
+                  },
+                  {
+                    "ui:widget": "statsCounter",
+                    "ui:value": "98%",
+                    "ui:label": "Success Rate",
+                    "ui:color": "#689f38",
+                    "ui:styles": { textAlign: "center", padding: "20px" },
+                  },
+                ],
+                "ui:styles": {
+                  marginBottom: "60px",
+                  padding: "40px",
+                  background: "#f1f8e9",
+                  borderRadius: "20px",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#f8fdf9",
+              minHeight: "100vh",
+            },
+            triggers: [
+              { event: "load", action: "fetchFeaturedPlants", source: "plants.api" },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerContent: {
+                "ui:widget": "columns",
+                "ui:columns": [
+                  {
+                    "ui:widget": "text",
+                    "ui:content": "🌿 GreenHaven<br>Premium Plant Store",
+                    "ui:styles": { color: "#e8f5e9", fontSize: "1.2rem", fontWeight: "bold" },
+                  },
+                  {
+                    "ui:widget": "list",
+                    "ui:items": ["Plant Care", "Delivery Info", "Returns", "Contact"],
+                    "ui:styles": { color: "#c8e6c9" },
+                  },
+                  {
+                    "ui:widget": "list",
+                    "ui:items": ["Privacy Policy", "Terms of Service", "FAQ"],
+                    "ui:styles": { color: "#c8e6c9" },
+                  },
+                ],
+                "ui:ratio": "1:1:1",
+                "ui:gap": "40px",
+              },
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 GreenHaven Plant Store. Cultivated with ❤️ and 🌱",
+                "ui:styles": { textAlign: "center", color: "#a5d6a7", marginTop: "40px" },
+              },
+            },
+            styles: {
+              background: "#2d4a3a",
+              padding: "60px 40px 40px",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 PLANTS CATALOG PAGE
+      plants: {
+        title: "Plant Catalog - GreenHaven",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🌿 GreenHaven",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/greenhaven/home" },
+                  { label: "Plants", action: "navigate:/greenhaven/plants" },
+                  { label: "Cart (3)", action: "navigate:/greenhaven/cart" },
+                  {
+                    label: "{{auth.token ? '👤 ' + auth.user.name : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate:/greenhaven/login'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e8f5e9",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(76, 175, 80, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              categoriesHeading: {
+                "ui:widget": "heading",
+                "ui:text": "📁 Plant Categories",
+                "ui:level": "h3",
+                "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+              },
+              categoryList: {
+                "ui:widget": "list",
+                "ui:ordered": false,
+                "ui:icon": "🌱",
+                "ui:items": [
+                  "Indoor Plants 🏠",
+                  "Succulents 🌵", 
+                  "Flowering Plants 🌸",
+                  "Air Purifying 💨",
+                  "Pet Safe 🐾",
+                  "Low Maintenance ⚡"
+                ],
+                "ui:itemStyles": {
+                  cursor: "pointer",
+                  padding: "12px 0",
+                  transition: "all 0.2s",
+                  fontSize: "1.1rem",
+                },
+              },
+
+              divider: {
+                "ui:widget": "divider",
+                "ui:spacing": "large",
+              },
+
+              careLevelHeading: {
+                "ui:widget": "heading",
+                "ui:text": "🌡️ Care Level",
+                "ui:level": "h3",
+                "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+              },
+
+              careEasy: {
+                "ui:widget": "checkbox",
+                "ui:label": "Easy Care 🌟",
+                "ui:styles": { marginBottom: "12px" },
+              },
+              careMedium: {
+                "ui:widget": "checkbox",
+                "ui:label": "Medium Care 💪",
+                "ui:styles": { marginBottom: "12px" },
+              },
+              careHard: {
+                "ui:widget": "checkbox",
+                "ui:label": "Expert Level 🏆",
+                "ui:styles": { marginBottom: "12px" },
+              },
+            },
+            styles: {
+              width: "280px",
+              background: "#f1f8e9",
+              padding: "120px 24px 24px",
+              minHeight: "100vh",
+              borderRight: "1px solid #e8f5e9",
+              position: "sticky",
+              top: 0,
+            },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              catalogHeading: {
+                "ui:widget": "heading",
+                "ui:text": "🌿 Plant Catalog",
+                "ui:level": "h1",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "50px",
+                  marginTop: "40px",
+                  fontSize: "2.8rem",
+                  color: "#2d4a3a",
+                },
+              },
+
+              // Table View for Plant Comparison
+              plantTable: {
+                "ui:widget": "dataTable",
+                "ui:columns": [
+                  {
+                    title: "Plant Name",
+                    dataIndex: "name",
+                    key: "name",
+                  },
+                  {
+                    title: "Price",
+                    dataIndex: "price",
+                    key: "price",
+                  },
+                  {
+                    title: "Care Level",
+                    dataIndex: "care",
+                    key: "care",
+                  },
+                  {
+                    title: "Light",
+                    dataIndex: "light",
+                    key: "light",
+                  },
+                  {
+                    title: "Action",
+                    dataIndex: "action",
+                    key: "action",
+                  },
+                ],
+                "ui:data": [
+                  {
+                    key: "1",
+                    name: "Monstera Deliciosa 🍃",
+                    price: "$45",
+                    care: "Easy",
+                    light: "Bright Indirect",
+                    action: "Add to Cart",
+                  },
+                  {
+                    key: "2",
+                    name: "Fiddle Leaf Fig 🎻",
+                    price: "$65",
+                    care: "Medium",
+                    light: "Bright Light",
+                    action: "Add to Cart",
+                  },
+                  {
+                    key: "3",
+                    name: "Snake Plant 🐍",
+                    price: "$28",
+                    care: "Easy",
+                    light: "Low to Bright",
+                    action: "Add to Cart",
+                  },
+                  {
+                    key: "4",
+                    name: "Peace Lily ☮️",
+                    price: "$35",
+                    care: "Easy",
+                    light: "Low to Medium",
+                    action: "Add to Cart",
+                  },
+                ],
+                "ui:styles": {
+                  marginBottom: "50px",
+                  animation: "fadeInUp 0.8s ease-out",
+                },
+              },
+
+              gridHeading: {
+                "ui:widget": "heading",
+                "ui:text": "🪴 Popular Plants Grid",
+                "ui:level": "h2",
+                "ui:styles": { marginBottom: "30px", color: "#4caf50" },
+              },
+
+              plantsGrid: {
+                "ui:widget": "cardGrid",
+                "ui:cards": [
+                  {
+                    "ui:title": "ZZ Plant 💎",
+                    "ui:description": "Extremely low maintenance with glossy leaves. Perfect for beginners.",
+                    "ui:image": "https://images.unsplash.com/photo-1596541223130-5ccd0ddbf94f?w=300&h=200&fit=crop",
+                    "ui:action": "addToCart:zz-plant",
+                    "ui:buttonLabel": "Add - $32",
+                  },
+                  {
+                    "ui:title": "Pothos 🌿",
+                    "ui:description": "Fast-growing trailing plant. Great for shelves and hanging baskets.",
+                    "ui:image": "https://images.unsplash.com/photo-1596464716127-f2a5e19d3c6e?w=300&h=200&fit=crop",
+                    "ui:action": "addToCart:pothos",
+                    "ui:buttonLabel": "Add - $18",
+                  },
+                  {
+                    "ui:title": "Rubber Plant 🌳",
+                    "ui:description": "Large leaves with deep green color. Makes a bold statement.",
+                    "ui:image": "https://images.unsplash.com/photo-1574180045827-681f8a1a9622?w=300&h=200&fit=crop",
+                    "ui:action": "addToCart:rubber-plant",
+                    "ui:buttonLabel": "Add - $55",
+                  },
+                  {
+                    "ui:title": "Chinese Money Plant 💰",
+                    "ui:description": "Unique circular leaves. Believed to bring good fortune.",
+                    "ui:image": "https://images.unsplash.com/photo-1517191439909-5b94d8e93f4c?w=300&h=200&fit=crop",
+                    "ui:action": "addToCart:money-plant",
+                    "ui:buttonLabel": "Add - $38",
+                  },
+                ],
+                "ui:columns": 4,
+                "ui:gap": "25px",
+                "ui:styles": {
+                  marginBottom: "60px",
+                  animation: "fadeInUp 1s ease-out",
+                },
+              },
+            },
+            styles: {
+              padding: "120px 40px 80px",
+              background: "#f8fdf9",
+              minHeight: "100vh",
+            },
+            triggers: [
+              { event: "load", action: "fetchPlants", source: "plants.api" },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 GreenHaven Plant Store. Cultivated with ❤️ and 🌱",
+                "ui:styles": { textAlign: "center", color: "#689f38" },
+              },
+            },
+            styles: {
+              background: "#2d4a3a",
+              padding: "40px",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 🔹 CART PAGE
+      cart: {
+        title: "Your Cart - GreenHaven",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🌿 GreenHaven",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  { label: "Home", action: "navigate:/greenhaven/home" },
+                  { label: "Plants", action: "navigate:/greenhaven/plants" },
+                  { label: "Cart (3)", action: "navigate:/greenhaven/cart" },
+                  {
+                    label: "{{auth.token ? '👤 ' + auth.user.name : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate:/greenhaven/login'}}",
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "clearAuth+reload",
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e8f5e9",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 20px rgba(76, 175, 80, 0.1)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              cartTitle: {
+                "ui:widget": "heading",
+                "ui:text": "🛒 Your Plant Cart",
+                "ui:level": "h1",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "50px",
+                  marginTop: "40px",
+                  fontSize: "2.5rem",
+                },
+              },
+
+              cartItem1: {
+                "ui:widget": "card",
+                "ui:title": "Monstera Deliciosa 🍃",
+                "ui:description": "Large tropical plant with unique leaf patterns. Quantity: 1",
+                "ui:image": "https://images.unsplash.com/photo-1525498128493-380d1990a112?w=200&h=200&fit=crop",
+                "ui:styles": {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto 20px",
+                  padding: "25px",
+                  animation: "grow 0.6s ease-out",
+                },
+              },
+
+              cartItem2: {
+                "ui:widget": "card",
+                "ui:title": "Fiddle Leaf Fig 🎻",
+                "ui:description": "Elegant tree with large violin-shaped leaves. Quantity: 1",
+                "ui:image": "https://images.unsplash.com/photo-1593482892290-9d013abb8a22?w=200&h=200&fit=crop",
+                "ui:styles": {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto 20px",
+                  padding: "25px",
+                  animation: "grow 0.8s ease-out",
+                },
+              },
+
+              cartItem3: {
+                "ui:widget": "card",
+                "ui:title": "Snake Plant 🐍",
+                "ui:description": "Low maintenance, air-purifying plant. Quantity: 2",
+                "ui:image": "https://images.unsplash.com/photo-1585350927251-3ab67c4d4e5a?w=200&h=200&fit=crop",
+                "ui:styles": {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto 20px",
+                  padding: "25px",
+                  animation: "grow 1s ease-out",
+                },
+              },
+
+              divider: {
+                "ui:widget": "divider",
+                "ui:spacing": "large",
+                "ui:styles": { maxWidth: "900px", margin: "40px auto" },
+              },
+
+              totalCard: {
+                "ui:widget": "card",
+                "ui:title": "Order Summary",
+                "ui:description": "Subtotal: $176.00 | Shipping: $15.00 | Tax: $17.60 | Total: $208.60",
+                "ui:action": "navigate:/greenhaven/checkout",
+                "ui:buttonLabel": "Proceed to Checkout 💳",
+                "ui:styles": {
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                  padding: "30px",
+                  background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+                  color: "white",
+                  textAlign: "center",
+                  animation: "float 2s ease-in-out infinite",
+                },
+              },
+            },
+            styles: {
+              padding: "120px 40px 80px",
+              background: "#f8fdf9",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 GreenHaven Plant Store. Cultivated with ❤️ and 🌱",
+                "ui:styles": { textAlign: "center", color: "#689f38" },
+              },
+            },
+            styles: {
+              background: "#2d4a3a",
+              padding: "40px",
+            },
+            triggers: [],
+          },
+        },
+      },
+    },
+
+    components: {
+      navbar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "🌿 GreenHaven",
+            "ui:styles": {
+              fontSize: "32px",
+              fontWeight: "800",
+              background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              cursor: "pointer",
+            },
+          },
+
+          searchBar: {
+            "ui:widget": "inputField",
+            "ui:placeholder": "Search plants...",
+            "ui:type": "text",
+            "ui:inputStyles": {
+              border: "2px solid #e8f5e9",
+              borderRadius: "25px",
+              padding: "12px 20px",
+              width: "300px",
+            },
+            "ui:styles": { marginBottom: "0" },
+          },
+
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:links": [
+              { label: "Home", action: "navigate:/greenhaven/home" },
+              { label: "Plants", action: "navigate:/greenhaven/plants" },
+              { label: "Cart (3)", action: "navigate:/greenhaven/cart" },
+              {
+                label: "{{auth.token ? '👤 ' + auth.user.name : 'Login'}}",
+                action: "{{auth.token ? '' : 'navigate:/greenhaven/login'}}",
+              },
+              {
+                label: "{{auth.token ? 'Logout' : ''}}",
+                action: "clearAuth+reload",
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "#ffffff",
+          borderBottom: "2px solid #e8f5e9",
+          padding: "20px 50px",
+          position: "fixed",
+          width: "100%",
+          zIndex: 1000,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 2px 20px rgba(76, 175, 80, 0.1)",
+        },
+        triggers: [],
+      },
+
+      sidebar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          categoriesHeading: {
+            "ui:widget": "heading",
+            "ui:text": "📁 Plant Categories",
+            "ui:level": "h3",
+            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+          },
+          categoryList: {
+            "ui:widget": "list",
+            "ui:ordered": false,
+            "ui:icon": "🌱",
+            "ui:items": [
+              "Indoor Plants 🏠",
+              "Succulents 🌵", 
+              "Flowering Plants 🌸",
+              "Air Purifying 💨",
+              "Pet Safe 🐾",
+              "Low Maintenance ⚡"
+            ],
+            "ui:itemStyles": {
+              cursor: "pointer",
+              padding: "12px 0",
+              transition: "all 0.2s",
+              fontSize: "1.1rem",
+            },
+          },
+
+          divider: {
+            "ui:widget": "divider",
+            "ui:spacing": "large",
+          },
+
+          careLevelHeading: {
+            "ui:widget": "heading",
+            "ui:text": "🌡️ Care Level",
+            "ui:level": "h3",
+            "ui:styles": { marginBottom: "20px", fontSize: "1.3rem" },
+          },
+
+          careEasy: {
+            "ui:widget": "checkbox",
+            "ui:label": "Easy Care 🌟",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          careMedium: {
+            "ui:widget": "checkbox",
+            "ui:label": "Medium Care 💪",
+            "ui:styles": { marginBottom: "12px" },
+          },
+          careHard: {
+            "ui:widget": "checkbox",
+            "ui:label": "Expert Level 🏆",
+            "ui:styles": { marginBottom: "12px" },
+          },
+        },
+        styles: {
+          width: "280px",
+          background: "#f1f8e9",
+          padding: "120px 24px 24px",
+          minHeight: "100vh",
+          borderRight: "1px solid #e8f5e9",
+          position: "sticky",
+          top: 0,
+        },
+        triggers: [],
+      },
+
+      main: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          hero: {
+            "ui:widget": "hero",
+            "ui:title": "Grow Your Indoor Jungle 🌿",
+            "ui:subtitle": "Discover rare and beautiful plants to transform your space into a green paradise",
+            "ui:cta": {
+              label: "Explore Plants 🌸",
+              action: "navigate:/greenhaven/plants",
+            },
+            "ui:styles": {
+              background: "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
+              minHeight: "600px",
+              padding: "180px 40px 100px",
+              textAlign: "center",
+              color: "white",
+            },
+          },
+
+          spacer1: { "ui:widget": "spacer", "ui:height": 80 },
+
+          featuredHeading: {
+            "ui:widget": "heading",
+            "ui:text": "✨ Featured Plants",
+            "ui:level": "h2",
+            "ui:styles": {
+              textAlign: "center",
+              marginBottom: "50px",
+              fontSize: "2.5rem",
+              color: "#2d4a3a",
+            },
+          },
+
+          featuredGrid: {
+            "ui:widget": "responsiveGrid",
+            "ui:items": [
+              {
+                "ui:widget": "card",
+                "ui:title": "Monstera Deliciosa 🍃",
+                "ui:description": "Large tropical plant with unique leaf patterns. Perfect for bright spaces.",
+                "ui:image": "https://images.unsplash.com/photo-1525498128493-380d1990a112?w=400&h=300&fit=crop",
+                "ui:action": "addToCart:monstera",
+                "ui:buttonLabel": "Add to Cart - $45",
+                "ui:styles": {
+                  textAlign: "center",
+                  animation: "grow 0.6s ease-out",
+                },
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "Fiddle Leaf Fig 🎻",
+                "ui:description": "Elegant tree with large violin-shaped leaves. Statement piece for any room.",
+                "ui:image": "https://images.unsplash.com/photo-1593482892290-9d013abb8a22?w=400&h=300&fit=crop",
+                "ui:action": "addToCart:fiddle-leaf",
+                "ui:buttonLabel": "Add to Cart - $65",
+                "ui:styles": {
+                  textAlign: "center",
+                  animation: "grow 0.8s ease-out",
+                },
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "Snake Plant 🐍",
+                "ui:description": "Low maintenance, air-purifying plant. Thrives in low light conditions.",
+                "ui:image": "https://images.unsplash.com/photo-1585350927251-3ab67c4d4e5a?w=400&h=300&fit=crop",
+                "ui:action": "addToCart:snake-plant",
+                "ui:buttonLabel": "Add to Cart - $28",
+                "ui:styles": {
+                  textAlign: "center",
+                  animation: "grow 1s ease-out",
+                },
+              },
+            ],
+            "ui:columns": {
+              desktop: 3,
+              tablet: 2,
+              mobile: 1,
+            },
+            "ui:gap": "30px",
+            "ui:styles": {
+              marginBottom: "60px",
+            },
+          },
+        },
+        styles: {
+          padding: "100px 40px 80px",
+          background: "#f8fdf9",
+          flex: 1,
+          minHeight: "100vh",
+        },
+        triggers: [
+          { event: "load", action: "fetchFeaturedPlants", source: "plants.api" },
+        ],
+      },
+
+      footer: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          footerContent: {
+            "ui:widget": "columns",
+            "ui:columns": [
+              {
+                "ui:widget": "text",
+                "ui:content": "🌿 GreenHaven<br>Premium Plant Store",
+                "ui:styles": { color: "#e8f5e9", fontSize: "1.2rem", fontWeight: "bold" },
+              },
+              {
+                "ui:widget": "list",
+                "ui:items": ["Plant Care", "Delivery Info", "Returns", "Contact"],
+                "ui:styles": { color: "#c8e6c9" },
+              },
+              {
+                "ui:widget": "list",
+                "ui:items": ["Privacy Policy", "Terms of Service", "FAQ"],
+                "ui:styles": { color: "#c8e6c9" },
+              },
+            ],
+            "ui:ratio": "1:1:1",
+            "ui:gap": "40px",
+          },
+          footerText: {
+            "ui:widget": "text",
+            "ui:content": "© 2024 GreenHaven Plant Store. Cultivated with ❤️ and 🌱",
+            "ui:styles": { textAlign: "center", color: "#a5d6a7", marginTop: "40px" },
+          },
+        },
+        styles: {
+          background: "#2d4a3a",
+          padding: "60px 40px 40px",
+        },
+        triggers: [],
+      },
+    },
   }
 ];
 

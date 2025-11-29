@@ -35,6 +35,8 @@ mongoose.connect(MONGO_URI, {
 // Routes
 const pageRoutes = require("./routes/pageConfigRoutes");
 const apiConfigRoutes = require("./routes/apiConfigRoutes");
+const productRoutes = require("./routes/products");
+app.use("/api/products", productRoutes);
 app.use("/api/pages", pageRoutes);
 app.use("/api/api-configs", apiConfigRoutes);
 // Health check
