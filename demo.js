@@ -959,7 +959,8 @@ categories: {
                   "ui:triggers": [
                     {
                       event: "change",
-                      source: "products.api",  // Match the actual data key
+                      source: "products.api", 
+                      params: "{{ value ? '?category=' + value : '' }}",
                       updateData: "products.api_filtered",
                       filters: {
                         category: "{{value}}",
