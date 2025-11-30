@@ -725,7 +725,7 @@ input:focus, textarea:focus, select:focus {
 
               cartItems: {
                 "ui:widget": "cartItemsGrid",
-                "ui:dataPath": "cart.items",
+                 "ui:dataKey": "cart.items", 
                 "ui:styles": {
                   padding: "0 40px",
                   maxWidth: "1200px",
@@ -759,7 +759,7 @@ input:focus, textarea:focus, select:focus {
 
               totalCard: {
                 "ui:widget": "cartSummary",
-                "ui:dataPath": "cart.items",
+                "ui:dataKey": "cart.items",
                 "ui:styles": {
                   maxWidth: "1200px",
                   margin: "0 auto 40px",
@@ -776,7 +776,12 @@ input:focus, textarea:focus, select:focus {
               background: "#f8fafc",
               minHeight: "100vh",
             },
-            triggers: [],
+         triggers: [
+        {
+          event: "load",
+          action: "loadCartFromLocal"
+        }
+      ],
           },
           footer: {
             table: {},

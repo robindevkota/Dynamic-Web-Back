@@ -366,7 +366,7 @@ const apiConfigs = [
   key: "cart.add",
   name: "Add to Cart",
   description: "Adds product to shopping cart via API",
-  url: "https://fakestoreapi.com/carts",  // ✅ NEW - real API
+  url: "https://fakestoreapi.com/carts",
   method: "POST",
   headers: {
     "Content-Type": "application/json"
@@ -403,10 +403,16 @@ const apiConfigs = [
   },
   storeResponse: true,
   storeKey: "cartAddResponse",
-  onSuccess: ["closeModal"],
+  // ✅ After API success, store locally too
+  onSuccess: [
+    "storeCartLocally", // Custom action we'll handle
+    "closeModal"
+  ],
   tags: ["cart", "ecommerce"],
   projectUUID: "global",
 },
+
+
 {
   key: "cart.remove",
   name: "Remove from Cart",
