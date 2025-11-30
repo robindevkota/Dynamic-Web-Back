@@ -151,6 +151,10 @@ input:focus, textarea:focus, select:focus {
         "auth.forgot",
         "products.api",
         "products.filter",
+        "cart.add",
+        "cart.get",
+        "cart.remove",
+        "cart.updateQuantity",
       ],
     },
 
@@ -642,24 +646,42 @@ input:focus, textarea:focus, select:focus {
                   cursor: "pointer",
                 },
               },
+              // In demo.js, update the navbar links in the categories page to this:
+
               links: {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  { label: "Home", action: "navigate:/shopzone" },
+                  {
+                    label: "Home",
+                    action: "navigate:/shopzone",
+                  },
                   {
                     label: "Categories",
                     action: "navigate:/shopzone/categories",
                   },
-                  { label: "Cart (3)", action: "navigate:/shopzone/cart" },
                   {
-                    label:
-                      "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+                    label: "🛒 Cart ({{data.cartCount || 0}})",
+                    action: "navigate:/shopzone/cart",
+                  },
+
+                  // ✅ When NOT logged in: Show Login button
+                  {
+                    label: "{{auth.token ? '' : 'Login'}}",
                     action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
                   },
+
+                  // ✅ When logged in: Show Welcome message (display only)
+                  {
+                    label:
+                      "{{auth.token ? 'Welcome, ' + auth.user.email : ''}}",
+                    action: "", // Empty action = display only
+                  },
+
+                  // ✅ When logged in: Show Logout button
                   {
                     label: "{{auth.token ? 'Logout' : ''}}",
-                    action: "clearAuth+reload",
+                    action: "{{auth.token ? 'clearAuth+reload' : ''}}",
                   },
                 ],
               },
@@ -701,54 +723,31 @@ input:focus, textarea:focus, select:focus {
                 },
               },
 
-              cartItem1: {
-                "ui:widget": "card",
-                "ui:title": "Wireless Headphones",
-                "ui:description":
-                  "Premium noise-cancelling headphones with 30-hour battery life. Quantity: 1",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200&h=200&fit=crop",
+              cartItems: {
+                "ui:widget": "cartItemsGrid",
+                "ui:dataPath": "cart.items",
                 "ui:styles": {
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  maxWidth: "900px",
-                  margin: "0 auto 20px",
-                  padding: "25px",
+                  padding: "0 40px",
+                  maxWidth: "1200px",
+                  margin: "0 auto",
                 },
               },
-
-              cartItem2: {
-                "ui:widget": "card",
-                "ui:title": "Smart Watch Series 7",
-                "ui:description":
-                  "Fitness tracker with heart rate monitor and GPS. Quantity: 1",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop",
-                "ui:styles": {
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  maxWidth: "900px",
-                  margin: "0 auto 20px",
-                  padding: "25px",
-                },
-              },
-
-              cartItem3: {
-                "ui:widget": "card",
-                "ui:title": "Laptop Stand Aluminum",
-                "ui:description":
-                  "Ergonomic adjustable laptop stand for desk. Quantity: 2",
-                "ui:image":
-                  "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=200&h=200&fit=crop",
-                "ui:styles": {
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  maxWidth: "900px",
-                  margin: "0 auto 20px",
-                  padding: "25px",
+              emptyCart: {
+                "ui:widget": "conditionalContent",
+                "ui:condition":
+                  "{{!data.cart.items || data.cart.items.length === 0}}",
+                "ui:content": {
+                  "ui:widget": "card",
+                  "ui:title": "Your cart is empty",
+                  "ui:description": "Start shopping to add items to your cart!",
+                  "ui:action": "navigate:/shopzone/categories",
+                  "ui:buttonLabel": "Browse Products",
+                  "ui:styles": {
+                    maxWidth: "500px",
+                    margin: "50px auto",
+                    textAlign: "center",
+                    padding: "40px",
+                  },
                 },
               },
 
@@ -759,20 +758,16 @@ input:focus, textarea:focus, select:focus {
               },
 
               totalCard: {
-                "ui:widget": "card",
-                "ui:title": "Order Summary",
-                "ui:description":
-                  "Subtotal: $458.00 | Shipping: $15.00 | Tax: $47.30 | Total: $520.30",
-                "ui:action": "navigate:/shopzone/checkout",
-                "ui:buttonLabel": "Proceed to Checkout 💳",
+                "ui:widget": "cartSummary",
+                "ui:dataPath": "cart.items",
                 "ui:styles": {
-                  maxWidth: "900px",
-                  margin: "0 auto",
+                  maxWidth: "1200px",
+                  margin: "0 auto 40px",
                   padding: "30px",
                   background:
-                    "linear-gradient(135deg, #47b81aff 0%, #764ba2 100%)",
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                   color: "white",
-                  textAlign: "center",
+                  borderRadius: "16px",
                 },
               },
             },
@@ -803,8 +798,6 @@ input:focus, textarea:focus, select:focus {
         },
       },
 
-   
-
       categories: {
         title: "Product Categories",
         components: {
@@ -824,24 +817,44 @@ input:focus, textarea:focus, select:focus {
                   WebkitTextFillColor: "transparent",
                 },
               },
+              // In demo.js, update the navbar links in the categories page to this:
+
+              // In demo.js, update the navbar links in the categories page to this:
+
               links: {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  { label: "Home", action: "navigate:/shopzone" },
+                  {
+                    label: "Home",
+                    action: "navigate:/shopzone",
+                  },
                   {
                     label: "Categories",
                     action: "navigate:/shopzone/categories",
                   },
-                  { label: "Cart (3)", action: "navigate:/shopzone/cart" },
                   {
-                    label:
-                      "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+                    label: "🛒 Cart ({{data.cartCount || 0}})",
+                    action: "navigate:/shopzone/cart",
+                  },
+
+                  // ✅ When NOT logged in: Show Login button
+                  {
+                    label: "{{auth.token ? '' : 'Login'}}",
                     action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
                   },
+
+                  // ✅ When logged in: Show Welcome message (display only)
+                  {
+                    label:
+                      "{{auth.token ? 'Welcome, ' + auth.user.email : ''}}",
+                    action: "", // Empty action = display only
+                  },
+
+                  // ✅ When logged in: Show Logout button
                   {
                     label: "{{auth.token ? 'Logout' : ''}}",
-                    action: "clearAuth+reload",
+                    action: "{{auth.token ? 'clearAuth+reload' : ''}}",
                   },
                 ],
               },
@@ -872,12 +885,16 @@ input:focus, textarea:focus, select:focus {
 
           main: {
             table: {},
+            // Replace the modal configuration in your categories page (demo.js):
+
             modal: {
               productDetail: {
+                // ✅ This becomes the modal key
                 "ui:title": "Product Details",
                 "ui:theme": "light",
                 "ui:styles": {
                   maxWidth: "700px",
+                  padding: "40px",
                 },
                 "ui:fields": [
                   {
@@ -886,18 +903,42 @@ input:focus, textarea:focus, select:focus {
                     type: "number",
                     placeholder: "1",
                     required: true,
+                    min: 1,
+                    max: 10,
                   },
                 ],
                 "ui:actions": [
                   {
-                    label: "Add to Cart",
+                    label: "🛒 Add to Cart",
                     action: "api:cart.add",
                     variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                      marginTop: "10px",
+                    },
                   },
                   {
                     label: "Close",
                     action: "closeModal",
                     variant: "outline",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background: "transparent",
+                      color: "#64748b",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "2px solid #e2e8f0",
+                    },
                   },
                 ],
               },
@@ -1055,6 +1096,7 @@ input:focus, textarea:focus, select:focus {
               featuredProducts: {
                 "ui:widget": "projectGrid",
                 "ui:animated": true,
+                "ui:onItemClick": "openModal:productDetail",
                 "ui:dataPath": "products.api_filtered", // Match filtered data key
                 "ui:styles": {
                   padding: "0 40px",
@@ -1196,25 +1238,41 @@ input:focus, textarea:focus, select:focus {
           },
 
           // ✅ NAV LINKS WITH AUTH CONDITIONAL
+          // In demo.js, update the navbar links in the categories page to this:
+
           links: {
             "ui:widget": "navLinks",
             "ui:theme": "light",
             "ui:links": [
-              { label: "Home", action: "navigate:/shopzone" },
-              { label: "Categories", action: "navigate:/shopzone/categories" },
-              { label: "Cart (3)", action: "navigate:/shopzone/cart" },
-
-              // ✅ Show "Welcome, User" if logged in, else "Login"
               {
-                label:
-                  "{{auth.token ? 'Welcome, ' + auth.user.email : 'Login'}}",
+                label: "Home",
+                action: "navigate:/shopzone",
+              },
+              {
+                label: "Categories",
+                action: "navigate:/shopzone/categories",
+              },
+              {
+                label: "🛒 Cart ({{data.cartCount || 0}})",
+                action: "navigate:/shopzone/cart",
+              },
+
+              // ✅ When NOT logged in: Show Login button
+              {
+                label: "{{auth.token ? '' : 'Login'}}",
                 action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
               },
 
-              // ✅ Show Logout button if logged in
+              // ✅ When logged in: Show Welcome message (display only)
+              {
+                label: "{{auth.token ? 'Welcome, ' + auth.user.email : ''}}",
+                action: "", // Empty action = display only
+              },
+
+              // ✅ When logged in: Show Logout button
               {
                 label: "{{auth.token ? 'Logout' : ''}}",
-                action: "clearAuth+reload",
+                action: "{{auth.token ? 'clearAuth+reload' : ''}}",
               },
             ],
           },
