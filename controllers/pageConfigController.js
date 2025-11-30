@@ -41,6 +41,9 @@ exports.getPageBySlug = async (req, res) => {
     
     console.log(`   - Sub-pages available:`, Object.keys(pageObject.pages || {}));
     
+    // ✅ ADD THIS: Log actions for debugging
+    console.log(`   - Actions available:`, pageObject.initialization?.actions ? Object.keys(pageObject.initialization.actions) : 'NO ACTIONS');
+    
     // 🆕 RESOLVE API REFERENCES
     if (pageObject.initialization?.resources && Array.isArray(pageObject.initialization.resources)) {
       const firstResource = pageObject.initialization.resources[0];
@@ -112,15 +115,26 @@ exports.createPage = async (req, res) => {
       }
     });
     
+    // ✅ ADD THIS: Handle initialization with actions
+    const initialization = req.body.initialization || {};
+    const processedInitialization = {
+      globalCSS: initialization.globalCSS || '',
+      resources: initialization.resources || [],
+      actions: initialization.actions || {} // ✅ Preserve actions
+    };
+    
     const pageData = {
       ...req.body,
-      components: processedComponents
+      components: processedComponents,
+      initialization: processedInitialization // ✅ Use processed initialization
     };
     
     const page = new PageConfig(pageData);
     await page.save();
     
     console.log(`✅ Created page: ${page.slug}`);
+    console.log(`   - Actions:`, Object.keys(page.initialization.actions || {}));
+    
     res.status(201).json(page);
   } catch (err) {
     if (err.code === 11000) {
@@ -150,9 +164,18 @@ exports.updatePage = async (req, res) => {
       }
     });
 
+    // ✅ ADD THIS: Handle initialization with actions
+    const initialization = req.body.initialization || {};
+    const processedInitialization = {
+      globalCSS: initialization.globalCSS || '',
+      resources: initialization.resources || [],
+      actions: initialization.actions || {} // ✅ Preserve actions
+    };
+
     const updateData = {
       ...req.body,
-      components: processedComponents
+      components: processedComponents,
+      initialization: processedInitialization // ✅ Use processed initialization
     };
 
     const page = await PageConfig.findOneAndUpdate(
@@ -169,6 +192,8 @@ exports.updatePage = async (req, res) => {
     }
 
     console.log(`✅ Updated page: ${page.slug} (v${page.version})`);
+    console.log(`   - Actions:`, Object.keys(page.initialization.actions || {}));
+    
     res.json(page);
 
   } catch (err) {

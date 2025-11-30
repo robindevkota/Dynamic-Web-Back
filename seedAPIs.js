@@ -62,47 +62,61 @@ const apiConfigs = [
   storeKey: "products.api_filtered",
 },
 
-  
-  {
-    key: "auth.login",
-    name: "User Login",
-    description: "Authenticates user and returns JWT token",
-    url: "https://jsonplaceholder.typicode.com/posts",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    transformPayload: `
-      (payload) => ({
-        email: payload.email,
-        password: payload.password
-      })
-    `,
-    successNotification: {
-      type: "toast",
-      message: "Welcome back! Login successful!",
-      background: "#10b981",
-      duration: 2000,
-    },
-    errorNotification: {
-      type: "toast",
-      message: "Invalid credentials. Please try again.",
-      background: "#ef4444",
-      duration: 3000,
-    },
-    closeModalOnSuccess: false,
-    storeResponse: true,
-    storeKey: "authResponse",
-    onSuccess: [
-      "setAuth:token=mock-jwt-token-{{$random}}",
-       "setAuth:user={{payload.email}}",
-      "navigate:/shopzone"
-    ],
-    onError: ["console:Login failed"],
-    onNetworkError: "console:Network error occurred",
-    tags: ["auth", "login", "authentication"],
-    projectUUID: "global",
+// In your seedAPIs.js, REPLACE the auth.login config with this:
+
+{
+  key: "auth.login",
+  name: "User Login",
+  isActive: true,
+  description: "Authenticates user and returns JWT token",
+  url: "https://jsonplaceholder.typicode.com/posts",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
   },
+  transformPayload: `
+    (payload) => ({
+      email: payload.email,
+      password: payload.password
+    })
+  `,
+  successNotification: {
+    type: "toast",
+    message: "Welcome back! Login successful!",
+    background: "#10b981",
+    duration: 2000,
+  },
+  errorNotification: {
+    type: "toast",
+    message: "Invalid credentials. Please try again.",
+    background: "#ef4444",
+    duration: 3000,
+  },
+  closeModalOnSuccess: false,
+  storeResponse: true,
+  storeKey: "authResponse",
+  
+  // ✅ FIX: Proper array of objects format
+  onSuccess: [
+    {
+      action: "setAuthToken",
+      actionParams: { token: "mock-jwt-token-12345" }
+    },
+    {
+      action: "setAuthUser",
+      actionParams: {}
+    },
+    {
+      action: "navigate",
+      actionParams: { url: "/shopzone" }
+    }
+  ],
+  
+  onError: [{ action: "console", actionParams: { message: "Login failed" } }],
+  onNetworkError: { action: "console", actionParams: { message: "Network error occurred" } },
+  tags: ["auth", "login", "authentication"],
+  projectUUID: "global",
+},
 
   // ✅ FIXED: SIGNUP API - Now sends name, email, and password correctly
   {
@@ -146,6 +160,7 @@ const apiConfigs = [
    {
     key: "user.profile",
     name: "Get User Profile", 
+    
     description: "Fetches current user profile data",
     url: "https://jsonplaceholder.typicode.com/users/1",
     method: "GET",
@@ -530,8 +545,18 @@ const seed = async () => {
     await APIConfig.deleteMany({});
     console.log("🗑️  Cleared old API configs");
 
-    await APIConfig.insertMany(apiConfigs);
-    console.log("✅ Seeded", apiConfigs.length, "API configurations");
+    // ✅ FIX: Add isActive: true to ALL configs automatically
+    const configsWithActive = apiConfigs.map(config => ({
+      ...config,
+      isActive: true
+    }));
+
+    await APIConfig.insertMany(configsWithActive);
+    console.log("✅ Seeded", configsWithActive.length, "API configurations");
+    
+    // ✅ Verify they were saved with isActive
+    const activeCount = await APIConfig.countDocuments({ isActive: true });
+    console.log(`✅ Active APIs in database: ${activeCount}`);
     
     console.log("\n📝 AUTH API PAYLOAD INFO:");
     console.log("   🔐 LOGIN (auth.login):");

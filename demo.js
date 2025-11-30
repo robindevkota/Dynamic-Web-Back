@@ -156,6 +156,470 @@ input:focus, textarea:focus, select:focus {
         "cart.remove",
         "cart.updateQuantity",
       ],
+      // In your demo.js - COMPLETE replacement for all built-in actions
+      actions: {
+        // In your demo.js, ADD these actions to initialization.actions:
+
+        setAuthToken: `
+  console.log("🔐 Setting auth token");
+  
+  // Generate a mock token (or use the one from actionParams)
+  const token = context.actionParams?.token || \`mock-jwt-\${Date.now()}\`;
+  
+  console.log("💾 Token:", token);
+  
+  // Store in localStorage
+  context.handlers.setAuthData('token', token);
+  
+  // Update state
+  context.handlers.setData(prev => ({
+    ...prev,
+    auth: context.handlers.getAuthData(),
+  }));
+  
+  console.log("✅ Auth token set");
+`,
+
+        setAuthUser: `
+  console.log("👤 Setting auth user");
+  
+  // Get email from payload (the API response)
+  const email = context.payload?.email || context.actionParams?.email;
+  
+  if (!email) {
+    console.error("❌ No email found in payload");
+    return;
+  }
+  
+  console.log("💾 User email:", email);
+  
+  // Store in localStorage
+  context.handlers.setAuthData('user', email);
+  
+  // Update state
+  context.handlers.setData(prev => ({
+    ...prev,
+    auth: context.handlers.getAuthData(),
+  }));
+  
+  console.log("✅ Auth user set");
+`,
+        // ========== NAVIGATION ACTIONS ==========
+        navigate: `
+  console.log("🧭 Navigation Context:", {
+    actionParams: context.actionParams,
+    url: context.actionParams?.url,
+    fullContext: context
+  });
+  
+  let url = context.actionParams?.url;
+  
+  if (!url) {
+    console.error("❌ No URL provided for navigation");
+    context.handlers.showNotification({
+      message: "Navigation error: No destination specified",
+      background: "#ef4444"
+    });
+    return;
+  }
+  
+  // Resolve templates in URL
+  if (url.includes('{{')) {
+    try {
+      console.log("🔍 Resolving templates in URL:", url);
+      url = context.handlers.resolveTemplate(url, {
+        auth: context.handlers.getAuthData(),
+        data: context.data,
+        formData: context.formData,
+        modalFormData: context.modalFormData
+      });
+      console.log("🔍 Resolved URL:", url);
+    } catch (error) {
+      console.error("❌ Template resolution failed:", error);
+    }
+  }
+  
+  // Validate URL
+  if (url === 'undefined' || url === 'null' || url.trim() === '') {
+    console.error("❌ Invalid URL after resolution:", url);
+    return;
+  }
+  
+  console.log("🚀 Navigating to:", url);
+  window.location.href = url;
+`,
+
+        scroll: `
+    const target = context.actionParams?.target;
+    console.log("🎯 Scrolling to:", target);
+    
+    if (target.startsWith('#')) {
+      document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
+    }
+  `,
+
+        // ========== MODAL ACTIONS ==========
+        openModal: `
+    const modalName = context.actionParams?.modal;
+    console.log("🎭 Opening modal:", modalName);
+    
+    context.handlers.setActiveModal(modalName);
+    context.handlers.setModalFormData({});
+    context.handlers.setFieldErrors({});
+    
+    // Pass selected product if available
+    if (context.payload?.selectedProduct) {
+      context.handlers.setData('selectedProduct', context.payload.selectedProduct);
+    }
+  `,
+
+        closeModal: `
+    console.log("❌ Closing modal");
+    context.handlers.setActiveModal(null);
+    context.handlers.setModalFormData({});
+    context.handlers.setFieldErrors({});
+  `,
+
+        // ========== API ACTIONS ==========
+        // REPLACE the 'api' action in your demo.js initialization.actions with this:
+
+        api: `
+  console.log("🚀 === API ACTION START ===");
+  
+  // ✅ Extract apiKey from actionParams
+  const apiKey = context.actionParams?.apiKey;
+  
+  // ✅ Get form data (could be from payload, modalFormData, or formData)
+  const formDataToUse = context.payload || context.modalFormData || context.formData || {};
+  
+  console.log("🔍 API Action Context:", {
+    apiKey: apiKey,
+    actionParams: context.actionParams,
+    payload: context.payload,
+    modalFormData: context.modalFormData,
+    formData: context.formData,
+    hasConfig: !!context.config,
+    hasResolvedAPIs: !!context.config?.resolvedAPIs,
+    availableAPIs: context.config?.resolvedAPIs ? Object.keys(context.config.resolvedAPIs) : []
+  });
+
+  if (!apiKey) {
+    const errorMsg = "❌ No apiKey provided for API action";
+    console.error(errorMsg);
+    console.error("📋 Context available:", {
+      actionParams: context.actionParams,
+      actionConfig: context.actionConfig
+    });
+    context.handlers.showNotification({
+      message: "API configuration error: No API key specified",
+      background: "#ef4444"
+    });
+    throw new Error(errorMsg);
+  }
+
+  // ✅ Check if API exists in config
+  const apiResource = context.config?.resolvedAPIs?.[apiKey];
+  if (!apiResource) {
+    const errorMsg = \`❌ API resource not found: \${apiKey}\`;
+    console.error(errorMsg);
+    console.log("📋 Available APIs:", Object.keys(context.config?.resolvedAPIs || {}));
+    context.handlers.showNotification({
+      message: \`API '\${apiKey}' not configured\`,
+      background: "#ef4444"
+    });
+    throw new Error(errorMsg);
+  }
+
+  console.log("✅ API Resource found:", {
+    url: apiResource.url,
+    method: apiResource.method,
+    hasTransform: !!apiResource.transformPayload
+  });
+
+  // ✅ Check if handleApiCall function exists
+  if (typeof context.handlers?.handleApiCall !== 'function') {
+    const errorMsg = "❌ handleApiCall function not available";
+    console.error(errorMsg);
+    context.handlers.showNotification({
+      message: "System error: API handler not available",
+      background: "#ef4444"
+    });
+    throw new Error(errorMsg);
+  }
+
+  try {
+    console.log("📡 Calling handleApiCall with:", {
+      apiKey: apiKey,
+      payload: formDataToUse,
+      actionConfig: context.actionConfig
+    });
+    
+    await context.handlers.handleApiCall(apiKey, formDataToUse, context.actionConfig);
+    
+    console.log("✅ API action completed successfully");
+  } catch (error) {
+    console.error("❌ API call failed:", error);
+    context.handlers.showNotification({
+      message: "API call failed: " + (error.message || "Unknown error"),
+      background: "#ef4444"
+    });
+    throw error;
+  }
+`,
+        debugButtonClick: `
+  console.log("🔍 Button Click Debug:", {
+    actionParams: context.actionParams,
+    actionConfig: context.actionConfig,
+    payload: context.payload,
+    hasApiKey: !!context.actionParams?.apiKey,
+    apiKey: context.actionParams?.apiKey
+  });
+  
+  if (context.actionParams?.apiKey) {
+    context.handlers.showNotification({
+      message: "API Key found: " + context.actionParams.apiKey,
+      background: "#10b981"
+    });
+  } else {
+    context.handlers.showNotification({
+      message: "No API key in actionParams",
+      background: "#ef4444"
+    });
+  }
+`,
+
+        // ========== FORM ACTIONS ==========
+        resetForm: `
+    console.log("🔄 Resetting form");
+    const formType = context.actionParams?.formType || 'main'; // 'main' or 'modal'
+    
+    if (formType === 'modal') {
+      context.handlers.setModalFormData({});
+    } else {
+      context.handlers.setFormData({});
+    }
+    
+    context.handlers.setFieldErrors({});
+    
+    // Reset filtered data if needed
+    if (context.actionParams?.resetFilters) {
+      context.handlers.setData(prev => ({
+        ...prev,
+        "products.api_filtered": prev["products.api"],
+      }));
+    }
+  `,
+
+        validateForm: `
+    console.log("📝 Validating form");
+    const formType = context.actionParams?.formType || 'main';
+    const formData = formType === 'modal' ? context.modalFormData : context.formData;
+    const formConfig = context.actionParams?.formConfig;
+    
+    if (!formConfig) {
+      console.error("❌ No form configuration provided for validation");
+      return false;
+    }
+    
+    const { isValid, errors } = context.handlers.validateAllFields(formConfig, formData);
+    
+    if (!isValid) {
+      context.handlers.setFieldErrors(errors);
+      context.handlers.showNotification({
+        message: "Please fix the errors before submitting",
+        background: "#ef4444",
+      });
+      return false;
+    }
+    
+    return true;
+  `,
+
+        // ========== AUTHENTICATION ACTIONS ==========
+        setAuth: `
+    const key = context.actionParams?.key;
+    const value = context.actionParams?.value;
+    
+    console.log("🔐 Setting auth:", key, "=", value);
+    context.handlers.setAuthData(key, value);
+
+    // Update state
+    context.handlers.setData(prev => ({
+      ...prev,
+      auth: context.handlers.getAuthData(),
+    }));
+  `,
+
+        clearAuth: `
+    console.log("🚪 Logging out...");
+    context.handlers.clearAuthData();
+    context.handlers.setData(prev => ({
+      ...prev,
+      auth: { token: null, user: { email: null }, isAuthenticated: false },
+    }));
+    context.handlers.showNotification({
+      type: "toast",
+      message: "Logged out successfully",
+      background: "#10b981",
+    });
+  `,
+
+        requireAuth: `
+    const authData = context.handlers.getAuthData();
+    if (!authData.isAuthenticated) {
+      console.log("🔒 Auth required - showing login modal");
+      context.handlers.setActiveModal("authModal");
+      context.handlers.showNotification({
+        type: "toast",
+        message: "Please login to continue",
+        background: "#f59e0b",
+      });
+      return false;
+    }
+    console.log("✅ User is authenticated");
+    return true;
+  `,
+
+        // ========== BROWSER ACTIONS ==========
+        reload: `
+    console.log("🔄 Reloading page");
+    window.location.reload();
+  `,
+
+        back: `
+    console.log("↩️ Going back");
+    window.history.back();
+  `,
+
+        console: `
+    const message = context.actionParams?.message;
+    console.log("📝 Console log:", message);
+  `,
+
+        // Add this temporary debug action
+        // Update your debugNavigation action to show what's REALLY available
+        debugNavigation: `
+  console.log("🐛 DEBUG Full Context:", {
+    // All available data
+    data: context.data,
+    formData: context.formData, 
+    modalFormData: context.modalFormData,
+    payload: context.payload,
+    
+    // Action configuration
+    actionParams: context.actionParams,
+    actionConfig: context.actionConfig,
+    
+    // Auth state
+    auth: context.handlers.getAuthData(),
+    
+    // Available handlers
+    handlers: Object.keys(context.handlers)
+  });
+  
+  // Test template resolution
+  const testTemplate = "{{auth.token ? 'logged-in' : 'logged-out'}}";
+  try {
+    const resolved = context.handlers.resolveTemplate(testTemplate, {
+      auth: context.handlers.getAuthData(),
+      data: context.data
+    });
+    console.log("🔍 Template test:", testTemplate, "->", resolved);
+  } catch (error) {
+    console.error("❌ Template resolution failed:", error);
+  }
+`,
+        // ========== CART ACTIONS ==========
+        storeCartLocally: `
+    console.log("💾 Storing cart locally");
+    
+    const product = context.modalFormData?.selectedProduct || context.payload?.selectedProduct;
+    const quantity = parseInt(context.modalFormData?.quantity) || 1;
+
+    if (!product) {
+      console.error("❌ No product to store");
+      return;
+    }
+
+    // Get existing cart
+    const cart = JSON.parse(localStorage.getItem("shopzone_cart") || "[]");
+
+    // Check if product exists
+    const existingIndex = cart.findIndex(item => item.id === product.id);
+
+    if (existingIndex !== -1) {
+      // Update quantity
+      cart[existingIndex].quantity += quantity;
+      console.log(\`📦 Updated product quantity: \${product.title} -> \${cart[existingIndex].quantity}\`);
+    } else {
+      // Add new item
+      cart.push({
+        id: product.id,
+        title: product.title,
+        price: product.price,
+        image: product.image,
+        quantity: quantity,
+        category: product.category,
+      });
+      console.log(\`🆕 Added new product to cart: \${product.title}\`);
+    }
+
+    // Save to localStorage
+    localStorage.setItem("shopzone_cart", JSON.stringify(cart));
+
+    console.log("✅ Cart stored locally:", cart);
+
+    // Update cart count in state
+    context.handlers.setData(prev => ({
+      ...prev,
+      cartCount: cart.length,
+      cartTotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+    }));
+  `,
+
+        // ========== NOTIFICATION ACTIONS ==========
+        notify: `
+    const type = context.actionParams?.type || 'info';
+    const message = context.actionParams?.message || 'Notification';
+    
+    console.log(\`💬 Showing \${type} notification: \${message}\`);
+    
+    const backgrounds = {
+      success: "#10b981",
+      error: "#ef4444", 
+      warning: "#f59e0b",
+      info: "#3b82f6"
+    };
+    
+    context.handlers.showNotification({
+      type: "toast",
+      message: message,
+      background: backgrounds[type] || "#3b82f6"
+    });
+  `,
+
+        // ========== TEST ACTION ==========
+        test: `
+    console.log("🧪 TEST ACTION FIRED!");
+    console.log("Full context:", context);
+    console.log("Action params:", context.actionParams);
+    console.log("Payload:", context.payload);
+    
+    context.handlers.showNotification({
+      type: "toast", 
+      message: "Test action executed successfully!",
+      background: "#8b5cf6"
+    });
+    
+    return {
+      success: true,
+      timestamp: new Date().toISOString(),
+      action: 'test'
+    };
+  `,
+      },
     },
 
     pages: {
@@ -184,8 +648,16 @@ input:focus, textarea:focus, select:focus {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  { label: "Home", action: "navigate:/shopzone" },
-                  { label: "Sign Up", action: "navigate:/shopzone/signup" },
+                  {
+                    label: "Home",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone" },
+                  },
+                  {
+                    label: "Sign Up",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/signup" },
+                  },
                 ],
               },
             },
@@ -250,7 +722,10 @@ input:focus, textarea:focus, select:focus {
                 "ui:actions": [
                   {
                     label: "Sign In",
-                    action: "api:auth.login",
+                    action: "api",
+                    actionParams: {
+                      apiKey: "auth.login", // ✅ FIX: Changed from 'url' to 'apiKey'
+                    },
                     variant: "primary",
                     styles: {
                       width: "100%",
@@ -274,12 +749,14 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "Forgot Password?",
-                    action: "navigate:/shopzone/forgot-password",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/forgot-password" },
                   },
                   {
                     prefix: "Don't have an account?",
                     label: "Sign Up",
-                    action: "navigate:/shopzone/signup",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/signup" },
                   },
                 ],
                 "ui:styles": {
@@ -340,8 +817,16 @@ input:focus, textarea:focus, select:focus {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  { label: "Home", action: "navigate:/shopzone" },
-                  { label: "Login", action: "navigate:/shopzone/login" },
+                  {
+                    label: "Home",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone" },
+                  },
+                  {
+                    label: "Login",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/login" },
+                  },
                 ],
               },
             },
@@ -422,7 +907,8 @@ input:focus, textarea:focus, select:focus {
                 "ui:actions": [
                   {
                     label: "Create Account",
-                    action: "api:auth.signup",
+                    action: "api",
+                    actionParams: { apiKey: "auth.signup" },
                     variant: "primary",
                     styles: {
                       width: "100%",
@@ -446,7 +932,8 @@ input:focus, textarea:focus, select:focus {
                   {
                     prefix: "Already have an account?",
                     label: "Login",
-                    action: "navigate:/shopzone/login",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/login" },
                   },
                 ],
                 "ui:styles": {
@@ -507,8 +994,16 @@ input:focus, textarea:focus, select:focus {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
-                  { label: "Home", action: "navigate:/shopzone" },
-                  { label: "Login", action: "navigate:/shopzone/login" },
+                  {
+                    label: "Home",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone" },
+                  },
+                  {
+                    label: "Login",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/login" },
+                  },
                 ],
               },
             },
@@ -566,7 +1061,8 @@ input:focus, textarea:focus, select:focus {
                 "ui:actions": [
                   {
                     label: "Send Reset Link",
-                    action: "api:auth.forgot",
+                    action: "api",
+                    actionParams: { apiKey: "auth.forgot" },
                     variant: "primary",
                     styles: {
                       width: "100%",
@@ -589,7 +1085,8 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "← Back to Login",
-                    action: "navigate:/shopzone/login",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/login" },
                   },
                 ],
                 "ui:styles": {
@@ -625,7 +1122,7 @@ input:focus, textarea:focus, select:focus {
         },
       },
 
-      // 🔹 EXISTING PAGES (Cart, Categories) remain the same but with updated navbar
+      // 🔹 CART PAGE
       cart: {
         title: "Shopping Cart",
         components: {
@@ -646,42 +1143,42 @@ input:focus, textarea:focus, select:focus {
                   cursor: "pointer",
                 },
               },
-              // In demo.js, update the navbar links in the categories page to this:
-
               links: {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
                   {
                     label: "Home",
-                    action: "navigate:/shopzone",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone" },
                   },
                   {
                     label: "Categories",
-                    action: "navigate:/shopzone/categories",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/categories" },
                   },
                   {
                     label: "🛒 Cart ({{data.cartCount || 0}})",
-                    action: "navigate:/shopzone/cart",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/cart" },
                   },
-
-                  // ✅ When NOT logged in: Show Login button
                   {
                     label: "{{auth.token ? '' : 'Login'}}",
-                    action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
+                    action: "{{auth.token ? '' : 'navigate'}}",
+                    actionParams: {
+                      url: "{{auth.token ? '' : '/shopzone/login'}}",
+                    },
                   },
-
-                  // ✅ When logged in: Show Welcome message (display only)
                   {
                     label:
                       "{{auth.token ? 'Welcome, ' + auth.user.email : ''}}",
-                    action: "", // Empty action = display only
+                    action: "",
+                    actionParams: {},
                   },
-
-                  // ✅ When logged in: Show Logout button
                   {
                     label: "{{auth.token ? 'Logout' : ''}}",
                     action: "{{auth.token ? 'clearAuth+reload' : ''}}",
+                    actionParams: {},
                   },
                 ],
               },
@@ -711,6 +1208,20 @@ input:focus, textarea:focus, select:focus {
             table: {},
             modal: {},
             uiSchema: {
+              testDiscountButton: {
+                "ui:widget": "button",
+                "ui:label": "Apply 10% Discount",
+                "ui:action": "applyDiscount",
+                "ui:actionParams": { percent: 10 },
+                "ui:styles": {
+                  background: "#667eea",
+                  color: "white",
+                  padding: "10px 20px",
+                  margin: "10px",
+                  borderRadius: "8px",
+                },
+              },
+
               pageTitle: {
                 "ui:widget": "heading",
                 "ui:text": "🛒 Your Shopping Cart",
@@ -725,7 +1236,7 @@ input:focus, textarea:focus, select:focus {
 
               cartItems: {
                 "ui:widget": "cartItemsGrid",
-                 "ui:dataKey": "cart.items", 
+                "ui:dataKey": "cart.items",
                 "ui:styles": {
                   padding: "0 40px",
                   maxWidth: "1200px",
@@ -740,7 +1251,8 @@ input:focus, textarea:focus, select:focus {
                   "ui:widget": "card",
                   "ui:title": "Your cart is empty",
                   "ui:description": "Start shopping to add items to your cart!",
-                  "ui:action": "navigate:/shopzone/categories",
+                  "ui:action": "navigate",
+                  "ui:actionParams": { url: "/shopzone/categories" },
                   "ui:buttonLabel": "Browse Products",
                   "ui:styles": {
                     maxWidth: "500px",
@@ -776,12 +1288,12 @@ input:focus, textarea:focus, select:focus {
               background: "#f8fafc",
               minHeight: "100vh",
             },
-         triggers: [
-        {
-          event: "load",
-          action: "loadCartFromLocal"
-        }
-      ],
+            triggers: [
+              {
+                event: "load",
+                action: "loadCartFromLocal",
+              },
+            ],
           },
           footer: {
             table: {},
@@ -803,6 +1315,7 @@ input:focus, textarea:focus, select:focus {
         },
       },
 
+      // 🔹 CATEGORIES PAGE
       categories: {
         title: "Product Categories",
         components: {
@@ -822,44 +1335,42 @@ input:focus, textarea:focus, select:focus {
                   WebkitTextFillColor: "transparent",
                 },
               },
-              // In demo.js, update the navbar links in the categories page to this:
-
-              // In demo.js, update the navbar links in the categories page to this:
-
               links: {
                 "ui:widget": "navLinks",
                 "ui:theme": "light",
                 "ui:links": [
                   {
                     label: "Home",
-                    action: "navigate:/shopzone",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone" },
                   },
                   {
                     label: "Categories",
-                    action: "navigate:/shopzone/categories",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/categories" },
                   },
                   {
                     label: "🛒 Cart ({{data.cartCount || 0}})",
-                    action: "navigate:/shopzone/cart",
+                    action: "navigate",
+                    actionParams: { url: "/shopzone/cart" },
                   },
-
-                  // ✅ When NOT logged in: Show Login button
                   {
                     label: "{{auth.token ? '' : 'Login'}}",
-                    action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
+                    action: "{{auth.token ? '' : 'navigate'}}",
+                    actionParams: {
+                      url: "{{auth.token ? '' : '/shopzone/login'}}",
+                    },
                   },
-
-                  // ✅ When logged in: Show Welcome message (display only)
                   {
                     label:
                       "{{auth.token ? 'Welcome, ' + auth.user.email : ''}}",
-                    action: "", // Empty action = display only
+                    action: "",
+                    actionParams: {},
                   },
-
-                  // ✅ When logged in: Show Logout button
                   {
                     label: "{{auth.token ? 'Logout' : ''}}",
                     action: "{{auth.token ? 'clearAuth+reload' : ''}}",
+                    actionParams: {},
                   },
                 ],
               },
@@ -890,11 +1401,8 @@ input:focus, textarea:focus, select:focus {
 
           main: {
             table: {},
-            // Replace the modal configuration in your categories page (demo.js):
-
             modal: {
               productDetail: {
-                // ✅ This becomes the modal key
                 "ui:title": "Product Details",
                 "ui:theme": "light",
                 "ui:styles": {
@@ -915,7 +1423,8 @@ input:focus, textarea:focus, select:focus {
                 "ui:actions": [
                   {
                     label: "🛒 Add to Cart",
-                    action: "api:cart.add",
+                    action: "api",
+                    actionParams: { apiKey: "cart.add" },
                     variant: "primary",
                     styles: {
                       width: "100%",
@@ -963,11 +1472,10 @@ input:focus, textarea:focus, select:focus {
 
               spacer1: { "ui:widget": "spacer", "ui:height": 60 },
 
-              // ✅ FIXED: Filter Section with CORRECT source keys
               filterSection: {
-                "ui:widget": "filterWidget", // ✅ Use dedicated filter widget
+                "ui:widget": "filterWidget",
                 "ui:title": "Filter Products",
-                "ui:filterOnChange": true, // Apply on button click
+                "ui:filterOnChange": true,
                 "ui:styles": {
                   padding: "30px 40px",
                   marginBottom: "40px",
@@ -989,7 +1497,7 @@ input:focus, textarea:focus, select:focus {
                     ],
                     "ui:styles": {
                       minWidth: "200px",
-                      marginBottom: "0", // ✅ No bottom margin for horizontal layout
+                      marginBottom: "0",
                     },
                   },
                   {
@@ -1000,7 +1508,7 @@ input:focus, textarea:focus, select:focus {
                     "ui:placeholder": "Search by name...",
                     "ui:styles": {
                       minWidth: "250px",
-                      marginBottom: "0", // ✅ No bottom margin
+                      marginBottom: "0",
                     },
                   },
                   {
@@ -1009,7 +1517,7 @@ input:focus, textarea:focus, select:focus {
                     "ui:label": "From Date",
                     "ui:styles": {
                       minWidth: "150px",
-                      marginBottom: "0", // ✅ No bottom margin
+                      marginBottom: "0",
                     },
                   },
                   {
@@ -1018,14 +1526,15 @@ input:focus, textarea:focus, select:focus {
                     "ui:label": "To Date",
                     "ui:styles": {
                       minWidth: "150px",
-                      marginBottom: "0", // ✅ No bottom margin
+                      marginBottom: "0",
                     },
                   },
                 ],
                 "ui:actions": [
                   {
                     label: "Apply Filters",
-                    action: "api:products.filter",
+                    action: "api",
+                    actionParams: { apiKey: "products.filter" },
                     variant: "filter",
                     styles: {
                       background: "#667eea",
@@ -1036,7 +1545,7 @@ input:focus, textarea:focus, select:focus {
                       fontWeight: "600",
                       cursor: "pointer",
                       minWidth: "120px",
-                      height: "44px", // ✅ Match field height
+                      height: "44px",
                     },
                   },
                   {
@@ -1052,7 +1561,7 @@ input:focus, textarea:focus, select:focus {
                       fontWeight: "600",
                       cursor: "pointer",
                       minWidth: "100px",
-                      height: "44px", // ✅ Match field height
+                      height: "44px",
                     },
                   },
                   {
@@ -1066,7 +1575,7 @@ input:focus, textarea:focus, select:focus {
                       padding: "10px",
                       cursor: "pointer",
                       fontSize: "16px",
-                      height: "44px", // ✅ Match field height
+                      height: "44px",
                       width: "44px",
                     },
                   },
@@ -1097,12 +1606,12 @@ input:focus, textarea:focus, select:focus {
                 },
               },
 
-              // ✅ CRITICAL FIX: Use correct dataPath
               featuredProducts: {
                 "ui:widget": "projectGrid",
                 "ui:animated": true,
-                "ui:onItemClick": "openModal:productDetail",
-                "ui:dataPath": "products.api_filtered", // Match filtered data key
+                "ui:onItemClick": "openModal",
+                "ui:actionParams": { modal: "productDetail" },
+                "ui:dataPath": "products.api_filtered",
                 "ui:styles": {
                   padding: "0 40px",
                   marginBottom: "60px",
@@ -1111,7 +1620,6 @@ input:focus, textarea:focus, select:focus {
 
               spacer2: { "ui:widget": "spacer", "ui:height": 60 },
 
-              // Static category cards
               categoriesHeader: {
                 "ui:widget": "heading",
                 "ui:level": "h2",
@@ -1139,6 +1647,10 @@ input:focus, textarea:focus, select:focus {
                     "ui:image":
                       "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&h=250&fit=crop",
                     "ui:buttonLabel": "Browse Electronics",
+                    "ui:action": "navigate",
+                    "ui:actionParams": {
+                      url: "/shopzone/categories?filter=electronics",
+                    },
                     "ui:styles": { minHeight: "200px" },
                     "ui:imageStyles": { height: "120px", objectFit: "cover" },
                   },
@@ -1149,6 +1661,10 @@ input:focus, textarea:focus, select:focus {
                     "ui:image":
                       "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=400&h=250&fit=crop",
                     "ui:buttonLabel": "Browse Jewelery",
+                    "ui:action": "navigate",
+                    "ui:actionParams": {
+                      url: "/shopzone/categories?filter=jewelery",
+                    },
                     "ui:styles": { minHeight: "200px" },
                     "ui:imageStyles": { height: "120px", objectFit: "cover" },
                   },
@@ -1159,6 +1675,10 @@ input:focus, textarea:focus, select:focus {
                     "ui:image":
                       "https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&h=250&fit=crop",
                     "ui:buttonLabel": "Browse Men's",
+                    "ui:action": "navigate",
+                    "ui:actionParams": {
+                      url: "/shopzone/categories?filter=men's clothing",
+                    },
                     "ui:styles": { minHeight: "200px" },
                     "ui:imageStyles": { height: "120px", objectFit: "cover" },
                   },
@@ -1169,6 +1689,10 @@ input:focus, textarea:focus, select:focus {
                     "ui:image":
                       "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=250&fit=crop",
                     "ui:buttonLabel": "Browse Women's",
+                    "ui:action": "navigate",
+                    "ui:actionParams": {
+                      url: "/shopzone/categories?filter=women's clothing",
+                    },
                     "ui:styles": { minHeight: "200px" },
                     "ui:imageStyles": { height: "120px", objectFit: "cover" },
                   },
@@ -1180,12 +1704,10 @@ input:focus, textarea:focus, select:focus {
               background: "#ffffff",
               minHeight: "100vh",
             },
-
-            // ✅ This loads products on page mount
             triggers: [
               {
                 event: "load",
-                source: "products.api", // This matches your API key
+                source: "products.api",
               },
             ],
           },
@@ -1251,33 +1773,40 @@ input:focus, textarea:focus, select:focus {
             "ui:links": [
               {
                 label: "Home",
-                action: "navigate:/shopzone",
+                action: "navigate",
+                actionParams: { url: "/shopzone" },
               },
               {
                 label: "Categories",
-                action: "navigate:/shopzone/categories",
+                action: "navigate",
+                actionParams: { url: "/shopzone/categories" },
               },
               {
                 label: "🛒 Cart ({{data.cartCount || 0}})",
-                action: "navigate:/shopzone/cart",
+                action: "navigate",
+                actionParams: { url: "/shopzone/cart" },
               },
 
-              // ✅ When NOT logged in: Show Login button
+              // ✅ Show only when NOT logged in
               {
-                label: "{{auth.token ? '' : 'Login'}}",
-                action: "{{auth.token ? '' : 'navigate:/shopzone/login'}}",
+                label: "Login",
+                action: "navigate",
+                actionParams: { url: "/shopzone/login" },
+                condition: "{{!auth.token}}", // Only show when not authenticated
               },
 
-              // ✅ When logged in: Show Welcome message (display only)
+              // ✅ Show only when logged in
               {
-                label: "{{auth.token ? 'Welcome, ' + auth.user.email : ''}}",
-                action: "", // Empty action = display only
+                label: "Welcome, {{auth.user.email}}",
+                action: "", // Display only
+                condition: "{{auth.token}}", // Only show when authenticated
               },
 
-              // ✅ When logged in: Show Logout button
+              // ✅ Show only when logged in
               {
-                label: "{{auth.token ? 'Logout' : ''}}",
-                action: "{{auth.token ? 'clearAuth+reload' : ''}}",
+                label: "Logout",
+                action: "clearAuth+reload",
+                condition: "{{auth.token}}", // Only show when authenticated
               },
             ],
           },

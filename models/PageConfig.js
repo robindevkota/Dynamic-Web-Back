@@ -33,7 +33,8 @@ const PageConfigSchema = new mongoose.Schema({
   initialization: {
     globalCSS: { type: String, default: "" },
     // 🔥 UPDATED: Accept both strings (API keys) AND objects (full config)
-    resources: [mongoose.Schema.Types.Mixed]
+    resources: [mongoose.Schema.Types.Mixed],
+    actions: { type: Object, default: {} }
   },
   
   // 🆕 Sub-pages
