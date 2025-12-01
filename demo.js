@@ -2009,26 +2009,17 @@ input:focus, textarea:focus, select:focus {
                 actionParams: { url: "/shopzone/cart" },
               },
 
-              // ✅ Show only when NOT logged in
+              // ✅ Show only when logged in
               {
-                label: "Login",
-                action: "navigateToPage",
+                label: "{{auth.token ? '👤 ' + auth.user?.email : 'Login'}}",
+                action: "{{auth.token ? '' : 'navigateToPage'}}",
                 actionParams: { url: "/shopzone/login" },
-                condition: "{{!auth.token}}", // Only show when not authenticated
+                // Only show when authenticated
               },
 
-              // ✅ Show only when logged in
               {
-                label: "Welcome, {{auth.user.email}}",
-                action: "", // Display only
-                condition: "{{auth.token}}", // Only show when authenticated
-              },
-
-              // ✅ Show only when logged in
-              {
-                label: "Logout",
-                action: "clearAuth+reload",
-                condition: "{{auth.token}}", // Only show when authenticated
+                label: "{{auth.token ? 'Logout' : ''}}",
+                action: "{{auth.token ? 'clearAuth+reload' : ''}}",
               },
             ],
           },
@@ -2750,13 +2741,16 @@ input:focus, textarea:focus, select:focus {
     return await context.handlers.handleApiCall(apiKey, formData);
   }
   
-  // Validate fields
+  // ✅ Validate fields
   const { isValid, errors } = context.handlers.validateAllFields(fields, formData);
   
   if (!isValid) {
     console.error("❌ Validation failed:", errors);
     
-    // Show first error
+    // ✅ Set field-level errors in DataStore (for UI display)
+    context.handlers.setFieldErrors(errors);
+    
+    // ✅ Show notification with FIRST error only
     const firstError = Object.values(errors)[0];
     context.handlers.showNotification({
       type: "toast",
@@ -2765,15 +2759,12 @@ input:focus, textarea:focus, select:focus {
       duration: 3000,
     });
     
-    // Set field errors in DataStore for UI display
-    context.handlers.setFieldErrors(errors);
-    
     return { success: false, errors };
   }
   
   console.log("✅ Validation passed, calling API");
   
-  // Clear any previous errors
+  // ✅ Clear any previous errors
   context.handlers.setFieldErrors({});
   
   // Call the actual API
@@ -3721,323 +3712,6 @@ input:focus, textarea:focus, select:focus {
       },
 
       // 🔹 MAIN LANDING PAGE (HOME) - FIXED ACTIONS
-      home: {
-        title: "GreenHaven - Premium Plant Store",
-        components: {
-          navbar: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              logo: {
-                "ui:widget": "text",
-                "ui:content": "🌿 GreenHaven",
-                "ui:styles": {
-                  fontSize: "32px",
-                  fontWeight: "800",
-                  background:
-                    "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  cursor: "pointer",
-                },
-                "ui:action": "navigateToPage",
-                "ui:actionParams": { url: "/greenhaven" },
-              },
-              links: {
-                "ui:widget": "navLinks",
-                "ui:theme": "light",
-                "ui:links": [
-                  {
-                    label: "Home",
-                    action: "navigateToPage",
-                    actionParams: { url: "/greenhaven" },
-                  },
-                  {
-                    label: "Plants",
-                    action: "navigateToPage",
-                    actionParams: { url: "/greenhaven/plants" },
-                  },
-                  {
-                    label: "🛒 Cart ({{data.cartCount || 0}})",
-                    action: "navigateToPage",
-                    actionParams: { url: "/greenhaven/cart" },
-                  },
-                  {
-                    label: "{{auth.token ? '👤 ' + auth.user?.name : 'Login'}}",
-                    action: "{{auth.token ? '' : 'navigateToPage'}}",
-                    actionParams: {
-                      url: "{{auth.token ? '' : '/greenhaven/login'}}",
-                    },
-                  },
-                  {
-                    label: "{{auth.token ? 'Logout' : ''}}",
-                    action: "{{auth.token ? 'clearAuth+reload' : ''}}",
-                  },
-                ],
-              },
-            },
-            styles: {
-              background: "#ffffff",
-              borderBottom: "2px solid #e8f5e9",
-              padding: "20px 50px",
-              position: "fixed",
-              width: "100%",
-              zIndex: 1000,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              boxShadow: "0 2px 20px rgba(76, 175, 80, 0.1)",
-            },
-            triggers: [],
-          },
-          sidebar: {
-            table: {},
-            modal: {},
-            uiSchema: {},
-            styles: { display: "none" },
-            triggers: [],
-          },
-          main: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              hero: {
-                "ui:widget": "hero",
-                "ui:title": "Grow Your Indoor Jungle 🌿",
-                "ui:subtitle":
-                  "Discover rare and beautiful plants to transform your space into a green paradise",
-                "ui:cta": {
-                  label: "Explore Plants 🌸",
-                  action: "navigateToPage",
-                  actionParams: { url: "/greenhaven/plants" },
-                },
-                "ui:styles": {
-                  background:
-                    "linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)",
-                  minHeight: "600px",
-                  padding: "180px 40px 100px",
-                  textAlign: "center",
-                  color: "white",
-                },
-              },
-
-              spacer1: { "ui:widget": "spacer", "ui:height": 80 },
-
-              featuredHeading: {
-                "ui:widget": "heading",
-                "ui:text": "✨ Featured Plants",
-                "ui:level": "h2",
-                "ui:styles": {
-                  textAlign: "center",
-                  marginBottom: "50px",
-                  fontSize: "2.5rem",
-                  color: "#2d4a3a",
-                },
-              },
-
-              featuredGrid: {
-                "ui:widget": "gridLayout",
-                "ui:columns": 3,
-                "ui:gap": "30px",
-                "ui:styles": {
-                  marginBottom: "60px",
-                },
-                "ui:children": [
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "Monstera Deliciosa 🍃",
-                    "ui:description":
-                      "Large tropical plant with unique leaf patterns. Perfect for bright spaces.",
-                    "ui:image":
-                      "https://images.unsplash.com/photo-1525498128493-380d1990a112?w=400&h=300&fit=crop",
-                    "ui:buttonLabel": "Add to Cart - $45",
-                    "ui:action": "storeCartLocally",
-                    "ui:actionParams": {
-                      productId: "monstera-001",
-                      name: "Monstera Deliciosa",
-                      price: 45,
-                      image:
-                        "https://images.unsplash.com/photo-1525498128493-380d1990a112?w=400&h=300&fit=crop",
-                      category: "Indoor Plants",
-                    },
-                    "ui:styles": {
-                      textAlign: "center",
-                    },
-                  },
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "Fiddle Leaf Fig 🎻",
-                    "ui:description":
-                      "Elegant tree with large violin-shaped leaves. Statement piece for any room.",
-                    "ui:image":
-                      "https://images.unsplash.com/photo-1593482892290-9d013abb8a22?w=400&h=300&fit=crop",
-                    "ui:buttonLabel": "Add to Cart - $65",
-                    "ui:action": "storeCartLocally",
-                    "ui:actionParams": {
-                      productId: "fiddle-002",
-                      name: "Fiddle Leaf Fig",
-                      price: 65,
-                      image:
-                        "https://images.unsplash.com/photo-1593482892290-9d013abb8a22?w=400&h=300&fit=crop",
-                      category: "Indoor Plants",
-                    },
-                    "ui:styles": {
-                      textAlign: "center",
-                    },
-                  },
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "Snake Plant 🐍",
-                    "ui:description":
-                      "Low maintenance, air-purifying plant. Thrives in low light conditions.",
-                    "ui:image":
-                      "https://images.unsplash.com/photo-1585350927251-3ab67c4d4e5a?w=400&h=300&fit=crop",
-                    "ui:buttonLabel": "Add to Cart - $28",
-                    "ui:action": "storeCartLocally",
-                    "ui:actionParams": {
-                      productId: "snake-003",
-                      name: "Snake Plant",
-                      price: 28,
-                      image:
-                        "https://images.unsplash.com/photo-1585350927251-3ab67c4d4e5a?w=400&h=300&fit=crop",
-                      category: "Indoor Plants",
-                    },
-                    "ui:styles": {
-                      textAlign: "center",
-                    },
-                  },
-                ],
-              },
-
-              promotionCard: {
-                "ui:widget": "card",
-                "ui:title": "🌱 New Plant Parent?",
-                "ui:description":
-                  "Get 15% OFF your first plant purchase! Use code: FIRSTPLANT15",
-                "ui:action": "navigateToPage",
-                "ui:actionParams": { url: "/greenhaven/plants" },
-                "ui:buttonLabel": "Shop Beginner Plants 🌿",
-                "ui:styles": {
-                  maxWidth: "800px",
-                  margin: "0 auto 60px",
-                  padding: "40px",
-                  background:
-                    "linear-gradient(135deg, #8bc34a 0%, #cddc39 100%)",
-                  color: "white",
-                  textAlign: "center",
-                },
-              },
-
-              statsSection: {
-                "ui:widget": "gridLayout",
-                "ui:columns": 3,
-                "ui:gap": "20px",
-                "ui:styles": {
-                  marginBottom: "60px",
-                  padding: "40px",
-                  background: "#f1f8e9",
-                  borderRadius: "20px",
-                },
-                "ui:children": [
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "500+",
-                    "ui:description": "Plant Varieties",
-                    "ui:styles": {
-                      textAlign: "center",
-                      padding: "20px",
-                      background: "transparent",
-                      boxShadow: "none",
-                    },
-                  },
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "10K+",
-                    "ui:description": "Happy Customers",
-                    "ui:styles": {
-                      textAlign: "center",
-                      padding: "20px",
-                      background: "transparent",
-                      boxShadow: "none",
-                    },
-                  },
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "98%",
-                    "ui:description": "Success Rate",
-                    "ui:styles": {
-                      textAlign: "center",
-                      padding: "20px",
-                      background: "transparent",
-                      boxShadow: "none",
-                    },
-                  },
-                ],
-              },
-            },
-            styles: {
-              padding: "100px 40px 80px",
-              background: "#f8fdf9",
-              minHeight: "100vh",
-            },
-            triggers: [
-              { event: "load", action: "loadCartFromLocal" },
-              { event: "load", source: "plants.api" },
-            ],
-          },
-          footer: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              footerContent: {
-                "ui:widget": "gridLayout",
-                "ui:columns": 3,
-                "ui:gap": "40px",
-                "ui:styles": {
-                  marginBottom: "40px",
-                },
-                "ui:children": [
-                  {
-                    "ui:widget": "text",
-                    "ui:content": "🌿 GreenHaven<br>Premium Plant Store",
-                    "ui:styles": {
-                      color: "#e8f5e9",
-                      fontSize: "1.2rem",
-                      fontWeight: "bold",
-                    },
-                  },
-                  {
-                    "ui:widget": "text",
-                    "ui:content":
-                      "Plant Care<br>Delivery Info<br>Returns<br>Contact",
-                    "ui:styles": { color: "#c8e6c9" },
-                  },
-                  {
-                    "ui:widget": "text",
-                    "ui:content": "Privacy Policy<br>Terms of Service<br>FAQ",
-                    "ui:styles": { color: "#c8e6c9" },
-                  },
-                ],
-              },
-              footerText: {
-                "ui:widget": "text",
-                "ui:content":
-                  "© 2024 GreenHaven Plant Store. Cultivated with ❤️ and 🌱",
-                "ui:styles": {
-                  textAlign: "center",
-                  color: "#a5d6a7",
-                  marginTop: "40px",
-                },
-              },
-            },
-            styles: {
-              background: "#2d4a3a",
-              padding: "60px 40px 40px",
-            },
-            triggers: [],
-          },
-        },
-      },
 
       // 🔹 PLANTS CATALOG PAGE - FIXED ACTIONS
       plants: {
@@ -4082,7 +3756,8 @@ input:focus, textarea:focus, select:focus {
                     actionParams: { url: "/greenhaven/cart" },
                   },
                   {
-                    label: "{{auth.token ? '👤 ' + auth.user?.name : 'Login'}}",
+                    label:
+                      "{{auth.token ? '👤 ' + auth.user?.email : 'Login'}}",
                     action: "{{auth.token ? '' : 'navigateToPage'}}",
                     actionParams: {
                       url: "{{auth.token ? '' : '/greenhaven/login'}}",
@@ -4452,7 +4127,8 @@ input:focus, textarea:focus, select:focus {
                     actionParams: { url: "/greenhaven/cart" },
                   },
                   {
-                    label: "{{auth.token ? '👤 ' + auth.user?.name : 'Login'}}",
+                    label:
+                      "{{auth.token ? '👤 ' + auth.user?.email : 'Login'}}",
                     action: "{{auth.token ? '' : 'navigateToPage'}}",
                     actionParams: {
                       url: "{{auth.token ? '' : '/greenhaven/login'}}",
@@ -4658,7 +4334,7 @@ input:focus, textarea:focus, select:focus {
                 actionParams: { url: "/greenhaven/cart" },
               },
               {
-                label: "{{auth.token ? '👤 ' + auth.user?.name : 'Login'}}",
+                label: "{{auth.token ? '👤 ' + auth.user?.email : 'Login'}}",
                 action: "{{auth.token ? '' : 'navigateToPage'}}",
                 actionParams: {
                   url: "{{auth.token ? '' : '/greenhaven/login'}}",
@@ -4779,6 +4455,7 @@ input:focus, textarea:focus, select:focus {
             },
           },
 
+          
           spacer1: { "ui:widget": "spacer", "ui:height": 80 },
 
           featuredHeading: {
@@ -4931,7 +4608,7 @@ input:focus, textarea:focus, select:focus {
         triggers: [],
       },
     },
-  }
+  },
 ];
 
 const seed = async () => {
