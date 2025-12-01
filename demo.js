@@ -1422,19 +1422,7 @@ input:focus, textarea:focus, select:focus {
             table: {},
             modal: {},
             uiSchema: {
-              testDiscountButton: {
-                "ui:widget": "button",
-                "ui:label": "Apply 10% Discount",
-                "ui:action": "applyDiscount",
-                "ui:actionParams": { percent: 20 },
-                "ui:styles": {
-                  background: "#667eea",
-                  color: "white",
-                  padding: "10px 20px",
-                  margin: "10px",
-                  borderRadius: "8px",
-                },
-              },
+            
 
               pageTitle: {
                 "ui:widget": "heading",
@@ -1450,32 +1438,14 @@ input:focus, textarea:focus, select:focus {
 
               cartItems: {
                 "ui:widget": "cartItemsGrid",
-                "ui:dataKey": "cartItems",
+                "ui:dataKey": "cart.get",
                 "ui:styles": {
                   padding: "0 40px",
                   maxWidth: "1200px",
                   margin: "0 auto",
                 },
               },
-              emptyCart: {
-                "ui:widget": "conditionalContent",
-                "ui:condition":
-                  "{{!data.cartItems || data.cartItems.length === 0}}", // ✅ Changed from cart.items
-                "ui:content": {
-                  "ui:widget": "card",
-                  "ui:title": "Your cart is empty",
-                  "ui:description": "Start shopping to add items to your cart!",
-                  "ui:action": "navigate",
-                  "ui:actionParams": { url: "/shopzone/categories" },
-                  "ui:buttonLabel": "Browse Products",
-                  "ui:styles": {
-                    maxWidth: "500px",
-                    margin: "50px auto",
-                    textAlign: "center",
-                    padding: "40px",
-                  },
-                },
-              },
+            
 
               divider: {
                 "ui:widget": "divider",
@@ -1483,19 +1453,7 @@ input:focus, textarea:focus, select:focus {
                 "ui:styles": { maxWidth: "900px", margin: "40px auto" },
               },
 
-              totalCard: {
-                "ui:widget": "cartSummary",
-                "ui:dataKey": "cartItems",
-                "ui:styles": {
-                  maxWidth: "1200px",
-                  margin: "0 auto 40px",
-                  padding: "30px",
-                  background:
-                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  color: "white",
-                  borderRadius: "16px",
-                },
-              },
+            
             },
             styles: {
               padding: "120px 40px 80px",
@@ -1503,13 +1461,10 @@ input:focus, textarea:focus, select:focus {
               minHeight: "100vh",
             },
             triggers: [
-              {
-                event: "load",
-                action: "loadCartFromLocal",
-              },
+              
               {
                 event: "load", // ✅ ADD THIS
-                source: "products.api", // This will fetch products
+                source: "cart.get", // This will fetch products
               },
             ],
           },

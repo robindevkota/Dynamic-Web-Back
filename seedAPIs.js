@@ -10,13 +10,13 @@ mongoose.connect(
 );
 
 const apiConfigs = [
-{
-  key: "products.filter",
-  name: "Filter Products",
-  description: "Filter products with multiple criteria",
-  url: "https://fakestoreapi.com/products",
-  method: "GET",
-  transformPayload: `(function(payload) {
+  {
+    key: "products.filter",
+    name: "Filter Products",
+    description: "Filter products with multiple criteria",
+    url: "https://fakestoreapi.com/products",
+    method: "GET",
+    transformPayload: `(function(payload) {
     console.log("=== TRANSFORM_PAYLOAD DEBUG ===");
     console.log("📦 Payload received:", payload);
     
@@ -53,70 +53,73 @@ const apiConfigs = [
     
     return finalUrl;
   })`,
-  successNotification: {
-    type: "toast", 
-    message: "Filters applied successfully",
-    background: "#10b981",
+    successNotification: {
+      type: "toast",
+      message: "Filters applied successfully",
+      background: "#10b981",
+    },
+    storeResponse: true,
+    storeKey: "products.api_filtered",
   },
-  storeResponse: true,
-  storeKey: "products.api_filtered",
-},
 
-// In your seedAPIs.js, REPLACE the auth.login config with this:
+  // In your seedAPIs.js, REPLACE the auth.login config with this:
 
-{
-  key: "auth.login",
-  name: "User Login",
-  isActive: true,
-  description: "Authenticates user and returns JWT token",
-  url: "https://jsonplaceholder.typicode.com/posts",
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  transformPayload: `
+  {
+    key: "auth.login",
+    name: "User Login",
+    isActive: true,
+    description: "Authenticates user and returns JWT token",
+    url: "https://jsonplaceholder.typicode.com/posts",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformPayload: `
     (payload) => ({
       email: payload.email,
       password: payload.password
     })
   `,
-  successNotification: {
-    type: "toast",
-    message: "Welcome back! Login successful!",
-    background: "#10b981",
-    duration: 2000,
-  },
-  errorNotification: {
-    type: "toast",
-    message: "Invalid credentials. Please try again.",
-    background: "#ef4444",
-    duration: 3000,
-  },
-  closeModalOnSuccess: false,
-  storeResponse: true,
-  storeKey: "authResponse",
-  
-  // ✅ FIX: Proper array of objects format
-  onSuccess: [
-    {
-      action: "setAuthToken",
-      actionParams: { token: "mock-jwt-token-12345" }
+    successNotification: {
+      type: "toast",
+      message: "Welcome back! Login successful!",
+      background: "#10b981",
+      duration: 2000,
     },
-    {
-      action: "setAuthUser",
-      actionParams: {}
+    errorNotification: {
+      type: "toast",
+      message: "Invalid credentials. Please try again.",
+      background: "#ef4444",
+      duration: 3000,
     },
-    {
-      action: "navigate",
-      actionParams: { url: "/greenhaven" }
-    }
-  ],
-  
-  onError: [{ action: "console", actionParams: { message: "Login failed" } }],
-  onNetworkError: { action: "console", actionParams: { message: "Network error occurred" } },
-  tags: ["auth", "login", "authentication"],
-  projectUUID: "global",
-},
+    closeModalOnSuccess: false,
+    storeResponse: true,
+    storeKey: "authResponse",
+
+    // ✅ FIX: Proper array of objects format
+    onSuccess: [
+      {
+        action: "setAuthToken",
+        actionParams: { token: "mock-jwt-token-12345" },
+      },
+      {
+        action: "setAuthUser",
+        actionParams: {},
+      },
+      {
+        action: "navigate",
+        actionParams: { url: "/greenhaven" },
+      },
+    ],
+
+    onError: [{ action: "console", actionParams: { message: "Login failed" } }],
+    onNetworkError: {
+      action: "console",
+      actionParams: { message: "Network error occurred" },
+    },
+    tags: ["auth", "login", "authentication"],
+    projectUUID: "global",
+  },
 
   // ✅ FIXED: SIGNUP API - Now sends name, email, and password correctly
   {
@@ -157,22 +160,22 @@ const apiConfigs = [
     tags: ["auth", "signup", "registration"],
     projectUUID: "global",
   },
-   {
+  {
     key: "user.profile",
-    name: "Get User Profile", 
-    
+    name: "Get User Profile",
+
     description: "Fetches current user profile data",
     url: "https://jsonplaceholder.typicode.com/users/1",
     method: "GET",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     transformPayload: "",
     successNotification: {
       type: "none",
     },
     errorNotification: {
-      type: "toast", 
+      type: "toast",
       message: "Failed to load profile",
       background: "#ef4444",
       duration: 3000,
@@ -182,7 +185,7 @@ const apiConfigs = [
     storeKey: "userProfile",
     onSuccess: ["console:User profile loaded successfully"],
     onError: ["console:Failed to load user profile"],
-    onNetworkError: "console:Network error while loading profile", 
+    onNetworkError: "console:Network error while loading profile",
     tags: ["user", "profile", "account"],
     projectUUID: "global",
   },
@@ -299,17 +302,16 @@ const apiConfigs = [
   },
 
   // ✅ NEW: GET USER PROFILE
- 
 
   // ✅ NEW: UPDATE USER PROFILE
   {
     key: "user.update",
     name: "Update User Profile",
-    description: "Updates user profile information", 
+    description: "Updates user profile information",
     url: "https://jsonplaceholder.typicode.com/users/1",
     method: "PUT",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     transformPayload: `
       (payload) => ({
@@ -326,7 +328,7 @@ const apiConfigs = [
     successNotification: {
       type: "toast",
       message: "Profile updated successfully!",
-      background: "#10b981", 
+      background: "#10b981",
       duration: 3000,
     },
     errorNotification: {
@@ -340,56 +342,72 @@ const apiConfigs = [
     storeKey: "updatedProfile",
     onSuccess: [
       "setAuth:user={{updatedProfile}}",
-      "console:Profile updated successfully"
+      "console:Profile updated successfully",
     ],
     onError: ["console:Failed to update profile"],
     onNetworkError: "console:Network error while updating profile",
     tags: ["user", "profile", "update"],
     projectUUID: "global",
   },
- 
 
-// Add these to your apiConfigs array in seedAPIs.js
+  // Add these to your apiConfigs array in seedAPIs.js
 
-{
-  key: "cart.get",
-  name: "Get Cart Items",
-  description: "Fetches current cart items from localStorage",
-  url: "local://cart", // Special URL for local operations
-  method: "GET",
-  transformPayload: `
-    (payload) => {
-      // Return cart from localStorage
-      try {
-        const cart = JSON.parse(localStorage.getItem('shopzone_cart') || '[]');
-        console.log('📦 Cart loaded:', cart);
-        return { data: cart, count: cart.length };
-      } catch (e) {
-        console.error('Error loading cart:', e);
-        return { data: [], count: 0 };
+  {
+    key: "cart.get",
+    name: "Get Cart Items",
+    description: "Fetches cart items (demo data from FakeStoreAPI)",
+    url: "https://fakestoreapi.com/products?limit=2",
+    method: "GET",
+    successNotification: { type: "none" },
+    storeResponse: true,
+    storeKey: "cartItems", // Changed from "cart" to match your widget
+    transformResponse: `
+    (response) => {
+      // Transform the fake store products into cart format
+      console.log('🛒 Transforming products to cart items:', response);
+      
+      if (Array.isArray(response)) {
+        // Add quantity and other cart-specific fields
+        const cartItems = response.map(product => ({
+          id: product.id,
+          title: product.title,
+          price: product.price,
+          image: product.image,
+          category: product.category,
+          quantity: 1, // Default quantity
+          total: product.price
+        }));
+        
+        // Calculate total items count
+        const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+        
+        return {
+          cartItems: cartItems,
+          cartCount: cartCount,
+          subtotal: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+        };
       }
+      
+      return { cartItems: [], cartCount: 0, subtotal: 0 };
     }
   `,
-  successNotification: { type: "none" },
-  storeResponse: true,
-  storeKey: "cart",
-  tags: ["cart", "ecommerce"],
-  projectUUID: "global",
-},
-// In seedAPIs.js - REPLACE your cart.add config:
-
-// In seedAPIs.js - REPLACE your cart.add config:
-
-{
-  key: "cart.add",
-  name: "Add to Cart",
-  description: "Adds product to shopping cart via API",
-  url: "https://fakestoreapi.com/carts",
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
+    tags: ["cart", "ecommerce", "demo"],
+    projectUUID: "global",
   },
-  transformPayload: `
+  // In seedAPIs.js - REPLACE your cart.add config:
+
+  // In seedAPIs.js - REPLACE your cart.add config:
+
+  {
+    key: "cart.add",
+    name: "Add to Cart",
+    description: "Adds product to shopping cart via API",
+    url: "https://fakestoreapi.com/carts",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    transformPayload: `
     (payload) => {
       console.log("🛒 Add to cart API - Payload:", payload);
       
@@ -411,46 +429,45 @@ const apiConfigs = [
       };
     }
   `,
-  
-  // ✅ FIX: Set to "none" - notification handled by storeCartLocally action
-  successNotification: {
-    type: "none"
-  },
-  
-  errorNotification: {
-    type: "toast",
-    message: "Failed to add to cart",
-    background: "#ef4444",
-    duration: 3000,
-  },
-  
-  storeResponse: true,
-  storeKey: "cartAddResponse",
-  
-  // ✅ This action shows the notification
-  onSuccess: [
-    {
-      action: "storeCartLocally",
-      actionParams: {}
+
+    // ✅ FIX: Set to "none" - notification handled by storeCartLocally action
+    successNotification: {
+      type: "none",
     },
-    {
-      action: "closeModal",
-      actionParams: {}
-    }
-  ],
-  
-  tags: ["cart", "ecommerce"],
-  projectUUID: "global",
-},
 
+    errorNotification: {
+      type: "toast",
+      message: "Failed to add to cart",
+      background: "#ef4444",
+      duration: 3000,
+    },
 
-{
-  key: "cart.remove",
-  name: "Remove from Cart",
-  description: "Removes item from cart",
-  url: "local://cart/remove",
-  method: "DELETE",
-  transformPayload: `
+    storeResponse: true,
+    storeKey: "cartAddResponse",
+
+    // ✅ This action shows the notification
+    onSuccess: [
+      {
+        action: "storeCartLocally",
+        actionParams: {},
+      },
+      {
+        action: "closeModal",
+        actionParams: {},
+      },
+    ],
+
+    tags: ["cart", "ecommerce"],
+    projectUUID: "global",
+  },
+
+  {
+    key: "cart.remove",
+    name: "Remove from Cart",
+    description: "Removes item from cart",
+    url: "local://cart/remove",
+    method: "DELETE",
+    transformPayload: `
     (payload) => {
       console.log("🗑️ Removing from cart:", payload);
       
@@ -478,30 +495,30 @@ const apiConfigs = [
       }
     }
   `,
-  successNotification: {
-    type: "toast",
-    message: "🗑️ Removed from cart",
-    background: "#ef4444",
-    duration: 2000,
+    successNotification: {
+      type: "toast",
+      message: "🗑️ Removed from cart",
+      background: "#ef4444",
+      duration: 2000,
+    },
+    storeResponse: true,
+    storeKey: "cartResponse",
+    onSuccess: [
+      "setData:cart.count={{cartResponse.count}}",
+      "setData:cart.items={{cartResponse.cart}}",
+      "triggerRefresh:cartItems",
+    ],
+    tags: ["cart", "ecommerce"],
+    projectUUID: "global",
   },
-  storeResponse: true,
-  storeKey: "cartResponse",
-  onSuccess: [
-    "setData:cart.count={{cartResponse.count}}",
-    "setData:cart.items={{cartResponse.cart}}",
-    "triggerRefresh:cartItems"
-  ],
-  tags: ["cart", "ecommerce"],
-  projectUUID: "global",
-},
 
-{
-  key: "cart.updateQuantity",
-  name: "Update Cart Quantity",
-  description: "Updates item quantity in cart",
-  url: "local://cart/update",
-  method: "PATCH",
-  transformPayload: `
+  {
+    key: "cart.updateQuantity",
+    name: "Update Cart Quantity",
+    description: "Updates item quantity in cart",
+    url: "local://cart/update",
+    method: "PATCH",
+    transformPayload: `
     (payload) => {
       console.log("🔢 Updating quantity:", payload);
       
@@ -538,22 +555,21 @@ const apiConfigs = [
       }
     }
   `,
-  successNotification: {
-    type: "toast",
-    message: "✅ Quantity updated",
-    background: "#10b981",
-    duration: 1500,
+    successNotification: {
+      type: "toast",
+      message: "✅ Quantity updated",
+      background: "#10b981",
+      duration: 1500,
+    },
+    storeResponse: true,
+    storeKey: "cartResponse",
+    onSuccess: [
+      "setData:cart.items={{cartResponse.cart}}",
+      "setData:cart.count={{cartResponse.count}}",
+    ],
+    tags: ["cart", "ecommerce"],
+    projectUUID: "global",
   },
-  storeResponse: true,
-  storeKey: "cartResponse",
-  onSuccess: [
-    "setData:cart.items={{cartResponse.cart}}",
-    "setData:cart.count={{cartResponse.count}}"
-  ],
-  tags: ["cart", "ecommerce"],
-  projectUUID: "global",
-}
- 
 ];
 
 const seed = async () => {
@@ -562,27 +578,33 @@ const seed = async () => {
     console.log("🗑️  Cleared old API configs");
 
     // ✅ FIX: Add isActive: true to ALL configs automatically
-    const configsWithActive = apiConfigs.map(config => ({
+    const configsWithActive = apiConfigs.map((config) => ({
       ...config,
-      isActive: true
+      isActive: true,
     }));
 
     await APIConfig.insertMany(configsWithActive);
     console.log("✅ Seeded", configsWithActive.length, "API configurations");
-    
+
     // ✅ Verify they were saved with isActive
     const activeCount = await APIConfig.countDocuments({ isActive: true });
     console.log(`✅ Active APIs in database: ${activeCount}`);
-    
+
     console.log("\n📝 AUTH API PAYLOAD INFO:");
     console.log("   🔐 LOGIN (auth.login):");
-    console.log("      Sends: { email: payload.email, password: payload.password }");
-    console.log("   👤 SIGNUP (auth.signup):"); 
-    console.log("      Sends: { name: payload.name, email: payload.email, password: payload.password, username: ... }");
+    console.log(
+      "      Sends: { email: payload.email, password: payload.password }"
+    );
+    console.log("   👤 SIGNUP (auth.signup):");
+    console.log(
+      "      Sends: { name: payload.name, email: payload.email, password: payload.password, username: ... }"
+    );
     console.log("   🔑 FORGOT PASSWORD (auth.forgot):");
     console.log("      Sends: { email: payload.email }");
     console.log("\n💡 Using JSONPlaceholder - any email/password will work!");
-    console.log("💡 Form field names must match payload keys (email, password, name, etc.)");
+    console.log(
+      "💡 Form field names must match payload keys (email, password, name, etc.)"
+    );
 
     mongoose.disconnect();
   } catch (err) {
