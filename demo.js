@@ -157,402 +157,321 @@ input:focus, textarea:focus, select:focus {
         "cart.updateQuantity",
       ],
       // In your demo.js - COMPLETE replacement for all built-in actions
+      // Add these to your initialization.actions in demo.js
+
       actions: {
-        // In your demo.js, ADD these actions to initialization.actions:
-
-        setAuthToken: `
-  console.log("🔐 Setting auth token");
-  
-  // Generate a mock token (or use the one from actionParams)
-  const token = context.actionParams?.token || \`mock-jwt-\${Date.now()}\`;
-  
-  console.log("💾 Token:", token);
-  
-  // Store in localStorage
-  context.handlers.setAuthData('token', token);
-  
-  // Update state
-  context.handlers.setData(prev => ({
-    ...prev,
-    auth: context.handlers.getAuthData(),
-  }));
-  
-  console.log("✅ Auth token set");
-`,
-
-        setAuthUser: `
-  console.log("👤 Setting auth user");
-  
-  // Get email from payload (the API response)
-  const email = context.payload?.email || context.actionParams?.email;
-  
-  if (!email) {
-    console.error("❌ No email found in payload");
-    return;
-  }
-  
-  console.log("💾 User email:", email);
-  
-  // Store in localStorage
-  context.handlers.setAuthData('user', email);
-  
-  // Update state
-  context.handlers.setData(prev => ({
-    ...prev,
-    auth: context.handlers.getAuthData(),
-  }));
-  
-  console.log("✅ Auth user set");
-`,
-        // ========== NAVIGATION ACTIONS ==========
-        navigate: `
-  console.log("🧭 Navigation Context:", {
-    actionParams: context.actionParams,
-    url: context.actionParams?.url,
-    fullContext: context
-  });
-  
-  let url = context.actionParams?.url;
-  
-  if (!url) {
-    console.error("❌ No URL provided for navigation");
-    context.handlers.showNotification({
-      message: "Navigation error: No destination specified",
-      background: "#ef4444"
-    });
-    return;
-  }
-  
-  // Resolve templates in URL
-  if (url.includes('{{')) {
-    try {
-      console.log("🔍 Resolving templates in URL:", url);
-      url = context.handlers.resolveTemplate(url, {
+        navigateToPage: `
+    const url = context.actionParams?.url;
+    
+    if (!url) {
+      console.error("❌ No URL provided");
+      context.handlers.showNotification({
+        message: "Navigation error: No URL specified",
+        background: "#ef4444"
+      });
+      return;
+    }
+    
+    console.log("🧭 Navigating to:", url);
+    
+    // Resolve templates if needed
+    let resolvedUrl = url;
+    if (url.includes('{{')) {
+      const templateContext = {
         auth: context.handlers.getAuthData(),
         data: context.data,
-        formData: context.formData,
-        modalFormData: context.modalFormData
-      });
-      console.log("🔍 Resolved URL:", url);
-    } catch (error) {
-      console.error("❌ Template resolution failed:", error);
+        form: context.formData,
+        modal: context.modalFormData,
+      };
+      resolvedUrl = context.handlers.resolveTemplate(url, templateContext);
     }
-  }
-  
-  // Validate URL
-  if (url === 'undefined' || url === 'null' || url.trim() === '') {
-    console.error("❌ Invalid URL after resolution:", url);
-    return;
-  }
-  
-  console.log("🚀 Navigating to:", url);
-  window.location.href = url;
-`,
+    
+    // Navigate
+    window.location.href = resolvedUrl;
+  `,
 
-        scroll: `
-    const target = context.actionParams?.target;
+        // Scroll to element
+        scrollToElement: `
+    const target = context.actionParams?.target || context.actionParams?.selector;
+    
+    if (!target) {
+      console.error("❌ No scroll target specified");
+      return;
+    }
+    
     console.log("🎯 Scrolling to:", target);
     
-    if (target.startsWith('#')) {
-      document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
-    }
-  `,
-
-        // ========== MODAL ACTIONS ==========
-        openModal: `
-    const modalName = context.actionParams?.modal;
-    console.log("🎭 Opening modal:", modalName);
+    // Handle both ID and selector formats
+    const selector = target.startsWith('#') ? target : '#' + target;
+    const element = document.querySelector(selector);
     
-    context.handlers.setActiveModal(modalName);
-    context.handlers.setModalFormData({});
-    context.handlers.setFieldErrors({});
-    
-    // Pass selected product if available
-    if (context.payload?.selectedProduct) {
-      context.handlers.setData('selectedProduct', context.payload.selectedProduct);
-    }
-  `,
-
-        closeModal: `
-    console.log("❌ Closing modal");
-    context.handlers.setActiveModal(null);
-    context.handlers.setModalFormData({});
-    context.handlers.setFieldErrors({});
-  `,
-
-        // ========== API ACTIONS ==========
-        // REPLACE the 'api' action in your demo.js initialization.actions with this:
-
-        api: `
-  console.log("🚀 === API ACTION START ===");
-  
-  // ✅ Extract apiKey from actionParams
-  const apiKey = context.actionParams?.apiKey;
-  
-  // ✅ Get form data (could be from payload, modalFormData, or formData)
-  const formDataToUse = context.payload || context.modalFormData || context.formData || {};
-  
-  console.log("🔍 API Action Context:", {
-    apiKey: apiKey,
-    actionParams: context.actionParams,
-    payload: context.payload,
-    modalFormData: context.modalFormData,
-    formData: context.formData,
-    hasConfig: !!context.config,
-    hasResolvedAPIs: !!context.config?.resolvedAPIs,
-    availableAPIs: context.config?.resolvedAPIs ? Object.keys(context.config.resolvedAPIs) : []
-  });
-
-  if (!apiKey) {
-    const errorMsg = "❌ No apiKey provided for API action";
-    console.error(errorMsg);
-    console.error("📋 Context available:", {
-      actionParams: context.actionParams,
-      actionConfig: context.actionConfig
-    });
-    context.handlers.showNotification({
-      message: "API configuration error: No API key specified",
-      background: "#ef4444"
-    });
-    throw new Error(errorMsg);
-  }
-
-  // ✅ Check if API exists in config
-  const apiResource = context.config?.resolvedAPIs?.[apiKey];
-  if (!apiResource) {
-    const errorMsg = \`❌ API resource not found: \${apiKey}\`;
-    console.error(errorMsg);
-    console.log("📋 Available APIs:", Object.keys(context.config?.resolvedAPIs || {}));
-    context.handlers.showNotification({
-      message: \`API '\${apiKey}' not configured\`,
-      background: "#ef4444"
-    });
-    throw new Error(errorMsg);
-  }
-
-  console.log("✅ API Resource found:", {
-    url: apiResource.url,
-    method: apiResource.method,
-    hasTransform: !!apiResource.transformPayload
-  });
-
-  // ✅ Check if handleApiCall function exists
-  if (typeof context.handlers?.handleApiCall !== 'function') {
-    const errorMsg = "❌ handleApiCall function not available";
-    console.error(errorMsg);
-    context.handlers.showNotification({
-      message: "System error: API handler not available",
-      background: "#ef4444"
-    });
-    throw new Error(errorMsg);
-  }
-
-  try {
-    console.log("📡 Calling handleApiCall with:", {
-      apiKey: apiKey,
-      payload: formDataToUse,
-      actionConfig: context.actionConfig
-    });
-    
-    await context.handlers.handleApiCall(apiKey, formDataToUse, context.actionConfig);
-    
-    console.log("✅ API action completed successfully");
-  } catch (error) {
-    console.error("❌ API call failed:", error);
-    context.handlers.showNotification({
-      message: "API call failed: " + (error.message || "Unknown error"),
-      background: "#ef4444"
-    });
-    throw error;
-  }
-`,
-        debugButtonClick: `
-  console.log("🔍 Button Click Debug:", {
-    actionParams: context.actionParams,
-    actionConfig: context.actionConfig,
-    payload: context.payload,
-    hasApiKey: !!context.actionParams?.apiKey,
-    apiKey: context.actionParams?.apiKey
-  });
-  
-  if (context.actionParams?.apiKey) {
-    context.handlers.showNotification({
-      message: "API Key found: " + context.actionParams.apiKey,
-      background: "#10b981"
-    });
-  } else {
-    context.handlers.showNotification({
-      message: "No API key in actionParams",
-      background: "#ef4444"
-    });
-  }
-`,
-
-        // ========== FORM ACTIONS ==========
-        resetForm: `
-    console.log("🔄 Resetting form");
-    const formType = context.actionParams?.formType || 'main'; // 'main' or 'modal'
-    
-    if (formType === 'modal') {
-      context.handlers.setModalFormData({});
-    } else {
-      context.handlers.setFormData({});
-    }
-    
-    context.handlers.setFieldErrors({});
-    
-    // Reset filtered data if needed
-    if (context.actionParams?.resetFilters) {
-      context.handlers.setData(prev => ({
-        ...prev,
-        "products.api_filtered": prev["products.api"],
-      }));
-    }
-  `,
-
-        validateForm: `
-    console.log("📝 Validating form");
-    const formType = context.actionParams?.formType || 'main';
-    const formData = formType === 'modal' ? context.modalFormData : context.formData;
-    const formConfig = context.actionParams?.formConfig;
-    
-    if (!formConfig) {
-      console.error("❌ No form configuration provided for validation");
-      return false;
-    }
-    
-    const { isValid, errors } = context.handlers.validateAllFields(formConfig, formData);
-    
-    if (!isValid) {
-      context.handlers.setFieldErrors(errors);
-      context.handlers.showNotification({
-        message: "Please fix the errors before submitting",
-        background: "#ef4444",
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: "smooth",
+        block: "start"
       });
-      return false;
+      console.log("✅ Scrolled to element");
+    } else {
+      console.error("❌ Element not found:", selector);
     }
-    
-    return true;
   `,
 
-        // ========== AUTHENTICATION ACTIONS ==========
-        setAuth: `
-    const key = context.actionParams?.key;
-    const value = context.actionParams?.value;
-    
-    console.log("🔐 Setting auth:", key, "=", value);
-    context.handlers.setAuthData(key, value);
-
-    // Update state
-    context.handlers.setData(prev => ({
-      ...prev,
-      auth: context.handlers.getAuthData(),
-    }));
-  `,
-
-        clearAuth: `
-    console.log("🚪 Logging out...");
-    context.handlers.clearAuthData();
-    context.handlers.setData(prev => ({
-      ...prev,
-      auth: { token: null, user: { email: null }, isAuthenticated: false },
-    }));
-    context.handlers.showNotification({
-      type: "toast",
-      message: "Logged out successfully",
-      background: "#10b981",
+        // Smooth scroll to top
+        scrollToTop: `
+    console.log("⬆️ Scrolling to top");
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
     });
   `,
 
-        requireAuth: `
-    const authData = context.handlers.getAuthData();
-    if (!authData.isAuthenticated) {
-      console.log("🔒 Auth required - showing login modal");
-      context.handlers.setActiveModal("authModal");
-      context.handlers.showNotification({
-        type: "toast",
-        message: "Please login to continue",
-        background: "#f59e0b",
-      });
-      return false;
+        // Open external link
+        openLink: `
+    const url = context.actionParams?.url;
+    const newTab = context.actionParams?.newTab !== false; // default true
+    
+    if (!url) {
+      console.error("❌ No URL provided");
+      return;
     }
-    console.log("✅ User is authenticated");
-    return true;
+    
+    console.log("🔗 Opening link:", url);
+    
+    if (newTab) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      window.location.href = url;
+    }
   `,
 
-        // ========== BROWSER ACTIONS ==========
+        // Go back in history
+        goBack: `
+    console.log("↩️ Going back");
+    window.history.back();
+  `,
         reload: `
     console.log("🔄 Reloading page");
     window.location.reload();
   `,
 
-        back: `
-    console.log("↩️ Going back");
-    window.history.back();
+        // ✅ ADD THIS - Close modal action
+        closeModal: `
+    console.log("❌ Closing modal");
+    context.handlers.setActiveModal(null);
+  `,
+        // Reload page
+        reloadPage: `
+    console.log("🔄 Reloading page");
+    const force = context.actionParams?.force || false;
+    if (force) {
+      window.location.reload();
+    } else {
+      window.location.reload();
+    }
   `,
 
-        console: `
-    const message = context.actionParams?.message;
-    console.log("📝 Console log:", message);
+        // Combined actions (execute multiple)
+        executeSequence: `
+    const actions = context.actionParams?.actions || [];
+    
+    console.log("🎬 Executing action sequence:", actions.length);
+    
+    for (const actionItem of actions) {
+      if (typeof actionItem === 'string') {
+        await context.handlers.handleAction(actionItem, {}, context.payload);
+      } else if (actionItem.action) {
+        await context.handlers.handleAction(
+          actionItem.action, 
+          actionItem, 
+          context.payload
+        );
+      }
+    }
+    
+    console.log("✅ Sequence completed");
   `,
 
-        // Add this temporary debug action
-        // Update your debugNavigation action to show what's REALLY available
-        debugNavigation: `
-  console.log("🐛 DEBUG Full Context:", {
-    // All available data
-    data: context.data,
-    formData: context.formData, 
-    modalFormData: context.modalFormData,
-    payload: context.payload,
+        // Conditional action
+        conditionalAction: `
+    const condition = context.actionParams?.condition;
+    const ifTrue = context.actionParams?.ifTrue;
+    const ifFalse = context.actionParams?.ifFalse;
     
-    // Action configuration
-    actionParams: context.actionParams,
-    actionConfig: context.actionConfig,
-    
-    // Auth state
-    auth: context.handlers.getAuthData(),
-    
-    // Available handlers
-    handlers: Object.keys(context.handlers)
-  });
-  
-  // Test template resolution
-  const testTemplate = "{{auth.token ? 'logged-in' : 'logged-out'}}";
-  try {
-    const resolved = context.handlers.resolveTemplate(testTemplate, {
-      auth: context.handlers.getAuthData(),
-      data: context.data
-    });
-    console.log("🔍 Template test:", testTemplate, "->", resolved);
-  } catch (error) {
-    console.error("❌ Template resolution failed:", error);
-  }
-`,
-        // ========== CART ACTIONS ==========
-        storeCartLocally: `
-    console.log("💾 Storing cart locally");
-    
-    const product = context.modalFormData?.selectedProduct || context.payload?.selectedProduct;
-    const quantity = parseInt(context.modalFormData?.quantity) || 1;
-
-    if (!product) {
-      console.error("❌ No product to store");
+    if (!condition) {
+      console.error("❌ No condition provided");
       return;
     }
+    
+    // Resolve condition template
+    const templateContext = {
+      auth: context.handlers.getAuthData(),
+      data: context.data,
+      form: context.formData,
+      modal: context.modalFormData,
+    };
+    
+    const resolved = context.handlers.resolveTemplate(
+      condition, 
+      templateContext
+    );
+    
+    const shouldExecute = resolved === true || 
+                         resolved === 'true' || 
+                         resolved === 1;
+    
+    console.log("🔀 Condition result:", shouldExecute);
+    
+    if (shouldExecute && ifTrue) {
+      await context.handlers.handleAction(ifTrue, {}, context.payload);
+    } else if (!shouldExecute && ifFalse) {
+      await context.handlers.handleAction(ifFalse, {}, context.payload);
+    }
+  `,
 
-    // Get existing cart
+        // Show/hide element
+        toggleElement: `
+    const selector = context.actionParams?.selector;
+    const show = context.actionParams?.show;
+    
+    if (!selector) {
+      console.error("❌ No selector provided");
+      return;
+    }
+    
+    const element = document.querySelector(selector);
+    if (!element) {
+      console.error("❌ Element not found:", selector);
+      return;
+    }
+    
+    if (show !== undefined) {
+      element.style.display = show ? 'block' : 'none';
+    } else {
+      // Toggle
+      element.style.display = 
+        element.style.display === 'none' ? 'block' : 'none';
+    }
+  `,
+
+        // Wait/delay
+        delay: `
+    const ms = context.actionParams?.ms || 1000;
+    console.log(\`⏱️ Delaying \${ms}ms\`);
+    await new Promise(resolve => setTimeout(resolve, ms));
+  `,
+
+        // Log to console
+        logDebug: `
+    const message = context.actionParams?.message || "Debug log";
+    const data = context.actionParams?.data;
+    
+    console.log("🔍 DEBUG:", message);
+    if (data) {
+      console.log("📦 Data:", data);
+    }
+    console.log("📊 Full Context:", {
+      actionParams: context.actionParams,
+      payload: context.payload,
+      formData: context.formData,
+      modalFormData: context.modalFormData,
+      data: context.data,
+    });
+  `,
+        // In demo.js - Find and REPLACE the loadCartFromLocal action:
+
+loadCartFromLocal: `
+  console.log("📥 Loading cart from localStorage");
+  
+  try {
+    // Get cart from localStorage
+    const cartJson = localStorage.getItem("shopzone_cart");
+    console.log("📝 Raw cart JSON:", cartJson);
+    
+    const cart = JSON.parse(cartJson || "[]");
+    console.log("📦 Parsed cart:", cart);
+    
+    // Calculate totals
+    const count = cart.length;
+    const total = cart.reduce((sum, item) => {
+      return sum + (item.price * item.quantity);
+    }, 0);
+    
+    console.log("📊 Cart stats:", { count, total, items: cart.length });
+    
+    // ✅ CRITICAL: Update DataStore with HANDLERS
+    context.handlers.setData('cartCount', count);
+    context.handlers.setData('cartItems', cart);
+    context.handlers.setData('cartTotal', total);
+    
+    console.log("✅ Cart data loaded into DataStore");
+    console.log("   - cartCount:", count);
+    console.log("   - cartItems length:", cart.length);
+    console.log("   - cartTotal:", total);
+    
+    // Force UI update
+    if (context.handlers.setRenderKey) {
+      context.handlers.setRenderKey(prev => prev + 1);
+    }
+    
+    return { success: true, cart, count, total };
+    
+  } catch (error) {
+    console.error("❌ Error loading cart:", error);
+    
+    // Reset on error
+    context.handlers.setData('cartCount', 0);
+    context.handlers.setData('cartItems', []);
+    context.handlers.setData('cartTotal', 0);
+    
+    return { 
+      success: false, 
+      error: error.message, 
+      cart: [], 
+      count: 0, 
+      total: 0 
+    };
+  }
+`,
+
+        // ✅ FIXED: Add to Cart
+        // In demo.js - Find and REPLACE the storeCartLocally action:
+
+        storeCartLocally: `
+  console.log("💾 Storing cart locally - DATASTORE VERSION");
+  
+  // Get product from DataStore
+  const product = context.data?.selectedProduct;
+  const quantity = parseInt(context.modalFormData?.quantity) || 1;
+
+  console.log("📦 Product from DataStore:", product);
+  console.log("🔢 Quantity:", quantity);
+
+  if (!product || !product.id) {
+    console.error("❌ No product in DataStore");
+    
+    // Show error notification
+    context.handlers.showNotification({
+      type: "toast",
+      message: "❌ Error: Product data not found",
+      background: "#ef4444",
+      duration: 3000,
+    });
+    
+    return { success: false };
+  }
+
+  try {
+    // Get existing cart from localStorage
     const cart = JSON.parse(localStorage.getItem("shopzone_cart") || "[]");
+    console.log("🛒 Current cart:", cart);
 
-    // Check if product exists
+    // Check if product already exists
     const existingIndex = cart.findIndex(item => item.id === product.id);
 
     if (existingIndex !== -1) {
       // Update quantity
       cart[existingIndex].quantity += quantity;
-      console.log(\`📦 Updated product quantity: \${product.title} -> \${cart[existingIndex].quantity}\`);
+      console.log(\`📦 Updated: \${product.title} -> qty: \${cart[existingIndex].quantity}\`);
     } else {
       // Add new item
       cart.push({
@@ -563,62 +482,314 @@ input:focus, textarea:focus, select:focus {
         quantity: quantity,
         category: product.category,
       });
-      console.log(\`🆕 Added new product to cart: \${product.title}\`);
+      console.log(\`🆕 Added: \${product.title}\`);
     }
 
     // Save to localStorage
     localStorage.setItem("shopzone_cart", JSON.stringify(cart));
+    console.log("💾 Saved to localStorage:", cart);
 
-    console.log("✅ Cart stored locally:", cart);
-
-    // Update cart count in state
-    context.handlers.setData(prev => ({
-      ...prev,
-      cartCount: cart.length,
-      cartTotal: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-    }));
-  `,
-
-        // ========== NOTIFICATION ACTIONS ==========
-        notify: `
-    const type = context.actionParams?.type || 'info';
-    const message = context.actionParams?.message || 'Notification';
+    // Update DataStore
+    const newCount = cart.length;
+    const newTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    console.log(\`💬 Showing \${type} notification: \${message}\`);
+    context.handlers.setData('cartCount', newCount);
+    context.handlers.setData('cartItems', cart);
+    context.handlers.setData('cartTotal', newTotal);
     
-    const backgrounds = {
-      success: "#10b981",
-      error: "#ef4444", 
-      warning: "#f59e0b",
-      info: "#3b82f6"
-    };
+    console.log("✅ DataStore updated:", { 
+      cartCount: newCount, 
+      cartItems: cart.length + " items",
+      cartTotal: newTotal 
+    });
     
+    // ✅ CRITICAL: Show success notification
     context.handlers.showNotification({
       type: "toast",
-      message: message,
-      background: backgrounds[type] || "#3b82f6"
+      message: \`✅ \${product.title} added to cart!\`,
+      background: "#10b981",
+      duration: 2500,
     });
+    
+    console.log("🎉 Notification shown!");
+    
+    return { success: true, cart, count: newCount, total: newTotal };
+
+  } catch (error) {
+    console.error("❌ Error storing cart:", error);
+    
+    // Show error notification
+    context.handlers.showNotification({
+      type: "toast",
+      message: "❌ Failed to add to cart",
+      background: "#ef4444",
+      duration: 3000,
+    });
+    
+    return { success: false, error: error.message };
+  }
+`,
+
+        // ✅ FIXED: Refresh Cart Display
+refreshCartDisplay: `
+  console.log("🔄 Refreshing cart display");
+  
+  try {
+    const cart = JSON.parse(localStorage.getItem("shopzone_cart") || "[]");
+    const count = cart.length;
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    console.log("📊 Refreshing with:", { count, items: cart.length, total });
+    
+    // ✅ FIX: Use handlers
+    context.handlers.setData('cartCount', count);
+    context.handlers.setData('cartItems', cart);
+    context.handlers.setData('cartTotal', total);
+    
+    console.log("✅ Cart display refreshed in DataStore");
+    
+  } catch (error) {
+    console.error("❌ Error refreshing cart:", error);
+  }
+`,
+
+        // ✅ FIXED: Refresh Cart (alias)
+refreshCart: `
+  console.log("🔄 Refreshing cart data");
+  try {
+    const cart = JSON.parse(localStorage.getItem("shopzone_cart") || "[]");
+    const count = cart.length;
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    console.log("📊 Cart refresh:", { count, total, items: cart });
+    
+    // ✅ FIX: Use handlers
+    context.handlers.setData('cartCount', count);
+    context.handlers.setData('cartItems', cart);
+    context.handlers.setData('cartTotal', total);
+    
+    console.log("✅ Cart refreshed");
+    return { success: true, count, items: cart, total };
+    
+  } catch (error) {
+    console.error("❌ Error refreshing cart:", error);
+    return { success: false, error: error.message };
+  }
+`,
+
+        // ✅ FIXED: Remove from Cart
+        removeFromCart: `
+    console.log("🗑️ Removing from cart");
+    
+    try {
+      const productId = context.actionParams?.productId || context.payload?.id;
+      
+      if (!productId) {
+        console.error("❌ No product ID provided");
+        return { success: false };
+      }
+      
+      const cart = JSON.parse(localStorage.getItem("shopzone_cart") || "[]");
+      const newCart = cart.filter(item => item.id !== productId);
+      
+      localStorage.setItem("shopzone_cart", JSON.stringify(newCart));
+      
+      // ✅ FIX: Update DataStore
+      const newCount = newCart.length;
+      const newTotal = newCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      context.handlers.setData('cartCount', newCount);
+      context.handlers.setData('cartItems', newCart);
+      context.handlers.setData('cartTotal', newTotal);
+      
+      console.log("✅ Item removed, cart updated");
+      
+      context.handlers.showNotification({
+        message: "🗑️ Removed from cart",
+        background: "#ef4444"
+      });
+      
+      return { success: true, cart: newCart, count: newCount };
+      
+    } catch (error) {
+      console.error("❌ Error removing from cart:", error);
+      return { success: false, error: error.message };
+    }
   `,
 
-        // ========== TEST ACTION ==========
-        test: `
-    console.log("🧪 TEST ACTION FIRED!");
-    console.log("Full context:", context);
-    console.log("Action params:", context.actionParams);
-    console.log("Payload:", context.payload);
+        // ✅ FIXED: Update Quantity
+        updateCartQuantity: `
+    console.log("🔢 Updating cart quantity");
     
-    context.handlers.showNotification({
-      type: "toast", 
-      message: "Test action executed successfully!",
-      background: "#8b5cf6"
-    });
-    
-    return {
-      success: true,
-      timestamp: new Date().toISOString(),
-      action: 'test'
-    };
+    try {
+      const productId = context.actionParams?.productId || context.payload?.id;
+      const newQuantity = parseInt(context.actionParams?.quantity || context.payload?.quantity);
+      
+      if (!productId || !newQuantity) {
+        console.error("❌ Missing productId or quantity");
+        return { success: false };
+      }
+      
+      const cart = JSON.parse(localStorage.getItem("shopzone_cart") || "[]");
+      const itemIndex = cart.findIndex(item => item.id === productId);
+      
+      if (itemIndex === -1) {
+        console.error("❌ Item not found in cart");
+        return { success: false };
+      }
+      
+      if (newQuantity <= 0) {
+        // Remove item
+        cart.splice(itemIndex, 1);
+        console.log("🗑️ Quantity 0, removing item");
+      } else {
+        // Update quantity
+        cart[itemIndex].quantity = newQuantity;
+        console.log(\`🔢 Updated quantity to \${newQuantity}\`);
+      }
+      
+      localStorage.setItem("shopzone_cart", JSON.stringify(cart));
+      
+      // ✅ FIX: Update DataStore
+      const newCount = cart.length;
+      const newTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      
+      context.handlers.setData('cartCount', newCount);
+      context.handlers.setData('cartItems', cart);
+      context.handlers.setData('cartTotal', newTotal);
+      
+      console.log("✅ Quantity updated");
+      
+      context.handlers.showNotification({
+        message: "✅ Cart updated",
+        background: "#10b981"
+      });
+      
+      return { success: true, cart, count: newCount };
+      
+    } catch (error) {
+      console.error("❌ Error updating quantity:", error);
+      return { success: false, error: error.message };
+    }
   `,
+
+        // ✅ FIXED: Clear Cart
+        clearCart: `
+    console.log("🗑️ Clearing entire cart");
+    
+    try {
+      localStorage.removeItem("shopzone_cart");
+      
+      // ✅ FIX: Reset DataStore
+      context.handlers.setData('cartCount', 0);
+      context.handlers.setData('cartItems', []);
+      context.handlers.setData('cartTotal', 0);
+      
+      console.log("✅ Cart cleared");
+      
+      context.handlers.showNotification({
+        message: "🗑️ Cart cleared",
+        background: "#64748b"
+      });
+      
+      return { success: true };
+      
+    } catch (error) {
+      console.error("❌ Error clearing cart:", error);
+      return { success: false, error: error.message };
+    }
+  `,
+        api: `
+    console.log("🚀 === API ACTION START ===");
+    const apiKey = context.actionParams?.apiKey;
+    const formDataToUse = context.payload || context.modalFormData || context.formData || {};
+    
+    if (!apiKey) {
+      console.error("❌ No apiKey provided");
+      context.handlers.showNotification({
+        message: "API configuration error: No API key",
+        background: "#ef4444"
+      });
+      return;
+    }
+
+    const apiResource = context.config?.resolvedAPIs?.[apiKey];
+    if (!apiResource) {
+      console.error("❌ API not found:", apiKey);
+      context.handlers.showNotification({
+        message: \`API '\${apiKey}' not configured\`,
+        background: "#ef4444"
+      });
+      return;
+    }
+
+    try {
+      await context.handlers.handleApiCall(apiKey, formDataToUse, context.actionConfig);
+      console.log("✅ API call completed");
+    } catch (error) {
+      console.error("❌ API call failed:", error);
+    }
+  `,
+        navigate: `
+    const url = context.actionParams?.url;
+    
+    if (!url) {
+      console.error("❌ No URL provided");
+      context.handlers.showNotification({
+        message: "Navigation error: No URL specified",
+        background: "#ef4444"
+      });
+      return;
+    }
+    
+    console.log("🧭 Navigating to:", url);
+    
+    // Resolve templates if needed
+    let resolvedUrl = url;
+    if (url.includes('{{')) {
+      const templateContext = {
+        auth: context.handlers.getAuthData(),
+        data: context.data,
+        form: context.formData,
+        modal: context.modalFormData,
+      };
+      resolvedUrl = context.handlers.resolveTemplate(url, templateContext);
+    }
+    
+    // Navigate
+    window.location.href = resolvedUrl;
+  `,
+
+        setAuthToken: `
+    const token = context.actionParams?.token || \`mock-jwt-\${Date.now()}\`;
+    context.handlers.setAuthData('token', token);
+  `,
+
+        setAuthUser: `
+    const email = context.payload?.email || context.actionParams?.email;
+    if (email) {
+      context.handlers.setAuthData('user', email);
+    }
+  `,
+
+        // In demo.js - REPLACE your clearAuth action:
+
+        clearAuth: `
+  console.log("🚪 Logging out...");
+  
+  // Clear auth data
+  context.handlers.clearAuthData();
+  
+  // ✅ ADD: Show success notification
+  context.handlers.showNotification({
+    type: "toast",
+    message: "✅ Logged out successfully",
+    background: "#10b981",
+    duration: 2000,
+  });
+  
+  console.log("✅ Logout complete");
+`,
       },
     },
 
@@ -650,12 +821,12 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "Home",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone" },
                   },
                   {
                     label: "Sign Up",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/signup" },
                   },
                 ],
@@ -749,13 +920,13 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "Forgot Password?",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/forgot-password" },
                   },
                   {
                     prefix: "Don't have an account?",
                     label: "Sign Up",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/signup" },
                   },
                 ],
@@ -819,12 +990,12 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "Home",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone" },
                   },
                   {
                     label: "Login",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/login" },
                   },
                 ],
@@ -932,7 +1103,7 @@ input:focus, textarea:focus, select:focus {
                   {
                     prefix: "Already have an account?",
                     label: "Login",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/login" },
                   },
                 ],
@@ -996,12 +1167,12 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "Home",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone" },
                   },
                   {
                     label: "Login",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/login" },
                   },
                 ],
@@ -1085,7 +1256,7 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "← Back to Login",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/login" },
                   },
                 ],
@@ -1149,17 +1320,17 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "Home",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone" },
                   },
                   {
                     label: "Categories",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/categories" },
                   },
                   {
                     label: "🛒 Cart ({{data.cartCount || 0}})",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/cart" },
                   },
                   {
@@ -1236,7 +1407,7 @@ input:focus, textarea:focus, select:focus {
 
               cartItems: {
                 "ui:widget": "cartItemsGrid",
-                "ui:dataKey": "cart.items",
+                "ui:dataKey": "cartItems",
                 "ui:styles": {
                   padding: "0 40px",
                   maxWidth: "1200px",
@@ -1246,7 +1417,7 @@ input:focus, textarea:focus, select:focus {
               emptyCart: {
                 "ui:widget": "conditionalContent",
                 "ui:condition":
-                  "{{!data.cart.items || data.cart.items.length === 0}}",
+                  "{{!data.cartItems || data.cartItems.length === 0}}", // ✅ Changed from cart.items
                 "ui:content": {
                   "ui:widget": "card",
                   "ui:title": "Your cart is empty",
@@ -1271,7 +1442,7 @@ input:focus, textarea:focus, select:focus {
 
               totalCard: {
                 "ui:widget": "cartSummary",
-                "ui:dataKey": "cart.items",
+                "ui:dataKey": "cartItems",
                 "ui:styles": {
                   maxWidth: "1200px",
                   margin: "0 auto 40px",
@@ -1341,17 +1512,17 @@ input:focus, textarea:focus, select:focus {
                 "ui:links": [
                   {
                     label: "Home",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone" },
                   },
                   {
                     label: "Categories",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/categories" },
                   },
                   {
                     label: "🛒 Cart ({{data.cartCount || 0}})",
-                    action: "navigate",
+                    action: "navigateToPage",
                     actionParams: { url: "/shopzone/cart" },
                   },
                   {
@@ -1709,6 +1880,10 @@ input:focus, textarea:focus, select:focus {
                 event: "load",
                 source: "products.api",
               },
+              {
+                event: "load",
+                action: "loadCartFromLocal",
+              },
             ],
           },
 
@@ -1773,24 +1948,24 @@ input:focus, textarea:focus, select:focus {
             "ui:links": [
               {
                 label: "Home",
-                action: "navigate",
+                action: "navigateToPage",
                 actionParams: { url: "/shopzone" },
               },
               {
                 label: "Categories",
-                action: "navigate",
+                action: "navigateToPage",
                 actionParams: { url: "/shopzone/categories" },
               },
               {
                 label: "🛒 Cart ({{data.cartCount || 0}})",
-                action: "navigate",
+                action: "navigateToPage",
                 actionParams: { url: "/shopzone/cart" },
               },
 
               // ✅ Show only when NOT logged in
               {
                 label: "Login",
-                action: "navigate",
+                action: "navigateToPage",
                 actionParams: { url: "/shopzone/login" },
                 condition: "{{!auth.token}}", // Only show when not authenticated
               },

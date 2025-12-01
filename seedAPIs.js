@@ -376,6 +376,9 @@ const apiConfigs = [
   tags: ["cart", "ecommerce"],
   projectUUID: "global",
 },
+// In seedAPIs.js - REPLACE your cart.add config:
+
+// In seedAPIs.js - REPLACE your cart.add config:
 
 {
   key: "cart.add",
@@ -388,9 +391,13 @@ const apiConfigs = [
   },
   transformPayload: `
     (payload) => {
-      console.log("🛒 Adding to cart via API:", payload);
+      console.log("🛒 Add to cart API - Payload:", payload);
       
       const product = payload.selectedProduct || payload;
+      const quantity = parseInt(payload.quantity) || 1;
+      
+      console.log("📦 Product for API:", product);
+      console.log("🔢 Quantity for API:", quantity);
       
       return {
         userId: 1,
@@ -398,31 +405,40 @@ const apiConfigs = [
         products: [
           {
             productId: product.id,
-            quantity: parseInt(payload.quantity) || 1
+            quantity: quantity
           }
         ]
       };
     }
   `,
+  
+  // ✅ FIX: Set to "none" - notification handled by storeCartLocally action
   successNotification: {
-    type: "toast",
-    message: "✅ Added to cart!",
-    background: "#10b981",
-    duration: 2000,
+    type: "none"
   },
+  
   errorNotification: {
     type: "toast",
-    message: "❌ Failed to add to cart",
+    message: "Failed to add to cart",
     background: "#ef4444",
     duration: 3000,
   },
+  
   storeResponse: true,
   storeKey: "cartAddResponse",
-  // ✅ After API success, store locally too
+  
+  // ✅ This action shows the notification
   onSuccess: [
-    "storeCartLocally", // Custom action we'll handle
-    "closeModal"
+    {
+      action: "storeCartLocally",
+      actionParams: {}
+    },
+    {
+      action: "closeModal",
+      actionParams: {}
+    }
   ],
+  
   tags: ["cart", "ecommerce"],
   projectUUID: "global",
 },
