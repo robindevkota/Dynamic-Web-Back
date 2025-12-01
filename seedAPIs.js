@@ -108,7 +108,7 @@ const apiConfigs = [
     },
     {
       action: "navigate",
-      actionParams: { url: "/shopzone" }
+      actionParams: { url: "/greenhaven" }
     }
   ],
   
