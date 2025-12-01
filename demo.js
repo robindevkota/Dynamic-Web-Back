@@ -10,6 +10,8 @@ mongoose.connect(
 );
 
 const websites = [
+
+
   {
     title: "ShopZone - Modern E-commerce",
     slug: "shopzone",
@@ -833,6 +835,22 @@ input:focus, textarea:focus, select:focus {
   
   console.log("✅ Logout complete");
 `,
+
+        // Add these two actions to your initialization.actions object
+
+        "api:cart.remove": `
+  console.log("api:cart.remove triggered", context.payload);
+  
+  // Call the actual API
+  await context.handlers.handleApiCall("cart.remove", context.payload);
+`,
+
+        "api:cart.updateQuantity": `
+  console.log("api:cart.updateQuantity triggered", context.payload);
+  
+  // Call the actual API
+  await context.handlers.handleApiCall("cart.updateQuantity", context.payload);
+`,
       },
     },
 
@@ -1422,8 +1440,6 @@ input:focus, textarea:focus, select:focus {
             table: {},
             modal: {},
             uiSchema: {
-            
-
               pageTitle: {
                 "ui:widget": "heading",
                 "ui:text": "🛒 Your Shopping Cart",
@@ -1445,15 +1461,12 @@ input:focus, textarea:focus, select:focus {
                   margin: "0 auto",
                 },
               },
-            
 
               divider: {
                 "ui:widget": "divider",
                 "ui:spacing": "large",
                 "ui:styles": { maxWidth: "900px", margin: "40px auto" },
               },
-
-            
             },
             styles: {
               padding: "120px 40px 80px",
@@ -1461,7 +1474,6 @@ input:focus, textarea:focus, select:focus {
               minHeight: "100vh",
             },
             triggers: [
-              
               {
                 event: "load", // ✅ ADD THIS
                 source: "cart.get", // This will fetch products
@@ -4410,7 +4422,6 @@ input:focus, textarea:focus, select:focus {
             },
           },
 
-          
           spacer1: { "ui:widget": "spacer", "ui:height": 80 },
 
           featuredHeading: {

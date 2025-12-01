@@ -356,7 +356,7 @@ const apiConfigs = [
     key: "cart.get",
     name: "Get Cart Items",
     description: "Fetches cart items (demo data from FakeStoreAPI)",
-    url: "https://fakestoreapi.com/products?limit=2",
+    url: "https://fakestoreapi.com/products?limit=5",
     method: "GET",
     successNotification: { type: "none" },
     storeResponse: true,
@@ -461,115 +461,72 @@ const apiConfigs = [
     projectUUID: "global",
   },
 
-  {
-    key: "cart.remove",
-    name: "Remove from Cart",
-    description: "Removes item from cart",
-    url: "local://cart/remove",
-    method: "DELETE",
-    transformPayload: `
-    (payload) => {
-      console.log("🗑️ Removing from cart:", payload);
-      
-      try {
-        const cart = JSON.parse(localStorage.getItem('shopzone_cart') || '[]');
-        const productId = payload.productId || payload.id;
-        
-        // Filter out the item
-        const newCart = cart.filter(item => item.id !== productId);
-        
-        // Save to localStorage
-        localStorage.setItem('shopzone_cart', JSON.stringify(newCart));
-        localStorage.setItem('shopzone_cart_count', newCart.length.toString());
-        
-        console.log('✅ Item removed, new cart:', newCart);
-        
-        return {
-          success: true,
-          cart: newCart,
-          count: newCart.length
-        };
-      } catch (e) {
-        console.error('❌ Error removing from cart:', e);
-        return { success: false, error: e.message };
-      }
-    }
-  `,
-    successNotification: {
-      type: "toast",
-      message: "🗑️ Removed from cart",
-      background: "#ef4444",
-      duration: 2000,
-    },
-    storeResponse: true,
-    storeKey: "cartResponse",
-    onSuccess: [
-      "setData:cart.count={{cartResponse.count}}",
-      "setData:cart.items={{cartResponse.cart}}",
-      "triggerRefresh:cartItems",
-    ],
-    tags: ["cart", "ecommerce"],
-    projectUUID: "global",
+{
+  "key": "cart.remove",
+  "name": "Remove from Cart",
+  "description": "Removes item from cart (demo with FakeStoreAPI)",
+  "url": "https://fakestoreapi.com/carts/1",
+  "method": "DELETE",
+  "transformPayload": "\n  (payload) => {\n    console.log('🗑️ Remove item for FakeAPI', payload);\n    \n    // Perform local removal\n    const cart = JSON.parse(localStorage.getItem(\"shopzone_cart\") || \"[]\");\n    const index = cart.findIndex(item => item.id === payload.id);\n    \n    if (index !== -1) {\n      cart.splice(index, 1);\n      localStorage.setItem(\"shopzone_cart\", JSON.stringify(cart));\n    }\n    \n    // For DELETE, no body needed\n    return null;\n  }\n  ",
+  "successNotification": {
+    "type": "toast",
+    "message": "Item removed from cart",
+    "background": "#ef4444",
+    "duration": 2000
   },
+  "errorNotification": {
+    "type": "toast",
+    "message": "Failed to remove item",
+    "background": "#ef4444",
+    "duration": 3000
+  },
+  "storeResponse": true,
+  "storeKey": "cartRemove",
+  "onSuccess": [
+    "loadCartFromLocal"
+  ],
+  "tags": [
+    "cart",
+    "ecommerce",
+    "demo"
+  ],
+  "projectUUID": "global"
+},
+{
+  "key": "cart.updateQuantity",
+  "name": "Update Cart Quantity",
+  "description": "Updates item quantity in cart (demo with FakeStoreAPI)",
+  "url": "https://fakestoreapi.com/carts/1",
+  "method": "PUT",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "transformPayload": "\n  (payload) => {\n    console.log('🔢 Update quantity for FakeAPI', payload);\n    \n    // Perform local update\n    const cart = JSON.parse(localStorage.getItem(\"shopzone_cart\") || \"[]\");\n    const index = cart.findIndex(item => item.id === payload.id);\n    \n    if (index !== -1) {\n      const newQty = parseInt(payload.quantity);\n      if (newQty <= 0) {\n        cart.splice(index, 1);\n      } else {\n        cart[index].quantity = newQty;\n      }\n      localStorage.setItem(\"shopzone_cart\", JSON.stringify(cart));\n    }\n    \n    // Return body for API call (full cart for demo)\n    return {\n      userId: 1,\n      date: new Date().toISOString(),\n      products: cart.map(item => ({\n        productId: item.id,\n        quantity: item.quantity\n      }))\n    };\n  }\n  ",
+  "successNotification": {
+    "type": "toast",
+    "message": "Quantity updated",
+    "background": "#10b981",
+    "duration": 2000
+  },
+  "errorNotification": {
+    "type": "toast",
+    "message": "Failed to update quantity",
+    "background": "#ef4444",
+    "duration": 3000
+  },
+  "storeResponse": true,
+  "storeKey": "cartUpdate",
+  "onSuccess": [
+    "loadCartFromLocal"
+  ],
+  "tags": [
+    "cart",
+    "ecommerce",
+    "demo"
+  ],
+  "projectUUID": "global"
+}
 
-  {
-    key: "cart.updateQuantity",
-    name: "Update Cart Quantity",
-    description: "Updates item quantity in cart",
-    url: "local://cart/update",
-    method: "PATCH",
-    transformPayload: `
-    (payload) => {
-      console.log("🔢 Updating quantity:", payload);
-      
-      try {
-        const cart = JSON.parse(localStorage.getItem('shopzone_cart') || '[]');
-        const productId = payload.productId || payload.id;
-        const newQuantity = parseInt(payload.quantity);
-        
-        // Find and update item
-        const itemIndex = cart.findIndex(item => item.id === productId);
-        
-        if (itemIndex !== -1) {
-          if (newQuantity <= 0) {
-            // Remove if quantity is 0
-            cart.splice(itemIndex, 1);
-          } else {
-            cart[itemIndex].quantity = newQuantity;
-          }
-          
-          localStorage.setItem('shopzone_cart', JSON.stringify(cart));
-          localStorage.setItem('shopzone_cart_count', cart.length.toString());
-          
-          return {
-            success: true,
-            cart: cart,
-            count: cart.length
-          };
-        }
-        
-        return { success: false, error: 'Item not found' };
-      } catch (e) {
-        console.error('❌ Error updating quantity:', e);
-        return { success: false, error: e.message };
-      }
-    }
-  `,
-    successNotification: {
-      type: "toast",
-      message: "✅ Quantity updated",
-      background: "#10b981",
-      duration: 1500,
-    },
-    storeResponse: true,
-    storeKey: "cartResponse",
-    onSuccess: [
-      "setData:cart.items={{cartResponse.cart}}",
-      "setData:cart.count={{cartResponse.count}}",
-    ],
-    tags: ["cart", "ecommerce"],
-    projectUUID: "global",
-  },
 ];
 
 const seed = async () => {
