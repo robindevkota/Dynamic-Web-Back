@@ -189,6 +189,49 @@ input:focus, textarea:focus, select:focus {
     // Navigate
     window.location.href = resolvedUrl;
   `,
+        applyDiscount: `
+    console.log("🎯 Testing Dynamic Discount Action!");
+    
+    // Get parameters from actionParams
+    const percent = context.actionParams?.percent || 10;
+    console.log("💰 Discount percent:", percent);
+    
+    // Get current cart total from DataStore
+    const cartTotal = context.data.cartTotal || 0;
+    console.log("🛒 Current cart total:", cartTotal);
+    
+    // Calculate discount
+    const discountAmount = (cartTotal * percent) / 100;
+    const newTotal = cartTotal - discountAmount;
+    
+    console.log("📊 Calculations:", {
+      discountAmount,
+      newTotal,
+      percent
+    });
+    
+    // Update DataStore
+    context.handlers.setData('discountAmount', discountAmount);
+    context.handlers.setData('discountPercent', percent);
+    context.handlers.setData('discountApplied', true);
+    
+    // Show notification
+    context.handlers.showNotification({
+      type: "toast",
+      message: \`🎉 \${percent}% discount applied! Saved $\${discountAmount.toFixed(2)}\`,
+      background: "#10b981",
+      duration: 3000,
+    });
+    
+    console.log("✅ Discount action completed successfully!");
+    
+    return {
+      success: true,
+      discountAmount,
+      newTotal,
+      percent
+    };
+  `,
 
         // Scroll to element
         scrollToElement: `
@@ -379,7 +422,7 @@ input:focus, textarea:focus, select:focus {
   `,
         // In demo.js - Find and REPLACE the loadCartFromLocal action:
 
-loadCartFromLocal: `
+        loadCartFromLocal: `
   console.log("📥 Loading cart from localStorage");
   
   try {
@@ -531,7 +574,7 @@ loadCartFromLocal: `
 `,
 
         // ✅ FIXED: Refresh Cart Display
-refreshCartDisplay: `
+        refreshCartDisplay: `
   console.log("🔄 Refreshing cart display");
   
   try {
@@ -554,7 +597,7 @@ refreshCartDisplay: `
 `,
 
         // ✅ FIXED: Refresh Cart (alias)
-refreshCart: `
+        refreshCart: `
   console.log("🔄 Refreshing cart data");
   try {
     const cart = JSON.parse(localStorage.getItem("shopzone_cart") || "[]");
@@ -1383,7 +1426,7 @@ refreshCart: `
                 "ui:widget": "button",
                 "ui:label": "Apply 10% Discount",
                 "ui:action": "applyDiscount",
-                "ui:actionParams": { percent: 10 },
+                "ui:actionParams": { percent: 20 },
                 "ui:styles": {
                   background: "#667eea",
                   color: "white",
@@ -1463,6 +1506,10 @@ refreshCart: `
               {
                 event: "load",
                 action: "loadCartFromLocal",
+              },
+              {
+                event: "load", // ✅ ADD THIS
+                source: "products.api", // This will fetch products
               },
             ],
           },
