@@ -2,56 +2,6 @@
 const mongoose = require('mongoose');
 const PageConfig = require('../models/PageConfig');
 
-// ✅ Helper function to resolve component references
-function resolveComponentReferences(pageObject) {
-  console.log('🔄 Resolving component references...');
-  
-  const mainComponents = pageObject.components || {};
-  
-  // Build reference map from main components
-  const componentMap = {};
-  Object.entries(mainComponents).forEach(([key, component]) => {
-    if (component && component._id) {
-      componentMap[component._id] = component;
-      console.log(`   📌 Registered: ${component._id}`);
-    }
-  });
-  
-  // Resolve references in pages
-  if (pageObject.pages) {
-    Object.keys(pageObject.pages).forEach(pageName => {
-      const page = pageObject.pages[pageName];
-      
-      if (page.components) {
-        ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compType => {
-          const component = page.components[compType];
-          
-          // Check if it's a reference
-          if (component && component.$ref) {
-            const refId = component.$ref;
-            
-            if (componentMap[refId]) {
-              // Clone the referenced component (deep copy)
-              page.components[compType] = JSON.parse(
-                JSON.stringify(componentMap[refId])
-              );
-              // Remove the _id from resolved component to avoid confusion
-              delete page.components[compType]._id;
-              
-              console.log(`   ✅ Resolved ${compType} → ${refId} for page "${pageName}"`);
-            } else {
-              console.warn(`   ⚠️ Reference not found: ${refId} for ${compType} in page "${pageName}"`);
-              // Keep the original reference object (don't break the page)
-            }
-          }
-        });
-      }
-    });
-  }
-  
-  return pageObject;
-}
-
 // GET all pages (for table)
 exports.getAllPages = async (req, res) => {
   try {
@@ -64,6 +14,9 @@ exports.getAllPages = async (req, res) => {
   }
 };
 
+// GET single page config by slug (for renderer)
+// GET single page config by slug (for renderer)
+// GET single page config by slug (for renderer)
 // GET single page config by slug (for renderer)
 exports.getPageBySlug = async (req, res) => {
   try {
@@ -78,29 +31,28 @@ exports.getPageBySlug = async (req, res) => {
     
     console.log(`📤 Sending page config for: ${page.slug}`);
     
-    // Convert Mongoose Map to plain object
+    // 🔥 FIX: Convert Mongoose Map to plain object
     const pageObject = page.toObject();
     
-    // Convert pages Map to regular object
+    // 🔥 Convert pages Map to regular object
     if (pageObject.pages && pageObject.pages instanceof Map) {
       pageObject.pages = Object.fromEntries(pageObject.pages);
     }
     
     console.log(`   - Sub-pages available:`, Object.keys(pageObject.pages || {}));
+    
+    // ✅ ADD THIS: Log actions for debugging
     console.log(`   - Actions available:`, pageObject.initialization?.actions ? Object.keys(pageObject.initialization.actions) : 'NO ACTIONS');
     
-    // ✅ RESOLVE COMPONENT REFERENCES
-    const resolvedPageObject = resolveComponentReferences(pageObject);
-    
-    // RESOLVE API REFERENCES
-    if (resolvedPageObject.initialization?.resources && Array.isArray(resolvedPageObject.initialization.resources)) {
-      const firstResource = resolvedPageObject.initialization.resources[0];
+    // 🆕 RESOLVE API REFERENCES
+    if (pageObject.initialization?.resources && Array.isArray(pageObject.initialization.resources)) {
+      const firstResource = pageObject.initialization.resources[0];
       
       // If resources are strings (API keys), resolve them
       if (typeof firstResource === "string") {
-        console.log(`🔍 Resolving ${resolvedPageObject.initialization.resources.length} API keys...`);
+        console.log(`🔍 Resolving ${pageObject.initialization.resources.length} API keys...`);
         
-        const apiKeys = resolvedPageObject.initialization.resources;
+        const apiKeys = pageObject.initialization.resources;
         const apis = await APIConfig.find({
           key: { $in: apiKeys },
           isActive: true,
@@ -128,23 +80,22 @@ exports.getPageBySlug = async (req, res) => {
           };
         });
         
-        // Return page with resolved APIs and resolved component references
+        // Return page with resolved APIs
         return res.json({
-          ...resolvedPageObject,
+          ...pageObject,
           resolvedAPIs: apisMap,
         });
       }
     }
     
     // If old format (full objects) or no resources, return as-is
-    res.json(resolvedPageObject);
+    res.json(pageObject);
     
   } catch (err) {
     console.error('❌ Error fetching page:', err);
     res.status(500).json({ message: err.message });
   }
 };
-
 // CREATE new page config
 exports.createPage = async (req, res) => {
   try {
@@ -155,8 +106,6 @@ exports.createPage = async (req, res) => {
     ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
       if (components[compName]) {
         processedComponents[compName] = {
-          _id: components[compName]._id || undefined, // ✅ Preserve _id
-          $ref: components[compName].$ref || undefined, // ✅ Preserve $ref
           table: components[compName].table || {},
           modal: components[compName].modal || {},
           uiSchema: components[compName].uiSchema || {},
@@ -166,52 +115,18 @@ exports.createPage = async (req, res) => {
       }
     });
     
-    // Handle initialization with actions
+    // ✅ ADD THIS: Handle initialization with actions
     const initialization = req.body.initialization || {};
     const processedInitialization = {
       globalCSS: initialization.globalCSS || '',
       resources: initialization.resources || [],
-      actions: initialization.actions || {}
+      actions: initialization.actions || {} // ✅ Preserve actions
     };
-    
-    // ✅ Process pages (preserve references)
-    const pages = req.body.pages || {};
-    const processedPages = {};
-    
-    Object.entries(pages).forEach(([pageName, pageData]) => {
-      processedPages[pageName] = {
-        title: pageData.title,
-        components: {}
-      };
-      
-      ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
-        if (pageData.components && pageData.components[compName]) {
-          const comp = pageData.components[compName];
-          
-          // If it's a reference, keep only $ref
-          if (comp.$ref) {
-            processedPages[pageName].components[compName] = {
-              $ref: comp.$ref
-            };
-          } else {
-            // Full component
-            processedPages[pageName].components[compName] = {
-              table: comp.table || {},
-              modal: comp.modal || {},
-              uiSchema: comp.uiSchema || {},
-              styles: comp.styles || {},
-              triggers: comp.triggers || []
-            };
-          }
-        }
-      });
-    });
     
     const pageData = {
       ...req.body,
       components: processedComponents,
-      initialization: processedInitialization,
-      pages: processedPages
+      initialization: processedInitialization // ✅ Use processed initialization
     };
     
     const page = new PageConfig(pageData);
@@ -219,7 +134,6 @@ exports.createPage = async (req, res) => {
     
     console.log(`✅ Created page: ${page.slug}`);
     console.log(`   - Actions:`, Object.keys(page.initialization.actions || {}));
-    console.log(`   - Sub-pages:`, Object.keys(page.pages || {}));
     
     res.status(201).json(page);
   } catch (err) {
@@ -241,8 +155,6 @@ exports.updatePage = async (req, res) => {
     ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
       if (components[compName]) {
         processedComponents[compName] = {
-          _id: components[compName]._id || undefined, // ✅ Preserve _id
-          $ref: components[compName].$ref || undefined, // ✅ Preserve $ref
           table: components[compName].table || {},
           modal: components[compName].modal || {},
           uiSchema: components[compName].uiSchema || {},
@@ -252,52 +164,18 @@ exports.updatePage = async (req, res) => {
       }
     });
 
-    // Handle initialization with actions
+    // ✅ ADD THIS: Handle initialization with actions
     const initialization = req.body.initialization || {};
     const processedInitialization = {
       globalCSS: initialization.globalCSS || '',
       resources: initialization.resources || [],
-      actions: initialization.actions || {}
+      actions: initialization.actions || {} // ✅ Preserve actions
     };
-
-    // ✅ Process pages (preserve references)
-    const pages = req.body.pages || {};
-    const processedPages = {};
-    
-    Object.entries(pages).forEach(([pageName, pageData]) => {
-      processedPages[pageName] = {
-        title: pageData.title,
-        components: {}
-      };
-      
-      ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
-        if (pageData.components && pageData.components[compName]) {
-          const comp = pageData.components[compName];
-          
-          // If it's a reference, keep only $ref
-          if (comp.$ref) {
-            processedPages[pageName].components[compName] = {
-              $ref: comp.$ref
-            };
-          } else {
-            // Full component
-            processedPages[pageName].components[compName] = {
-              table: comp.table || {},
-              modal: comp.modal || {},
-              uiSchema: comp.uiSchema || {},
-              styles: comp.styles || {},
-              triggers: comp.triggers || []
-            };
-          }
-        }
-      });
-    });
 
     const updateData = {
       ...req.body,
       components: processedComponents,
-      initialization: processedInitialization,
-      pages: processedPages
+      initialization: processedInitialization // ✅ Use processed initialization
     };
 
     const page = await PageConfig.findOneAndUpdate(
@@ -315,7 +193,6 @@ exports.updatePage = async (req, res) => {
 
     console.log(`✅ Updated page: ${page.slug} (v${page.version})`);
     console.log(`   - Actions:`, Object.keys(page.initialization.actions || {}));
-    console.log(`   - Sub-pages:`, Object.keys(page.pages || {}));
     
     res.json(page);
 

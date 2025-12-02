@@ -1,14 +1,12 @@
 const mongoose = require('mongoose');
 
 const ComponentSchema = new mongoose.Schema({
-  _id: { type: String },  // ✅ ADD: Optional ID for references
-  $ref: { type: String }, // ✅ ADD: Reference to another component
   table: { type: Object, default: {} },
   modal: { type: Object, default: {} },
   uiSchema: { type: Object, default: {} },
   styles: { type: Object, default: {} },
   triggers: { type: Array, default: [] }
-}, { _id: false, strict: false }); // ✅ strict: false allows $ref
+}, { _id: false });
 
 // 🆕 Sub-page Schema
 const SubPageSchema = new mongoose.Schema({
@@ -34,6 +32,7 @@ const PageConfigSchema = new mongoose.Schema({
   
   initialization: {
     globalCSS: { type: String, default: "" },
+    // 🔥 UPDATED: Accept both strings (API keys) AND objects (full config)
     resources: [mongoose.Schema.Types.Mixed],
     actions: { type: Object, default: {} }
   },
@@ -60,8 +59,3 @@ const PageConfigSchema = new mongoose.Schema({
 });
 
 module.exports = mongoose.model('PageConfig', PageConfigSchema);
-
-
-
-
-
