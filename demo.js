@@ -10,8 +10,6 @@ mongoose.connect(
 );
 
 const websites = [
-
-
   {
     title: "ShopZone - Modern E-commerce",
     slug: "shopzone",
@@ -24,6 +22,7 @@ const websites = [
 
     initialization: {
       globalCSS: `
+      @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 /* Reset and Base Styles */
 * {
   margin: 0;
@@ -162,6 +161,52 @@ input:focus, textarea:focus, select:focus {
       // Add these to your initialization.actions in demo.js
 
       actions: {
+        validateThenApi: `
+  console.log("✅ Validating form before API call");
+  
+  // Get fields from actionParams
+  const fields = context.actionParams?.fields || [];
+  const formData = context.formData || {};
+  const apiKey = context.actionParams?.apiKey;
+  
+  console.log("📋 Fields to validate:", fields);
+  console.log("📦 Form data:", formData);
+  
+  if (!fields || fields.length === 0) {
+    console.warn("⚠️ No fields provided for validation");
+    // Skip validation, just call API
+    return await context.handlers.handleApiCall(apiKey, formData);
+  }
+  
+  // ✅ Validate fields
+  const { isValid, errors } = context.handlers.validateAllFields(fields, formData);
+  
+  if (!isValid) {
+    console.error("❌ Validation failed:", errors);
+    
+    // ✅ Set field-level errors in DataStore (for UI display)
+    context.handlers.setFieldErrors(errors);
+    
+    // ✅ Show notification with FIRST error only
+    const firstError = Object.values(errors)[0];
+    context.handlers.showNotification({
+      type: "toast",
+      message: firstError,
+      background: "#ef4444",
+      duration: 3000,
+    });
+    
+    return { success: false, errors };
+  }
+  
+  console.log("✅ Validation passed, calling API");
+  
+  // ✅ Clear any previous errors
+  context.handlers.setFieldErrors({});
+  
+  // Call the actual API
+  return await context.handlers.handleApiCall(apiKey, formData);
+`,
         navigateToPage: `
     const url = context.actionParams?.url;
     
@@ -940,6 +985,16 @@ input:focus, textarea:focus, select:focus {
                     "ui:type": "email",
                     "ui:name": "email",
                     "ui:required": true,
+                    validation: {
+                      required: true,
+                      requiredMessage: "Email is required to continue",
+                      email: true,
+                      emailMessage: "Please enter a valid email address",
+                    },
+                    "ui:errorStyles": {
+                      color: "#dc2626",
+                      fontWeight: "600",
+                    },
                   },
                   {
                     "ui:widget": "inputField",
@@ -948,15 +1003,46 @@ input:focus, textarea:focus, select:focus {
                     "ui:type": "password",
                     "ui:name": "password",
                     "ui:required": true,
+                    validation: {
+                      required: true,
+                      requiredMessage: "🔒 Password is required",
+                      minLength: 6,
+                      minLengthMessage:
+                        "🔒 Password must be at least 6 characters",
+                    },
                   },
                 ],
 
                 "ui:actions": [
                   {
                     label: "Sign In",
-                    action: "api",
+                   action: "validateThenApi",
                     actionParams: {
-                      apiKey: "auth.login", // ✅ FIX: Changed from 'url' to 'apiKey'
+                      apiKey: "auth.login",
+                      fields: [
+                        {
+                          name: "email",
+                          label: "Email",
+                          validation: {
+                            required: true,
+                            requiredMessage: "🌿 Email is required to continue",
+                            email: true,
+                            emailMessage:
+                              "🌿 Please enter a valid email address",
+                          },
+                        },
+                        {
+                          name: "password",
+                          label: "Password",
+                          validation: {
+                            required: true,
+                            requiredMessage: "🔒 Password is required",
+                            minLength: 6,
+                            minLengthMessage:
+                              "🔒 Password must be at least 6 characters",
+                          },
+                        },
+                      ], // ✅ FIX: Changed from 'url' to 'apiKey'
                     },
                     variant: "primary",
                     styles: {
@@ -1360,7 +1446,62 @@ input:focus, textarea:focus, select:focus {
         components: {
           navbar: {
             table: {},
-            modal: {},
+            modal: {
+              productDetail: {
+                "ui:title": "Product Details",
+                "ui:theme": "light",
+                "ui:styles": {
+                  maxWidth: "700px",
+                  padding: "40px",
+                },
+                "ui:fields": [
+                  {
+                    name: "quantity",
+                    label: "Quantity",
+                    type: "number",
+                    placeholder: "1",
+                    required: true,
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "🛒 Add to Cart",
+                    action: "api",
+                    actionParams: { apiKey: "cart.add" },
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                      marginTop: "10px",
+                    },
+                  },
+                  {
+                    label: "Close",
+                    action: "closeModal",
+                    variant: "outline",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background: "transparent",
+                      color: "#64748b",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "2px solid #e2e8f0",
+                    },
+                  },
+                ],
+              },
+            },
             uiSchema: {
               logo: {
                 "ui:widget": "text",
@@ -1437,7 +1578,6 @@ input:focus, textarea:focus, select:focus {
             triggers: [],
           },
           main: {
-            table: {},
             modal: {},
             uiSchema: {
               pageTitle: {
@@ -1920,6 +2060,366 @@ input:focus, textarea:focus, select:focus {
           },
         },
       },
+      dashboard: {
+        title: "Admin Dashboard",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🛒 ShopZone",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/shopzone" },
+                  },
+                  {
+                    label: "Categories",
+                    action: "navigateToPage",
+                    actionParams: { url: "/shopzone/categories" },
+                  },
+                  {
+                    label: "🛒 Cart ({{data.cartCount || 0}})",
+                    action: "navigateToPage",
+                    actionParams: { url: "/shopzone/cart" },
+                  },
+                  {
+                    label: "{{auth.token ? '' : 'Login'}}",
+                    action: "{{auth.token ? '' : 'navigate'}}",
+                    actionParams: {
+                      url: "{{auth.token ? '' : '/shopzone/login'}}",
+                    },
+                  },
+                  {
+                    label:
+                      "{{auth.token ? 'Welcome, ' + auth.user.email : ''}}",
+                    action: "",
+                    actionParams: {},
+                  },
+                  {
+                    label: "{{auth.token ? 'Logout' : ''}}",
+                    action: "{{auth.token ? 'clearAuth+reload' : ''}}",
+                    actionParams: {},
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #f0f0f0",
+              padding: "20px 50px",
+              position: "sticky",
+              top: 0,
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+
+          main: {
+            table: {},
+            modal: {
+              productDetail: {
+                "ui:title": "Product Details",
+                "ui:theme": "light",
+                "ui:styles": {
+                  maxWidth: "700px",
+                  padding: "40px",
+                },
+                "ui:fields": [
+                  {
+                    name: "quantity",
+                    label: "Quantity",
+                    type: "number",
+                    placeholder: "1",
+                    required: true,
+                    min: 1,
+                    max: 10,
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "🛒 Add to Cart",
+                    action: "api",
+                    actionParams: { apiKey: "cart.add" },
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                      marginTop: "10px",
+                    },
+                  },
+                  {
+                    label: "Close",
+                    action: "closeModal",
+                    variant: "outline",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background: "transparent",
+                      color: "#64748b",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "2px solid #e2e8f0",
+                    },
+                  },
+                ],
+              },
+            },
+            uiSchema: {
+              filterSection: {
+                "ui:widget": "filterWidget",
+                "ui:title": "Filter Products",
+                "ui:filterOnChange": true,
+                "ui:styles": {
+                  padding: "30px 40px",
+                  marginBottom: "40px",
+                  background: "#f8fafc",
+                  borderRadius: "12px",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "selectField",
+                    "ui:name": "category",
+                    "ui:label": "Category",
+                    "ui:placeholder": "All Categories",
+                    "ui:options": [
+                      { label: "All Products", value: "" },
+                      { label: "Electronics", value: "electronics" },
+                      { label: "Jewelery", value: "jewelery" },
+                      { label: "Men's Clothing", value: "men's clothing" },
+                      { label: "Women's Clothing", value: "women's clothing" },
+                    ],
+                    "ui:styles": {
+                      minWidth: "200px",
+                      marginBottom: "0",
+                    },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:name": "search",
+                    "ui:label": "Search Products",
+                    "ui:type": "text",
+                    "ui:placeholder": "Search by name...",
+                    "ui:styles": {
+                      minWidth: "250px",
+                      marginBottom: "0",
+                    },
+                  },
+                  {
+                    "ui:widget": "dateField",
+                    "ui:name": "fromDate",
+                    "ui:label": "From Date",
+                    "ui:styles": {
+                      minWidth: "150px",
+                      marginBottom: "0",
+                    },
+                  },
+                  {
+                    "ui:widget": "dateField",
+                    "ui:name": "toDate",
+                    "ui:label": "To Date",
+                    "ui:styles": {
+                      minWidth: "150px",
+                      marginBottom: "0",
+                    },
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Apply Filters",
+                    action: "api",
+                    actionParams: { apiKey: "products.filter" },
+                    variant: "filter",
+                    styles: {
+                      background: "#667eea",
+                      color: "white",
+                      padding: "12px 24px",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      minWidth: "120px",
+                      height: "44px",
+                    },
+                  },
+                  {
+                    label: "Reset",
+                    action: "resetForm",
+                    variant: "reset",
+                    styles: {
+                      background: "#e2e8f0",
+                      color: "#64748b",
+                      padding: "12px 24px",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                      minWidth: "100px",
+                      height: "44px",
+                    },
+                  },
+                  {
+                    label: "🔄",
+                    action: "reload",
+                    variant: "refresh",
+                    styles: {
+                      background: "transparent",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "8px",
+                      padding: "10px",
+                      cursor: "pointer",
+                      fontSize: "16px",
+                      height: "44px",
+                      width: "44px",
+                    },
+                  },
+                ],
+              },
+
+              testTable: {
+                "ui:widget": "dataTable",
+                "ui:title": "Products List",
+                "ui:id": "productsTable",
+                "ui:description": "Manage your products",
+                "ui:emptyText": "No products found",
+                "ui:dataSource": "products.api_filtered",
+                "ui:pagination": {
+                  enabled: true,
+                  pageSize: 3,
+                },
+                "ui:columns": [
+                  {
+                    key: "id",
+                    title: "ID",
+                    dataIndex: "id",
+                    width: "80px",
+                  },
+                  {
+                    key: "name",
+                    title: "Product Name",
+                    dataIndex: "title",
+                  },
+                  {
+                    key: "price",
+                    title: "Price",
+                    dataIndex: "price",
+                    align: "right",
+                  },
+                  {
+                    key: "status",
+                    title: "Status",
+                    dataIndex: "status",
+                  },
+                  {
+                    key: "actions",
+                    title: "Actions",
+                    type: "actions",
+                    align: "center",
+                    actions: [
+                      {
+                        label: "View",
+                        action: "openModal:productDetail", // ✅ Fixed modal name
+                        variant: "secondary",
+                        condition:
+                          "function(row) { return row.status === 'active'; }",
+                      },
+                      {
+                        label: "Edit",
+                        action: "openModal:productDetail", // This opens same modal
+                        variant: "primary",
+                        condition: "function(row) { return row.id > 0; }",
+                        actionParams: {
+                          // Optional: add params to differentiate
+                          mode: "edit",
+                        },
+                      },
+                      {
+                        label: "Delete",
+                        action: "api:deleteProduct",
+                        variant: "danger",
+                        condition:
+                          "function(row) { return row.status !== 'archived'; }",
+                        confirm: true,
+                        confirmMessage:
+                          "Are you sure you want to delete this product?",
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            styles: {
+              padding: "0",
+              background: "#ffffff",
+              minHeight: "100vh",
+            },
+            triggers: [
+              {
+                event: "load",
+                source: "products.api",
+              },
+              {
+                event: "load",
+                action: "loadCartFromLocal",
+              },
+            ],
+          },
+
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 ShopZone. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "40px",
+              borderTop: "3px solid #667eea",
+            },
+            triggers: [],
+          },
+        },
+      },
     },
 
     components: {
@@ -2011,6 +2511,71 @@ input:focus, textarea:focus, select:focus {
         table: {},
         modal: {},
         uiSchema: {
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:iconStyles": {
+              transition: "all 0.3s ease",
+              color: "#64748b",
+            },
+            "ui:linkStyles": {
+              transition: "all 0.3s ease",
+              borderRadius: "8px",
+              padding: "10px 12px",
+            },
+            "ui:hoverStyles": {
+              background: "rgba(102, 126, 234, 0.08)",
+            },
+            "ui:links": [
+              {
+                label: "Home",
+                action: "navigate:/devfolio",
+                fontAwesome: "fas fa-home",
+                iconHoverStyles: {
+                  color: "#667eea",
+                  transform: "scale(1.2)",
+                },
+              },
+              {
+                label: "About",
+                action: "openModal:aboutModal",
+                fontAwesome: "fas fa-user",
+                iconHoverStyles: {
+                  color: "#764ba2",
+                  transform: "scale(1.2)",
+                },
+              },
+              {
+                label: "Projects",
+                action: "openModal:projectsModal",
+                fontAwesome: "fas fa-briefcase",
+                iconHoverStyles: {
+                  color: "#f093fb",
+                  transform: "scale(1.2)",
+                },
+              },
+              {
+                label: "Dashboard",
+                action: "navigateToPage",
+                actionParams: { url: "shopzone/dashboard" },
+                fontAwesome:
+                  "{{auth.token ? 'fas fa-tachometer-alt' : 'fas fa-sign-in-alt'}}",
+                iconHoverStyles: {
+                  transform: "scale(1.2)",
+                  color: "{{auth.token ? '#10b981' : '#6366f1'}}",
+                },
+              },
+              {
+                label: "{{auth.token ? 'Logout' : ''}}",
+                action: "clearAuth+reload",
+                fontAwesome: "{{auth.token ? 'fas fa-sign-out-alt' : ''}}",
+                iconHoverStyles: {
+                  color: "#ef4444",
+                  transform: "scale(1.2)",
+                },
+              },
+            ],
+          },
           categoriesHeading: {
             "ui:widget": "heading",
             "ui:text": "📂 Categories",

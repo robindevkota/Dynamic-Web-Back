@@ -14,13 +14,13 @@ const apiConfigs = [
     key: "products.filter",
     name: "Filter Products",
     description: "Filter products with multiple criteria",
-    url: "https://fakestoreapi.com/products",
+    url: "https://fakestoreapi.com/products?limit=2",
     method: "GET",
     transformPayload: `(function(payload) {
     console.log("=== TRANSFORM_PAYLOAD DEBUG ===");
     console.log("📦 Payload received:", payload);
     
-    const baseUrl = "https://fakestoreapi.com/products";
+    const baseUrl = "https://fakestoreapi.com/products?limit=2";
     const params = new URLSearchParams();
     
     if (payload.category && payload.category !== "") {
