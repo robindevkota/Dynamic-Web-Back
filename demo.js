@@ -5318,7 +5318,7 @@ input:focus, textarea:focus, select:focus {
       // In your JSON config, UPDATE the globalCSS to this:
 
       globalCSS: `
-   /* ============================================ */
+/* ============================================ */
 /* GLOBAL CSS - Enhanced Dark Winter Night Theme */
 /* ============================================ */
 
@@ -5339,7 +5339,6 @@ body {
   line-height: 1.6;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: #1e293b !important;
-  overflow-x: hidden;
   position: relative;
   min-height: 100vh;
   transition: background 0.5s ease, color 0.5s ease;
@@ -5364,8 +5363,8 @@ body.dark-mode header,
 body.dark-mode nav > *,
 body.dark-mode header > *,
 body.dark-mode .navbar {
-  background: rgba(17, 24, 39, 0.98) !important; /* Increased opacity */
-  border-bottom: 2px solid #4b5563 !important; /* Brighter border */
+  background: rgba(17, 24, 39, 0.98) !important;
+  border-bottom: 2px solid #4b5563 !important;
   backdrop-filter: blur(12px) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
 }
@@ -5428,7 +5427,7 @@ body:not(.dark-mode) nav a:hover {
 body.dark-mode {
   background: #000000 !important;
   color: #ffffff !important;
-  overflow: hidden;
+  /* REMOVED: overflow: hidden; - This was causing the scrolling issue */
 }
 
 body.dark-mode > div,
@@ -5441,149 +5440,7 @@ body.dark-mode article {
 
 /* Better dark mode border consistency */
 body.dark-mode * {
-  border-color: #4b5563 !important; /* Brighter border for better visibility */
-}
-
-/* ============================================ */
-/* ULTRA DENSE SNOWFALL - 3 Layers              */
-/* ============================================ */
-body.dark-mode::before,
-body.dark-mode::after,
-body.dark-mode .snow-layer3 {
-  content: '';
-  position: fixed;
-  inset: -20% 0 0 0;
-  pointer-events: none;
-  z-index: 1;
-  background-repeat: repeat;
-}
-
-/* Fast layer - small/medium flakes */
-body.dark-mode::before {
-  background-image: 
-    radial-gradient(1.8px circle at 5% 8%,  #ffffffcc 50%, transparent 50%),
-    radial-gradient(1.3px circle at 14% 17%, #ffffffd9 50%, transparent 50%),
-    radial-gradient(2.5px circle at 23% 11%, #ffffffff 50%, transparent 50%),
-    radial-gradient(1.6px circle at 32% 29%, #ffffffcc 50%, transparent 50%),
-    radial-gradient(2.2px circle at 41% 19%, #ffffffe6 50%, transparent 50%),
-    radial-gradient(1.1px circle at 49% 42%, #ffffffb3 50%, transparent 50%),
-    radial-gradient(2.9px circle at 58% 26%, #ffffffff 50%, transparent 50%);
-  background-size: 220% 220%;
-  animation: snowfall-fast 13s linear infinite;
-  opacity: 0.78;
-}
-
-/* Medium layer - bigger flakes, slower */
-body.dark-mode::after {
-  background-image: 
-    radial-gradient(2.7px circle at 9% 21%,  #ffffffcc 50%, transparent 50%),
-    radial-gradient(3.4px circle at 21% 34%, #ffffffd9 50%, transparent 50%),
-    radial-gradient(2.1px circle at 37% 48%, #ffffffb3 50%, transparent 50%),
-    radial-gradient(3.1px circle at 52% 15%, #ffffffff 50%, transparent 50%),
-    radial-gradient(2.4px circle at 68% 63%, #ffffffcc 50%, transparent 50%);
-  background-size: 190% 190%;
-  animation: snowfall-medium 24s linear infinite;
-  opacity: 0.58;
-}
-
-/* Slow fluffy layer */
-body.dark-mode .snow-layer3 {
-  background-image: 
-    radial-gradient(4.5px circle at 12% 38%,  #ffffffcc 45%, transparent 50%),
-    radial-gradient(5.2px circle at 31% 67%, #ffffffb3 45%, transparent 50%),
-    radial-gradient(4.8px circle at 59% 81%, #ffffffff 45%, transparent 50%),
-    radial-gradient(4.1px circle at 79% 24%, #ffffffd9 45%, transparent 50%);
-  background-size: 140% 140%;
-  animation: snowfall-slow 42s linear infinite;
-  opacity: 0.32;
-}
-
-@keyframes snowfall-fast   { from { transform: translateY(-20%); } to { transform: translateY(120%); } }
-@keyframes snowfall-medium { from { transform: translateY(-15%); } to { transform: translateY(115%); } }
-@keyframes snowfall-slow   { from { transform: translateY(-12%); } to { transform: translateY(110%); } }
-
-/* ============================================ */
-/* DENSE TWINKLING STARS + SHOOTING STARS       */
-/* ============================================ */
-body.dark-mode .stars {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background: 
-    radial-gradient(1.4px circle at 4% 9%, white 65%, transparent 65%),
-    radial-gradient(1px circle at 11% 22%, white 60%, transparent 60%),
-    radial-gradient(1.7px circle at 19% 31%, white 70%, transparent 70%),
-    radial-gradient(1.2px circle at 27% 44%, white 62%, transparent 62%),
-    radial-gradient(1.9px circle at 36% 16%, white 68%, transparent 68%),
-    radial-gradient(1.5px circle at 45% 59%, white 65%, transparent 65%),
-    radial-gradient(2.2px circle at 54% 37%, white 72%, transparent 72%),
-    radial-gradient(1.3px circle at 63% 68%, white 60%, transparent 60%),
-    radial-gradient(1.8px circle at 74% 25%, white 70%, transparent 70%),
-    radial-gradient(1.6px circle at 86% 73%, white 64%, transparent 64%);
-  background-size: 240% 240%;
-  opacity: 0.91;
-}
-
-body.dark-mode .stars::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(1.5px circle at 8% 18%, white 68%, transparent 68%),
-    radial-gradient(1.8px circle at 24% 36%, white 72%, transparent 72%),
-    radial-gradient(1.2px circle at 41% 52%, white 62%, transparent 62%),
-    radial-gradient(2.1px circle at 57% 71%, white 70%, transparent 70%);
-  background-size: 200% 200%;
-  animation: twinkle-intense 4.8s ease-in-out infinite;
-  opacity: 0.85;
-}
-
-/* Shooting stars */
-body.dark-mode .shooting-stars {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
-}
-
-body.dark-mode .shooting-stars::before,
-body.dark-mode .shooting-stars::after {
-  content: '';
-  position: absolute;
-  width: 140px;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #ffffff44, #ffffffff, #ffffffaa, transparent);
-  filter: blur(1.2px);
-  border-radius: 50%;
-  opacity: 0;
-  transform: translateX(-200%) translateY(-200%);
-}
-
-body.dark-mode .shooting-stars::before {
-  top: 15%;
-  left: -15%;
-  animation: shooting-star 5.8s linear infinite 2.4s;
-}
-
-body.dark-mode .shooting-stars::after {
-  top: 38%;
-  right: -15%;
-  animation: shooting-star 7.2s linear infinite 5.1s;
-  transform: rotate(-38deg) scaleX(-1);
-}
-
-@keyframes shooting-star {
-  0%   { opacity: 0; transform: translateX(-200%) translateY(-200%) scale(0.4); }
-  4%   { opacity: 0.95; transform: translateX(0%) translateY(0%) scale(1.1); }
-  12%  { opacity: 1; transform: translateX(220%) translateY(220%) scale(0.6); }
-  100% { opacity: 0; transform: translateX(450%) translateY(450%) scale(0.1); }
-}
-
-@keyframes twinkle-intense {
-  0%,100%   { opacity: 0.25; transform: scale(0.96); }
-  50%       { opacity: 1;    transform: scale(1.14); }
+  border-color: #4b5563 !important;
 }
 
 /* ============================================ */
@@ -5602,7 +5459,7 @@ body.dark-mode [class*="card"],
 body.dark-mode div[style*="background: white"],
 body.dark-mode div[style*="background:white"] {
   background: rgba(17, 24, 39, 0.94) !important;
-  border-color: #4b5563 !important; /* Brighter border */
+  border-color: #4b5563 !important;
   color: #ffffff !important;
   backdrop-filter: blur(10px);
 }
@@ -5649,7 +5506,7 @@ body.dark-mode::-webkit-scrollbar-track {
   background: #111827;
 }
 body.dark-mode::-webkit-scrollbar-thumb {
-  background: #4b5563; /* Brighter thumb */
+  background: #4b5563;
 }
 ::-webkit-scrollbar {
   width: 10px;
@@ -5671,7 +5528,8 @@ html {
 .fade-in {
   animation: fadeInUp 0.8s ease-out;
 }
-`,
+
+      `,
 
       actions: {
         toggleTheme: `console.log('🌓 Toggling theme');
@@ -5841,7 +5699,15 @@ context.handlers.setFormData({});`,
             "ui:widget": "backgroundEffect",
             "ui:effect": "snowfall",
             "ui:intensity": "high",
-            "ui:color": "#fcfcfc",
+            "ui:color": [
+              "#ff0000",
+              "#ff9900",
+              "#ffff00",
+              "#00ff00",
+              "#0099ff",
+              "#6600ff",
+              "#ff00ff",
+            ],
             "ui:speed": "medium",
           },
           backgroundEffectt: {
