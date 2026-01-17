@@ -21,8 +21,16 @@ const websites = [
     isAnonymous: false,
 
     initialization: {
-      globalCSS: `
-      @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+      globalCSS: `@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+      @keyframes flashIn {
+  0%   { transform: translateX(-50%) translateY(-120px); opacity: 0; }
+  100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+@keyframes flashOut {
+  0%   { transform: translateX(-50%) translateY(0); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+}
 /* Reset and Base Styles */
 * {
   margin: 0;
@@ -161,6 +169,19 @@ input:focus, textarea:focus, select:focus {
       // Add these to your initialization.actions in demo.js
 
       actions: {
+        // Auto-hide any element after X ms
+        hideAfter: `
+  const delay = context.actionParams?.delay || 3000;
+  setTimeout(() => {
+    const el = context.element;
+    if (el && el.parentNode) {
+      el.style.transition = "all 0.6s ease-out";
+      el.style.opacity = "0";
+      el.style.transform = "translateX(-50%) translateY(-100px)";
+      setTimeout(() => el.remove(), 600);
+    }
+  }, delay);
+`,
         validateThenApi: `
   console.log("✅ Validating form before API call");
   
@@ -1016,7 +1037,7 @@ input:focus, textarea:focus, select:focus {
                 "ui:actions": [
                   {
                     label: "Sign In",
-                   action: "validateThenApi",
+                    action: "validateThenApi",
                     actionParams: {
                       apiKey: "auth.login",
                       fields: [
@@ -2490,11 +2511,96 @@ input:focus, textarea:focus, select:focus {
               },
             ],
           },
+          notificationsDropdown: {
+            "ui:widget": "dropdown",
+            "ui:label": "🔔",
+            "ui:icon": "", // Remove default icon since we're using emoji
+            "ui:position": "bottom-right",
+            "ui:width": "320px",
+            "ui:styles": {
+              marginLeft: "12px", // ✅ Space from previous nav items
+              marginRight: "0", // No space on right edge
+            },
+            "ui:buttonStyles": {
+              width: "45px",
+              height: "45px",
+              borderRadius: "50%",
+              padding: "0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "20px",
+              border: "2px solid #e2e8f0",
+              background: "white",
+            },
+            "ui:items": [
+              {
+                type: "header",
+                label: "Notifications",
+              },
+              {
+                icon: "📦",
+                label: "Your order has shipped",
+                action: "navigateToPage",
+                actionParams: { url: "/shopzone/order/123" },
+              },
+              {
+                icon: "💰",
+                label: "New discount available",
+                badge: "New",
+                action: "navigateToPage",
+                actionParams: { url: "/shopzone/deals" },
+              },
+              {
+                type: "divider",
+              },
+              {
+                label: "View All Notifications",
+                action: "navigateToPage",
+                actionParams: { url: "/shopzone/notifications" },
+              },
+            ],
+          },
+
+          // ✅ Language Selector
+          languageDropdown: {
+            "ui:widget": "dropdown",
+            "ui:label": "🌐 English",
+            "ui:position": "bottom-right",
+            "ui:width": "200px",
+            "ui:styles": {
+              marginLeft: "12px",
+            },
+            "ui:buttonStyles": {
+              padding: "10px 16px",
+              borderRadius: "8px",
+            },
+            "ui:items": [
+              {
+                icon: "🇺🇸",
+                label: "English",
+                action: "setLanguage",
+                actionParams: { lang: "en" },
+              },
+              {
+                icon: "🇪🇸",
+                label: "Español",
+                action: "setLanguage",
+                actionParams: { lang: "es" },
+              },
+              {
+                icon: "🇫🇷",
+                label: "Français",
+                action: "setLanguage",
+                actionParams: { lang: "fr" },
+              },
+            ],
+          },
         },
         styles: {
           background: "#ffffff",
           borderBottom: "2px solid #f0f0f0",
-          padding: "20px 50px",
+          marginTop: 40,
           position: "fixed",
           width: "100%",
           zIndex: 1000,
@@ -2665,7 +2771,7 @@ input:focus, textarea:focus, select:focus {
         styles: {
           width: "280px",
           background: "#f8fafc",
-          padding: "120px 24px 24px",
+          padding: "12px 24px 24px",
           minHeight: "100vh",
           borderRight: "1px solid #e2e8f0",
           position: "sticky",
@@ -2678,9 +2784,37 @@ input:focus, textarea:focus, select:focus {
         table: {},
         modal: {},
         uiSchema: {
+          welcomeFlash: {
+            "ui:widget": "card",
+            "ui:title": "Added to cart!",
+            "ui:description": "Monstera Deliciosa × 1",
+            "ui:styles": {
+              position: "fixed",
+              top: "30%",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 9999,
+              background: "#10b981",
+              color: "white",
+              padding: "20px 48px",
+              borderRadius: "16px",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
+              textAlign: "center",
+              fontWeight: "600",
+              minWidth: "320px",
+              animation: "flashIn 0.5s ease-out, flashOut 0.8s 3.2s forwards",
+              pointerEvents: "none",
+            },
+            "ui:triggers": [
+              {
+                event: "load",
+                action: "noop",
+              },
+            ],
+          },
           hero: {
             "ui:widget": "hero",
-            "ui:title": "Summer Sale 🔥",
+            "ui:title": "Summer Sale",
             "ui:subtitle":
               "Up to 50% OFF on selected items. Limited time offer!",
             "ui:cta": {
@@ -2689,8 +2823,30 @@ input:focus, textarea:focus, select:focus {
             },
             "ui:styles": {
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              minHeight: "500px",
-              padding: "150px 40px 100px",
+              minHeight: "520px",
+              height: "auto",
+              width: "100vw",
+              position: "relative",
+              left: "50%",
+              right: "50%",
+              marginLeft: "-50vw",
+              marginRight: "-50vw",
+              padding: "140px 20px 80px",
+              textAlign: "center",
+              color: "white",
+              boxSizing: "border-box",
+              overflow: "hidden",
+            },
+            "ui:titleStyles": {
+              fontSize: "clamp(2.5rem, 8vw, 4.5rem)",
+              fontWeight: "800",
+              marginBottom: "16px",
+              textShadow: "0 4px 12px rgba(0,0,0,0.3)",
+            },
+            "ui:subtitleStyles": {
+              fontSize: "clamp(1.2rem, 4vw, 1.8rem)",
+              marginBottom: "32px",
+              opacity: "0.95",
             },
           },
 
@@ -2765,13 +2921,21 @@ input:focus, textarea:focus, select:focus {
           },
         },
         styles: {
-          padding: "100px 40px 80px",
+          padding: "0",
+          margin: "0",
           background: "#ffffff",
           flex: 1,
           minHeight: "100vh",
+          overflow: "hidden",
+          position: "relative",
         },
         triggers: [
           { event: "load", action: "fetchProducts", source: "products.api" },
+          {
+            event: "load",
+            action: "hideAfter",
+            actionParams: { delay: 3500 },
+          },
         ],
       },
 
@@ -5139,6 +5303,1145 @@ input:focus, textarea:focus, select:focus {
         triggers: [],
       },
     },
+  },
+  {
+    title: "Robin Devkota - Frontend Developer",
+    slug: "robin-portfolio",
+    projectUUID: "portfolio-robin",
+    taskUUID: "portfolio001",
+    status: "Active",
+    accountValidation: false,
+    otpValidation: false,
+    isAnonymous: true,
+
+    initialization: {
+      // In your JSON config, UPDATE the globalCSS to this:
+
+      globalCSS: `
+   /* ============================================ */
+/* GLOBAL CSS - Enhanced Dark Winter Night Theme */
+/* ============================================ */
+
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================ */
+/* BASE STYLES - Light Mode (Default)           */
+/* ============================================ */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: #1e293b !important;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* Light mode logo fix */
+body:not(.dark-mode) nav [class*="logo"],
+body:not(.dark-mode) nav [style*="gradient"],
+body:not(.dark-mode) .navbar-logo {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ============================================ */
+/* NAVIGATION LINKS - UPDATED FIX               */
+/* ============================================ */
+/* NAVBAR - HIGHER CONTRAST IN DARK MODE */
+body.dark-mode nav,
+body.dark-mode header,
+body.dark-mode nav > *,
+body.dark-mode header > *,
+body.dark-mode .navbar {
+  background: rgba(17, 24, 39, 0.98) !important; /* Increased opacity */
+  border-bottom: 2px solid #4b5563 !important; /* Brighter border */
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Ensure all text inside navbar is visible */
+body.dark-mode nav *,
+body.dark-mode header *,
+body.dark-mode .navbar * {
+  color: #ffffff !important;
+}
+
+/* Specific nav links styling */
+body.dark-mode nav a,
+body.dark-mode .nav-links a,
+body.dark-mode [class*="navLink"],
+body.dark-mode [class*="nav-link"],
+body.dark-mode .navbar-links a,
+body.dark-mode .ui-navLinks a {
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  opacity: 1 !important;
+  font-weight: 600 !important;
+}
+
+/* Hover state */
+body.dark-mode nav a:hover,
+body.dark-mode .nav-links a:hover,
+body.dark-mode [class*="navLink"]:hover,
+body.dark-mode [class*="nav-link"]:hover {
+  color: #60a5fa !important;
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Light mode nav */
+body:not(.dark-mode) nav,
+body:not(.dark-mode) header,
+body:not(.dark-mode) nav > *,
+body:not(.dark-mode) header > * {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-bottom-color: #e2e8f0 !important;
+  backdrop-filter: blur(10px);
+}
+
+body:not(.dark-mode) nav a,
+body:not(.dark-mode) .nav-links a,
+body:not(.dark-mode) [class*="navLink"],
+body:not(.dark-mode) [class*="nav-link"] {
+  color: #0e5ad4 !important;
+  font-weight: 600 !important;
+}
+
+body:not(.dark-mode) nav a:hover {
+  color: #2563eb !important;
+}
+
+/* ============================================ */
+/* DARK MODE - True Black + Winter Sky          */
+/* ============================================ */
+body.dark-mode {
+  background: #000000 !important;
+  color: #ffffff !important;
+  overflow: hidden;
+}
+
+body.dark-mode > div,
+body.dark-mode section,
+body.dark-mode main,
+body.dark-mode aside,
+body.dark-mode article {
+  background: transparent !important;
+}
+
+/* Better dark mode border consistency */
+body.dark-mode * {
+  border-color: #4b5563 !important; /* Brighter border for better visibility */
+}
+
+/* ============================================ */
+/* ULTRA DENSE SNOWFALL - 3 Layers              */
+/* ============================================ */
+body.dark-mode::before,
+body.dark-mode::after,
+body.dark-mode .snow-layer3 {
+  content: '';
+  position: fixed;
+  inset: -20% 0 0 0;
+  pointer-events: none;
+  z-index: 1;
+  background-repeat: repeat;
+}
+
+/* Fast layer - small/medium flakes */
+body.dark-mode::before {
+  background-image: 
+    radial-gradient(1.8px circle at 5% 8%,  #ffffffcc 50%, transparent 50%),
+    radial-gradient(1.3px circle at 14% 17%, #ffffffd9 50%, transparent 50%),
+    radial-gradient(2.5px circle at 23% 11%, #ffffffff 50%, transparent 50%),
+    radial-gradient(1.6px circle at 32% 29%, #ffffffcc 50%, transparent 50%),
+    radial-gradient(2.2px circle at 41% 19%, #ffffffe6 50%, transparent 50%),
+    radial-gradient(1.1px circle at 49% 42%, #ffffffb3 50%, transparent 50%),
+    radial-gradient(2.9px circle at 58% 26%, #ffffffff 50%, transparent 50%);
+  background-size: 220% 220%;
+  animation: snowfall-fast 13s linear infinite;
+  opacity: 0.78;
+}
+
+/* Medium layer - bigger flakes, slower */
+body.dark-mode::after {
+  background-image: 
+    radial-gradient(2.7px circle at 9% 21%,  #ffffffcc 50%, transparent 50%),
+    radial-gradient(3.4px circle at 21% 34%, #ffffffd9 50%, transparent 50%),
+    radial-gradient(2.1px circle at 37% 48%, #ffffffb3 50%, transparent 50%),
+    radial-gradient(3.1px circle at 52% 15%, #ffffffff 50%, transparent 50%),
+    radial-gradient(2.4px circle at 68% 63%, #ffffffcc 50%, transparent 50%);
+  background-size: 190% 190%;
+  animation: snowfall-medium 24s linear infinite;
+  opacity: 0.58;
+}
+
+/* Slow fluffy layer */
+body.dark-mode .snow-layer3 {
+  background-image: 
+    radial-gradient(4.5px circle at 12% 38%,  #ffffffcc 45%, transparent 50%),
+    radial-gradient(5.2px circle at 31% 67%, #ffffffb3 45%, transparent 50%),
+    radial-gradient(4.8px circle at 59% 81%, #ffffffff 45%, transparent 50%),
+    radial-gradient(4.1px circle at 79% 24%, #ffffffd9 45%, transparent 50%);
+  background-size: 140% 140%;
+  animation: snowfall-slow 42s linear infinite;
+  opacity: 0.32;
+}
+
+@keyframes snowfall-fast   { from { transform: translateY(-20%); } to { transform: translateY(120%); } }
+@keyframes snowfall-medium { from { transform: translateY(-15%); } to { transform: translateY(115%); } }
+@keyframes snowfall-slow   { from { transform: translateY(-12%); } to { transform: translateY(110%); } }
+
+/* ============================================ */
+/* DENSE TWINKLING STARS + SHOOTING STARS       */
+/* ============================================ */
+body.dark-mode .stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: 
+    radial-gradient(1.4px circle at 4% 9%, white 65%, transparent 65%),
+    radial-gradient(1px circle at 11% 22%, white 60%, transparent 60%),
+    radial-gradient(1.7px circle at 19% 31%, white 70%, transparent 70%),
+    radial-gradient(1.2px circle at 27% 44%, white 62%, transparent 62%),
+    radial-gradient(1.9px circle at 36% 16%, white 68%, transparent 68%),
+    radial-gradient(1.5px circle at 45% 59%, white 65%, transparent 65%),
+    radial-gradient(2.2px circle at 54% 37%, white 72%, transparent 72%),
+    radial-gradient(1.3px circle at 63% 68%, white 60%, transparent 60%),
+    radial-gradient(1.8px circle at 74% 25%, white 70%, transparent 70%),
+    radial-gradient(1.6px circle at 86% 73%, white 64%, transparent 64%);
+  background-size: 240% 240%;
+  opacity: 0.91;
+}
+
+body.dark-mode .stars::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(1.5px circle at 8% 18%, white 68%, transparent 68%),
+    radial-gradient(1.8px circle at 24% 36%, white 72%, transparent 72%),
+    radial-gradient(1.2px circle at 41% 52%, white 62%, transparent 62%),
+    radial-gradient(2.1px circle at 57% 71%, white 70%, transparent 70%);
+  background-size: 200% 200%;
+  animation: twinkle-intense 4.8s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+/* Shooting stars */
+body.dark-mode .shooting-stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+body.dark-mode .shooting-stars::before,
+body.dark-mode .shooting-stars::after {
+  content: '';
+  position: absolute;
+  width: 140px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffffff44, #ffffffff, #ffffffaa, transparent);
+  filter: blur(1.2px);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translateX(-200%) translateY(-200%);
+}
+
+body.dark-mode .shooting-stars::before {
+  top: 15%;
+  left: -15%;
+  animation: shooting-star 5.8s linear infinite 2.4s;
+}
+
+body.dark-mode .shooting-stars::after {
+  top: 38%;
+  right: -15%;
+  animation: shooting-star 7.2s linear infinite 5.1s;
+  transform: rotate(-38deg) scaleX(-1);
+}
+
+@keyframes shooting-star {
+  0%   { opacity: 0; transform: translateX(-200%) translateY(-200%) scale(0.4); }
+  4%   { opacity: 0.95; transform: translateX(0%) translateY(0%) scale(1.1); }
+  12%  { opacity: 1; transform: translateX(220%) translateY(220%) scale(0.6); }
+  100% { opacity: 0; transform: translateX(450%) translateY(450%) scale(0.1); }
+}
+
+@keyframes twinkle-intense {
+  0%,100%   { opacity: 0.25; transform: scale(0.96); }
+  50%       { opacity: 1;    transform: scale(1.14); }
+}
+
+/* ============================================ */
+/* Z-INDEX MANAGEMENT                           */
+/* ============================================ */
+body.dark-mode > *:not(.stars):not(.shooting-stars):not(.snow-layer3) {
+  position: relative;
+  z-index: 10 !important;
+}
+
+/* ============================================ */
+/* CARDS & OTHER COMPONENTS                     */
+/* ============================================ */
+body.dark-mode article,
+body.dark-mode [class*="card"],
+body.dark-mode div[style*="background: white"],
+body.dark-mode div[style*="background:white"] {
+  background: rgba(17, 24, 39, 0.94) !important;
+  border-color: #4b5563 !important; /* Brighter border */
+  color: #ffffff !important;
+  backdrop-filter: blur(10px);
+}
+
+/* Headings & Text */
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3,
+body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+body.dark-mode p,
+body.dark-mode span:not(.gradient-text),
+body.dark-mode div {
+  color: #e5e7eb !important;
+}
+
+/* Forms */
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background: rgba(31, 41, 55, 0.92) !important;
+  border-color: #4b5563 !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Gradient text */
+.gradient-text,
+span[style*="gradient"],
+h2[style*="gradient"] {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* Scrollbar */
+body.dark-mode::-webkit-scrollbar-track {
+  background: #111827;
+}
+body.dark-mode::-webkit-scrollbar-thumb {
+  background: #4b5563; /* Brighter thumb */
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+}
+
+/* Smooth scrolling & fade animation */
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeInUp 0.8s ease-out;
+}
+`,
+
+      actions: {
+        toggleTheme: `console.log('🌓 Toggling theme');
+const body = document.body;
+const isDark = body.classList.contains('dark-mode');
+
+// Create stars container if it doesn't exist
+let starsContainer = document.querySelector('.stars');
+if (!starsContainer) {
+  starsContainer = document.createElement('div');
+  starsContainer.className = 'stars';
+  document.body.appendChild(starsContainer);
+}
+
+if (isDark) {
+  body.classList.remove('dark-mode');
+  localStorage.setItem('theme', 'light');
+  console.log('☀️ Light mode');
+  // Remove stars container in light mode
+  if (starsContainer) {
+    starsContainer.remove();
+  }
+} else {
+  body.classList.add('dark-mode');
+  localStorage.setItem('theme', 'dark');
+  console.log('🌙 Dark mode with snowfall');
+  // Ensure stars container is in body
+  if (!document.querySelector('.stars')) {
+    document.body.appendChild(starsContainer);
+  }
+}`,
+
+        loadTheme: `console.log('🎨 Loading theme');
+const saved = localStorage.getItem('theme');
+if (saved === 'dark') {
+  document.body.classList.add('dark-mode');
+  console.log('🌙 Dark mode with snowfall loaded');
+  
+  // Create stars container for dark mode
+  let starsContainer = document.querySelector('.stars');
+  if (!starsContainer) {
+    starsContainer = document.createElement('div');
+    starsContainer.className = 'stars';
+    document.body.appendChild(starsContainer);
+  }
+}`,
+
+        scrollToSection: `const section = context.actionParams?.section;
+if (!section) return;
+console.log('🎯 Scrolling to:', section);
+const el = document.getElementById(section);
+if (el) {
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}`,
+
+        logContactForm: `console.log('📧 === CONTACT FORM ===');
+console.log('📦 Data:', context.formData);
+console.log('📧 Email:', context.formData?.email);
+console.log('💬 Message:', context.formData?.message);
+context.handlers.showNotification({
+  type: 'toast',
+  message: '✅ Message sent successfully!',
+  background: '#10b981',
+  duration: 3000
+});
+context.handlers.setFormData({});`,
+      },
+    },
+
+    components: {
+      navbar: {
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "👨‍💻 Robin Devkota",
+            "ui:styles": {
+              fontSize: "24px",
+              fontWeight: "800",
+              background: "linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+            },
+            "ui:action": "scrollToSection",
+            "ui:actionParams": { section: "home" },
+          },
+
+          themeToggle: {
+            "ui:widget": "toggle",
+            "ui:label": "",
+            "ui:size": "medium",
+            "ui:onChange": "toggleTheme",
+            "ui:styles": {
+              marginLeft: "auto",
+              marginRight: "20px",
+            },
+          },
+
+          navLinks: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:styles": {
+              color: "#374151",
+              fontWeight: "600",
+            },
+            "ui:links": [
+              {
+                label: "Home",
+                action: "scrollToSection",
+                actionParams: { section: "home" },
+                styles: {
+                  color: "inherit",
+                  padding: "10px 15px",
+                  borderRadius: "6px",
+                  transition: "all 0.3s ease",
+                },
+              },
+              {
+                label: "Projects",
+                action: "scrollToSection",
+                actionParams: { section: "projects" },
+                styles: {
+                  color: "inherit",
+                  padding: "10px 15px",
+                  borderRadius: "6px",
+                  transition: "all 0.3s ease",
+                },
+              },
+              {
+                label: "Contact",
+                action: "scrollToSection",
+                actionParams: { section: "contact" },
+                styles: {
+                  color: "inherit",
+                  padding: "10px 15px",
+                  borderRadius: "6px",
+                  transition: "all 0.3s ease",
+                },
+              },
+            ],
+          },
+        },
+        styles: {
+          borderBottom: "2px solid #e2e8f0",
+          padding: "16px 50px",
+          position: "fixed",
+          width: "100%",
+          top: "0",
+          zIndex: "10000",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+        },
+        triggers: [
+          {
+            event: "load",
+            action: "loadTheme",
+          },
+        ],
+      },
+      main: {
+        uiSchema: {
+          backgroundEffect: {
+            "ui:widget": "backgroundEffect",
+            "ui:effect": "snowfall",
+            "ui:intensity": "high",
+            "ui:color": "#fcfcfc",
+            "ui:speed": "medium",
+          },
+          backgroundEffectt: {
+            "ui:widget": "backgroundEffect",
+            "ui:effect": "shootingStars",
+            "ui:intensity": "medium",
+            "ui:color": "#9ff00a",
+          },
+          backgroundEffecttt: {
+            "ui:widget": "backgroundEffect",
+            "ui:effect": "stars",
+            "ui:intensity": "high",
+            "ui:color": "#380ff0",
+          },
+
+          homeSection: {
+            "ui:widget": "container",
+            "ui:id": "home",
+            "ui:children": [
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 2,
+                "ui:gap": "60px",
+                "ui:styles": {
+                  maxWidth: "1200px",
+                  margin: "0 auto",
+                  alignItems: "center",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:gap": "24px",
+                    "ui:children": [
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "Hi, I'm Robin Devkota 👋",
+                        "ui:level": "h1",
+                        "ui:styles": {
+                          fontSize: "3.5rem",
+                          fontWeight: "800",
+                          marginBottom: "0",
+                        },
+                      },
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "Frontend Developer",
+                        "ui:level": "h2",
+                        "ui:styles": {
+                          fontSize: "2rem",
+                          fontWeight: "600",
+
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          marginBottom: "0",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text":
+                          "Frontend Developer with 2+ years of experience building scalable web applications using React, MERN, and RJSF. Skilled in reusable UI component development, form automation, and enhancing UX flows. Passionate about problem solving and writing clean, maintainable code.",
+                        "ui:styles": {
+                          fontSize: "1.1rem",
+                          lineHeight: "1.8",
+                          color: "#64748b",
+                          fontWeight: "400",
+                        },
+                      },
+                      {
+                        "ui:widget": "flexLayout",
+                        "ui:direction": "row",
+                        "ui:gap": "16px",
+                        "ui:children": [
+                          {
+                            "ui:widget": "button",
+                            "ui:label": "View Projects",
+                            "ui:action": "scrollToSection",
+                            "ui:actionParams": { section: "projects" },
+                            "ui:variant": "primary",
+                            "ui:styles": {
+                              padding: "14px 32px",
+                              fontSize: "1.1rem",
+
+                              color: "white",
+                              borderRadius: "8px",
+                              border: "none",
+                              fontWeight: "600",
+                              className: "btn-primary",
+                            },
+                          },
+                          {
+                            "ui:widget": "button",
+                            "ui:label": "Contact Me",
+                            "ui:action": "scrollToSection",
+                            "ui:actionParams": { section: "contact" },
+                            "ui:variant": "outline",
+                            "ui:styles": {
+                              padding: "14px 32px",
+                              fontSize: "1.1rem",
+
+                              color: "#3b82f6",
+                              borderRadius: "8px",
+                              border: "2px solid #3b82f6",
+                              fontWeight: "600",
+                              className: "btn-outline",
+                            },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                  {
+                    "ui:widget": "gridLayout",
+                    "ui:columns": 2,
+                    "ui:gap": "20px",
+                    "ui:children": [
+                      {
+                        "ui:widget": "card",
+                        "ui:title": "🎨 Frontend",
+                        "ui:description":
+                          "React, JavaScript, HTML/CSS, React Native",
+                        "ui:styles": {
+                          padding: "24px",
+
+                          border: "2px solid #3b82f6",
+                          fontWeight: "500",
+                        },
+                      },
+                      {
+                        "ui:widget": "card",
+                        "ui:title": "⚙️ Backend",
+                        "ui:description": "Node.js, Express, MongoDB, SQL",
+                        "ui:styles": {
+                          padding: "24px",
+
+                          border: "2px solid #10b981",
+                          fontWeight: "500",
+                        },
+                      },
+                      {
+                        "ui:widget": "card",
+                        "ui:title": "🛠️ Tools",
+                        "ui:description": "Git, VS Code, Postman, Figma",
+                        "ui:styles": {
+                          padding: "24px",
+
+                          border: "2px solid #f59e0b",
+                          fontWeight: "500",
+                        },
+                      },
+                      {
+                        "ui:widget": "card",
+                        "ui:title": "📚 Learning",
+                        "ui:description": "TypeScript, Next.js, GraphQL",
+                        "ui:styles": {
+                          padding: "24px",
+
+                          border: "2px solid #a855f7",
+                          fontWeight: "500",
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                "ui:widget": "spacer",
+                "ui:height": 60,
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 2,
+                "ui:gap": "40px",
+                "ui:styles": {
+                  maxWidth: "1200px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "💼 Experience",
+                    "ui:description":
+                      "Associate Software Engineer\n\n• Pharma Release Management System\n• Account Opening CMS\n• Reduced form errors by 30%+\n• Optimized workflows saving 40% time",
+                    "ui:styles": {
+                      padding: "32px",
+                      minHeight: "250px",
+                      fontWeight: "500",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🎓 Education",
+                    "ui:description":
+                      "Bachelor of Science in Computer Science and IT\nPrime College (2019-2024)\nGrade: A\n\nHigh School Science\nKIST College (2017-2019)\nGrade: A",
+                    "ui:styles": {
+                      padding: "32px",
+                      minHeight: "250px",
+                      fontWeight: "500",
+                    },
+                  },
+                ],
+              },
+            ],
+            "ui:styles": {
+              padding: "120px 40px 80px",
+
+              minHeight: "100vh",
+            },
+          },
+
+          projectsSection: {
+            "ui:widget": "container",
+            "ui:id": "projects",
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "🚀 Featured Projects",
+                "ui:level": "h2",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "60px",
+                  fontSize: "2.8rem",
+                  fontWeight: "800",
+                },
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 1,
+                "ui:gap": "40px",
+                "ui:styles": {
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🏥 Pharma Release Management",
+                    "ui:description":
+                      "Dynamic multi-role system for streamlining version and release workflows. Built with React, implemented RBAC, integrated APIs for version control. Reduced manual effort by 40%.",
+                    "ui:image":
+                      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop",
+                    "ui:styles": {
+                      padding: "40px",
+                      fontWeight: "500",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🏦 Account Opening CMS",
+                    "ui:description":
+                      "Multi-step account opening form using React and RJSF. Enhanced validation logic and conditional rendering. Reduced form submission errors by 30%+.",
+                    "ui:image":
+                      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=400&fit=crop",
+                    "ui:styles": {
+                      padding: "40px",
+                      fontWeight: "500",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🎨 Pixel History",
+                    "ui:description":
+                      "Full-stack MERN application with integrated payment gateway. E-commerce platform for digital art. Complete authentication, cart system, and order management.",
+                    "ui:image":
+                      "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=400&fit=crop",
+                    "ui:styles": {
+                      padding: "40px",
+                      fontWeight: "500",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "spacer",
+                "ui:height": 40,
+              },
+              {
+                "ui:widget": "heading",
+                "ui:text": "🛠️ Technologies I Use",
+                "ui:level": "h3",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "30px",
+                  fontWeight: "700",
+                },
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 4,
+                "ui:gap": "20px",
+                "ui:styles": {
+                  maxWidth: "1000px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "badge",
+                    "ui:text": "React",
+                    "ui:variant": "info",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                    },
+                  },
+                  {
+                    "ui:widget": "badge",
+                    "ui:text": "Node.js",
+                    "ui:variant": "success",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                    },
+                  },
+                  {
+                    "ui:widget": "badge",
+                    "ui:text": "MongoDB",
+                    "ui:variant": "success",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                    },
+                  },
+                  {
+                    "ui:widget": "badge",
+                    "ui:text": "Express",
+                    "ui:variant": "primary",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                    },
+                  },
+                  {
+                    "ui:widget": "badge",
+                    "ui:text": "JavaScript",
+                    "ui:variant": "warning",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                    },
+                  },
+                  {
+                    "ui:widget": "badge",
+                    "ui:text": "SQL",
+                    "ui:variant": "info",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                    },
+                  },
+                  {
+                    "ui:widget": "badge",
+                    "ui:text": "Python",
+                    "ui:variant": "primary",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                    },
+                  },
+                  {
+                    "ui:widget": "badge",
+                    "ui:text": "C++",
+                    "ui:variant": "danger",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                    },
+                  },
+                ],
+              },
+            ],
+            "ui:styles": {
+              padding: "100px 40px",
+
+              minHeight: "100vh",
+            },
+          },
+
+          contactSection: {
+            "ui:widget": "container",
+            "ui:id": "contact",
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "📬 Get In Touch",
+                "ui:level": "h2",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "60px",
+                  fontSize: "2.8rem",
+                  fontWeight: "800",
+                },
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 2,
+                "ui:gap": "60px",
+                "ui:styles": {
+                  maxWidth: "1200px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:gap": "30px",
+                    "ui:children": [
+                      {
+                        "ui:widget": "card",
+                        "ui:title": "📧 Email",
+                        "ui:description": "robindevkta0@gmail.com",
+                        "ui:styles": {
+                          padding: "24px",
+
+                          border: "2px solid #3b82f6",
+                          fontWeight: "500",
+                        },
+                      },
+                      {
+                        "ui:widget": "card",
+                        "ui:title": "📱 Phone",
+                        "ui:description": "+977 9813025452",
+                        "ui:styles": {
+                          padding: "24px",
+
+                          border: "2px solid #10b981",
+                          fontWeight: "500",
+                        },
+                      },
+                      {
+                        "ui:widget": "card",
+                        "ui:title": "📍 Location",
+                        "ui:description": "Thamel, Kathmandu, Nepal",
+                        "ui:styles": {
+                          padding: "24px",
+
+                          border: "2px solid #f59e0b",
+                          fontWeight: "500",
+                        },
+                      },
+                      {
+                        "ui:widget": "card",
+                        "ui:title": "🌐 Portfolio",
+                        "ui:description": "robindevkota.com.np",
+                        "ui:styles": {
+                          padding: "24px",
+
+                          border: "2px solid #a855f7",
+                          fontWeight: "500",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    "ui:widget": "formContainer",
+                    "ui:title": "Send Me a Message",
+                    "ui:description":
+                      "I'll get back to you as soon as possible!",
+                    "ui:styles": {
+                      padding: "40px",
+                      borderRadius: "16px",
+                      boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                    },
+                    "ui:fields": [
+                      {
+                        "ui:widget": "inputField",
+                        "ui:label": "Your Email",
+                        "ui:placeholder": "your.email@example.com",
+                        "ui:type": "email",
+                        "ui:name": "email",
+                        "ui:required": true,
+                      },
+                      {
+                        "ui:widget": "textareaField",
+                        "ui:label": "Your Message",
+                        "ui:placeholder": "Type your message here...",
+                        "ui:name": "message",
+                        "ui:required": true,
+                        "ui:rows": 6,
+                      },
+                    ],
+                    "ui:actions": [
+                      {
+                        label: "Send Message 📤",
+                        action: "logContactForm",
+                        variant: "primary",
+                        styles: {
+                          width: "100%",
+                          padding: "14px 0",
+
+                          color: "white",
+                          fontSize: "1.1rem",
+                          fontWeight: "600",
+                          borderRadius: "8px",
+                          border: "none",
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+              {
+                "ui:widget": "spacer",
+                "ui:height": 60,
+              },
+              {
+                "ui:widget": "socialIcons",
+                "ui:size": "large",
+                "ui:variant": "colored",
+                "ui:icons": [
+                  {
+                    platform: "linkedin",
+                    url: "https://linkedin.com/in/robin-devkota",
+                    fontAwesome: "fab fa-linkedin-in",
+                  },
+                  {
+                    platform: "github",
+                    url: "https://github.com/robindevkota",
+                    fontAwesome: "fab fa-github",
+                  },
+                  {
+                    platform: "email",
+                    url: "mailto:robindevkta0@gmail.com",
+                    fontAwesome: "fas fa-envelope",
+                  },
+                  {
+                    platform: "website",
+                    url: "https://robindevkota.com.np",
+                    fontAwesome: "fas fa-globe",
+                  },
+                ],
+                "ui:styles": {
+                  marginTop: "40px",
+                },
+              },
+            ],
+            "ui:styles": {
+              padding: "100px 40px",
+
+              minHeight: "100vh",
+            },
+          },
+        },
+        styles: {
+          paddingTop: "80px",
+        },
+        triggers: [
+          {
+            event: "load",
+            action: "loadTheme",
+          },
+        ],
+      },
+
+      footer: {
+        uiSchema: {
+          footerContent: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:align": "center",
+            "ui:gap": "20px",
+            "ui:children": [
+              {
+                "ui:widget": "text",
+                "ui:content": "© 2024 Robin Devkota. All rights reserved.",
+                "ui:styles": {
+                  color: "#94a3b8",
+                  fontSize: "0.95rem",
+                  fontWeight: "400",
+                },
+              },
+              {
+                "ui:widget": "text",
+                "ui:content":
+                  "Built with ❤️ using React & JSON-driven architecture",
+                "ui:styles": {
+                  color: "#64748b",
+                  fontSize: "0.9rem",
+                  fontWeight: "400",
+                },
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "#1e293b",
+          padding: "40px 20px",
+          textAlign: "center",
+        },
+      },
+    },
+
+    resolvedAPIs: {},
   },
 ];
 

@@ -1,48 +1,56 @@
-const websites = [
-  {
-    title: "ShopZone",
-    slug: "shopzone",
-    
-    components: {
-      navbar: {
-        _id: "main-navbar",  // ✅ Give it an ID
-        table: {},
-        modal: {},
-        uiSchema: { /* navbar widgets */ },
-        styles: { /* navbar styles */ },
-        triggers: []
-      },
-      
-      footer: {
-        _id: "main-footer",  // ✅ Give it an ID
-        table: {},
-        modal: {},
-        uiSchema: { /* footer widgets */ },
-        styles: { /* footer styles */ },
-        triggers: []
+"projectsSection": {
+  "ui:widget": "container",
+  "ui:id": "projects",
+  "ui:children": [
+    {
+      "ui:widget": "heading",
+      "ui:text": "🚀 Featured Projects",
+      "ui:level": "h2",
+      "ui:styles": {
+        "textAlign": "center",
+        "marginBottom": "60px",
+        "fontSize": "2.8rem",
+        "fontWeight": "800"
       }
     },
-    
-    pages: {
-      login: {
-        title: "Login",
-        components: {
-          navbar: { $ref: "main-navbar" },  // ✅ Reference
-          sidebar: { styles: { display: "none" } },
-          main: { /* login content */ },
-          footer: { $ref: "main-footer" }  // ✅ Reference
-        }
+    {
+      "ui:widget": "gridLayout",
+      "ui:columns": 1,
+      "ui:gap": "40px",
+      "ui:styles": {
+        "maxWidth": "900px",
+        "margin": "0 auto"
       },
-      
-      signup: {
-        title: "Sign Up",
-        components: {
-          navbar: { $ref: "main-navbar" },  // ✅ Reference
-          sidebar: { styles: { display: "none" } },
-          main: { /* signup content */ },
-          footer: { $ref: "main-footer" }  // ✅ Reference
-        }
-      }
+      "ui:children": [
+        {
+          "ui:widget": "animatedContainer",
+          "ui:effects": [
+            {
+              "type": "slideUp",
+              "trigger": "onScroll",
+              "duration": 800
+            },
+            {
+              "type": "zoomIn",
+              "trigger": "onHover",
+              "duration": 300
+            }
+          ],
+          "ui:children": [
+            {
+              "ui:widget": "card",
+              "ui:title": "🏥 Pharma Release Management",
+              "ui:description": "Dynamic multi-role system for streamlining version and release workflows. Built with React, implemented RBAC, integrated APIs for version control. Reduced manual effort by 40%.",
+              "ui:image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop",
+              "ui:styles": {
+                "padding": "40px",
+                "fontWeight": "500"
+              }
+            }
+          ]
+        },
+        // ... other project cards
+      ]
     }
-  }
-];
+  ]
+}
