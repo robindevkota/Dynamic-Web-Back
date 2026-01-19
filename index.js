@@ -8,9 +8,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3000", // frontend origin
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // <-- important for cookies
   })
 );
 
@@ -36,6 +37,8 @@ mongoose.connect(MONGO_URI, {
 const pageRoutes = require("./routes/pageConfigRoutes");
 const apiConfigRoutes = require("./routes/apiConfigRoutes");
 const productRoutes = require("./routes/products");
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/pages", pageRoutes);
 app.use("/api/api-configs", apiConfigRoutes);

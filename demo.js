@@ -6,7 +6,7 @@ mongoose.connect(
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  }
+  },
 );
 
 const websites = [
@@ -6303,6 +6303,2790 @@ context.handlers.setFormData({});`,
           background: "#1e293b",
           padding: "40px 20px",
           textAlign: "center",
+        },
+      },
+    },
+
+    resolvedAPIs: {},
+  },
+  // Add this to your demo.js websites array
+
+  // Add this to your demo.js websites array
+
+  // Add this to your demo.js websites array
+
+  {
+    title: "HotelHub - Reservation Management",
+    slug: "hotelhub",
+    projectUUID: "hotel-hotelhub",
+    taskUUID: "hotel001",
+    status: "Active",
+    accountValidation: true,
+    otpValidation: false,
+    isAnonymous: false,
+    requireAuth: false, // Allow access to login page
+    redirectIfNotAuth: "/hotelhub/login",
+
+    initialization: {
+      globalCSS: `
+/* HotelHub Global Styles */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1e293b;
+  background: #f8fafc;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  line-height: 1.4;
+}
+
+.card, article {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover, article:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-center { text-align: center; }
+.mt-4 { margin-top: 2rem; }
+.mb-4 { margin-bottom: 2rem; }
+    `,
+
+      resources: ["auth.login", "auth.signup", "rooms.api", "rooms.create"],
+
+      actions: {
+        // Navigation actions
+        navigateToPage: `
+        const url = context.actionParams?.url;
+        if (!url) {
+          console.error("❌ No URL provided");
+          return;
+        }
+        console.log("🧭 Navigating to:", url);
+        window.location.href = url;
+      `,
+
+        // Auth actions
+        validateThenApi: `
+        console.log("✅ Validating form before API call");
+        const fields = context.actionParams?.fields || [];
+        const formData = context.formData || {};
+        const apiKey = context.actionParams?.apiKey;
+        
+        if (!fields || fields.length === 0) {
+          return await context.handlers.handleApiCall(apiKey, formData);
+        }
+        
+        const { isValid, errors } = context.handlers.validateAllFields(fields, formData);
+        
+        if (!isValid) {
+          console.error("❌ Validation failed:", errors);
+          context.handlers.setFieldErrors(errors);
+          const firstError = Object.values(errors)[0];
+          context.handlers.showNotification({
+            type: "toast",
+            message: firstError,
+            background: "#ef4444",
+            duration: 3000,
+          });
+          return { success: false, errors };
+        }
+        
+        console.log("✅ Validation passed, calling API");
+        context.handlers.setFieldErrors({});
+        return await context.handlers.handleApiCall(apiKey, formData);
+      `,
+
+        setAuthToken: `
+        const token = context.actionParams?.token || \`mock-jwt-\${Date.now()}\`;
+        context.handlers.setAuthData('token', token);
+      `,
+
+        setAuthUser: `
+        const email = context.payload?.email || context.actionParams?.email;
+        if (email) {
+          context.handlers.setAuthData('user', email);
+        }
+      `,
+
+        clearAuth: `
+        console.log("🚪 Logging out...");
+        context.handlers.clearAuthData();
+        context.handlers.showNotification({
+          type: "toast",
+          message: "✅ Logged out successfully",
+          background: "#10b981",
+          duration: 2000,
+        });
+        console.log("✅ Logout complete");
+      `,
+
+        // Modal actions
+        openModal: `
+        const modalName = context.actionParams?.modal || context.actionParams?.modalName;
+        if (!modalName) {
+          console.error("❌ No modal name provided");
+          return;
+        }
+        console.log("🎭 Opening modal:", modalName);
+        context.handlers.setActiveModal(modalName);
+      `,
+
+        closeModal: `
+        console.log("❌ Closing modal");
+        context.handlers.setActiveModal(null);
+        context.handlers.setFormData({});
+      `,
+
+        // API action
+        api: `
+        console.log("🚀 === API ACTION START ===");
+        const apiKey = context.actionParams?.apiKey;
+        const formDataToUse = context.payload || context.modalFormData || context.formData || {};
+        
+        if (!apiKey) {
+          console.error("❌ No apiKey provided");
+          return;
+        }
+
+        try {
+          await context.handlers.handleApiCall(apiKey, formDataToUse, context.actionConfig);
+          console.log("✅ API call completed");
+        } catch (error) {
+          console.error("❌ API call failed:", error);
+        }
+      `,
+
+        reload: `
+        console.log("🔄 Reloading page");
+        window.location.reload();
+      `,
+      },
+    },
+
+    // 📄 LOGIN PAGE
+    pages: {
+      login: {
+        title: "Login - HotelHub",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🏨 HotelHub",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub" },
+                  },
+                  {
+                    label: "Sign Up",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub/signup" },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e2e8f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              loginForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🏨 Welcome Back",
+                "ui:description": "Sign in to manage your hotel",
+                "ui:id": "loginForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "manager@hotelhub.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    validation: {
+                      required: true,
+                      requiredMessage: "📧 Email is required",
+                      email: true,
+                      emailMessage: "📧 Please enter a valid email",
+                    },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Enter your password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    validation: {
+                      required: true,
+                      requiredMessage: "🔒 Password is required",
+                      minLength: 6,
+                      minLengthMessage:
+                        "🔒 Password must be at least 6 characters",
+                    },
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Sign In",
+                    action: "validateThenApi",
+                    actionParams: {
+                      apiKey: "auth.login",
+                      fields: [
+                        {
+                          name: "email",
+                          label: "Email",
+                          validation: {
+                            required: true,
+                            requiredMessage: "📧 Email is required",
+                            email: true,
+                            emailMessage: "📧 Please enter a valid email",
+                          },
+                        },
+                        {
+                          name: "password",
+                          label: "Password",
+                          validation: {
+                            required: true,
+                            requiredMessage: "🔒 Password is required",
+                            minLength: 6,
+                            minLengthMessage:
+                              "🔒 Password must be at least 6 characters",
+                          },
+                        },
+                      ],
+                    },
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:direction": "column",
+                "ui:links": [
+                  {
+                    prefix: "Don't have an account?",
+                    label: "Sign Up",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub/signup" },
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#f8fafc",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 HotelHub. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 📄 SIGNUP PAGE
+      signup: {
+        title: "Sign Up - HotelHub",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🏨 HotelHub",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub" },
+                  },
+                  {
+                    label: "Login",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub/login" },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e2e8f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              signupForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "✨ Create Account",
+                "ui:description": "Join HotelHub and start managing",
+                "ui:id": "signupForm",
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "150px auto 0",
+                  padding: "40px",
+                  background: "white",
+                  borderRadius: "16px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Full Name",
+                    "ui:placeholder": "John Doe",
+                    "ui:type": "text",
+                    "ui:name": "name",
+                    "ui:required": true,
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "you@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Create a password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Create Account",
+                    action: "api",
+                    actionParams: { apiKey: "auth.signup" },
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    prefix: "Already have an account?",
+                    label: "Login",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub/login" },
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "450px",
+                  margin: "20px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background: "#f8fafc",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 HotelHub. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 📄 DASHBOARD PAGE (Protected)
+      dashboard: {
+        title: "Dashboard - HotelHub",
+        requireAuth: true,
+        redirectIfNotAuth: "/hotelhub/login",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🏨 HotelHub",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              userInfo: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "{{auth.user?.email || 'User'}}",
+                    action: "",
+                    actionParams: {},
+                  },
+                  {
+                    label: "Logout",
+                    action: "clearAuth+reload",
+                    actionParams: {},
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e2e8f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              menuHeading: {
+                "ui:widget": "heading",
+                "ui:text": "📋 Menu",
+                "ui:level": "h3",
+                "ui:styles": {
+                  marginBottom: "30px",
+                  fontSize: "1.2rem",
+                  color: "#1e293b",
+                  textAlign: "center",
+                },
+              },
+              menuContainer: {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "8px",
+                "ui:styles": {
+                  width: "100%",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🏠 Dashboard",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/dashboard" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      color: "#334155",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "15px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                    "ui:hoverStyles": {
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🛏️ Rooms",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/rooms" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      color: "#334155",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "15px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                    "ui:hoverStyles": {
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "📅 Reservations",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/reservations" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      color: "#334155",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "15px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                    "ui:hoverStyles": {
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "👥 Guests",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/guests" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      color: "#334155",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "15px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                    "ui:hoverStyles": {
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                    },
+                  },
+                ],
+              },
+            },
+            styles: {
+              width: "250px",
+              background: "#f8fafc",
+              padding: "100px 20px 20px",
+              minHeight: "100vh",
+              borderRight: "1px solid #e2e8f0",
+              position: "fixed",
+              top: 0,
+            },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              welcomeCard: {
+                "ui:widget": "card",
+                "ui:title": "👋 Welcome to HotelHub Dashboard",
+                "ui:description":
+                  "Logged in as: {{auth.user?.email || 'User'}}",
+                "ui:styles": {
+                  padding: "40px",
+                  textAlign: "center",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  color: "white",
+                  border: "none",
+                  marginBottom: "30px",
+                },
+              },
+              statsGrid: {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "20px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🛏️ Total Rooms",
+                    "ui:description": "25 Rooms",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "#e0f2fe",
+                      border: "2px solid #0ea5e9",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "✅ Available",
+                    "ui:description": "18 Rooms",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "#d1fae5",
+                      border: "2px solid #10b981",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🔒 Occupied",
+                    "ui:description": "7 Rooms",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "#fee2e2",
+                      border: "2px solid #ef4444",
+                    },
+                  },
+                ],
+              },
+            },
+            styles: {
+              marginLeft: "250px",
+              padding: "120px 40px 40px",
+              background: "#ffffff",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 HotelHub. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              marginLeft: "250px",
+              background: "#1e293b",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      // 📄 ROOMS PAGE (Protected)
+      rooms: {
+        title: "Rooms - HotelHub",
+        requireAuth: true,
+        redirectIfNotAuth: "/hotelhub/login",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🏨 HotelHub",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+              },
+              userInfo: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "{{auth.user?.email || 'User'}}",
+                    action: "",
+                    actionParams: {},
+                  },
+                  {
+                    label: "Logout",
+                    action: "clearAuth+reload",
+                    actionParams: {},
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "#ffffff",
+              borderBottom: "2px solid #e2e8f0",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              menuHeading: {
+                "ui:widget": "heading",
+                "ui:text": "📋 Menu",
+                "ui:level": "h3",
+                "ui:styles": {
+                  marginBottom: "30px",
+                  fontSize: "1.2rem",
+                  color: "#1e293b",
+                  textAlign: "center",
+                },
+              },
+              menuContainer: {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "8px",
+                "ui:styles": {
+                  width: "100%",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🏠 Dashboard",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/dashboard" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      color: "#334155",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "15px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                    "ui:hoverStyles": {
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🛏️ Rooms",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/rooms" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      color: "#334155",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "15px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                    "ui:hoverStyles": {
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "📅 Reservations",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/reservations" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      color: "#334155",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "15px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                    "ui:hoverStyles": {
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "👥 Guests",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/guests" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 16px",
+                      background: "transparent",
+                      color: "#334155",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "15px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                    "ui:hoverStyles": {
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                    },
+                  },
+                ],
+              },
+            },
+            styles: {
+              width: "250px",
+              background: "#f8fafc",
+              padding: "100px 20px 20px",
+              minHeight: "100vh",
+              borderRight: "1px solid #e2e8f0",
+              position: "fixed",
+              top: 0,
+            },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {
+              addRoom: {
+                "ui:title": "Add New Room",
+                "ui:theme": "light",
+                "ui:styles": {
+                  maxWidth: "500px",
+                  padding: "40px",
+                },
+                "ui:fields": [
+                  {
+                    name: "roomNumber",
+                    label: "Room Number",
+                    type: "text",
+                    placeholder: "101",
+                    required: true,
+                  },
+                  {
+                    name: "roomType",
+                    label: "Room Type",
+                    type: "text",
+                    placeholder: "Deluxe, Suite, Standard",
+                    required: true,
+                  },
+                  {
+                    name: "price",
+                    label: "Price per Night",
+                    type: "number",
+                    placeholder: "150",
+                    required: true,
+                  },
+                  {
+                    name: "status",
+                    label: "Status",
+                    type: "text",
+                    placeholder: "Available",
+                    required: true,
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Add Room",
+                    action: "api",
+                    actionParams: { apiKey: "rooms.create" },
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                      marginTop: "10px",
+                    },
+                  },
+                  {
+                    label: "Cancel",
+                    action: "closeModal",
+                    variant: "outline",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background: "transparent",
+                      color: "#64748b",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "2px solid #e2e8f0",
+                    },
+                  },
+                ],
+              },
+            },
+            uiSchema: {
+              pageHeader: {
+                "ui:widget": "flexLayout",
+                "ui:direction": "row",
+                "ui:justify": "space-between",
+                "ui:align": "center",
+                "ui:styles": {
+                  marginBottom: "30px",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "🛏️ Rooms Management",
+                    "ui:level": "h1",
+                    "ui:styles": {
+                      margin: "0",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "➕ Add Room",
+                    "ui:action": "openModal",
+                    "ui:actionParams": { modal: "addRoom" },
+                    "ui:variant": "primary",
+                    "ui:styles": {
+                      padding: "12px 24px",
+                      background: "#0ea5e9",
+                      color: "white",
+                      borderRadius: "8px",
+                      border: "none",
+                      fontWeight: "600",
+                    },
+                  },
+                ],
+              },
+              roomsTable: {
+                "ui:widget": "dataTable",
+                "ui:title": "Room List",
+                "ui:id": "roomsTable",
+                "ui:description": "Manage all hotel rooms",
+                "ui:emptyText": "No rooms found",
+                "ui:dataSource": "rooms.api",
+                "ui:pagination": {
+                  enabled: true,
+                  pageSize: 10,
+                },
+                "ui:columns": [
+                  {
+                    key: "id",
+                    title: "ID",
+                    dataIndex: "id",
+                    width: "80px",
+                  },
+                  {
+                    key: "title",
+                    title: "Room Number",
+                    dataIndex: "title",
+                  },
+                  {
+                    key: "body",
+                    title: "Description",
+                    dataIndex: "body",
+                  },
+                  {
+                    key: "userId",
+                    title: "Status",
+                    dataIndex: "userId",
+                  },
+                  {
+                    key: "actions",
+                    title: "Actions",
+                    type: "actions",
+                    align: "center",
+                    actions: [
+                      {
+                        label: "Edit",
+                        action: "openModal",
+                        actionParams: { modal: "addRoom" },
+                        variant: "primary",
+                      },
+                      {
+                        label: "Delete",
+                        action: "api:deleteRoom",
+                        variant: "danger",
+                        confirm: true,
+                        confirmMessage:
+                          "Are you sure you want to delete this room?",
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            styles: {
+              marginLeft: "250px",
+              padding: "120px 40px 40px",
+              background: "#ffffff",
+              minHeight: "100vh",
+            },
+            triggers: [
+              {
+                event: "load",
+                source: "rooms.api",
+              },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 HotelHub. All rights reserved.",
+                "ui:styles": { textAlign: "center", color: "#94a3b8" },
+              },
+            },
+            styles: {
+              marginLeft: "250px",
+              background: "#1e293b",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+    },
+
+    // 🏠 MAIN LANDING PAGE
+    components: {
+      navbar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "🏨 HotelHub",
+            "ui:styles": {
+              fontSize: "28px",
+              fontWeight: "800",
+              background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              cursor: "pointer",
+            },
+          },
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:links": [
+              {
+                label: "{{auth.token ? '' : 'Login'}}",
+                action: "{{auth.token ? '' : 'navigateToPage'}}",
+                actionParams: { url: "/hotelhub/login" },
+              },
+              {
+                label: "{{auth.token ? 'Dashboard' : ''}}",
+                action: "{{auth.token ? 'navigateToPage' : ''}}",
+                actionParams: { url: "/hotelhub/dashboard" },
+              },
+              {
+                label: "{{auth.token ? 'Logout' : ''}}",
+                action: "{{auth.token ? 'clearAuth+reload' : ''}}",
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "#ffffff",
+          borderBottom: "2px solid #e2e8f0",
+          padding: "20px 50px",
+          position: "fixed",
+          width: "100%",
+          zIndex: 1000,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 2px 15px rgba(0,0,0,0.08)",
+        },
+        triggers: [],
+      },
+      sidebar: {
+        table: {},
+        modal: {},
+        uiSchema: {},
+        styles: { display: "none" },
+        triggers: [],
+      },
+      main: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          hero: {
+            "ui:widget": "hero",
+            "ui:title": "Welcome to HotelHub",
+            "ui:subtitle": "Modern Hotel Management System",
+            "ui:cta": {
+              label: "Get Started",
+              action: "navigateToPage",
+              actionParams: { url: "/hotelhub/login" },
+            },
+            "ui:styles": {
+              background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+              minHeight: "600px",
+              padding: "180px 40px 100px",
+            },
+          },
+        },
+        styles: {
+          padding: "0",
+          background: "#ffffff",
+          minHeight: "100vh",
+        },
+        triggers: [],
+      },
+      footer: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          footerText: {
+            "ui:widget": "text",
+            "ui:content": "© 2024 HotelHub. All rights reserved.",
+            "ui:styles": { textAlign: "center", color: "#94a3b8" },
+          },
+        },
+        styles: {
+          background: "#1e293b",
+          padding: "40px",
+          textAlign: "center",
+        },
+        triggers: [],
+      },
+    },
+  },
+
+  // backend/seeds/platform-auth.js (REPLACE ENTIRE FILE)
+  {
+    title: "BuilderPlatform - Create Websites Without Code",
+    slug: "auth",
+    projectUUID: "platform-auth-001",
+    taskUUID: "auth001",
+    status: "Active",
+    accountValidation: false,
+    otpValidation: false,
+    isAnonymous: true,
+
+    initialization: {
+      globalCSS: `
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+      @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+      
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      /* ============================================ */
+      /* BASE STYLES - Light Mode (Default)           */
+      /* ============================================ */
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        background: #ffffff !important;
+        color: #1e293b !important;
+        position: relative;
+        min-height: 100vh;
+        transition: background 0.5s ease, color 0.5s ease;
+        overflow-x: hidden;
+      }
+
+      /* Light mode logo fix */
+      body:not(.dark-mode) nav [class*="logo"],
+      body:not(.dark-mode) nav [style*="gradient"],
+      body:not(.dark-mode) .navbar-logo {
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+      }
+
+      /* ============================================ */
+      /* NAVIGATION LINKS - UPDATED FIX               */
+      /* ============================================ */
+      /* NAVBAR - DARK MODE - TRUE BLACK */
+      body.dark-mode nav,
+      body.dark-mode header,
+      body.dark-mode nav > *,
+      body.dark-mode header > *,
+      body.dark-mode .navbar {
+        background: #000000 !important;
+        border-bottom: 2px solid #333333 !important;
+        backdrop-filter: blur(12px) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+      }
+
+      /* FOOTER - DARK MODE - TRUE BLACK */
+      body.dark-mode footer,
+      body.dark-mode footer > * {
+        background: #000000 !important;
+        border-top: 2px solid #333333 !important;
+      }
+
+      /* Ensure all text inside navbar/footer is visible */
+      body.dark-mode nav *,
+      body.dark-mode header *,
+      body.dark-mode .navbar *,
+      body.dark-mode footer * {
+        color: #ffffff !important;
+      }
+
+      /* Specific nav links styling */
+      body.dark-mode nav a,
+      body.dark-mode .nav-links a,
+      body.dark-mode [class*="navLink"],
+      body.dark-mode [class*="nav-link"],
+      body.dark-mode .navbar-links a,
+      body.dark-mode .ui-navLinks a {
+        color: #ffffff !important;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+        opacity: 1 !important;
+        font-weight: 600 !important;
+      }
+
+      /* Hover state */
+      body.dark-mode nav a:hover,
+      body.dark-mode .nav-links a:hover,
+      body.dark-mode [class*="navLink"]:hover,
+      body.dark-mode [class*="nav-link"]:hover {
+        color: #60a5fa !important;
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+      }
+
+      /* Light mode nav */
+      body:not(.dark-mode) nav,
+      body:not(.dark-mode) header,
+      body:not(.dark-mode) nav > *,
+      body:not(.dark-mode) header > * {
+        background: rgba(255, 255, 255, 0.98) !important;
+        border-bottom-color: #e2e8f0 !important;
+        backdrop-filter: blur(10px);
+      }
+
+      body:not(.dark-mode) nav a,
+      body:not(.dark-mode) .nav-links a,
+      body:not(.dark-mode) [class*="navLink"],
+      body:not(.dark-mode) [class*="nav-link"] {
+        color: #0e5ad4 !important;
+        font-weight: 600 !important;
+      }
+
+      body:not(.dark-mode) nav a:hover {
+        color: #2563eb !important;
+      }
+
+      /* ============================================ */
+      /* DARK MODE - True Black + Winter Sky          */
+      /* ============================================ */
+      body.dark-mode {
+        background: #000000 !important;
+        color: #ffffff !important;
+      }
+
+      /* Fix ALL sections for dark mode */
+      body.dark-mode #home,
+      body.dark-mode #features,
+      body.dark-mode #pricing,
+      body.dark-mode #login {
+        background: #000000 !important;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* Pricing section specific dark mode */
+      body.dark-mode .pricing-section-bg {
+        background: #000000 !important;
+      }
+
+      /* ============================================ */
+      /* ANIMATIONS - FIXED FOR DARK MODE             */
+      /* ============================================ */
+      
+      /* Stars container - FIXED POSITIONING */
+      .stars-container {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 1 !important;
+        pointer-events: none !important;
+        overflow: hidden !important;
+      }
+
+      /* Star animation - FIXED */
+      .star {
+        position: absolute !important;
+        background-color: white !important;
+        border-radius: 50% !important;
+        animation: twinkle 3s infinite !important;
+      }
+
+      @keyframes twinkle {
+        0%, 100% { 
+          opacity: 0.2; 
+          transform: scale(1);
+        }
+        50% { 
+          opacity: 1; 
+          transform: scale(1.1);
+        }
+      }
+
+      /* Shooting star animation - FIXED */
+      .shooting-star {
+        position: absolute !important;
+        width: 100px !important;
+        height: 2px !important;
+        background: linear-gradient(90deg, rgba(255,255,255,0), white, rgba(255,255,255,0)) !important;
+        border-radius: 50% !important;
+        animation: shootingStar 3s infinite !important;
+        z-index: 2 !important;
+      }
+
+      @keyframes shootingStar {
+        0% {
+          transform: translateX(-100px) translateY(0px) rotate(45deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 1;
+        }
+        90% {
+          opacity: 1;
+        }
+        100% {
+          transform: translateX(calc(100vw + 100px)) translateY(calc(100vh + 100px)) rotate(45deg);
+          opacity: 0;
+        }
+      }
+
+      /* Snowflake animation - FIXED */
+      .snowflake {
+        position: absolute !important;
+        background-color: white !important;
+        border-radius: 50% !important;
+        opacity: 0.8 !important;
+        animation: fall linear infinite !important;
+        z-index: 2 !important;
+      }
+
+      @keyframes fall {
+        0% {
+          transform: translateY(-100px) translateX(0px) rotate(0deg);
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(100vh) translateX(calc(100px * var(--random-x))) rotate(360deg);
+          opacity: 0;
+        }
+      }
+
+      /* Ensure content is above stars/snow */
+      body.dark-mode > div,
+      body.dark-mode section,
+      body.dark-mode main,
+      body.dark-mode aside,
+      body.dark-mode article {
+        background: transparent !important;
+        position: relative;
+        z-index: 20 !important;
+      }
+
+      /* Better dark mode border consistency */
+      body.dark-mode * {
+        border-color: #333333 !important;
+      }
+
+      /* ============================================ */
+      /* CARDS & OTHER COMPONENTS - DARK MODE         */
+      /* ============================================ */
+      body.dark-mode article,
+      body.dark-mode [class*="card"],
+      body.dark-mode div[style*="background: white"],
+      body.dark-mode div[style*="background:white"],
+      body.dark-mode .white-bg-section {
+        background: rgba(0, 0, 0, 0.8) !important;
+        border-color: #333333 !important;
+        color: #ffffff !important;
+        backdrop-filter: blur(10px);
+      }
+
+      /* Specific pricing cards */
+      body.dark-mode .pricing-card {
+        background: rgba(0, 0, 0, 0.9) !important;
+        border-color: #333333 !important;
+      }
+
+      /* Headings & Text */
+      body.dark-mode h1, body.dark-mode h2, body.dark-mode h3,
+      body.dark-mode h4, body.dark-mode h5, body.dark-mode h6 {
+        color: #ffffff !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      }
+
+      body.dark-mode p,
+      body.dark-mode span:not(.gradient-text),
+      body.dark-mode div:not(.star):not(.shooting-star):not(.snowflake) {
+        color: #e5e7eb !important;
+      }
+
+      /* Forms */
+      body.dark-mode input,
+      body.dark-mode textarea,
+      body.dark-mode select {
+        background: rgba(0, 0, 0, 0.8) !important;
+        border-color: #333333 !important;
+        color: #ffffff !important;
+      }
+
+      body.dark-mode input::placeholder,
+      body.dark-mode textarea::placeholder {
+        color: #9ca3af !important;
+      }
+
+      /* Gradient text - Robin Devkota style */
+      .gradient-text,
+      span[style*="gradient"],
+      h2[style*="gradient"] {
+        background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+      }
+
+      /* Light mode gradient text */
+      body:not(.dark-mode) h1.gradient-heading,
+      body:not(.dark-mode) h2.gradient-heading,
+      body:not(.dark-mode) h3.gradient-heading {
+        background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        background-clip: text !important;
+      }
+
+      /* Gray text color */
+      .gray-text {
+        color: #64748b !important;
+      }
+
+      body.dark-mode .gray-text {
+        color: #94a3b8 !important;
+      }
+
+      /* Section backgrounds */
+      .white-bg-section {
+        background: #ffffff !important;
+      }
+
+      body.dark-mode .white-bg-section {
+        background: #000000 !important;
+      }
+
+      /* Hero Image Styling */
+      .hero-image {
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .hero-image:hover {
+        transform: translateY(-5px);
+      }
+
+      body.dark-mode .hero-image {
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        filter: brightness(0.8) contrast(1.2);
+      }
+
+      /* CENTERED FORM STYLING - CRITICAL FIX */
+      #login {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        width: 100% !important;
+      }
+
+      .login-form-container {
+        width: 100% !important;
+        max-width: 450px !important;
+        margin: 0 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+      }
+
+      /* Scrollbar */
+      body.dark-mode::-webkit-scrollbar-track {
+        background: #000000;
+      }
+      body.dark-mode::-webkit-scrollbar-thumb {
+        background: #333333;
+      }
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+      }
+
+      /* Smooth scrolling & fade animation */
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      .fade-in {
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      /* Smooth scroll padding for fixed navbar */
+      section {
+        scroll-margin-top: 80px;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .hero-grid {
+          grid-template-columns: 1fr !important;
+          gap: 40px !important;
+          text-align: center !important;
+        }
+        
+        .hero-image {
+          order: -1;
+          max-width: 100% !important;
+        }
+        
+        .hero-content {
+          padding: 0 20px !important;
+        }
+      }
+    `,
+
+      actions: {
+        toggleTheme: `
+        console.log('🌓 Toggling theme');
+        const body = document.body;
+        const isDark = body.classList.contains('dark-mode');
+
+        if (isDark) {
+          // Switching to LIGHT mode
+          body.classList.remove('dark-mode');
+          localStorage.setItem('theme', 'light');
+          console.log('☀️ Light mode');
+          
+          // Remove effects container
+          const effectsContainer = document.querySelector('.stars-container');
+          if (effectsContainer) {
+            effectsContainer.remove();
+          }
+          
+        } else {
+          // Switching to DARK mode
+          body.classList.add('dark-mode');
+          localStorage.setItem('theme', 'dark');
+          console.log('🌙 Dark mode with stars and snow');
+          
+          // Create effects container
+          let effectsContainer = document.querySelector('.stars-container');
+          if (!effectsContainer) {
+            effectsContainer = document.createElement('div');
+            effectsContainer.className = 'stars-container';
+            effectsContainer.style.position = 'fixed';
+            effectsContainer.style.top = '0';
+            effectsContainer.style.left = '0';
+            effectsContainer.style.width = '100vw';
+            effectsContainer.style.height = '100vh';
+            effectsContainer.style.zIndex = '1';
+            effectsContainer.style.pointerEvents = 'none';
+            effectsContainer.style.overflow = 'hidden';
+            document.body.appendChild(effectsContainer);
+            
+            // Create stars
+            for (let i = 0; i < 150; i++) {
+              const star = document.createElement('div');
+              star.className = 'star';
+              star.style.width = Math.random() * 3 + 1 + 'px';
+              star.style.height = star.style.width;
+              star.style.left = Math.random() * 100 + '%';
+              star.style.top = Math.random() * 100 + '%';
+              star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+              star.style.animationDelay = Math.random() * 5 + 's';
+              star.style.animationTimingFunction = 'ease-in-out';
+              star.style.animationIterationCount = 'infinite';
+              effectsContainer.appendChild(star);
+            }
+            
+            // Create shooting stars
+            for (let i = 0; i < 5; i++) {
+              const shootingStar = document.createElement('div');
+              shootingStar.className = 'shooting-star';
+              shootingStar.style.left = Math.random() * 100 + '%';
+              shootingStar.style.top = Math.random() * 100 + '%';
+              shootingStar.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+              shootingStar.style.animationDelay = Math.random() * 8 + 's';
+              shootingStar.style.animationIterationCount = 'infinite';
+              effectsContainer.appendChild(shootingStar);
+            }
+            
+            // Create snowflakes
+            for (let i = 0; i < 80; i++) {
+              const snowflake = document.createElement('div');
+              snowflake.className = 'snowflake';
+              const size = Math.random() * 4 + 2;
+              snowflake.style.width = size + 'px';
+              snowflake.style.height = size + 'px';
+              snowflake.style.left = Math.random() * 100 + '%';
+              snowflake.style.top = Math.random() * -100 + 'px';
+              const duration = Math.random() * 4 + 6;
+              snowflake.style.animationDuration = duration + 's';
+              snowflake.style.animationDelay = Math.random() * 5 + 's';
+              snowflake.style.animationIterationCount = 'infinite';
+              snowflake.style.setProperty('--random-x', Math.random() * 2 - 1);
+              effectsContainer.appendChild(snowflake);
+            }
+            
+            console.log('✨ Created effects: 150 stars, 5 shooting stars, 80 snowflakes');
+          }
+        }
+      `,
+
+        loadTheme: `
+        console.log('🎨 Loading theme');
+        const saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+          document.body.classList.add('dark-mode');
+          console.log('🌙 Dark mode loaded with stars and snow');
+          
+          // Create effects container after a short delay to ensure DOM is ready
+          setTimeout(() => {
+            let effectsContainer = document.querySelector('.stars-container');
+            if (!effectsContainer) {
+              effectsContainer = document.createElement('div');
+              effectsContainer.className = 'stars-container';
+              effectsContainer.style.position = 'fixed';
+              effectsContainer.style.top = '0';
+              effectsContainer.style.left = '0';
+              effectsContainer.style.width = '100vw';
+              effectsContainer.style.height = '100vh';
+              effectsContainer.style.zIndex = '1';
+              effectsContainer.style.pointerEvents = 'none';
+              effectsContainer.style.overflow = 'hidden';
+              document.body.appendChild(effectsContainer);
+              
+              // Create stars
+              for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = (Math.random() * 2 + 1) + 's';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationTimingFunction = 'ease-in-out';
+                star.style.animationIterationCount = 'infinite';
+                effectsContainer.appendChild(star);
+              }
+              
+              // Create shooting stars
+              for (let i = 0; i < 5; i++) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                shootingStar.style.left = Math.random() * 100 + '%';
+                shootingStar.style.top = Math.random() * 100 + '%';
+                shootingStar.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+                shootingStar.style.animationDelay = Math.random() * 8 + 's';
+                shootingStar.style.animationIterationCount = 'infinite';
+                effectsContainer.appendChild(shootingStar);
+              }
+              
+              // Create snowflakes
+              for (let i = 0; i < 80; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                const size = Math.random() * 4 + 2;
+                snowflake.style.width = size + 'px';
+                snowflake.style.height = size + 'px';
+                snowflake.style.left = Math.random() * 100 + '%';
+                snowflake.style.top = Math.random() * -100 + 'px';
+                const duration = Math.random() * 4 + 6;
+                snowflake.style.animationDuration = duration + 's';
+                snowflake.style.animationDelay = Math.random() * 5 + 's';
+                snowflake.style.animationIterationCount = 'infinite';
+                snowflake.style.setProperty('--random-x', Math.random() * 2 - 1);
+                effectsContainer.appendChild(snowflake);
+              }
+              
+              console.log('✨ Created effects: 150 stars, 5 shooting stars, 80 snowflakes');
+            }
+          }, 100);
+        }
+      `,
+
+        scrollToSection: `
+        const section = context.actionParams?.section;
+        if (!section) return;
+        console.log('🎯 Scrolling to:', section);
+        const el = document.getElementById(section);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      `,
+        // In platform-auth.js - Update handleLogin to call real API
+
+        handleLogin: `
+console.log('🔐 Login action triggered');
+const email = context.formData?.email;
+const password = context.formData?.password;
+
+if (!email || !password) {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Please enter email and password',
+    background: '#ef4444'
+  });
+  return;
+}
+
+try {
+  // ✅ Call real backend API
+  const response = await fetch('http://localhost:5000/api/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include', // Important for cookies
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: data.error || '❌ Login failed',
+      background: '#ef4444'
+    });
+    return;
+  }
+
+  console.log('✅ Login successful:', data);
+
+  // ✅ Cookie is set automatically by backend
+  // Optionally store user data in localStorage for client-side access
+  localStorage.setItem('user_email', data.user.email);
+  localStorage.setItem('user_role', data.user.role);
+  localStorage.setItem('user_id', data.user.id);
+
+  context.handlers.showNotification({
+    type: 'toast',
+    message: \`✅ Welcome back, \${data.user.firstName || 'User'}!\`,
+    background: '#10b981'
+  });
+
+  // Redirect based on role
+  setTimeout(() => {
+    if (data.user.role === 'SUPER_ADMIN') {
+      window.location.href = '/dashboard';
+    } else if (data.user.role === 'CLIENT_ADMIN') {
+      window.location.href = '/dashboard';
+    } else if (data.user.role === 'DEVELOPER') {
+      window.location.href = '/projects';
+    }
+  }, 1000);
+
+} catch (error) {
+  console.error('Login error:', error);
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Network error. Please try again.',
+    background: '#ef4444'
+  });
+}
+`,
+
+        handleSignup: `
+        console.log('📝 Platform Signup');
+        const formData = context.formData;
+
+        if (!formData?.email || !formData?.password || !formData?.organizationName) {
+          context.handlers.showNotification({
+            type: 'toast',
+            message: '❌ Please fill all fields',
+            background: '#ef4444'
+          });
+          return;
+        }
+
+        context.handlers.showNotification({
+          type: 'toast',
+          message: '✅ Account created! Please login.',
+          background: '#10b981'
+        });
+
+        setTimeout(() => {
+          const loginSection = document.getElementById('login');
+          if (loginSection) {
+            loginSection.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 1500);
+      `,
+      },
+    },
+
+    components: {
+      navbar: {
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "🚀 BuilderPlatform",
+            "ui:styles": {
+              fontSize: "24px",
+              fontWeight: "800",
+              background: "linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              cursor: "pointer",
+            },
+            "ui:action": "scrollToSection",
+            "ui:actionParams": { section: "home" },
+          },
+
+          themeToggle: {
+            "ui:widget": "toggle",
+            "ui:label": "",
+            "ui:size": "medium",
+            "ui:onChange": "toggleTheme",
+            "ui:styles": {
+              marginLeft: "auto",
+              marginRight: "20px",
+            },
+          },
+
+          navLinks: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:links": [
+              {
+                label: "Home",
+                action: "scrollToSection",
+                actionParams: { section: "home" },
+                styles: {
+                  color: "#475569",
+                  fontWeight: "600",
+                  padding: "10px 15px",
+                  cursor: "pointer",
+                },
+              },
+              {
+                label: "Features",
+                action: "scrollToSection",
+                actionParams: { section: "features" },
+                styles: {
+                  color: "#475569",
+                  fontWeight: "600",
+                  padding: "10px 15px",
+                  cursor: "pointer",
+                },
+              },
+              {
+                label: "Pricing",
+                action: "scrollToSection",
+                actionParams: { section: "pricing" },
+                styles: {
+                  color: "#475569",
+                  fontWeight: "600",
+                  padding: "10px 15px",
+                  cursor: "pointer",
+                },
+              },
+              {
+                label: "Login",
+                action: "scrollToSection",
+                actionParams: { section: "login" },
+                styles: {
+                  color: "#1e40af",
+                  fontWeight: "600",
+                  padding: "10px 20px",
+                  border: "2px solid #1e40af",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                },
+              },
+            ],
+          },
+        },
+        styles: {
+          position: "fixed",
+          top: 0,
+          width: "100%",
+          zIndex: 10000,
+          background: "rgba(255, 255, 255, 0.98)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid #e2e8f0",
+          padding: "16px 50px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
+        },
+        triggers: [
+          {
+            event: "load",
+            action: "loadTheme",
+          },
+        ],
+      },
+
+      main: {
+        uiSchema: {
+          // ========== HOME SECTION (2-COLUMN LAYOUT) ==========
+          homeSection: {
+            "ui:widget": "container",
+            "ui:id": "home",
+            "ui:className": "white-bg-section",
+            "ui:styles": {
+              minHeight: "100vh",
+              padding: "120px 40px 80px",
+              position: "relative",
+              display: "flex",
+              alignItems: "center",
+              zIndex: 20,
+            },
+            "ui:children": [
+              {
+                "ui:widget": "gridLayout",
+                "ui:className": "hero-grid",
+                "ui:columns": 2,
+                "ui:gap": "80px",
+                "ui:alignItems": "center",
+                "ui:styles": {
+                  maxWidth: "1200px",
+                  margin: "0 auto",
+                  width: "100%",
+                  zIndex: 20,
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:className": "hero-content",
+                    "ui:direction": "column",
+                    "ui:gap": "24px",
+                    "ui:styles": {
+                      textAlign: "left",
+                      zIndex: 20,
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "Build Websites Without Code",
+                        "ui:level": "h1",
+                        "ui:className": "gradient-heading",
+                        "ui:styles": {
+                          fontSize: "3.5rem",
+                          fontWeight: "800",
+                          lineHeight: "1.2",
+                          marginBottom: "0",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text":
+                          "The fastest way to create beautiful, dynamic websites using JSON configurations. Perfect for agencies, developers, and businesses.",
+                        "ui:className": "gray-text",
+                        "ui:styles": {
+                          fontSize: "1.3rem",
+                          lineHeight: "1.8",
+                          marginBottom: "0",
+                        },
+                      },
+                      {
+                        "ui:widget": "flexLayout",
+                        "ui:direction": "row",
+                        "ui:gap": "20px",
+                        "ui:styles": {
+                          marginTop: "10px",
+                          zIndex: 20,
+                        },
+                        "ui:children": [
+                          {
+                            "ui:widget": "button",
+                            "ui:label": "Get Started Free",
+                            "ui:action": "scrollToSection",
+                            "ui:actionParams": { section: "pricing" },
+                            "ui:styles": {
+                              padding: "16px 32px",
+                              fontSize: "1.1rem",
+                              fontWeight: "600",
+                              background: "#1e40af",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "8px",
+                              cursor: "pointer",
+                              boxShadow: "0 4px 14px rgba(30, 64, 175, 0.2)",
+                              transition: "all 0.3s ease",
+                              zIndex: 20,
+                            },
+                          },
+                          {
+                            "ui:widget": "button",
+                            "ui:label": "View Demo",
+                            "ui:action": "navigate",
+                            "ui:actionParams": { url: "/shopzone" },
+                            "ui:styles": {
+                              padding: "16px 32px",
+                              fontSize: "1.1rem",
+                              fontWeight: "600",
+                              background: "transparent",
+                              color: "#1e40af",
+                              border: "2px solid #1e40af",
+                              borderRadius: "8px",
+                              cursor: "pointer",
+                              transition: "all 0.3s ease",
+                              zIndex: 20,
+                            },
+                          },
+                        ],
+                      },
+                      {
+                        "ui:widget": "spacer",
+                        "ui:height": 30,
+                      },
+                      {
+                        "ui:widget": "text",
+                        "ui:content":
+                          "✨ Trusted by 500+ agencies and developers worldwide",
+                        "ui:className": "gray-text",
+                        "ui:styles": {
+                          fontSize: "0.95rem",
+                          opacity: "0.9",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:alignItems": "center",
+                    "ui:justifyContent": "center",
+                    "ui:styles": {
+                      position: "relative",
+                      zIndex: 20,
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "image",
+                        "ui:src":
+                          "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=800&h=600&fit=crop&q=80",
+                        "ui:alt": "BuilderPlatform Dashboard",
+                        "ui:className": "hero-image",
+                        "ui:styles": {
+                          width: "100%",
+                          maxWidth: "600px",
+                          height: "auto",
+                          borderRadius: "16px",
+                          boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+                          zIndex: 20,
+                        },
+                      },
+                      {
+                        "ui:widget": "container",
+                        "ui:styles": {
+                          position: "absolute",
+                          bottom: "-30px",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          background: "white",
+                          borderRadius: "12px",
+                          padding: "20px",
+                          boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+                          border: "1px solid #e2e8f0",
+                          width: "80%",
+                          maxWidth: "400px",
+                          zIndex: 20,
+                        },
+                        "ui:children": [
+                          {
+                            "ui:widget": "text",
+                            "ui:content": "🚀 Live Preview",
+                            "ui:styles": {
+                              fontSize: "1rem",
+                              fontWeight: "600",
+                              color: "#1e40af",
+                              marginBottom: "5px",
+                            },
+                          },
+                          {
+                            "ui:widget": "text",
+                            "ui:content":
+                              "See real-time JSON configuration changes",
+                            "ui:className": "gray-text",
+                            "ui:styles": {
+                              fontSize: "0.9rem",
+                            },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+
+          // ========== FEATURES SECTION ==========
+          featuresSection: {
+            "ui:widget": "container",
+            "ui:id": "features",
+            "ui:className": "white-bg-section",
+            "ui:styles": {
+              minHeight: "100vh",
+              padding: "100px 40px",
+              zIndex: 20,
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "⚡ Powerful Features",
+                "ui:level": "h2",
+                "ui:className": "gradient-heading",
+                "ui:styles": {
+                  textAlign: "center",
+                  fontSize: "2.8rem",
+                  fontWeight: "800",
+                  marginBottom: "20px",
+                },
+              },
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "Everything you need to build and manage beautiful websites",
+                "ui:className": "gray-text",
+                "ui:styles": {
+                  textAlign: "center",
+                  fontSize: "1.2rem",
+                  marginBottom: "60px",
+                  maxWidth: "600px",
+                  margin: "0 auto 60px",
+                },
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "40px",
+                "ui:styles": {
+                  maxWidth: "1200px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🎨 50+ Widgets",
+                    "ui:description":
+                      "Pre-built components for forms, cards, tables, modals, and more. Build complex UIs without code.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "12px",
+                      transition: "all 0.3s ease",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "⚡ JSON Config",
+                    "ui:description":
+                      "Everything is JSON. Version control, easy updates, no code. Perfect for teams and agencies.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "12px",
+                      transition: "all 0.3s ease",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🚀 Instant Deploy",
+                    "ui:description":
+                      "Custom domains, SSL, CDN included. Your site live in minutes, not hours.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "12px",
+                      transition: "all 0.3s ease",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "👥 Team Collaboration",
+                    "ui:description":
+                      "Invite developers, assign projects, manage permissions. Built for teams.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "12px",
+                      transition: "all 0.3s ease",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🔌 API Integration",
+                    "ui:description":
+                      "Connect to any API. Built-in handlers for authentication, data fetching, and more.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "12px",
+                      transition: "all 0.3s ease",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "📊 Analytics",
+                    "ui:description":
+                      "Track page views, user behavior, and performance. Make data-driven decisions.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      border: "2px solid #e2e8f0",
+                      borderRadius: "12px",
+                      transition: "all 0.3s ease",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          // ========== PRICING SECTION ==========
+          pricingSection: {
+            "ui:widget": "container",
+            "ui:id": "pricing",
+            "ui:className": "pricing-section-bg",
+            "ui:styles": {
+              minHeight: "100vh",
+              padding: "100px 40px",
+              zIndex: 20,
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "💰 Simple, Transparent Pricing",
+                "ui:level": "h2",
+                "ui:className": "gradient-heading",
+                "ui:styles": {
+                  textAlign: "center",
+                  fontSize: "2.8rem",
+                  fontWeight: "800",
+                  marginBottom: "20px",
+                },
+              },
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "Choose the plan that fits your needs. Upgrade or downgrade anytime.",
+                "ui:className": "gray-text",
+                "ui:styles": {
+                  textAlign: "center",
+                  fontSize: "1.2rem",
+                  marginBottom: "60px",
+                  maxWidth: "600px",
+                  margin: "0 auto 60px",
+                },
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "40px",
+                "ui:styles": {
+                  maxWidth: "1200px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "pricingCard",
+                    "ui:title": "Starter",
+                    "ui:price": "$99",
+                    "ui:period": "/month",
+                    "ui:features": [
+                      "5 websites",
+                      "4 team members",
+                      "10 pages per site",
+                      "1GB storage",
+                      "Email support",
+                      "Custom domains",
+                    ],
+                    "ui:buttonLabel": "Start Free Trial",
+                    "ui:action": "scrollToSection",
+                    "ui:actionParams": { section: "login" },
+                    "ui:styles": {
+                      border: "2px solid #e2e8f0",
+                    },
+                  },
+                  {
+                    "ui:widget": "pricingCard",
+                    "ui:title": "Professional",
+                    "ui:price": "$249",
+                    "ui:period": "/month",
+                    "ui:highlighted": true,
+                    "ui:features": [
+                      "15 websites",
+                      "10 team members",
+                      "50 pages per site",
+                      "5GB storage",
+                      "Priority support",
+                      "White-label option",
+                      "Advanced analytics",
+                    ],
+                    "ui:buttonLabel": "Get Started",
+                    "ui:action": "scrollToSection",
+                    "ui:actionParams": { section: "login" },
+                    "ui:styles": {
+                      border: "2px solid #1e40af",
+                    },
+                  },
+                  {
+                    "ui:widget": "pricingCard",
+                    "ui:title": "Enterprise",
+                    "ui:price": "$599",
+                    "ui:period": "/month",
+                    "ui:features": [
+                      "Unlimited websites",
+                      "25 team members",
+                      "Unlimited pages",
+                      "20GB storage",
+                      "Dedicated support",
+                      "Custom integrations",
+                      "SLA guarantee",
+                      "On-premise option",
+                    ],
+                    "ui:buttonLabel": "Contact Sales",
+                    "ui:action": "scrollToSection",
+                    "ui:actionParams": { section: "login" },
+                    "ui:styles": {
+                      border: "2px solid #e2e8f0",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          // ========== LOGIN SECTION (CENTERED - FIXED) ==========
+          loginSection: {
+            "ui:widget": "container",
+            "ui:id": "login",
+            "ui:className": "white-bg-section",
+            "ui:styles": {
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "120px 20px 80px",
+              width: "100%",
+              boxSizing: "border-box",
+              zIndex: 20,
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:className": "login-form-container",
+                "ui:styles": {
+                  width: "100%",
+                  maxWidth: "450px",
+                  background: "white",
+                  borderRadius: "16px",
+                  padding: "40px",
+                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+                  border: "1px solid #e2e8f0",
+                  margin: "0 auto",
+                  zIndex: 20,
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "🚀 Welcome Back!",
+                    "ui:level": "h2",
+                    "ui:className": "gradient-heading",
+                    "ui:styles": {
+                      textAlign: "center",
+                      marginBottom: "10px",
+                      fontSize: "2rem",
+                      fontWeight: "800",
+                      width: "100%",
+                    },
+                  },
+                  {
+                    "ui:widget": "paragraph",
+                    "ui:text": "Sign in to access your dashboard",
+                    "ui:className": "gray-text",
+                    "ui:styles": {
+                      textAlign: "center",
+                      marginBottom: "30px",
+                      width: "100%",
+                    },
+                  },
+                  {
+                    "ui:widget": "formContainer",
+                    "ui:title": "",
+                    "ui:styles": {
+                      border: "none",
+                      padding: "0",
+                      width: "100%",
+                    },
+                    "ui:fields": [
+                      {
+                        "ui:widget": "inputField",
+                        "ui:label": "Email Address",
+                        "ui:name": "email",
+                        "ui:type": "email",
+                        "ui:placeholder": "you@company.com",
+                        "ui:required": true,
+                        "ui:styles": {
+                          border: "2px solid #e2e8f0",
+                          padding: "12px 16px",
+                          width: "100%",
+                          boxSizing: "border-box",
+                        },
+                      },
+                      {
+                        "ui:widget": "inputField",
+                        "ui:label": "Password",
+                        "ui:name": "password",
+                        "ui:type": "password",
+                        "ui:placeholder": "Enter your password",
+                        "ui:required": true,
+                        "ui:styles": {
+                          border: "2px solid #e2e8f0",
+                          padding: "12px 16px",
+                          width: "100%",
+                          boxSizing: "border-box",
+                        },
+                      },
+                    ],
+                    "ui:actions": [
+                      {
+                        label: "Login",
+                        action: "handleLogin",
+                        variant: "primary",
+                        styles: {
+                          width: "100%",
+                          padding: "14px",
+                          fontSize: "1rem",
+                          fontWeight: "600",
+                          background: "#1e40af",
+                          border: "none",
+                          borderRadius: "8px",
+                          color: "white",
+                          cursor: "pointer",
+                          boxSizing: "border-box",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    "ui:widget": "spacer",
+                    "ui:height": 20,
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content":
+                      "Don't have an account? Start with our free trial!",
+                    "ui:className": "gray-text",
+                    "ui:styles": {
+                      textAlign: "center",
+                      fontSize: "0.9rem",
+                      width: "100%",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        styles: {
+          paddingTop: "80px",
+          width: "100%",
+          position: "relative",
+          zIndex: 20,
+        },
+        triggers: [
+          {
+            event: "load",
+            action: "loadTheme",
+          },
+        ],
+      },
+
+      footer: {
+        uiSchema: {
+          footerContent: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:align": "center",
+            "ui:gap": "20px",
+            "ui:children": [
+              {
+                "ui:widget": "text",
+                "ui:content": "© 2025 BuilderPlatform. All rights reserved.",
+                "ui:styles": {
+                  color: "#94a3b8",
+                  fontSize: "0.95rem",
+                },
+              },
+              {
+                "ui:widget": "text",
+                "ui:content": "Built with ❤️ using JSON-driven architecture",
+                "ui:styles": {
+                  color: "#64748b",
+                  fontSize: "0.9rem",
+                },
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "#1e293b",
+          padding: "40px 20px",
+          textAlign: "center",
+          borderTop: "3px solid #1e40af",
+          position: "relative",
+          zIndex: 20,
         },
       },
     },
