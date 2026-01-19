@@ -9,11 +9,9 @@ const userSchema = new mongoose.Schema(
       enum: ["SUPER_ADMIN", "CLIENT_ADMIN", "DEVELOPER"],
       required: true,
     },
-    organizationId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Organization",
-      default: null,
-    },
+    organizationId: { type: mongoose.Schema.Types.ObjectId, ref: "Organization" },
+    firstName: { type: String, default: "" },
+    lastName: { type: String, default: "" },
     isEmailVerified: { type: Boolean, default: false },
     status: {
       type: String,

@@ -7701,6 +7701,22 @@ input:focus, textarea:focus, select:focus {
         scroll-behavior: smooth;
       }
 
+      /* Smooth form transitions */
+.login-form-container {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
       /* ============================================ */
       /* BASE STYLES - Light Mode (Default)           */
       /* ============================================ */
@@ -8092,6 +8108,133 @@ input:focus, textarea:focus, select:focus {
     `,
 
       actions: {
+        // ✅ ADD: handleSignup
+        handleSignup: `
+console.log('📝 Signup action triggered');
+
+const { email, password, firstName, lastName, organizationName, pricingPlan } = context.formData || {};
+
+if (!email || !password || !organizationName || !pricingPlan) {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Please fill all required fields, including plan',
+    background: '#ef4444'
+  });
+  return;
+}
+
+try {
+  const response = await fetch('http://localhost:5000/api/auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include', // needed for cookie
+    body: JSON.stringify({
+      email,
+      password,
+      firstName,        // optional
+      lastName,         // optional
+      organizationName, // required
+      pricingPlan       // required: 'starter' | 'professional' | 'enterprise'
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: data.error || '❌ Signup failed',
+      background: '#ef4444'
+    });
+    return;
+  }
+
+  console.log('✅ Signup successful:', data);
+
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '✅ Account created successfully. Please login.',
+    background: '#10b981'
+  });
+
+  // Switch to login view
+  setTimeout(() => {
+    context.handlers.setData('authMode', 'login');
+  }, 1200);
+
+} catch (error) {
+  console.error('Signup error:', error);
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Network error. Please try again.',
+    background: '#ef4444'
+  });
+}
+`,
+
+        // ✅ ADD: handleForgotPassword
+        handleForgotPassword: `
+        console.log('🔑 Forgot password action triggered');
+        const { email } = context.formData || {};
+
+        if (!email) {
+          context.handlers.showNotification({
+            type: 'toast',
+            message: '❌ Please enter your email address',
+            background: '#ef4444'
+          });
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/auth/forgot-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            context.handlers.showNotification({
+              type: 'toast',
+              message: data.error || '❌ Request failed',
+              background: '#ef4444'
+            });
+            return;
+          }
+
+          context.handlers.showNotification({
+            type: 'toast',
+            message: '✅ Password reset link sent to your email!',
+            background: '#10b981'
+          });
+
+          // Switch back to login after sending reset link
+          setTimeout(() => {
+            context.handlers.setData('authMode', 'login');
+          }, 2000);
+
+        } catch (error) {
+          console.error('Forgot password error:', error);
+          context.handlers.showNotification({
+            type: 'toast',
+            message: '❌ Network error. Please try again.',
+            background: '#ef4444'
+          });
+        }
+      `,
+        switchAuthMode: `
+        const mode = context.actionParams?.mode || 'login';
+        console.log('🔄 Switching auth mode to:', mode);
+        
+        // Store current mode in DataStore
+        context.handlers.setData('authMode', mode);
+        
+        // Clear any previous form data
+        context.handlers.setFormData({});
+        context.handlers.setFieldErrors({});
+      `,
         toggleTheme: `
         console.log('🌓 Toggling theme');
         const body = document.body;
@@ -8278,13 +8421,13 @@ if (!email || !password) {
 }
 
 try {
-  // ✅ Call real backend API
-  const response = await fetch('http://localhost:5000/api/auth/login', {
+  // ✅ CHANGED: Call /api instead of http://localhost:5000/api
+  const response = await fetch('/api/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    credentials: 'include', // Important for cookies
+    credentials: 'include',
     body: JSON.stringify({ email, password })
   });
 
@@ -8301,24 +8444,17 @@ try {
 
   console.log('✅ Login successful:', data);
 
-  // ✅ Cookie is set automatically by backend
-  // Optionally store user data in localStorage for client-side access
-  localStorage.setItem('user_email', data.user.email);
-  localStorage.setItem('user_role', data.user.role);
-  localStorage.setItem('user_id', data.user.id);
-
   context.handlers.showNotification({
     type: 'toast',
     message: \`✅ Welcome back, \${data.user.firstName || 'User'}!\`,
     background: '#10b981'
   });
 
-  // Redirect based on role
   setTimeout(() => {
     if (data.user.role === 'SUPER_ADMIN') {
-      window.location.href = '/dashboard';
+      window.location.href = '/';
     } else if (data.user.role === 'CLIENT_ADMIN') {
-      window.location.href = '/dashboard';
+      window.location.href = '/';
     } else if (data.user.role === 'DEVELOPER') {
       window.location.href = '/projects';
     }
@@ -8333,33 +8469,6 @@ try {
   });
 }
 `,
-
-        handleSignup: `
-        console.log('📝 Platform Signup');
-        const formData = context.formData;
-
-        if (!formData?.email || !formData?.password || !formData?.organizationName) {
-          context.handlers.showNotification({
-            type: 'toast',
-            message: '❌ Please fill all fields',
-            background: '#ef4444'
-          });
-          return;
-        }
-
-        context.handlers.showNotification({
-          type: 'toast',
-          message: '✅ Account created! Please login.',
-          background: '#10b981'
-        });
-
-        setTimeout(() => {
-          const loginSection = document.getElementById('login');
-          if (loginSection) {
-            loginSection.scrollIntoView({ behavior: 'smooth' });
-          }
-        }, 1500);
-      `,
       },
     },
 
@@ -8664,6 +8773,8 @@ try {
             ],
           },
 
+          
+
           // ========== FEATURES SECTION ==========
           featuresSection: {
             "ui:widget": "container",
@@ -8905,8 +9016,10 @@ try {
               },
             ],
           },
-
+ 
           // ========== LOGIN SECTION (CENTERED - FIXED) ==========
+          // ✅ FIXED LOGIN SECTION - All forms properly centered
+          // ✅ FIXED LOGIN SECTION - Left-aligned labels, larger wrapper
           loginSection: {
             "ui:widget": "container",
             "ui:id": "login",
@@ -8923,118 +9036,594 @@ try {
               zIndex: 20,
             },
             "ui:children": [
+              
+              // ========== LOGIN FORM ==========
               {
-                "ui:widget": "container",
-                "ui:className": "login-form-container",
-                "ui:styles": {
-                  width: "100%",
-                  maxWidth: "450px",
-                  background: "white",
-                  borderRadius: "16px",
-                  padding: "40px",
-                  boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-                  border: "1px solid #e2e8f0",
-                  margin: "0 auto",
-                  zIndex: 20,
+                "ui:widget": "conditionalContent",
+                "ui:condition":
+                  "{{data.authMode === 'login' || !data.authMode}}",
+                "ui:content": {
+                  "ui:widget": "container",
+                  "ui:direction": "column",
+                  "ui:align": "flex-start", // Changed from "center" to "flex-start"
+                  "ui:styles": {
+                    width: "100%",
+                    maxWidth: "500px", // Increased from 450px
+                    margin: "0 auto",
+                    background: "white",
+                    padding: "50px", // Increased padding
+                    borderRadius: "20px", // Slightly larger radius
+                    boxShadow: "0 15px 50px rgba(0,0,0,0.12)", // Enhanced shadow
+                    border: "1px solid #e2e8f0",
+                    boxSizing: "border-box",
+                  },
+                  "ui:children": [
+                    {
+                      "ui:widget": "heading",
+                      "ui:text": "🚀 Welcome Back!",
+                      "ui:level": "h2",
+                      "ui:className": "gradient-heading",
+                      "ui:styles": {
+                        textAlign: "center",
+                        marginBottom: "10px",
+                        fontSize: "2.2rem", // Slightly larger
+                        fontWeight: "800",
+                        width: "100%",
+                      },
+                    },
+                    {
+                      "ui:widget": "paragraph",
+                      "ui:text": "Login to your BuilderPlatform account",
+                      "ui:className": "gray-text",
+                      "ui:styles": {
+                        textAlign: "center",
+                        marginBottom: "40px", // Increased margin
+                        width: "100%",
+                        fontSize: "1.05rem", // Slightly larger
+                      },
+                    },
+                    {
+                      "ui:widget": "formContainer",
+                      "ui:title": "",
+                      "ui:styles": {
+                        width: "100%",
+                        border: "none",
+                        padding: "0",
+                        boxSizing: "border-box",
+                      },
+                      "ui:fields": [
+                        {
+                          "ui:widget": "inputField",
+                          "ui:label": "Email Address",
+                          "ui:name": "email",
+                          "ui:type": "email",
+                          "ui:placeholder": "you@company.com",
+                          "ui:required": true,
+                          "ui:styles": {
+                            marginBottom: "20px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                          "ui:labelStyles": {
+                            // Added labelStyles
+                            textAlign: "left",
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                          },
+                          "ui:inputStyles": {
+                            border: "2px solid #e2e8f0",
+                            padding: "14px 18px", // Slightly larger padding
+                            fontSize: "1.05rem", // Slightly larger
+                            borderRadius: "10px", // Slightly larger radius
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                        },
+                        {
+                          "ui:widget": "inputField",
+                          "ui:label": "Password",
+                          "ui:name": "password",
+                          "ui:type": "password",
+                          "ui:placeholder": "Enter your password",
+                          "ui:required": true,
+                          "ui:styles": {
+                            marginBottom: "30px", // Increased margin
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                          "ui:labelStyles": {
+                            // Added labelStyles
+                            textAlign: "left",
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                          },
+                          "ui:inputStyles": {
+                            border: "2px solid #e2e8f0",
+                            padding: "14px 18px", // Slightly larger padding
+                            fontSize: "1.05rem", // Slightly larger
+                            borderRadius: "10px", // Slightly larger radius
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                        },
+                      ],
+                      "ui:actions": [
+                        {
+                          label: "Login",
+                          action: "handleLogin",
+                          variant: "primary",
+                          styles: {
+                            width: "100%",
+                            padding: "16px", // Slightly larger
+                            fontSize: "1.05rem", // Slightly larger
+                            fontWeight: "600",
+                            background: "#1e40af",
+                            border: "none",
+                            borderRadius: "10px", // Slightly larger radius
+                            color: "white",
+                            cursor: "pointer",
+                            boxSizing: "border-box",
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      "ui:widget": "spacer",
+                      "ui:height": 25, // Increased
+                    },
+                    {
+                      "ui:widget": "authLinks",
+                      "ui:alignment": "center",
+                      "ui:direction": "column",
+                      "ui:styles": {
+                        width: "100%",
+                        gap: "15px", // Increased gap
+                      },
+                      "ui:links": [
+                        {
+                          label: "Forgot Password?",
+                          action: "switchAuthMode",
+                          actionParams: { mode: "forgot" },
+                        },
+                        {
+                          prefix: "Don't have an account?",
+                          label: "Sign Up",
+                          action: "switchAuthMode",
+                          actionParams: { mode: "signup" },
+                        },
+                      ],
+                    },
+                  ],
                 },
-                "ui:children": [
-                  {
-                    "ui:widget": "heading",
-                    "ui:text": "🚀 Welcome Back!",
-                    "ui:level": "h2",
-                    "ui:className": "gradient-heading",
-                    "ui:styles": {
-                      textAlign: "center",
-                      marginBottom: "10px",
-                      fontSize: "2rem",
-                      fontWeight: "800",
-                      width: "100%",
-                    },
+              },
+
+              // ========== SIGNUP FORM ==========
+              {
+                "ui:widget": "conditionalContent",
+                "ui:condition": "{{data.authMode === 'signup'}}",
+                "ui:content": {
+                  "ui:widget": "container",
+                  "ui:direction": "column",
+                  "ui:align": "flex-start",
+                  "ui:styles": {
+                    width: "100%",
+                    maxWidth: "520px",
+                    margin: "0 auto",
+                    background: "white",
+                    padding: "50px",
+                    borderRadius: "20px",
+                    boxShadow: "0 15px 50px rgba(0,0,0,0.12)",
+                    border: "1px solid #e2e8f0",
+                    boxSizing: "border-box",
                   },
-                  {
-                    "ui:widget": "paragraph",
-                    "ui:text": "Sign in to access your dashboard",
-                    "ui:className": "gray-text",
-                    "ui:styles": {
-                      textAlign: "center",
-                      marginBottom: "30px",
-                      width: "100%",
-                    },
-                  },
-                  {
-                    "ui:widget": "formContainer",
-                    "ui:title": "",
-                    "ui:styles": {
-                      border: "none",
-                      padding: "0",
-                      width: "100%",
-                    },
-                    "ui:fields": [
-                      {
-                        "ui:widget": "inputField",
-                        "ui:label": "Email Address",
-                        "ui:name": "email",
-                        "ui:type": "email",
-                        "ui:placeholder": "you@company.com",
-                        "ui:required": true,
-                        "ui:styles": {
-                          border: "2px solid #e2e8f0",
-                          padding: "12px 16px",
-                          width: "100%",
-                          boxSizing: "border-box",
-                        },
+                  "ui:children": [
+                    {
+                      "ui:widget": "heading",
+                      "ui:text": "✨ Create Your Account",
+                      "ui:level": "h2",
+                      "ui:className": "gradient-heading",
+                      "ui:styles": {
+                        textAlign: "center",
+                        marginBottom: "10px",
+                        fontSize: "2.2rem",
+                        fontWeight: "800",
+                        width: "100%",
                       },
-                      {
-                        "ui:widget": "inputField",
-                        "ui:label": "Password",
-                        "ui:name": "password",
-                        "ui:type": "password",
-                        "ui:placeholder": "Enter your password",
-                        "ui:required": true,
-                        "ui:styles": {
-                          border: "2px solid #e2e8f0",
-                          padding: "12px 16px",
-                          width: "100%",
-                          boxSizing: "border-box",
-                        },
-                      },
-                    ],
-                    "ui:actions": [
-                      {
-                        label: "Login",
-                        action: "handleLogin",
-                        variant: "primary",
-                        styles: {
-                          width: "100%",
-                          padding: "14px",
-                          fontSize: "1rem",
-                          fontWeight: "600",
-                          background: "#1e40af",
-                          border: "none",
-                          borderRadius: "8px",
-                          color: "white",
-                          cursor: "pointer",
-                          boxSizing: "border-box",
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    "ui:widget": "spacer",
-                    "ui:height": 20,
-                  },
-                  {
-                    "ui:widget": "text",
-                    "ui:content":
-                      "Don't have an account? Start with our free trial!",
-                    "ui:className": "gray-text",
-                    "ui:styles": {
-                      textAlign: "center",
-                      fontSize: "0.9rem",
-                      width: "100%",
                     },
+                    {
+                      "ui:widget": "paragraph",
+                      "ui:text": "Join BuilderPlatform and start building",
+                      "ui:className": "gray-text",
+                      "ui:styles": {
+                        textAlign: "center",
+                        marginBottom: "40px",
+                        width: "100%",
+                        fontSize: "1.05rem",
+                      },
+                    },
+                    {
+                      "ui:widget": "formContainer",
+                      "ui:title": "",
+                      "ui:styles": {
+                        width: "100%",
+                        border: "none",
+                        padding: "0",
+                        boxSizing: "border-box",
+                      },
+                      "ui:fields": [
+                        {
+                          "ui:widget": "gridLayout",
+                          "ui:columns": 2,
+                          "ui:gap": "20px",
+                          "ui:styles": {
+                            marginBottom: "20px",
+                            width: "100%",
+                          },
+                          "ui:children": [
+                            {
+                              "ui:widget": "inputField",
+                              "ui:label": "First Name",
+                              "ui:name": "firstName",
+                              "ui:type": "text",
+                              "ui:placeholder": "John",
+                              "ui:required": true,
+                              "ui:styles": {
+                                width: "100%",
+                                boxSizing: "border-box",
+                              },
+                              "ui:labelStyles": {
+                                textAlign: "left",
+                                display: "block",
+                                marginBottom: "8px",
+                                fontWeight: "600",
+                                color: "#334155",
+                                fontSize: "0.95rem",
+                              },
+                              "ui:inputStyles": {
+                                border: "2px solid #e2e8f0",
+                                padding: "14px 16px",
+                                width: "100%",
+                                boxSizing: "border-box",
+                                borderRadius: "10px",
+                                fontSize: "1.05rem",
+                              },
+                            },
+                            {
+                              "ui:widget": "inputField",
+                              "ui:label": "Last Name",
+                              "ui:name": "lastName",
+                              "ui:type": "text",
+                              "ui:placeholder": "Doe",
+                              "ui:required": true,
+                              "ui:styles": {
+                                width: "100%",
+                                boxSizing: "border-box",
+                              },
+                              "ui:labelStyles": {
+                                textAlign: "left",
+                                display: "block",
+                                marginBottom: "8px",
+                                fontWeight: "600",
+                                color: "#334155",
+                                fontSize: "0.95rem",
+                              },
+                              "ui:inputStyles": {
+                                border: "2px solid #e2e8f0",
+                                padding: "14px 16px",
+                                width: "100%",
+                                boxSizing: "border-box",
+                                borderRadius: "10px",
+                                fontSize: "1.05rem",
+                              },
+                            },
+                          ],
+                        },
+                        {
+                          "ui:widget": "inputField",
+                          "ui:label": "Organization Name",
+                          "ui:name": "organizationName",
+                          "ui:type": "text",
+                          "ui:placeholder": "Your Company Inc.",
+                          "ui:required": true,
+                          "ui:styles": {
+                            marginBottom: "20px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                          "ui:labelStyles": {
+                            textAlign: "left",
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                          },
+                          "ui:inputStyles": {
+                            border: "2px solid #e2e8f0",
+                            padding: "14px 18px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                            borderRadius: "10px",
+                            fontSize: "1.05rem",
+                          },
+                        },
+                        {
+                          "ui:widget": "selectField",
+                          "ui:label": "Select Pricing Plan",
+                          "ui:name": "pricingPlan",
+                          "ui:placeholder": "Choose a plan",
+                          "ui:required": true,
+                          "ui:options": [
+                            {
+                              value: "starter",
+                              label: "Starter - $200/month",
+                            },
+                            {
+                              value: "professional",
+                              label: "Professional - $400/month",
+                            },
+                            {
+                              value: "enterprise",
+                              label: "Enterprise - $800/month",
+                            },
+                          ],
+                          "ui:styles": {
+                            marginBottom: "20px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                          "ui:labelStyles": {
+                            textAlign: "left",
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                          },
+                          "ui:selectStyles": {
+                            border: "2px solid #e2e8f0",
+                            padding: "14px 18px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                            borderRadius: "10px",
+                            fontSize: "1.05rem",
+                            backgroundColor: "white",
+                            cursor: "pointer",
+                          },
+                        },
+                        {
+                          "ui:widget": "inputField",
+                          "ui:label": "Email Address",
+                          "ui:name": "email",
+                          "ui:type": "email",
+                          "ui:placeholder": "you@company.com",
+                          "ui:required": true,
+                          "ui:styles": {
+                            marginBottom: "20px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                          "ui:labelStyles": {
+                            textAlign: "left",
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                          },
+                          "ui:inputStyles": {
+                            border: "2px solid #e2e8f0",
+                            padding: "14px 18px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                            borderRadius: "10px",
+                            fontSize: "1.05rem",
+                          },
+                        },
+                        {
+                          "ui:widget": "inputField",
+                          "ui:label": "Password",
+                          "ui:name": "password",
+                          "ui:type": "password",
+                          "ui:placeholder": "Create a strong password",
+                          "ui:required": true,
+                          "ui:styles": {
+                            marginBottom: "30px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                          "ui:labelStyles": {
+                            textAlign: "left",
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                          },
+                          "ui:inputStyles": {
+                            border: "2px solid #e2e8f0",
+                            padding: "14px 18px",
+                            width: "100%",
+                            boxSizing: "border-box",
+                            borderRadius: "10px",
+                            fontSize: "1.05rem",
+                          },
+                        },
+                      ],
+                      "ui:actions": [
+                        {
+                          label: "Create Account",
+                          action: "handleSignup",
+                          variant: "primary",
+                          styles: {
+                            width: "100%",
+                            padding: "16px",
+                            fontSize: "1.05rem",
+                            fontWeight: "600",
+                            background: "#1e40af",
+                            border: "none",
+                            borderRadius: "10px",
+                            color: "white",
+                            cursor: "pointer",
+                            boxSizing: "border-box",
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      "ui:widget": "spacer",
+                      "ui:height": 25,
+                    },
+                    {
+                      "ui:widget": "authLinks",
+                      "ui:alignment": "center",
+                      "ui:styles": {
+                        width: "100%",
+                      },
+                      "ui:links": [
+                        {
+                          prefix: "Already have an account?",
+                          label: "Login",
+                          action: "switchAuthMode",
+                          actionParams: { mode: "login" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+
+              // ========== FORGOT PASSWORD FORM ==========
+              {
+                "ui:widget": "conditionalContent",
+                "ui:condition": "{{data.authMode === 'forgot'}}",
+                "ui:content": {
+                  "ui:widget": "container",
+                  "ui:direction": "column",
+                  "ui:align": "flex-start", // Changed from "center" to "flex-start"
+                  "ui:styles": {
+                    width: "100%",
+                    maxWidth: "500px", // Increased from 450px
+                    margin: "0 auto",
+                    background: "white",
+                    padding: "50px", // Increased padding
+                    borderRadius: "20px", // Slightly larger radius
+                    boxShadow: "0 15px 50px rgba(0,0,0,0.12)", // Enhanced shadow
+                    border: "1px solid #e2e8f0",
+                    boxSizing: "border-box",
                   },
-                ],
+                  "ui:children": [
+                    {
+                      "ui:widget": "heading",
+                      "ui:text": "🔑 Reset Password",
+                      "ui:level": "h2",
+                      "ui:className": "gradient-heading",
+                      "ui:styles": {
+                        textAlign: "center",
+                        marginBottom: "10px",
+                        fontSize: "2.2rem", // Slightly larger
+                        fontWeight: "800",
+                        width: "100%",
+                      },
+                    },
+                    {
+                      "ui:widget": "paragraph",
+                      "ui:text": "Enter your email to receive a reset link",
+                      "ui:className": "gray-text",
+                      "ui:styles": {
+                        textAlign: "center",
+                        marginBottom: "40px", // Increased margin
+                        width: "100%",
+                        fontSize: "1.05rem", // Slightly larger
+                      },
+                    },
+                    {
+                      "ui:widget": "formContainer",
+                      "ui:title": "",
+                      "ui:styles": {
+                        width: "100%",
+                        border: "none",
+                        padding: "0",
+                        boxSizing: "border-box",
+                      },
+                      "ui:fields": [
+                        {
+                          "ui:widget": "inputField",
+                          "ui:label": "Email Address",
+                          "ui:name": "email",
+                          "ui:type": "email",
+                          "ui:placeholder": "you@company.com",
+                          "ui:required": true,
+                          "ui:styles": {
+                            marginBottom: "30px", // Increased margin
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                          "ui:labelStyles": {
+                            // Added labelStyles
+                            textAlign: "left",
+                            display: "block",
+                            marginBottom: "8px",
+                            fontWeight: "600",
+                            color: "#334155",
+                            fontSize: "0.95rem",
+                          },
+                          "ui:inputStyles": {
+                            border: "2px solid #e2e8f0",
+                            padding: "14px 18px", // Slightly larger padding
+                            fontSize: "1.05rem", // Slightly larger
+                            borderRadius: "10px", // Slightly larger radius
+                            width: "100%",
+                            boxSizing: "border-box",
+                          },
+                        },
+                      ],
+                      "ui:actions": [
+                        {
+                          label: "Send Reset Link",
+                          action: "handleForgotPassword",
+                          variant: "primary",
+                          styles: {
+                            width: "100%",
+                            padding: "16px", // Slightly larger
+                            fontSize: "1.05rem", // Slightly larger
+                            fontWeight: "600",
+                            background: "#1e40af",
+                            border: "none",
+                            borderRadius: "10px", // Slightly larger radius
+                            color: "white",
+                            cursor: "pointer",
+                            boxSizing: "border-box",
+                          },
+                        },
+                      ],
+                    },
+                    {
+                      "ui:widget": "spacer",
+                      "ui:height": 25,
+                    },
+                    {
+                      "ui:widget": "authLinks",
+                      "ui:alignment": "center",
+                      "ui:styles": {
+                        width: "100%",
+                      },
+                      "ui:links": [
+                        {
+                          label: "← Back to Login",
+                          action: "switchAuthMode",
+                          actionParams: { mode: "login" },
+                        },
+                      ],
+                    },
+                  ],
+                },
               },
             ],
           },

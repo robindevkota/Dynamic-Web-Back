@@ -2,6 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const app = express();
@@ -15,7 +16,7 @@ app.use(
   })
 );
 
-
+app.use(cookieParser());
 
 app.use(express.json({ limit: '10mb' })); // Important for large JSON configs
 
@@ -38,6 +39,9 @@ const pageRoutes = require("./routes/pageConfigRoutes");
 const apiConfigRoutes = require("./routes/apiConfigRoutes");
 const productRoutes = require("./routes/products");
 const authRoutes = require("./routes/authRoutes");
+
+const userRoutes = require("./routes/userRoutes");
+app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/pages", pageRoutes);

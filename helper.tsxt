@@ -1,56 +1,295 @@
-"projectsSection": {
-  "ui:widget": "container",
-  "ui:id": "projects",
-  "ui:children": [
-    {
-      "ui:widget": "heading",
-      "ui:text": "🚀 Featured Projects",
-      "ui:level": "h2",
-      "ui:styles": {
-        "textAlign": "center",
-        "marginBottom": "60px",
-        "fontSize": "2.8rem",
-        "fontWeight": "800"
-      }
+// ========== SIGNUP FORM ==========
+{
+  "ui:widget": "conditionalContent",
+  "ui:condition": "{{data.authMode === 'signup'}}",
+  "ui:content": {
+    "ui:widget": "container",
+    "ui:direction": "column",
+    "ui:align": "flex-start",
+    "ui:styles": {
+      width: "100%",
+      maxWidth: "520px",
+      margin: "0 auto",
+      background: "white",
+      padding: "50px",
+      borderRadius: "20px",
+      boxShadow: "0 15px 50px rgba(0,0,0,0.12)",
+      border: "1px solid #e2e8f0",
+      boxSizing: "border-box",
     },
-    {
-      "ui:widget": "gridLayout",
-      "ui:columns": 1,
-      "ui:gap": "40px",
-      "ui:styles": {
-        "maxWidth": "900px",
-        "margin": "0 auto"
-      },
-      "ui:children": [
-        {
-          "ui:widget": "animatedContainer",
-          "ui:effects": [
-            {
-              "type": "slideUp",
-              "trigger": "onScroll",
-              "duration": 800
-            },
-            {
-              "type": "zoomIn",
-              "trigger": "onHover",
-              "duration": 300
-            }
-          ],
-          "ui:children": [
-            {
-              "ui:widget": "card",
-              "ui:title": "🏥 Pharma Release Management",
-              "ui:description": "Dynamic multi-role system for streamlining version and release workflows. Built with React, implemented RBAC, integrated APIs for version control. Reduced manual effort by 40%.",
-              "ui:image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop",
-              "ui:styles": {
-                "padding": "40px",
-                "fontWeight": "500"
-              }
-            }
-          ]
+    "ui:children": [
+      {
+        "ui:widget": "heading",
+        "ui:text": "✨ Create Your Account",
+        "ui:level": "h2",
+        "ui:className": "gradient-heading",
+        "ui:styles": {
+          textAlign: "center",
+          marginBottom: "10px",
+          fontSize: "2.2rem",
+          fontWeight: "800",
+          width: "100%",
         },
-        // ... other project cards
-      ]
-    }
-  ]
-}
+      },
+      {
+        "ui:widget": "paragraph",
+        "ui:text": "Join BuilderPlatform and start building",
+        "ui:className": "gray-text",
+        "ui:styles": {
+          textAlign: "center",
+          marginBottom: "40px",
+          width: "100%",
+          fontSize: "1.05rem",
+        },
+      },
+      {
+        "ui:widget": "formContainer",
+        "ui:title": "",
+        "ui:styles": {
+          width: "100%",
+          border: "none",
+          padding: "0",
+          boxSizing: "border-box",
+        },
+        "ui:fields": [
+          {
+            "ui:widget": "gridLayout",
+            "ui:columns": 2,
+            "ui:gap": "20px",
+            "ui:styles": {
+              marginBottom: "20px",
+              width: "100%",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "inputField",
+                "ui:label": "First Name",
+                "ui:name": "firstName",
+                "ui:type": "text",
+                "ui:placeholder": "John",
+                "ui:required": true,
+                "ui:styles": {
+                  width: "100%",
+                  boxSizing: "border-box",
+                },
+                "ui:labelStyles": {
+                  textAlign: "left",
+                  display: "block",
+                  marginBottom: "8px",
+                  fontWeight: "600",
+                  color: "#334155",
+                  fontSize: "0.95rem",
+                },
+                "ui:inputStyles": {
+                  border: "2px solid #e2e8f0",
+                  padding: "14px 16px",
+                  width: "100%",
+                  boxSizing: "border-box",
+                  borderRadius: "10px",
+                  fontSize: "1.05rem",
+                },
+              },
+              {
+                "ui:widget": "inputField",
+                "ui:label": "Last Name",
+                "ui:name": "lastName",
+                "ui:type": "text",
+                "ui:placeholder": "Doe",
+                "ui:required": true,
+                "ui:styles": {
+                  width: "100%",
+                  boxSizing: "border-box",
+                },
+                "ui:labelStyles": {
+                  textAlign: "left",
+                  display: "block",
+                  marginBottom: "8px",
+                  fontWeight: "600",
+                  color: "#334155",
+                  fontSize: "0.95rem",
+                },
+                "ui:inputStyles": {
+                  border: "2px solid #e2e8f0",
+                  padding: "14px 16px",
+                  width: "100%",
+                  boxSizing: "border-box",
+                  borderRadius: "10px",
+                  fontSize: "1.05rem",
+                },
+              },
+            ],
+          },
+          {
+            "ui:widget": "inputField",
+            "ui:label": "Organization Name",
+            "ui:name": "organizationName",
+            "ui:type": "text",
+            "ui:placeholder": "Your Company Inc.",
+            "ui:required": true,
+            "ui:styles": {
+              marginBottom: "20px",
+              width: "100%",
+              boxSizing: "border-box",
+            },
+            "ui:labelStyles": {
+              textAlign: "left",
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "600",
+              color: "#334155",
+              fontSize: "0.95rem",
+            },
+            "ui:inputStyles": {
+              border: "2px solid #e2e8f0",
+              padding: "14px 18px",
+              width: "100%",
+              boxSizing: "border-box",
+              borderRadius: "10px",
+              fontSize: "1.05rem",
+            },
+          },
+          {
+            "ui:widget": "selectField",
+            "ui:label": "Select Pricing Plan",
+            "ui:name": "pricingPlan",
+            "ui:placeholder": "Choose a plan",
+            "ui:required": true,
+            "ui:options": [
+              {
+                "value": "starter",
+                "label": "Starter - $200/month"
+              },
+              {
+                "value": "professional",
+                "label": "Professional - $400/month"
+              },
+              {
+                "value": "enterprise",
+                "label": "Enterprise - $800/month"
+              }
+            ],
+            "ui:styles": {
+              marginBottom: "20px",
+              width: "100%",
+              boxSizing: "border-box",
+            },
+            "ui:labelStyles": {
+              textAlign: "left",
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "600",
+              color: "#334155",
+              fontSize: "0.95rem",
+            },
+            "ui:selectStyles": {
+              border: "2px solid #e2e8f0",
+              padding: "14px 18px",
+              width: "100%",
+              boxSizing: "border-box",
+              borderRadius: "10px",
+              fontSize: "1.05rem",
+              backgroundColor: "white",
+              cursor: "pointer",
+            },
+          },
+          {
+            "ui:widget": "inputField",
+            "ui:label": "Email Address",
+            "ui:name": "email",
+            "ui:type": "email",
+            "ui:placeholder": "you@company.com",
+            "ui:required": true,
+            "ui:styles": {
+              marginBottom: "20px",
+              width: "100%",
+              boxSizing: "border-box",
+            },
+            "ui:labelStyles": {
+              textAlign: "left",
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "600",
+              color: "#334155",
+              fontSize: "0.95rem",
+            },
+            "ui:inputStyles": {
+              border: "2px solid #e2e8f0",
+              padding: "14px 18px",
+              width: "100%",
+              boxSizing: "border-box",
+              borderRadius: "10px",
+              fontSize: "1.05rem",
+            },
+          },
+          {
+            "ui:widget": "inputField",
+            "ui:label": "Password",
+            "ui:name": "password",
+            "ui:type": "password",
+            "ui:placeholder": "Create a strong password",
+            "ui:required": true,
+            "ui:styles": {
+              marginBottom: "30px",
+              width: "100%",
+              boxSizing: "border-box",
+            },
+            "ui:labelStyles": {
+              textAlign: "left",
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "600",
+              color: "#334155",
+              fontSize: "0.95rem",
+            },
+            "ui:inputStyles": {
+              border: "2px solid #e2e8f0",
+              padding: "14px 18px",
+              width: "100%",
+              boxSizing: "border-box",
+              borderRadius: "10px",
+              fontSize: "1.05rem",
+            },
+          },
+        ],
+        "ui:actions": [
+          {
+            label: "Create Account",
+            action: "handleSignup",
+            variant: "primary",
+            styles: {
+              width: "100%",
+              padding: "16px",
+              fontSize: "1.05rem",
+              fontWeight: "600",
+              background: "#1e40af",
+              border: "none",
+              borderRadius: "10px",
+              color: "white",
+              cursor: "pointer",
+              boxSizing: "border-box",
+            },
+          },
+        ],
+      },
+      {
+        "ui:widget": "spacer",
+        "ui:height": 25,
+      },
+      {
+        "ui:widget": "authLinks",
+        "ui:alignment": "center",
+        "ui:styles": {
+          width: "100%",
+        },
+        "ui:links": [
+          {
+            prefix: "Already have an account?",
+            label: "Login",
+            action: "switchAuthMode",
+            actionParams: { mode: "login" },
+          },
+        ],
+      },
+    ],
+  },
+},
