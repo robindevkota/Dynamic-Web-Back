@@ -105,8 +105,6 @@ exports.signup = async (req, res) => {
       message: "Account created! Please check your email to verify your account.",
       email: user.email,
       nextStep: "EMAIL_VERIFICATION",
-      // ⚠️ FOR TESTING ONLY - REMOVE IN PRODUCTION
-      debugToken: process.env.NODE_ENV === 'development' ? verificationToken : undefined
     });
 
   } catch (err) {
@@ -271,8 +269,6 @@ exports.resendVerification = async (req, res) => {
     res.json({
       success: true,
       message: "Verification email sent! Please check your inbox.",
-      // FOR TESTING ONLY
-      debugToken: process.env.NODE_ENV === 'development' ? verificationToken : undefined
     });
 
   } catch (err) {
@@ -447,8 +443,8 @@ exports.login = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    // Clear the JWT cookie
-    res.clearCookie("jwt", {
+    // Clear the JWT cookie (match the name used in login)
+    res.clearCookie("auth_token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",

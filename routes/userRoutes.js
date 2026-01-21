@@ -2,7 +2,16 @@
 
 const express = require("express");
 const router = express.Router();
+const rateLimit = require("express-rate-limit");
 const authMiddleware = require("../middleware/authMiddleware");
+
+// 🛡️ Rate limiting for invitations (10 per hour)
+const inviteLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  message: { error: "Invitation limit reached. Please try again in an hour." }
+});
+
 const {
   getAllUsers,
   getMyOrganizationUsers,
@@ -22,7 +31,7 @@ router.get("/", authMiddleware, getAllUsers);
 router.get("/my-organization", authMiddleware, getMyOrganizationUsers);
 
 // ✅ Invite developer (CLIENT_ADMIN)
-router.post("/invite", authMiddleware, inviteDeveloper);
+router.post("/invite", authMiddleware, inviteLimiter, inviteDeveloper);
 
 // ✅ Accept invitation (public - no auth)
 router.post("/accept-invitation", acceptInvitation);
