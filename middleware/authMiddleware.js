@@ -1,21 +1,31 @@
+// backend/middleware/authMiddleware.js
+
 const jwt = require("jsonwebtoken");
 
-exports.verifySuperAdmin = (req, res, next) => {
+module.exports = (req, res, next) => {
   try {
-    const token = req.cookies.jwt || req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(401).json({ error: "Unauthorized" });
+    // Get token from cookie
+    const token = req.cookies.auth_token;
 
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    if (payload.role !== "SUPER_ADMIN") {
-      return res.status(403).json({ error: "Forbidden: SUPER_ADMIN only" });
+    if (!token) {
+      return res.status(401).json({ error: "Authentication required" });
     }
 
-    req.user = payload; // attach user info to req
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Attach user info to request
+    req.user = {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role,
+      organizationId: decoded.organizationId
+    };
+
     next();
+
   } catch (err) {
     console.error("Auth middleware error:", err);
-    res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({ error: "Invalid or expired token" });
   }
 };
-
-

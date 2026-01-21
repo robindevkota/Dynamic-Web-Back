@@ -1,13 +1,33 @@
+// backend/routes/userRoutes.js
+
 const express = require("express");
-const { getAllUsers, getUsersByOrganization } = require("../controllers/userController");
-const { verifySuperAdmin } = require("../middleware/authMiddleware");
-
 const router = express.Router();
+const authMiddleware = require("../middleware/authMiddleware");
+const {
+  getAllUsers,
+  getMyOrganizationUsers,
+  inviteDeveloper,
+  acceptInvitation,
+  getCurrentUser,
+  removeUser
+} = require("../controllers/userController");
 
-// ✅ Only SUPER_ADMIN can fetch all users
-router.get("/", verifySuperAdmin, getAllUsers);
+// ✅ Get current user (all roles)
+router.get("/me", authMiddleware, getCurrentUser);
 
-// Optional: fetch users by org
-router.get("/organization/:orgId", verifySuperAdmin, getUsersByOrganization);
+// ✅ Get all users (SUPER_ADMIN only)
+router.get("/", authMiddleware, getAllUsers);
+
+// ✅ Get users in my organization (CLIENT_ADMIN)
+router.get("/my-organization", authMiddleware, getMyOrganizationUsers);
+
+// ✅ Invite developer (CLIENT_ADMIN)
+router.post("/invite", authMiddleware, inviteDeveloper);
+
+// ✅ Accept invitation (public - no auth)
+router.post("/accept-invitation", acceptInvitation);
+
+// ✅ Remove user (CLIENT_ADMIN)
+router.delete("/:userId", authMiddleware, removeUser);
 
 module.exports = router;

@@ -96,4 +96,44 @@ exports.sendVerificationEmail = async ({ to, name, verificationUrl }) => {
   }
 };
 
-// Do the same pattern for sendDeveloperInvitation if needed
+// ✅ FIXED: Now calls getTransporter() and uses etherealFrom
+exports.sendDeveloperInvitation = async ({ to, organizationName, invitationUrl }) => {
+  try {
+    const tp = await getTransporter();  // ← FIX: Get transporter first
+
+    const mailOptions = {
+      from: `"BuilderPlatform" <${etherealFrom}>`,  // ← FIX: Use etherealFrom
+      to,
+      subject: `You've been invited to join ${organizationName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>You've been invited!</h2>
+          <p><strong>${organizationName}</strong> has invited you to join their team as a developer on BuilderPlatform.</p>
+          <p>
+            <a href="${invitationUrl}" 
+               style="background: #667eea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              Accept Invitation
+            </a>
+          </p>
+          <p>Or copy this link: ${invitationUrl}</p>
+          <p>This invitation will expire in 7 days.</p>
+          <p>After accepting, you'll be able to access assigned projects and start building!</p>
+        </div>
+      `
+    };
+
+    const info = await tp.sendMail(mailOptions);
+    
+    console.log('✅ Invitation email sent to:', to);
+    const preview = nodemailer.getTestMessageUrl(info);
+    if (preview) {
+      console.log('📬 Preview URL:', preview);
+    }
+
+  } catch (error) {
+    console.error('❌ sendDeveloperInvitation failed:', error.message);
+    if (error.code) console.error('Error code:', error.code);
+    if (error.response) console.error('Response:', error.response);
+    throw error;
+  }
+};
