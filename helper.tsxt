@@ -1,295 +1,410 @@
-// ========== SIGNUP FORM ==========
-{
-  "ui:widget": "conditionalContent",
-  "ui:condition": "{{data.authMode === 'signup'}}",
-  "ui:content": {
-    "ui:widget": "container",
-    "ui:direction": "column",
-    "ui:align": "flex-start",
-    "ui:styles": {
-      width: "100%",
-      maxWidth: "520px",
-      margin: "0 auto",
-      background: "white",
-      padding: "50px",
-      borderRadius: "20px",
-      boxShadow: "0 15px 50px rgba(0,0,0,0.12)",
-      border: "1px solid #e2e8f0",
-      boxSizing: "border-box",
-    },
-    "ui:children": [
+
+
+const mongoose = require('mongoose');
+const PageConfig = require('../models/PageConfig');
+const Organization = require('../models/Organization');
+
+// Helper function to resolve component references (keep existing)
+function resolveComponentReferences(pageObject) {
+  // ... keep your existing implementation
+  return pageObject;
+}
+
+// ✅ GET all pages (filtered by role)
+exports.getAllPages = async (req, res) => {
+  try {
+    const { role, organizationId } = req.user;
+
+    let query = { status: { $ne: 'Deleted' } };
+
+    // SUPER_ADMIN sees everything
+    if (role === 'SUPER_ADMIN') {
+      // No filter needed
+    }
+    // CLIENT_ADMIN sees: templates + their org's projects
+    else if (role === 'CLIENT_ADMIN') {
+      query = {
+        ...query,
+        $or: [
+          { isTemplate: true }, // All templates
+          { organizationId: organizationId } // Their projects
+        ]
+      };
+    }
+    // DEVELOPER sees: templates + projects they're assigned to
+    else if (role === 'DEVELOPER') {
+      // For now, developers see templates + their org's projects
+      // You can add assignedProjects logic later
+      query = {
+        ...query,
+        $or: [
+          { isTemplate: true },
+          { organizationId: organizationId }
+        ]
+      };
+    }
+
+    const pages = await PageConfig.find(query)
+      .select('title slug projectUUID taskUUID status isTemplate templateCategory organizationId createdAt')
+      .populate('organizationId', 'name')
+      .sort({ isTemplate: -1, createdAt: -1 }); // Templates first
+
+    const pagesWithPermissions = pages.map(page => ({
+      ...page.toObject(),
+      canEdit: role === 'SUPER_ADMIN' || 
+               (!page.isTemplate && page.organizationId?._id.toString() === organizationId),
+      canDelete: role === 'SUPER_ADMIN' || 
+                 (!page.isTemplate && page.organizationId?._id.toString() === organizationId)
+    }));
+
+    res.json(pagesWithPermissions);
+
+  } catch (err) {
+    console.error('Error fetching pages:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ GET single page (keep existing but add ownership info)
+exports.getPageBySlug = async (req, res) => {
+  try {
+    const { role, organizationId } = req.user || {};
+    
+    const page = await PageConfig.findOne({ 
+      slug: req.params.slug,
+      status: { $ne: 'Deleted' } 
+    }).populate('organizationId', 'name');
+    
+    if (!page) return res.status(404).json({ message: 'Page not found' });
+
+    // Check permissions
+    const canEdit = role === 'SUPER_ADMIN' || 
+                    (!page.isTemplate && page.organizationId?._id.toString() === organizationId);
+
+    console.log(`📤 Sending page config for: ${page.slug}`);
+    
+    const pageObject = page.toObject();
+    
+    if (pageObject.pages && pageObject.pages instanceof Map) {
+      pageObject.pages = Object.fromEntries(pageObject.pages);
+    }
+    
+    const resolvedPageObject = resolveComponentReferences(pageObject);
+    
+    // Resolve API references (keep existing logic)
+    if (resolvedPageObject.initialization?.resources && Array.isArray(resolvedPageObject.initialization.resources)) {
+      // ... keep your existing API resolution logic
+    }
+    
+    res.json({
+      ...resolvedPageObject,
+      canEdit,
+      canDelete: canEdit && !page.isTemplate
+    });
+    
+  } catch (err) {
+    console.error('❌ Error fetching page:', err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ CREATE new page
+exports.createPage = async (req, res) => {
+  try {
+    const { role, organizationId, userId } = req.user;
+
+    // Process components (keep existing logic)
+    const components = req.body.components || {};
+    const processedComponents = {};
+    
+    ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
+      if (components[compName]) {
+        processedComponents[compName] = {
+          _id: components[compName]._id || undefined,
+          $ref: components[compName].$ref || undefined,
+          table: components[compName].table || {},
+          modal: components[compName].modal || {},
+          uiSchema: components[compName].uiSchema || {},
+          styles: components[compName].styles || {},
+          triggers: components[compName].triggers || []
+        };
+      }
+    });
+    
+    const initialization = req.body.initialization || {};
+    const processedInitialization = {
+      globalCSS: initialization.globalCSS || '',
+      resources: initialization.resources || [],
+      actions: initialization.actions || {}
+    };
+    
+    const pages = req.body.pages || {};
+    const processedPages = {};
+    
+    Object.entries(pages).forEach(([pageName, pageData]) => {
+      processedPages[pageName] = {
+        title: pageData.title,
+        components: {}
+      };
+      
+      ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
+        if (pageData.components && pageData.components[compName]) {
+          const comp = pageData.components[compName];
+          
+          if (comp.$ref) {
+            processedPages[pageName].components[compName] = { $ref: comp.$ref };
+          } else {
+            processedPages[pageName].components[compName] = {
+              table: comp.table || {},
+              modal: comp.modal || {},
+              uiSchema: comp.uiSchema || {},
+              styles: comp.styles || {},
+              triggers: comp.triggers || []
+            };
+          }
+        }
+      });
+    });
+
+    // ✅ Set ownership
+    const pageData = {
+      ...req.body,
+      components: processedComponents,
+      initialization: processedInitialization,
+      pages: processedPages,
+      createdBy: userId,
+      organizationId: role === 'SUPER_ADMIN' ? (req.body.organizationId || null) : organizationId,
+      isTemplate: role === 'SUPER_ADMIN' ? (req.body.isTemplate || false) : false
+    };
+    
+    const page = new PageConfig(pageData);
+    await page.save();
+
+    // ✅ Increment project count (if not template)
+    if (!page.isTemplate && page.organizationId) {
+      await Organization.findByIdAndUpdate(
+        page.organizationId,
+        { $inc: { currentProjects: 1 } }
+      );
+    }
+    
+    console.log(`✅ Created page: ${page.slug}`);
+    
+    res.status(201).json(page);
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({ message: 'Slug already exists' });
+    }
+    console.error('❌ Create error:', err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// ✅ UPDATE page
+exports.updatePage = async (req, res) => {
+  try {
+    const { role } = req.user;
+
+    // Process components (keep existing logic)
+    const components = req.body.components || {};
+    const processedComponents = {};
+    
+    ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
+      if (components[compName]) {
+        processedComponents[compName] = {
+          _id: components[compName]._id || undefined,
+          $ref: components[compName].$ref || undefined,
+          table: components[compName].table || {},
+          modal: components[compName].modal || {},
+          uiSchema: components[compName].uiSchema || {},
+          styles: components[compName].styles || {},
+          triggers: components[compName].triggers || []
+        };
+      }
+    });
+
+    const initialization = req.body.initialization || {};
+    const processedInitialization = {
+      globalCSS: initialization.globalCSS || '',
+      resources: initialization.resources || [],
+      actions: initialization.actions || {}
+    };
+
+    const pages = req.body.pages || {};
+    const processedPages = {};
+    
+    Object.entries(pages).forEach(([pageName, pageData]) => {
+      processedPages[pageName] = {
+        title: pageData.title,
+        components: {}
+      };
+      
+      ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
+        if (pageData.components && pageData.components[compName]) {
+          const comp = pageData.components[compName];
+          
+          if (comp.$ref) {
+            processedPages[pageName].components[compName] = { $ref: comp.$ref };
+          } else {
+            processedPages[pageName].components[compName] = {
+              table: comp.table || {},
+              modal: comp.modal || {},
+              uiSchema: comp.uiSchema || {},
+              styles: comp.styles || {},
+              triggers: comp.triggers || []
+            };
+          }
+        }
+      });
+    });
+
+    const updateData = {
+      ...req.body,
+      components: processedComponents,
+      initialization: processedInitialization,
+      pages: processedPages
+    };
+
+    // ✅ SUPER_ADMIN can update template status
+    if (role !== 'SUPER_ADMIN') {
+      delete updateData.isTemplate;
+      delete updateData.organizationId;
+    }
+
+    const page = await PageConfig.findOneAndUpdate(
+      { slug: req.params.slug },
       {
-        "ui:widget": "heading",
-        "ui:text": "✨ Create Your Account",
-        "ui:level": "h2",
-        "ui:className": "gradient-heading",
-        "ui:styles": {
-          textAlign: "center",
-          marginBottom: "10px",
-          fontSize: "2.2rem",
-          fontWeight: "800",
-          width: "100%",
-        },
+        $set: updateData,
+        $inc: { version: 1 }
       },
-      {
-        "ui:widget": "paragraph",
-        "ui:text": "Join BuilderPlatform and start building",
-        "ui:className": "gray-text",
-        "ui:styles": {
-          textAlign: "center",
-          marginBottom: "40px",
-          width: "100%",
-          fontSize: "1.05rem",
-        },
-      },
-      {
-        "ui:widget": "formContainer",
-        "ui:title": "",
-        "ui:styles": {
-          width: "100%",
-          border: "none",
-          padding: "0",
-          boxSizing: "border-box",
-        },
-        "ui:fields": [
-          {
-            "ui:widget": "gridLayout",
-            "ui:columns": 2,
-            "ui:gap": "20px",
-            "ui:styles": {
-              marginBottom: "20px",
-              width: "100%",
-            },
-            "ui:children": [
-              {
-                "ui:widget": "inputField",
-                "ui:label": "First Name",
-                "ui:name": "firstName",
-                "ui:type": "text",
-                "ui:placeholder": "John",
-                "ui:required": true,
-                "ui:styles": {
-                  width: "100%",
-                  boxSizing: "border-box",
-                },
-                "ui:labelStyles": {
-                  textAlign: "left",
-                  display: "block",
-                  marginBottom: "8px",
-                  fontWeight: "600",
-                  color: "#334155",
-                  fontSize: "0.95rem",
-                },
-                "ui:inputStyles": {
-                  border: "2px solid #e2e8f0",
-                  padding: "14px 16px",
-                  width: "100%",
-                  boxSizing: "border-box",
-                  borderRadius: "10px",
-                  fontSize: "1.05rem",
-                },
-              },
-              {
-                "ui:widget": "inputField",
-                "ui:label": "Last Name",
-                "ui:name": "lastName",
-                "ui:type": "text",
-                "ui:placeholder": "Doe",
-                "ui:required": true,
-                "ui:styles": {
-                  width: "100%",
-                  boxSizing: "border-box",
-                },
-                "ui:labelStyles": {
-                  textAlign: "left",
-                  display: "block",
-                  marginBottom: "8px",
-                  fontWeight: "600",
-                  color: "#334155",
-                  fontSize: "0.95rem",
-                },
-                "ui:inputStyles": {
-                  border: "2px solid #e2e8f0",
-                  padding: "14px 16px",
-                  width: "100%",
-                  boxSizing: "border-box",
-                  borderRadius: "10px",
-                  fontSize: "1.05rem",
-                },
-              },
-            ],
-          },
-          {
-            "ui:widget": "inputField",
-            "ui:label": "Organization Name",
-            "ui:name": "organizationName",
-            "ui:type": "text",
-            "ui:placeholder": "Your Company Inc.",
-            "ui:required": true,
-            "ui:styles": {
-              marginBottom: "20px",
-              width: "100%",
-              boxSizing: "border-box",
-            },
-            "ui:labelStyles": {
-              textAlign: "left",
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "600",
-              color: "#334155",
-              fontSize: "0.95rem",
-            },
-            "ui:inputStyles": {
-              border: "2px solid #e2e8f0",
-              padding: "14px 18px",
-              width: "100%",
-              boxSizing: "border-box",
-              borderRadius: "10px",
-              fontSize: "1.05rem",
-            },
-          },
-          {
-            "ui:widget": "selectField",
-            "ui:label": "Select Pricing Plan",
-            "ui:name": "pricingPlan",
-            "ui:placeholder": "Choose a plan",
-            "ui:required": true,
-            "ui:options": [
-              {
-                "value": "starter",
-                "label": "Starter - $200/month"
-              },
-              {
-                "value": "professional",
-                "label": "Professional - $400/month"
-              },
-              {
-                "value": "enterprise",
-                "label": "Enterprise - $800/month"
-              }
-            ],
-            "ui:styles": {
-              marginBottom: "20px",
-              width: "100%",
-              boxSizing: "border-box",
-            },
-            "ui:labelStyles": {
-              textAlign: "left",
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "600",
-              color: "#334155",
-              fontSize: "0.95rem",
-            },
-            "ui:selectStyles": {
-              border: "2px solid #e2e8f0",
-              padding: "14px 18px",
-              width: "100%",
-              boxSizing: "border-box",
-              borderRadius: "10px",
-              fontSize: "1.05rem",
-              backgroundColor: "white",
-              cursor: "pointer",
-            },
-          },
-          {
-            "ui:widget": "inputField",
-            "ui:label": "Email Address",
-            "ui:name": "email",
-            "ui:type": "email",
-            "ui:placeholder": "you@company.com",
-            "ui:required": true,
-            "ui:styles": {
-              marginBottom: "20px",
-              width: "100%",
-              boxSizing: "border-box",
-            },
-            "ui:labelStyles": {
-              textAlign: "left",
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "600",
-              color: "#334155",
-              fontSize: "0.95rem",
-            },
-            "ui:inputStyles": {
-              border: "2px solid #e2e8f0",
-              padding: "14px 18px",
-              width: "100%",
-              boxSizing: "border-box",
-              borderRadius: "10px",
-              fontSize: "1.05rem",
-            },
-          },
-          {
-            "ui:widget": "inputField",
-            "ui:label": "Password",
-            "ui:name": "password",
-            "ui:type": "password",
-            "ui:placeholder": "Create a strong password",
-            "ui:required": true,
-            "ui:styles": {
-              marginBottom: "30px",
-              width: "100%",
-              boxSizing: "border-box",
-            },
-            "ui:labelStyles": {
-              textAlign: "left",
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "600",
-              color: "#334155",
-              fontSize: "0.95rem",
-            },
-            "ui:inputStyles": {
-              border: "2px solid #e2e8f0",
-              padding: "14px 18px",
-              width: "100%",
-              boxSizing: "border-box",
-              borderRadius: "10px",
-              fontSize: "1.05rem",
-            },
-          },
-        ],
-        "ui:actions": [
-          {
-            label: "Create Account",
-            action: "handleSignup",
-            variant: "primary",
-            styles: {
-              width: "100%",
-              padding: "16px",
-              fontSize: "1.05rem",
-              fontWeight: "600",
-              background: "#1e40af",
-              border: "none",
-              borderRadius: "10px",
-              color: "white",
-              cursor: "pointer",
-              boxSizing: "border-box",
-            },
-          },
-        ],
-      },
-      {
-        "ui:widget": "spacer",
-        "ui:height": 25,
-      },
-      {
-        "ui:widget": "authLinks",
-        "ui:alignment": "center",
-        "ui:styles": {
-          width: "100%",
-        },
-        "ui:links": [
-          {
-            prefix: "Already have an account?",
-            label: "Login",
-            action: "switchAuthMode",
-            actionParams: { mode: "login" },
-          },
-        ],
-      },
-    ],
-  },
-},
+      { new: true, runValidators: true }
+    );
+
+    if (!page) {
+      return res.status(404).json({ message: "Page not found" });
+    }
+
+    console.log(`✅ Updated page: ${page.slug} (v${page.version})`);
+    
+    res.json(page);
+
+  } catch (err) {
+    console.error("❌ Update Error:", err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// ✅ SOFT DELETE
+exports.deletePage = async (req, res) => {
+  try {
+    const page = await PageConfig.findOneAndUpdate(
+      { slug: req.params.slug },
+      { status: 'Deleted' },
+      { new: true }
+    );
+    
+    if (!page) return res.status(404).json({ message: 'Page not found' });
+
+    // ✅ Decrement project count (if not template)
+    if (!page.isTemplate && page.organizationId) {
+      await Organization.findByIdAndUpdate(
+        page.organizationId,
+        { $inc: { currentProjects: -1 } }
+      );
+    }
+    
+    console.log(`🗑️ Deleted page: ${page.slug}`);
+    res.json({ message: 'Page deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ NEW: Clone template
+exports.cloneTemplate = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { newTitle, newSlug } = req.body;
+    const { role, organizationId, userId } = req.user;
+
+    // Find template
+    const template = await PageConfig.findOne({ slug, isTemplate: true });
+    
+    if (!template) {
+      return res.status(404).json({ error: "Template not found" });
+    }
+
+    // Check project limits
+    if (role === 'CLIENT_ADMIN') {
+      const organization = await Organization.findById(organizationId);
+      
+      if (organization.currentProjects >= organization.maxProjects) {
+        return res.status(403).json({ 
+          error: `Project limit reached (${organization.maxProjects})` 
+        });
+      }
+    }
+
+    // Clone template
+    const clonedData = template.toObject();
+    delete clonedData._id;
+    delete clonedData.createdAt;
+    delete clonedData.updatedAt;
+    
+    const newPage = new PageConfig({
+      ...clonedData,
+      title: newTitle,
+      slug: newSlug,
+      isTemplate: false,
+      organizationId: role === 'SUPER_ADMIN' ? (req.body.organizationId || null) : organizationId,
+      createdBy: userId,
+      status: 'Draft'
+    });
+
+    await newPage.save();
+
+    // Increment project count
+    if (newPage.organizationId) {
+      await Organization.findByIdAndUpdate(
+        newPage.organizationId,
+        { $inc: { currentProjects: 1 } }
+      );
+    }
+
+    console.log(`✅ Cloned template: ${template.slug} → ${newPage.slug}`);
+    
+    res.status(201).json(newPage);
+
+  } catch (err) {
+    console.error('❌ Clone error:', err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
+// ========================================
+// 4. UPDATE pageConfigRoutes.js
+// ========================================
+// backend/routes/pageConfigRoutes.js
+
+const express = require('express');
+const router = express.Router();
+const authMiddleware = require('../middleware/authMiddleware');
+const { canCreateProject, canEditProject, canDeleteProject } = require('../middleware/projectPermissions');
+const {
+  getAllPages,
+  getPageBySlug,
+  createPage,
+  updatePage,
+  deletePage,
+  cloneTemplate
+} = require('../controllers/pageConfigController');
+
+// ✅ Protected routes (require authentication)
+router.get('/', authMiddleware, getAllPages);
+router.get('/:slug', authMiddleware, getPageBySlug);
+router.post('/', authMiddleware, canCreateProject, createPage);
+router.post('/clone/:slug', authMiddleware, canCreateProject, cloneTemplate);
+router.put('/:slug', authMiddleware, canEditProject, updatePage);
+router.delete('/:slug', authMiddleware, canDeleteProject, deletePage);
+
+module.exports = router;

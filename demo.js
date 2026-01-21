@@ -19,6 +19,10 @@ const websites = [
     accountValidation: true,
     otpValidation: false,
     isAnonymous: false,
+    isTemplate: true, // Mark as global template
+    templateCategory: "E-commerce", // Category (E-commerce, Portfolio, Dashboard, Landing Page, Blog, Other)
+    organizationId: null,
+    createdBy: "000000000000000000000000",
 
     initialization: {
       globalCSS: `@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
@@ -3062,6 +3066,10 @@ input:focus, textarea:focus, select:focus {
     accountValidation: true,
     otpValidation: false,
     isAnonymous: false,
+    isTemplate: true, // Mark as global template
+    templateCategory: "E-commerce", // Category (E-commerce, Portfolio, Dashboard, Landing Page, Blog, Other)
+    organizationId: null,
+    createdBy: "000000000000000000000000",
 
     initialization: {
       globalCSS: `
@@ -5313,7 +5321,10 @@ input:focus, textarea:focus, select:focus {
     accountValidation: false,
     otpValidation: false,
     isAnonymous: true,
-
+    isTemplate: true, // Mark as global template
+    templateCategory: "E-commerce", // Category (E-commerce, Portfolio, Dashboard, Landing Page, Blog, Other)
+    organizationId: null,
+    createdBy: "000000000000000000000000",
     initialization: {
       // In your JSON config, UPDATE the globalCSS to this:
 
@@ -6321,6 +6332,11 @@ context.handlers.setFormData({});`,
     projectUUID: "hotel-hotelhub",
     taskUUID: "hotel001",
     status: "Active",
+
+    isTemplate: true, // Mark as global template
+    templateCategory: "E-commerce", // Category (E-commerce, Portfolio, Dashboard, Landing Page, Blog, Other)
+    organizationId: null,
+    createdBy: "000000000000000000000000",
     accountValidation: true,
     otpValidation: false,
     isAnonymous: false,
@@ -7685,6 +7701,10 @@ input:focus, textarea:focus, select:focus {
     accountValidation: false,
     otpValidation: false,
     isAnonymous: true,
+    isTemplate: false, // Mark as global template
+    templateCategory: "E-commerce", // Category (E-commerce, Portfolio, Dashboard, Landing Page, Blog, Other)
+    organizationId: null,
+    createdBy: "000000000000000000000000",
 
     initialization: {
       globalCSS: `
@@ -8109,7 +8129,7 @@ input:focus, textarea:focus, select:focus {
 
       actions: {
         // ✅ ADD: handleSignup
-    handleSignup: `
+        handleSignup: `
 console.log('📝 Signup action triggered');
 
 const { email, password, firstName, lastName, organizationName, pricingPlan } = context.formData || {};
@@ -9702,14 +9722,29 @@ try {
 
 const seed = async () => {
   try {
+    // ✅ Find a SUPER_ADMIN user
+    const User = require("./models/User");
+    let systemUser = await User.findOne({ role: 'SUPER_ADMIN' });
+    
+    if (!systemUser) {
+      console.error("❌ No SUPER_ADMIN user found. Please create one first.");
+      mongoose.disconnect();
+      return;
+    }
+    
+    // ✅ Update createdBy for all websites
+    websites.forEach(site => {
+      site.createdBy = systemUser._id;
+    });
+    
     await PageConfig.deleteMany({});
     console.log("🗑️  Cleared old data");
 
     await PageConfig.insertMany(websites);
-    console.log("✅ Seeded", websites.length, "websites");
+    console.log("✅ Seeded", websites.length, "templates");
+    console.log("👤 Created by:", systemUser.email);
 
     mongoose.disconnect();
-    console.log("📡 Database disconnected");
   } catch (err) {
     console.error("❌ Seed failed:", err);
     mongoose.disconnect();

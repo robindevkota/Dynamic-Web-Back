@@ -1,16 +1,15 @@
 const mongoose = require('mongoose');
 
 const ComponentSchema = new mongoose.Schema({
-  _id: { type: String },  // ✅ ADD: Optional ID for references
-  $ref: { type: String }, // ✅ ADD: Reference to another component
+  _id: { type: String },
+  $ref: { type: String },
   table: { type: Object, default: {} },
   modal: { type: Object, default: {} },
   uiSchema: { type: Object, default: {} },
   styles: { type: Object, default: {} },
   triggers: { type: Array, default: [] }
-}, { _id: false, strict: false }); // ✅ strict: false allows $ref
+}, { _id: false, strict: false });
 
-// 🆕 Sub-page Schema
 const SubPageSchema = new mongoose.Schema({
   title: { type: String, required: true },
   components: {
@@ -32,20 +31,39 @@ const PageConfigSchema = new mongoose.Schema({
   otpValidation: { type: Boolean, default: false },
   isAnonymous: { type: Boolean, default: true },
   
+  // ✅ NEW: Ownership & Permissions
+  organizationId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Organization",
+    required: false // null = SUPER_ADMIN template
+  },
+  createdBy: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "User",
+    required: true
+  },
+  isTemplate: { 
+    type: Boolean, 
+    default: false // true = starter template (read-only for clients)
+  },
+  templateCategory: {
+    type: String,
+    enum: ['E-commerce', 'Portfolio', 'Blog', 'Dashboard', 'Landing Page', 'Other'],
+    default: 'Other'
+  },
+  
   initialization: {
     globalCSS: { type: String, default: "" },
     resources: [mongoose.Schema.Types.Mixed],
     actions: { type: Object, default: {} }
   },
   
-  // 🆕 Sub-pages
   pages: {
     type: Map,
     of: SubPageSchema,
     default: {}
   },
   
-  // Main page components
   components: {
     navbar: ComponentSchema,
     sidebar: ComponentSchema,
@@ -59,9 +77,8 @@ const PageConfigSchema = new mongoose.Schema({
   timestamps: true 
 });
 
+// Index for efficient queries
+PageConfigSchema.index({ organizationId: 1, status: 1 });
+PageConfigSchema.index({ isTemplate: 1, status: 1 });
+
 module.exports = mongoose.model('PageConfig', PageConfigSchema);
-
-
-
-
-
