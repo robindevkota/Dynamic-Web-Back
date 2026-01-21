@@ -40,12 +40,16 @@ const apiConfigRoutes = require("./routes/apiConfigRoutes");
 const productRoutes = require("./routes/products");
 const authRoutes = require("./routes/authRoutes");
 
+
 const userRoutes = require("./routes/userRoutes");
+const organizationRoutes = require("./routes/organizationRoutes");
+
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/pages", pageRoutes);
 app.use("/api/api-configs", apiConfigRoutes);
+app.use("/api/organizations", organizationRoutes);
 // Health check
 app.get("/", (req, res) => {
   res.json({ message: "Dynamic Website Engine API Running" });

@@ -8109,7 +8109,7 @@ input:focus, textarea:focus, select:focus {
 
       actions: {
         // ✅ ADD: handleSignup
-        handleSignup: `
+    handleSignup: `
 console.log('📝 Signup action triggered');
 
 const { email, password, firstName, lastName, organizationName, pricingPlan } = context.formData || {};
@@ -8117,7 +8117,7 @@ const { email, password, firstName, lastName, organizationName, pricingPlan } = 
 if (!email || !password || !organizationName || !pricingPlan) {
   context.handlers.showNotification({
     type: 'toast',
-    message: '❌ Please fill all required fields, including plan',
+    message: '❌ Please fill all required fields (email, password, organization, plan)',
     background: '#ef4444'
   });
   return;
@@ -8127,51 +8127,70 @@ try {
   const response = await fetch('http://localhost:5000/api/auth/signup', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include', // needed for cookie
+    credentials: 'include',
     body: JSON.stringify({
-      email,
+      email: email.trim().toLowerCase(),
       password,
-      firstName,        // optional
-      lastName,         // optional
-      organizationName, // required
-      pricingPlan       // required: 'starter' | 'professional' | 'enterprise'
+      firstName: firstName?.trim() || '',
+      lastName: lastName?.trim() || '',
+      organizationName: organizationName.trim(),
+      pricingPlan
     })
   });
 
   const data = await response.json();
 
   if (!response.ok) {
+    // Handle common backend errors with better messages
+    let errorMsg = data.error || 'Signup failed';
+
+    if (errorMsg.includes('Email already registered')) {
+      errorMsg = 'This email is already in use. Try logging in?';
+    } else if (errorMsg.includes('Invalid pricing plan')) {
+      errorMsg = 'Please select a valid plan (Starter, Professional, Enterprise)';
+    }
+
     context.handlers.showNotification({
       type: 'toast',
-      message: data.error || '❌ Signup failed',
-      background: '#ef4444'
+      message: '❌ ' + errorMsg,
+      background: '#ef4444',
+      duration: 6000
     });
     return;
   }
 
-  console.log('✅ Signup successful:', data);
+  console.log('✅ Signup response:', data);
 
+  // ── Success path ──
   context.handlers.showNotification({
     type: 'toast',
-    message: '✅ Account created successfully. Please login.',
-    background: '#10b981'
+    message: '🎉 Account created! Check your email to verify it',
+    background: '#10b981',
+    duration: 4000
   });
 
-  // Switch to login view
+  // Redirect to check-email page with email parameter
   setTimeout(() => {
-    context.handlers.setData('authMode', 'login');
-  }, 1200);
+    window.location.href = '/check-email?email=' + encodeURIComponent(email.trim().toLowerCase());
+  }, 1500);
 
 } catch (error) {
-  console.error('Signup error:', error);
+  console.error('Signup network error:', error);
+
+  let msg = '❌ Something went wrong. Please check your connection.';
+  if (error.message && error.message.includes('CORS')) {
+    msg = '❌ Server connection issue (CORS). Is backend running?';
+  } else if (error.message && error.message.includes('fetch')) {
+    msg = '❌ Cannot connect to server. Is it running on localhost:5000?';
+  }
+
   context.handlers.showNotification({
     type: 'toast',
-    message: '❌ Network error. Please try again.',
+    message: msg,
     background: '#ef4444'
   });
 }
 `,
-
         // ✅ ADD: handleForgotPassword
         handleForgotPassword: `
         console.log('🔑 Forgot password action triggered');
@@ -8773,8 +8792,6 @@ try {
             ],
           },
 
-          
-
           // ========== FEATURES SECTION ==========
           featuresSection: {
             "ui:widget": "container",
@@ -9016,7 +9033,7 @@ try {
               },
             ],
           },
- 
+
           // ========== LOGIN SECTION (CENTERED - FIXED) ==========
           // ✅ FIXED LOGIN SECTION - All forms properly centered
           // ✅ FIXED LOGIN SECTION - Left-aligned labels, larger wrapper
@@ -9036,7 +9053,6 @@ try {
               zIndex: 20,
             },
             "ui:children": [
-              
               // ========== LOGIN FORM ==========
               {
                 "ui:widget": "conditionalContent",
