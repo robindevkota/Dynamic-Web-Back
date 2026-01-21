@@ -43,6 +43,8 @@ const authRoutes = require("./routes/authRoutes");
 
 const userRoutes = require("./routes/userRoutes");
 const organizationRoutes = require("./routes/organizationRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
+app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -50,6 +52,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/pages", pageRoutes);
 app.use("/api/api-configs", apiConfigRoutes);
 app.use("/api/organizations", organizationRoutes);
+
 // Health check
 app.get("/", (req, res) => {
   res.json({ message: "Dynamic Website Engine API Running" });
