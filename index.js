@@ -44,20 +44,40 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const organizationRoutes = require("./routes/organizationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
-app.use("/api/dashboard", dashboardRoutes);
+const aiRoutes = require("./routes/aiRoutes");
 
+app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/pages", pageRoutes);
 app.use("/api/api-configs", apiConfigRoutes);
 app.use("/api/organizations", organizationRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Health check
 app.get("/", (req, res) => {
   res.json({ message: "Dynamic Website Engine API Running" });
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('🛑 GLOBAL ERROR caught in index.js:', err.message);
+  console.error(err.stack);
+
+  // If headers were already sent, delegate to default express handler
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  res.status(err.status || 500);
+  res.setHeader('Content-Type', 'application/json');
+  res.json({
+    success: false,
+    error: err.message || 'Internal Server Error',
+    path: req.path
+  });
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
