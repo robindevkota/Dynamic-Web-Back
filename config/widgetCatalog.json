@@ -1,0 +1,91 @@
+{
+    "navbar": {
+        "description": "Top navigation bar - keep it simple and clean",
+        "allowedWidgets": [
+            "text",
+            "navLinks",
+            "authLinks",
+            "button",
+            "dropdown",
+            "socialIcons"
+        ],
+        "notAllowed": [
+            "formContainer",
+            "dataTable",
+            "hero",
+            "card",
+            "modal",
+            "video"
+        ]
+    },
+    "sidebar": {
+        "description": "Side navigation menu - vertical layout",
+        "allowedWidgets": [
+            "heading",
+            "navLinks",
+            "button",
+            "list",
+            "divider",
+            "badge",
+            "text"
+        ],
+        "notAllowed": [
+            "hero",
+            "dataTable",
+            "formContainer",
+            "video",
+            "card"
+        ]
+    },
+    "main": {
+        "description": "Primary content area - most flexible, all widgets allowed",
+        "allowedWidgets": "ALL",
+        "recommended": [
+            "hero",
+            "card",
+            "formContainer",
+            "dataTable",
+            "gridLayout",
+            "responsiveGrid",
+            "tabs",
+            "accordion"
+        ]
+    },
+    "footer": {
+        "description": "Bottom section - simple and informative",
+        "allowedWidgets": [
+            "text",
+            "navLinks",
+            "socialIcons",
+            "columns",
+            "divider",
+            "heading",
+            "paragraph"
+        ],
+        "notAllowed": [
+            "hero",
+            "formContainer",
+            "dataTable",
+            "modal",
+            "video"
+        ]
+    },
+    "modal": {
+        "description": "Popup dialogs - forms and confirmations",
+        "allowedWidgets": [
+            "heading",
+            "text",
+            "formContainer",
+            "inputField",
+            "button",
+            "alert",
+            "image"
+        ],
+        "notAllowed": [
+            "hero",
+            "dataTable",
+            "navbar",
+            "footer"
+        ]
+    }
+}

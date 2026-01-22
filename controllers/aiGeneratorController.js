@@ -1,281 +1,273 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+// backend/controllers/aiGeneratorController.js - Ollama only (2025 realistic version)
+
+const widgetCatalog = require("../config/widgetCatalog.json"); // if you still use it, otherwise remove
 
 /**
- * AI Generator Controller - Gemini Free Edition
- * Handles the "Magic Build" logic using Google Gemini 1.5 Flash
+ * AI Generator Controller – Ollama only
+ * Generates complete multi-page website configurations using local model
  */
-// backend/controllers/aiGeneratorController.js
-
 exports.generatePage = async (req, res) => {
-    try {
-        const { prompt = "", context = "General" } = req.body || {};
+  try {
+    const { prompt = "", context = "General", pageType = "single" } = req.body || {};
 
-        if (!prompt) {
-            return res.status(400).json({ error: "Missing prompt" });
-        }
-
-        console.log(`🧠 AI Generation Requested: "${prompt}"`);
-
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            console.warn("⚠️ No GEMINI_API_KEY found.");
-            return res.json(getMockAiResponse(prompt));
-        }
-
-        const genAI = new GoogleGenerativeAI(apiKey);
-
-        const modelNames = [
-            "gemini-2.0-flash",
-            "gemini-flash-latest",
-            "gemini-1.5-flash",
-            "gemini-pro-latest"
-        ];
-
-        let result = null;
-        let lastError = null;
-
-        for (const modelName of modelNames) {
-            try {
-                console.log(`📡 Trying Gemini Model: ${modelName}`);
-                const model = genAI.getGenerativeModel({ model: modelName });
-
-                // ✅ UPDATED SYSTEM PROMPT - Generate correct PageConfig schema
-                const systemPrompt = `You are the WebFactory AI Expert. Your task is to generate a beautiful, functional PageConfig JSON based on user requirements.
-
-                SCHEMA RULES:
-                1. ROOT: { "title": string, "slug": "generated-site", "components": { "navbar": Component, "main": Component, "footer": Component } }
-                2. Component: { "uiSchema": { [id: string]: Widget }, "styles": Object }
-                3. Widget: { 
-                   "ui:widget": "hero" | "navbar" | "cardGrid" | "pricingCard" | "footer" | "statsCounter" | "heading" | "paragraph" | "button" | "image" | "spacer",
-                   "ui:title": string,
-                   "ui:subtitle": string,
-                   "ui:content": string,
-                   "ui:styles": Object
-                }
-
-                WIDGET GUIDELINES:
-                - navbar: use "ui:logo", "ui:links" (Array<{label, action}>)
-                - hero: use "ui:title", "ui:subtitle", "ui:cta" ({label, action})
-                - cardGrid: use "ui:cards" (Array<{ui:title, ui:description, ui:image}>), "ui:columns" (number)
-                - footer: use "ui:copyright", "ui:columns" (Array<{title, links}>)
-
-                USER PROMPT: "${prompt}"
-                CONTEXT: "${context}"
-
-                CRITICAL: 
-                - Output ONLY valid, raw JSON. 
-                - NO markdown blocks (no \`\`\`json).
-                - Ensure the structure is exactly as defined (ROOT -> components -> [navbar, main, footer] -> uiSchema -> widgets).
-                - Use professional design sense. Colors should be harmonious.`;
-
-                result = await model.generateContent(systemPrompt);
-
-                if (result && result.response) {
-                    const text = result.response.text();
-                    if (text && text.length > 10) {
-                        console.log(`✅ Success with ${modelName}`);
-                        break;
-                    }
-                }
-            } catch (err) {
-                console.warn(`❌ Model ${modelName} failed:`, err.message);
-                lastError = err;
-            }
-        }
-
-        if (res.headersSent) return;
-
-        if (!result) {
-            console.error("❌ All Gemini models failed.");
-            const mock = getMockAiResponse(prompt);
-            mock.error = lastError?.message || "All models returned 404 or empty responses";
-            return res.json(mock);
-        }
-
-        const responseText = result.response.text();
-        try {
-            const cleanJson = responseText.replace(/```json|```/g, "").trim();
-            const generatedJson = JSON.parse(cleanJson);
-
-            return res.json({
-                success: true,
-                data: generatedJson,
-                source: 'gemini'
-            });
-        } catch (parseErr) {
-            console.error("❌ JSON Parse Error. Raw text:", responseText);
-            const mock = getMockAiResponse(prompt);
-            mock.error = "AI returned invalid JSON. Try refreshing or changing the prompt.";
-            return res.json(mock);
-        }
-
-    } catch (globalErr) {
-        console.error("💀 CRITICAL CONTROLLER ERROR:", globalErr);
-        if (!res.headersSent) {
-            return res.status(500).json({
-                success: false,
-                error: "An internal error occurred while generating content.",
-                details: globalErr.message
-            });
-        }
+    if (!prompt.trim()) {
+      return res.status(400).json({ error: "Missing or empty prompt" });
     }
+
+    console.log(`[AI] Generation requested: "${prompt}" | context: ${context}`);
+
+    const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+    const model = process.env.OLLAMA_MODEL || 'llama3.2'; // or 'qwen2.5:14b', 'mistral-nemo', etc.
+
+    console.log(`[AI] Using Ollama → ${ollamaUrl} / model: ${model}`);
+
+    const systemPrompt = createStrongSystemPrompt(prompt, context, pageType);
+
+    const response = await fetch(`${ollamaUrl}/api/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,
+        prompt: systemPrompt,
+        stream: false,
+        options: {
+          temperature: 0.65,       // lower = more structured
+          top_p: 0.92,
+          num_predict: 6000,       // give it room for full multi-page output
+          num_ctx: 8192            // important for large prompts + examples
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ollama HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    let responseText = data.response || '';
+
+    console.log(`[AI] Ollama raw response length: ${responseText.length}`);
+
+    // Aggressive cleaning – Ollama often wraps in ```json ... ```
+    responseText = responseText
+      .replace(/^```json?\s*/i, '')
+      .replace(/```$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '')     // remove js-style comments
+      .replace(/\/\/.*$/gm, '')             // remove line comments
+      .trim();
+
+    let generatedJson;
+    try {
+      generatedJson = JSON.parse(responseText);
+    } catch (parseErr) {
+      console.error("[AI] JSON parse failed:", parseErr.message);
+      console.debug("[AI] First 600 chars of cleaned response:", responseText.slice(0, 600));
+
+      // Fallback to mock
+      const mock = getImprovedMockResponse(prompt, pageType);
+      return res.json({
+        success: false,
+        error: "Could not parse valid JSON from model – using fallback example",
+        fallbackUsed: true,
+        data: mock
+      });
+    }
+
+    // Light normalization
+    const normalized = normalizeConfig(generatedJson, prompt);
+
+    return res.json({
+      success: true,
+      data: normalized,
+      source: 'ollama',
+      modelUsed: model
+    });
+
+  } catch (err) {
+    console.error("[AI] Critical error:", err.message);
+    const mock = getImprovedMockResponse(prompt || "Untitled", "single");
+    return res.json({
+      success: false,
+      error: "Ollama generation failed",
+      details: err.message,
+      fallbackUsed: true,
+      data: mock
+    });
+  }
 };
 
-// ✅ UPDATED MOCK RESPONSE - Correct PageConfig schema
-function getMockAiResponse(prompt) {
-    return {
-        success: true,
-        source: 'mock',
-        data: {
-            title: `Hospital Dashboard: ${prompt}`,
-            slug: "generated-site",
-            components: {
-                navbar: {
-                    uiSchema: {
-                        logo: {
-                            "ui:widget": "text",
-                            "ui:content": "🏥 Hospital HMS",
-                            "ui:styles": {
-                                fontSize: "26px",
-                                fontWeight: "800",
-                                color: "#0047AB"
-                            }
-                        },
-                        nav: {
-                            "ui:widget": "navLinks",
-                            "ui:theme": "light",
-                            "ui:links": [
-                                { label: "Overview", action: "navigate", actionParams: { url: "#overview" } },
-                                { label: "Patients", action: "navigate", actionParams: { url: "#patients" } },
-                                { label: "Staff", action: "navigate", actionParams: { url: "#staff" } }
-                            ]
-                        }
-                    },
-                    styles: {
-                        background: "#ffffff",
-                        borderBottom: "2px solid #e2e8f0",
-                        padding: "20px 50px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        boxShadow: "0 2px 10px rgba(0,0,0,0.05)"
-                    }
-                },
-                main: {
-                    uiSchema: {
-                        header: {
-                            "ui:widget": "heading",
-                            "ui:text": "📊 Hospital Operations Dashboard",
-                            "ui:level": "h1",
-                            "ui:styles": {
-                                textAlign: "center",
-                                marginBottom: "40px",
-                                fontSize: "2.5rem",
-                                color: "#1e293b"
-                            }
-                        },
-                        statsGrid: {
-                            "ui:widget": "gridLayout",
-                            "ui:columns": 3,
-                            "ui:gap": "24px",
-                            "ui:styles": {
-                                marginBottom: "50px"
-                            },
-                            "ui:children": [
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "👥 Total Patients",
-                                    "ui:description": "1,452 Active Patients\n+2.1% from yesterday",
-                                    "ui:styles": {
-                                        padding: "32px",
-                                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                        color: "white",
-                                        borderRadius: "16px",
-                                        textAlign: "center"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "⚕️ Doctors Available",
-                                    "ui:description": "78 Active Doctors\n95% Readiness",
-                                    "ui:styles": {
-                                        padding: "32px",
-                                        background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
-                                        color: "white",
-                                        borderRadius: "16px",
-                                        textAlign: "center"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "⏱️ Avg Wait Time",
-                                    "ui:description": "25 minutes\n-5 mins improvement",
-                                    "ui:styles": {
-                                        padding: "32px",
-                                        background: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)",
-                                        color: "white",
-                                        borderRadius: "16px",
-                                        textAlign: "center"
-                                    }
-                                }
-                            ]
-                        },
-                        tableSection: {
-                            "ui:widget": "dataTable",
-                            "ui:title": "Recent Appointments",
-                            "ui:description": "Latest patient consultations and upcoming schedules",
-                            "ui:columns": [
-                                { key: "id", title: "Patient ID", dataIndex: "id", width: "120px" },
-                                { key: "name", title: "Patient Name", dataIndex: "name" },
-                                { key: "doctor", title: "Doctor", dataIndex: "doctor" },
-                                { key: "department", title: "Department", dataIndex: "department" },
-                                { key: "time", title: "Time", dataIndex: "time" },
-                                { key: "status", title: "Status", dataIndex: "status" }
-                            ],
-                            "ui:data": [
-                                { id: "P10023", name: "Anya Sharma", doctor: "Dr. E. Reynolds", department: "Cardiology", time: "10:00 AM", status: "Scheduled" },
-                                { id: "P10022", name: "Michael Chen", doctor: "Dr. K. Patel", department: "Pediatrics", time: "09:30 AM", status: "Complete" },
-                                { id: "P10021", name: "David Lee", doctor: "Dr. J. Rodriguez", department: "Orthopedics", time: "11:15 AM", status: "Scheduled" },
-                                { id: "P10020", name: "Sarah Smith", doctor: "Dr. A. Varma", department: "Emergency", time: "08:00 AM", status: "Cancelled" },
-                                { id: "P10019", name: "Jennifer Wong", doctor: "Dr. L. Singh", department: "General Practice", time: "12:00 PM", status: "Pending" }
-                            ],
-                            "ui:styles": {
-                                background: "white",
-                                padding: "30px",
-                                borderRadius: "16px",
-                                boxShadow: "0 4px 20px rgba(0,0,0,0.08)"
-                            }
-                        }
-                    },
-                    styles: {
-                        padding: "60px 40px",
-                        background: "#f8fafc",
-                        minHeight: "100vh"
-                    }
-                },
-                footer: {
-                    uiSchema: {
-                        copyright: {
-                            "ui:widget": "text",
-                            "ui:content": "© 2024 Hospital Management System. All Rights Reserved.",
-                            "ui:styles": {
-                                textAlign: "center",
-                                color: "#94a3b8"
-                            }
-                        }
-                    },
-                    styles: {
-                        background: "#1e293b",
-                        padding: "30px",
-                        textAlign: "center"
-                    }
-                }
-            },
-            initialization: {
-                globalCSS: "",
-                resources: [],
-                actions: {}
-            }
+// ───────────────────────────────────────────────
+//   STRONG SYSTEM PROMPT – main quality lever
+// ───────────────────────────────────────────────
+function createStrongSystemPrompt(userPrompt, context, pageType) {
+  return `
+You are a professional web developer that outputs **only valid JSON** PageConfig objects for a dynamic React renderer.
+
+────────────────────────────────────────────────────────────
+MUST FOLLOW THESE RULES – VIOLATION = INVALID OUTPUT
+────────────────────────────────────────────────────────────
+
+1. Return **ONLY** clean JSON. No markdown, no \`\`\`json, no explanations, no comments inside JSON.
+2. Top-level structure:
+   {
+     "title": string,
+     "slug": string (kebab-case),
+     "components": { navbar?, sidebar?, main: {...}, footer?, modals? },
+     "pages"?: Map-like object { [pageKey: string]: { title: string, components: { navbar?, main, footer?, ... } } },
+     "initialization": {
+       "globalCSS": string (modern css with @import if needed),
+       "resources": string[] (api keys like "products.list", "auth.login"),
+       "actions": { [name: string]: string (javascript code) }
+     }
+   }
+3. Every visual piece **must** have "ui:widget"
+4. Use **only** these widget names (do NOT invent new ones):
+
+   Layout: container, columns, responsiveGrid, cardGrid, flexLayout, sidebarLayout
+   Content: heading, text, paragraph, button, image, icon, divider, spacer, hero, badge, alert, timeline
+   Forms: formContainer, inputField, textareaField, selectField, checkbox, radioGroup, toggle, searchBar, dateField, dateRangePicker
+   Data: dataTable, projectGrid, statsCounter, skillRadar, pagination, kanbanBoard, cartItemsGrid, cartSummary
+   Interactive: tabs, accordion, dropdown, tooltip, rating, breadcrumb
+   Navigation: navbar, footer, navLinks, authLinks, socialIcons
+   Commerce: pricingCard
+   Special: conditionalContent, backgroundEffect
+
+5. Actions examples you can use in "ui:actions" or initialization.actions:
+   - navigateToPage: window.location.href = context.actionParams?.url
+   - api: await context.handlers.handleApiCall(context.actionParams?.apiKey, context.formData)
+   - openModal: context.handlers.setActiveModal(context.actionParams?.modal)
+   - validateThenApi (custom – validate fields before api call)
+   - addToCart, removeFromCart (for e-commerce)
+
+6. Put modals inside main.uiSchema.modals or components.modals
+7. Use modern 2025 styles: glassmorphism, gradients, clamp(), subtle shadows, hover:scale-105, transitions
+
+────────────────────────────────────────────────────────────
+REALISTIC EXAMPLE – follow this style and structure
+────────────────────────────────────────────────────────────
+
+${JSON.stringify(getShopzoneInspiredExample(), null, 2)}
+
+────────────────────────────────────────────────────────────
+USER REQUEST
+────────────────────────────────────────────────────────────
+
+${userPrompt}
+
+Generate complete, beautiful, responsive PageConfig JSON now:
+`;
+}
+
+// ───────────────────────────────────────────────
+//  Better fallback than your original mock
+// ───────────────────────────────────────────────
+function getImprovedMockResponse(prompt, pageType) {
+  return {
+    title: `Fallback: ${prompt.slice(0, 50)}...`,
+    slug: `fallback-${Date.now().toString(36).slice(-6)}`,
+    components: {
+      navbar: {
+        uiSchema: {
+          logo: { "ui:widget": "heading", "ui:text": "MyApp", "ui:level": "h2" },
+          links: { "ui:widget": "navLinks", "ui:links": [{ label: "Home", action: "navigateToPage", actionParams: { url: "/" } }] }
+        },
+        styles: { padding: "16px 32px", background: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }
+      },
+      main: {
+        uiSchema: {
+          hero: {
+            "ui:widget": "hero",
+            "ui:title": prompt || "Welcome",
+            "ui:subtitle": "Generated fallback layout",
+            "ui:styles": { padding: "120px 40px", textAlign: "center", background: "linear-gradient(135deg, #667eea, #764ba2)", color: "white" }
+          }
         }
-    };
+      },
+      footer: {
+        uiSchema: {
+          text: { "ui:widget": "text", "ui:content": "© 2026 My Company" }
+        },
+        styles: { padding: "40px", background: "#1e293b", color: "#94a3b8", textAlign: "center" }
+      }
+    },
+    initialization: {
+      globalCSS: "body { font-family: 'Inter', system-ui; margin:0; } button:hover { transform: scale(1.04); }",
+      actions: {
+        navigateToPage: "window.location.href = context.actionParams?.url;"
+      }
+    }
+  };
+}
+
+// ───────────────────────────────────────────────
+//  Very compact but realistic ShopZone-like example
+// ───────────────────────────────────────────────
+function getShopzoneInspiredExample() {
+  return {
+    title: "TechStore – Modern E-commerce",
+    slug: "techstore",
+    components: {
+      navbar: {
+        uiSchema: {
+          logo: { "ui:widget": "heading", "ui:text": "TechStore", "ui:level": "h3", "ui:styles": { fontWeight: "800", color: "#6366f1" } },
+          links: {
+            "ui:widget": "navLinks", "ui:links": [
+              { label: "Home", action: "navigateToPage", actionParams: { url: "/" } },
+              { label: "Shop", action: "navigateToPage", actionParams: { url: "/products" } },
+              { label: "Cart", action: "navigateToPage", actionParams: { url: "/cart" } }
+            ]
+          }
+        },
+        styles: { padding: "16px 40px", background: "white", boxShadow: "0 2px 12px rgba(0,0,0,0.06)" }
+      },
+      main: {
+        uiSchema: {
+          hero: {
+            "ui:widget": "hero",
+            "ui:title": "Discover Premium Gadgets",
+            "ui:subtitle": "Latest • Fast • Affordable",
+            "ui:styles": { padding: "140px 40px", background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: "white", textAlign: "center" }
+          }
+        }
+      }
+    },
+    pages: {
+      products: {
+        title: "Products",
+        components: {
+          main: {
+            uiSchema: {
+              grid: { "ui:widget": "projectGrid", "ui:dataKey": "products", "ui:columns": 4 }
+            }
+          }
+        }
+      },
+      cart: {
+        title: "Cart",
+        components: {
+          main: {
+            uiSchema: {
+              items: { "ui:widget": "cartItemsGrid", "ui:dataKey": "cartItems" }
+            }
+          }
+        }
+      }
+    },
+    initialization: {
+      globalCSS: "body{font-family:'Inter',sans-serif} .card:hover{transform:scale(1.03);transition:0.2s}",
+      actions: {
+        navigateToPage: "window.location.href=context.actionParams?.url"
+      }
+    }
+  };
+}
+
+// Very simple normalization
+function normalizeConfig(json, originalPrompt) {
+  const safe = { ...json };
+  if (!safe.title) safe.title = originalPrompt.slice(0, 60) || "Generated Page";
+  if (!safe.slug) safe.slug = `gen-${Date.now().toString(36).slice(-8)}`;
+  if (!safe.components?.main) safe.components = safe.components || {};
+  if (!safe.initialization) safe.initialization = { globalCSS: "", actions: {} };
+  return safe;
 }
