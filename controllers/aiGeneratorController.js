@@ -23,14 +23,14 @@ exports.generatePage = async (req, res) => {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        
+
         const modelNames = [
             "gemini-2.0-flash",
             "gemini-flash-latest",
             "gemini-1.5-flash",
             "gemini-pro-latest"
         ];
-        
+
         let result = null;
         let lastError = null;
 
@@ -38,7 +38,7 @@ exports.generatePage = async (req, res) => {
             try {
                 console.log(`📡 Trying Gemini Model: ${modelName}`);
                 const model = genAI.getGenerativeModel({ model: modelName });
-                
+
                 // ✅ UPDATED SYSTEM PROMPT - Generate correct PageConfig schema
                 const systemPrompt = `You are the WebFactory AI Expert. Your task is to generate a beautiful, functional PageConfig JSON based on user requirements.
 
@@ -69,7 +69,7 @@ exports.generatePage = async (req, res) => {
                 - Use professional design sense. Colors should be harmonious.`;
 
                 result = await model.generateContent(systemPrompt);
-                
+
                 if (result && result.response) {
                     const text = result.response.text();
                     if (text && text.length > 10) {
@@ -96,7 +96,7 @@ exports.generatePage = async (req, res) => {
         try {
             const cleanJson = responseText.replace(/```json|```/g, "").trim();
             const generatedJson = JSON.parse(cleanJson);
-            
+
             return res.json({
                 success: true,
                 data: generatedJson,
@@ -112,10 +112,10 @@ exports.generatePage = async (req, res) => {
     } catch (globalErr) {
         console.error("💀 CRITICAL CONTROLLER ERROR:", globalErr);
         if (!res.headersSent) {
-            return res.status(500).json({ 
-                success: false, 
+            return res.status(500).json({
+                success: false,
                 error: "An internal error occurred while generating content.",
-                details: globalErr.message 
+                details: globalErr.message
             });
         }
     }
