@@ -1,4 +1,4 @@
-// server.js
+// server.js - OPTIMIZED VERSION
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -7,45 +7,80 @@ require("dotenv").config();
 
 const app = express();
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  🔧 MIDDLEWARE - ORDER MATTERS!
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// 1️⃣ CORS - MUST BE FIRST
 app.use(
   cors({
-    origin: "http://localhost:3000", // frontend origin
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // <-- important for cookies
+    credentials: true,
   })
 );
 
+// 2️⃣ Body Parsers - BEFORE routes
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// 3️⃣ Cookie Parser
 app.use(cookieParser());
 
-app.use(express.json({ limit: '10mb' })); // Important for large JSON configs
+// 4️⃣ Request Logging (helpful for debugging)
+app.use((req, res, next) => {
+  console.log(`📍 ${req.method} ${req.path}`);
+  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+    console.log('📦 Body keys:', Object.keys(req.body || {}));
+  }
+  next();
+});
 
-// MongoDB
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  💾 MONGODB CONNECTION
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) {
-  console.error("Missing MONGO_URI");
+  console.error("❌ Missing MONGO_URI in environment");
   process.exit(1);
 }
 
-mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.error("MongoDB Error:", err));
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err.message);
+    process.exit(1);
+  });
 
-// Routes
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  🛣️ ROUTES - MUST COME AFTER MIDDLEWARE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 const pageRoutes = require("./routes/pageConfigRoutes");
 const apiConfigRoutes = require("./routes/apiConfigRoutes");
 const productRoutes = require("./routes/products");
 const authRoutes = require("./routes/authRoutes");
-
-
 const userRoutes = require("./routes/userRoutes");
 const organizationRoutes = require("./routes/organizationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 
+// Health check - FIRST (no auth needed)
+app.get("/", (req, res) => {
+  res.json({
+    message: "Dynamic Website Engine API Running",
+    status: "healthy",
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Mount routes
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
@@ -55,30 +90,64 @@ app.use("/api/api-configs", apiConfigRoutes);
 app.use("/api/organizations", organizationRoutes);
 app.use("/api/ai", aiRoutes);
 
-// Health check
-app.get("/", (req, res) => {
-  res.json({ message: "Dynamic Website Engine API Running" });
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  🚫 404 HANDLER - Catch undefined routes
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+app.use((req, res, next) => {
+  console.warn(`⚠️ 404 Not Found: ${req.method} ${req.path}`);
+  res.status(404).json({
+    success: false,
+    error: "Route not found",
+    path: req.path,
+    method: req.method
+  });
 });
 
-// Global Error Handler
-app.use((err, req, res, next) => {
-  console.error('🛑 GLOBAL ERROR caught in index.js:', err.message);
-  console.error(err.stack);
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  🛑 GLOBAL ERROR HANDLER - MUST BE LAST
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  // If headers were already sent, delegate to default express handler
+app.use((err, req, res, next) => {
+  console.error('🛑 GLOBAL ERROR:', err.message);
+  console.error('📍 Path:', req.path);
+  console.error('📦 Body:', req.body);
+  console.error('🔍 Stack:', err.stack);
+
+  // If headers already sent, delegate to Express
   if (res.headersSent) {
     return next(err);
   }
 
-  res.status(err.status || 500);
-  res.setHeader('Content-Type', 'application/json');
-  res.json({
+  // Determine status code
+  const statusCode = err.statusCode || err.status || 500;
+
+  // Send error response
+  res.status(statusCode).json({
     success: false,
     error: err.message || 'Internal Server Error',
-    path: req.path
+    path: req.path,
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  🚀 START SERVER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`🌐 Frontend: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  console.log(`🤖 Ollama: ${process.env.OLLAMA_BASE_URL || 'http://localhost:11434'}`);
+  console.log(`🎨 Model: ${process.env.OLLAMA_MODEL || 'qwen2.5-coder:7b'}`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('⏹️ SIGTERM received, closing server...');
+  mongoose.connection.close(false, () => {
+    console.log('MongoDB connection closed');
+    process.exit(0);
+  });
 });
