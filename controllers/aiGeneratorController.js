@@ -1,6 +1,7 @@
-// backend/controllers/aiGeneratorController.js - Ollama only (2025 realistic version)
+// backend/controllers/aiGeneratorController.js
+// Updated 2026 – more reliable Ollama JSON generation
 
-const widgetCatalog = require("../config/widgetCatalog.json"); // if you still use it, otherwise remove
+const widgetCatalog = require("../config/widgetCatalog.json"); // remove if unused
 
 /**
  * AI Generator Controller – Ollama only
@@ -17,78 +18,146 @@ exports.generatePage = async (req, res) => {
     console.log(`[AI] Generation requested: "${prompt}" | context: ${context}`);
 
     const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-    const model = process.env.OLLAMA_MODEL || 'llama3.2'; // or 'qwen2.5:14b', 'mistral-nemo', etc.
+    let primaryModel = process.env.OLLAMA_MODEL || 'qwen2.5:14b-instruct-q5_K_M';
+    const fallbackModel = process.env.OLLAMA_FALLBACK_MODEL || 'qwen2.5:7b-instruct-q6_K';
 
-    console.log(`[AI] Using Ollama → ${ollamaUrl} / model: ${model}`);
+    console.log(`[AI] Primary model: ${primaryModel} @ ${ollamaUrl}`);
 
-    const systemPrompt = createStrongSystemPrompt(prompt, context, pageType);
-
-    const response = await fetch(`${ollamaUrl}/api/generate`, {
+    // ─── 1. Warm-up the model (critical for avoiding empty responses) ───
+    console.log("[AI] Warming up model...");
+    await fetch(`${ollamaUrl}/api/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model,
-        prompt: systemPrompt,
+        model: primaryModel,
+        prompt: "Output a tiny JSON: {\"status\":\"warm\"}",
         stream: false,
-        options: {
-          temperature: 0.65,       // lower = more structured
-          top_p: 0.92,
-          num_predict: 6000,       // give it room for full multi-page output
-          num_ctx: 8192            // important for large prompts + examples
-        }
+        options: { temperature: 0.8, num_predict: 64 }
       })
-    });
+    }).catch(err => console.log("[warmup] ignored:", err.message));
 
-    if (!response.ok) {
-      throw new Error(`Ollama HTTP ${response.status}`);
+    await new Promise(r => setTimeout(r, 1200)); // give it ~1.2s to actually load
+
+    // ─── 2. Prepare strong (but shorter) system prompt ───
+    const systemPrompt = createStrongSystemPrompt(prompt, context, pageType);
+
+    // ─── 3. Generation attempt (with one retry on fallback model) ───
+    let attempt = 0;
+    let modelUsed = primaryModel;
+    let generatedJson = null;
+    let duration = null;
+
+    while (attempt < 2 && !generatedJson) {
+      attempt++;
+      if (attempt === 2) {
+        console.warn(`[AI] Primary model failed → falling back to ${fallbackModel}`);
+        modelUsed = fallbackModel;
+      }
+
+      console.log(`[AI] Attempt ${attempt}/${modelUsed} ⏳`);
+
+      const startTime = Date.now();
+
+      const response = await fetch(`${ollamaUrl}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: modelUsed,
+          prompt: systemPrompt,
+          stream: false,
+          // format: "json",           // ← DO NOT enable unless you tested it works reliably
+          options: {
+            temperature: attempt === 1 ? 0.75 : 0.45,   // slightly more creative on retry
+            top_p: 0.92,
+            top_k: 45,
+            num_predict: 3200,
+            num_ctx: 12288,
+            // stop: ["```"]          // removed — often truncates too early
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ollama HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      duration = ((Date.now() - startTime) / 1000).toFixed(1);
+
+      console.log(`[AI] Ollama replied in ${duration}s | raw length: ${data.response?.length ?? 0}`);
+
+      // ─── Very important: full raw dump for debugging ───
+      console.log("[RAW OLLAMA RESPONSE]");
+      console.log(data.response || "[EMPTY RESPONSE FIELD]");
+      console.log("[END RAW]");
+
+      let cleanedText = (data.response || '').trim();
+
+      // Your excellent cleaning pipeline (slightly optimized)
+      cleanedText = cleanedText.replace(/[-\u001F\u007F-\u009F\uFEFF]/g, '');
+
+      const firstBrace = cleanedText.indexOf('{');
+      const lastBrace = cleanedText.lastIndexOf('}');
+
+      if (firstBrace !== -1 && lastBrace > firstBrace) {
+        const jsonBlockMatch = cleanedText.match(/```json\s*([\s\S]*?)\s*```/i) ||
+          cleanedText.match(/```\s*([\s\S]*?)\s*```/);
+        cleanedText = jsonBlockMatch ? jsonBlockMatch[1] : cleanedText.slice(firstBrace, lastBrace + 1);
+      }
+
+      cleanedText = cleanedText
+        .replace(/\/\*[\s\S]*?\*\//g, '')
+        .replace(/(^|[^\:])\/\/.*$/gm, '$1')
+        .replace(/,\s*([}\]])/g, '$1')
+        .trim();
+
+      // Char code debug
+      const preview = cleanedText.slice(0, 120);
+      const charCodes = Array.from(preview).map(c => c.charCodeAt(0));
+      console.log(`[AI] Cleaned preview starts: ${preview.replace(/\n/g, '↵')}`);
+      console.log(`[AI] Char codes: [${charCodes.join(', ')}]`);
+
+      try {
+        generatedJson = JSON.parse(cleanedText);
+        console.log("[AI] ✓ JSON parsed successfully");
+      } catch (parseErr) {
+        console.error("[AI] Parse failed:", parseErr.message);
+        console.debug("[AI] Error near:", cleanedText.slice(Math.max(0, parseErr.index - 40), parseErr.index + 40));
+      }
     }
 
-    const data = await response.json();
-    let responseText = data.response || '';
-
-    console.log(`[AI] Ollama raw response length: ${responseText.length}`);
-
-    // Aggressive cleaning – Ollama often wraps in ```json ... ```
-    responseText = responseText
-      .replace(/^```json?\s*/i, '')
-      .replace(/```$/gm, '')
-      .replace(/\/\*[\s\S]*?\*\//g, '')     // remove js-style comments
-      .replace(/\/\/.*$/gm, '')             // remove line comments
-      .trim();
-
-    let generatedJson;
-    try {
-      generatedJson = JSON.parse(responseText);
-    } catch (parseErr) {
-      console.error("[AI] JSON parse failed:", parseErr.message);
-      console.debug("[AI] First 600 chars of cleaned response:", responseText.slice(0, 600));
-
-      // Fallback to mock
+    if (!generatedJson) {
+      console.error("[AI] All attempts failed to produce valid JSON");
       const mock = getImprovedMockResponse(prompt, pageType);
       return res.json({
         success: false,
-        error: "Could not parse valid JSON from model – using fallback example",
+        error: "Could not generate valid JSON after retries",
         fallbackUsed: true,
-        data: mock
+        data: mock,
+        debug: { lastModel: modelUsed, duration }
       });
     }
 
-    // Light normalization
+    // Normalize & respond
     const normalized = normalizeConfig(generatedJson, prompt);
 
-    return res.json({
+    const finalResponse = {
       success: true,
       data: normalized,
       source: 'ollama',
-      modelUsed: model
-    });
+      modelUsed,
+      generationTime: `${duration}s`
+    };
+
+    console.log("[AI] ✓ Success – sending to frontend");
+    res.status(200).json(finalResponse);
 
   } catch (err) {
-    console.error("[AI] Critical error:", err.message);
-    const mock = getImprovedMockResponse(prompt || "Untitled", "single");
-    return res.json({
+    console.error("[AI] Critical error:", err);
+    const mock = getImprovedMockResponse(req.body?.prompt || "Untitled", "single");
+    res.status(500).json({
       success: false,
-      error: "Ollama generation failed",
+      error: "Ollama generation crashed",
       details: err.message,
       fallbackUsed: true,
       data: mock
@@ -97,66 +166,45 @@ exports.generatePage = async (req, res) => {
 };
 
 // ───────────────────────────────────────────────
-//   STRONG SYSTEM PROMPT – main quality lever
+// Updated – shorter, less aggressive, higher success rate
 // ───────────────────────────────────────────────
 function createStrongSystemPrompt(userPrompt, context, pageType) {
   return `
-You are a professional web developer that outputs **only valid JSON** PageConfig objects for a dynamic React renderer.
+You are a JSON-only web layout generator. Output **nothing** except valid JSON.
 
-────────────────────────────────────────────────────────────
-MUST FOLLOW THESE RULES – VIOLATION = INVALID OUTPUT
-────────────────────────────────────────────────────────────
+Rules:
+- Start directly with {
+- End exactly with }
+- No explanations, no markdown, no fences, no comments
+- Use only these widgets: hero, heading, text, button, image, container, columns, card, formContainer, inputField, navLinks, navbar, footer
+- Make modern, responsive designs with nice gradients / shadows / glassmorphism when appropriate
 
-1. Return **ONLY** clean JSON. No markdown, no \`\`\`json, no explanations, no comments inside JSON.
-2. Top-level structure:
-   {
-     "title": string,
-     "slug": string (kebab-case),
-     "components": { navbar?, sidebar?, main: {...}, footer?, modals? },
-     "pages"?: Map-like object { [pageKey: string]: { title: string, components: { navbar?, main, footer?, ... } } },
-     "initialization": {
-       "globalCSS": string (modern css with @import if needed),
-       "resources": string[] (api keys like "products.list", "auth.login"),
-       "actions": { [name: string]: string (javascript code) }
-     }
-   }
-3. Every visual piece **must** have "ui:widget"
-4. Use **only** these widget names (do NOT invent new ones):
-
-   Layout: container, columns, responsiveGrid, cardGrid, flexLayout, sidebarLayout
-   Content: heading, text, paragraph, button, image, icon, divider, spacer, hero, badge, alert, timeline
-   Forms: formContainer, inputField, textareaField, selectField, checkbox, radioGroup, toggle, searchBar, dateField, dateRangePicker
-   Data: dataTable, projectGrid, statsCounter, skillRadar, pagination, kanbanBoard, cartItemsGrid, cartSummary
-   Interactive: tabs, accordion, dropdown, tooltip, rating, breadcrumb
-   Navigation: navbar, footer, navLinks, authLinks, socialIcons
-   Commerce: pricingCard
-   Special: conditionalContent, backgroundEffect
-
-5. Actions examples you can use in "ui:actions" or initialization.actions:
-   - navigateToPage: window.location.href = context.actionParams?.url
-   - api: await context.handlers.handleApiCall(context.actionParams?.apiKey, context.formData)
-   - openModal: context.handlers.setActiveModal(context.actionParams?.modal)
-   - validateThenApi (custom – validate fields before api call)
-   - addToCart, removeFromCart (for e-commerce)
-
-6. Put modals inside main.uiSchema.modals or components.modals
-7. Use modern 2025 styles: glassmorphism, gradients, clamp(), subtle shadows, hover:scale-105, transitions
-
-────────────────────────────────────────────────────────────
-REALISTIC EXAMPLE – follow this style and structure
-────────────────────────────────────────────────────────────
-
-${JSON.stringify(getShopzoneInspiredExample(), null, 2)}
-
-────────────────────────────────────────────────────────────
-USER REQUEST
-────────────────────────────────────────────────────────────
-
-${userPrompt}
-
-Generate complete, beautiful, responsive PageConfig JSON now:
-`;
+Required structure:
+{
+  "title": "short catchy title",
+  "slug": "kebab-case-unique-slug",
+  "components": {
+    "navbar": { "uiSchema": {...}, "styles": {...} },
+    "main":   { "uiSchema": {...}, "styles": {...} },
+    "footer": { "uiSchema": {...}, "styles": {...} }
+  },
+  "initialization": {
+    "globalCSS": "body{font-family:'Inter',sans-serif} ...",
+    "actions": {
+      "navigateToPage": "window.location.href = context.actionParams?.url;"
+    }
+  }
 }
+
+USER REQUEST: ${userPrompt}
+
+Output JSON now:`;
+}
+
+// Keep your existing getImprovedMockResponse(), getShopzoneInspiredExample(), normalizeConfig()
+// ───────────────────────────────────────────────
+// (they are already good – no changes needed here)
+// ───────────────────────────────────────────────
 
 // ───────────────────────────────────────────────
 //  Better fallback than your original mock
@@ -262,12 +310,53 @@ function getShopzoneInspiredExample() {
   };
 }
 
-// Very simple normalization
+// Comprehensive normalization to match PageConfig model and demo.js quality
 function normalizeConfig(json, originalPrompt) {
-  const safe = { ...json };
-  if (!safe.title) safe.title = originalPrompt.slice(0, 60) || "Generated Page";
-  if (!safe.slug) safe.slug = `gen-${Date.now().toString(36).slice(-8)}`;
-  if (!safe.components?.main) safe.components = safe.components || {};
-  if (!safe.initialization) safe.initialization = { globalCSS: "", actions: {} };
+  // 🛡️ Extra defense: Ensure we have an object
+  let safe = {};
+  try {
+    if (Array.isArray(json)) {
+      safe = { ...json[0] }; // Use first item if AI returned an array
+    } else if (typeof json === 'object' && json !== null) {
+      safe = { ...json };
+    } else {
+      console.warn("[AI] Input is not an object or array, using empty object");
+    }
+  } catch (e) {
+    console.error("[AI] Normalization spread error:", e.message);
+  }
+
+  // Metadata
+  safe.title = safe.title || originalPrompt.slice(0, 60) || "Generated Page";
+  safe.slug = safe.slug || `gen-${Date.now().toString(36).slice(-8)}`;
+  safe.status = safe.status || "Draft";
+  safe.isTemplate = safe.isTemplate ?? false;
+  safe.templateCategory = safe.templateCategory || "Other";
+
+  // Ensure components structure
+  if (!safe.components || typeof safe.components !== 'object') {
+    safe.components = {};
+  }
+
+  if (!safe.components.main || typeof safe.components.main !== 'object') {
+    safe.components.main = { uiSchema: {}, styles: { padding: "40px 20px" } };
+  }
+
+  // Ensure initialization structure
+  if (!safe.initialization || typeof safe.initialization !== 'object') {
+    safe.initialization = {
+      globalCSS: "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap'); body { font-family: 'Inter', sans-serif; margin: 0; }",
+      resources: [],
+      actions: {
+        navigateToPage: "window.location.href = context.actionParams?.url;"
+      }
+    };
+  } else {
+    safe.initialization.actions = safe.initialization.actions || {};
+    if (!safe.initialization.actions.navigateToPage) {
+      safe.initialization.actions.navigateToPage = "window.location.href = context.actionParams?.url;";
+    }
+  }
+
   return safe;
 }

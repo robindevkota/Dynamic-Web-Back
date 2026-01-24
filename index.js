@@ -70,6 +70,9 @@ const userRoutes = require("./routes/userRoutes");
 const organizationRoutes = require("./routes/organizationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const dynamicCrudRoutes = require("./routes/dynamicCrudRoutes");
+
+
 
 // Health check - FIRST (no auth needed)
 app.get("/", (req, res) => {
@@ -81,6 +84,7 @@ app.get("/", (req, res) => {
 });
 
 // Mount routes
+app.use("/api/crud", dynamicCrudRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
