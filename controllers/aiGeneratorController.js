@@ -1,8 +1,8 @@
- * @file aiGeneratorController.js
-  * @copyright(c) 2026 Robin Devkota.All Rights Reserved.
- * @license Proprietary - No unauthorized copying or distribution.
- * For inquiries, contact: robindevkta0 @gmail.com
- */
+//  * @file aiGeneratorController.js
+//   * @copyright(c) 2026 Robin Devkota.All Rights Reserved.
+//  * @license Proprietary - No unauthorized copying or distribution.
+//  * For inquiries, contact: robindevkta0 @gmail.com
+//  */
 
 // backend/controllers/aiGeneratorController.js
 // Updated 2026 – more reliable Ollama JSON generation

@@ -19,8 +19,15 @@ function getDynamicModel(entity) {
   const schemaDef = {
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      index: true
+      required: false,  // ✅ CHANGED FROM true TO false
+      index: true,
+      default: null
+    },
+    projectUUID: {
+      type: String,
+      required: false,
+      index: true,
+      default: null
     },
     organizationId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -31,19 +38,27 @@ function getDynamicModel(entity) {
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
   };
 
-  // Convert schema Map → mongoose schema fields
-  for (const [fieldName, fieldDef] of entity.schema.entries()) {
+  // ✅ Handle both Map and plain object for schema
+  let schemaEntries;
+  if (entity.schema instanceof Map) {
+    schemaEntries = Array.from(entity.schema.entries());
+  } else if (typeof entity.schema === 'object' && entity.schema !== null) {
+    schemaEntries = Object.entries(entity.schema);
+  } else {
+    throw new Error(`Invalid schema format for entity ${entity.entityName}`);
+  }
+
+  // Convert schema entries to mongoose fields
+  for (const [fieldName, fieldDef] of schemaEntries) {
     const fieldSchema = {
       type: mapFieldType(fieldDef.type),
       required: fieldDef.required || false,
       default: fieldDef.default !== undefined ? fieldDef.default : undefined
     };
 
-    // Basic mongoose validators from your schema
     if (fieldDef.validation) {
       if (fieldDef.validation.min !== undefined) fieldSchema.min = fieldDef.validation.min;
       if (fieldDef.validation.max !== undefined) fieldSchema.max = fieldDef.validation.max;
-      // minLength / maxLength / pattern → can be enforced in pre-validate hook later
     }
 
     schemaDef[fieldName] = fieldSchema;
@@ -51,11 +66,17 @@ function getDynamicModel(entity) {
 
   const schema = new mongoose.Schema(schemaDef, {
     timestamps: true,
-    collection: `dyn_${entity.slug.replace(/[^a-zA-Z0-9_]/g, '_')}` // safe collection name
+    collection: `dyn_${entity.slug.replace(/[^a-zA-Z0-9_]/g, '_')}`
   });
 
-  const Model = mongoose.model(`Dynamic_${entity.slug.replace(/[^a-zA-Z0-9_]/g, '_')}`, schema);
+  const Model = mongoose.model(
+    `Dynamic_${entity.slug.replace(/[^a-zA-Z0-9_]/g, '_')}`,
+    schema
+  );
+
   modelCache.set(cacheKey, Model);
+
+  console.log(`✅ Dynamic model created: ${entity.entityName}`);
 
   return Model;
 }
@@ -80,55 +101,49 @@ class DynamicCrudController {
 
 
 
-static async listEntities(req, res) {
-  try {
-    const { organizationId, projectId, projectUUID } = req.user;
+  // controllers/dynamicCrudController.js
 
-    const query = {
-      organizationId,
-      $or: []
-    };
+  static async listEntities(req, res) {
+    try {
+      const { organizationId, projectId, projectUUID } = req.user;
 
-    if (projectUUID) query.$or.push({ projectUUID });
-    if (projectId)    query.$or.push({ projectId });
-    query.$or.push({ projectId: null, projectUUID: null });
+      // ✅ SIMPLIFIED: Just get all entities for this organization
+      // The frontend can filter by project if needed
+      const query = {
+        organizationId
+      };
 
-    if (query.$or.length === 1) {
-      delete query.$or;
-      query.$or = [{ projectId: null, projectUUID: null }];
+      console.log('🔍 Fetching all entities for org:', organizationId);
+
+      const entities = await DynamicEntity.find(query)
+        .select('entityName slug schema operations projectUUID projectId createdAt updatedAt')
+        .lean();
+
+      const entitiesWithSchema = entities.map(entity => ({
+        ...entity,
+        schema: entity.schema || {},
+        scope: entity.projectUUID || entity.projectId ? 'project' : 'organization'
+      }));
+
+      console.log(`✅ Found ${entitiesWithSchema.length} entities`);
+
+      res.json({
+        success: true,
+        count: entitiesWithSchema.length,
+        entities: entitiesWithSchema,
+        context: {
+          organizationId,
+          projectId: projectId || null,
+          projectUUID: projectUUID || null
+        }
+      });
+    } catch (error) {
+      console.error('❌ listEntities failed:', error);
+      res.status(500).json({ error: error.message });
     }
-
-    console.log('🔍 Query:', JSON.stringify(query, null, 2));
-
-    const entities = await DynamicEntity.find(query)
-      .select('entityName slug schema operations projectUUID projectId createdAt updatedAt')
-      .lean();
-
-    const entitiesWithSchema = entities.map(entity => ({
-      ...entity,
-      schema: entity.schema || {},                    // ← FIXED: plain object, no fromEntries needed
-      scope: entity.projectUUID || entity.projectId ? 'project' : 'organization'
-    }));
-
-    console.log(`✅ Found ${entitiesWithSchema.length} entities`);
-
-    res.json({
-      success: true,
-      count: entitiesWithSchema.length,
-      entities: entitiesWithSchema,
-      context: {
-        organizationId,
-        projectId: projectId || null,
-        projectUUID: projectUUID || null
-      }
-    });
-  } catch (error) {
-    console.error('❌ listEntities failed:', error);
-    res.status(500).json({ error: error.message });
   }
-}
   // ── 1. Define new entity (creates metadata + auto APIConfig)
- static async defineEntity(req, res) {
+  static async defineEntity(req, res) {
     try {
       const { entityName, schema, operations, projectUUID, projectId } = req.body;
       const { organizationId, userId } = req.user;
@@ -141,8 +156,8 @@ static async listEntities(req, res) {
       const finalProjectUUID = projectUUID || req.user.projectUUID || null;
 
       if (!entityName || typeof entityName !== 'string' || !/^[a-z][a-z0-9_]*$/.test(entityName)) {
-        return res.status(400).json({ 
-          error: "Invalid entityName (lowercase, numbers, underscores only)" 
+        return res.status(400).json({
+          error: "Invalid entityName (lowercase, numbers, underscores only)"
         });
       }
 
@@ -162,7 +177,7 @@ static async listEntities(req, res) {
       // Check for duplicates
       const existing = await DynamicEntity.findOne({ slug });
       if (existing) {
-        return res.status(409).json({ 
+        return res.status(409).json({
           error: `Entity "${entityName}" already exists in this scope`,
           existingSlug: existing.slug
         });
@@ -224,30 +239,51 @@ static async listEntities(req, res) {
     return async (req, res) => {
       try {
         const { organizationId, entityName } = req.params;
-        const { projectId, userId } = req.user;
+        const { projectId: userProjectId, projectUUID: userProjectUUID, userId } = req.user;
 
-        // Load entity metadata
+        // ✅ FIXED: Query entity by organizationId and entityName only
+        // Don't filter by projectId here since entity metadata doesn't need it
         const entity = await DynamicEntity.findOne({
           organizationId,
-          entityName,
-          projectId
-        });
+          entityName
+        }).lean();
 
         if (!entity) {
-          return res.status(404).json({ error: `Entity "${entityName}" not found in this project` });
+          return res.status(404).json({
+            error: `Entity "${entityName}" not found`
+          });
+        }
+
+        // ✅ Convert schema to plain object if needed
+        if (entity.schema && typeof entity.schema === 'object' && !Array.isArray(entity.schema)) {
+          if (entity.schema.$__ || entity.schema.constructor.name === 'Map') {
+            entity.schema = Object.fromEntries(
+              Object.entries(entity.schema).filter(([key]) => !key.startsWith('$'))
+            );
+          }
         }
 
         // Check if operation is allowed
         if (!entity.operations.includes(operation)) {
-          return res.status(403).json({ error: `Operation "${operation}" not allowed for this entity` });
+          return res.status(403).json({
+            error: `Operation "${operation}" not allowed for this entity`
+          });
         }
 
         const Model = getDynamicModel(entity);
 
+        // ✅ Use the entity's projectId for data operations (not user's)
+        const projectId = entity.projectId;
+        const projectUUID = entity.projectUUID;
+
         switch (operation) {
           // ── LIST ───────────────────────────────────────
           case 'list': {
-            const items = await Model.find({ projectId, organizationId }).lean();
+            const query = { organizationId };
+            if (projectId) query.projectId = projectId;
+            if (projectUUID) query.projectUUID = projectUUID;
+
+            const items = await Model.find(query).lean();
             return res.json({ success: true, count: items.length, data: items });
           }
 
@@ -255,12 +291,16 @@ static async listEntities(req, res) {
           case 'create': {
             const validation = DynamicCrudController.validateRecord(req.body, entity.schema, false);
             if (!validation.valid) {
-              return res.status(400).json({ error: 'Validation failed', details: validation.errors });
+              return res.status(400).json({
+                error: 'Validation failed',
+                details: validation.errors
+              });
             }
 
             const record = new Model({
               ...req.body,
-              projectId,
+              projectId: projectId || null,
+              projectUUID: projectUUID || null,
               organizationId,
               createdBy: userId
             });
@@ -280,11 +320,11 @@ static async listEntities(req, res) {
               return res.status(400).json({ error: 'Invalid record ID' });
             }
 
-            const record = await Model.findOne({
-              _id: recordId,
-              projectId,
-              organizationId
-            }).lean();
+            const query = { _id: recordId, organizationId };
+            if (projectId) query.projectId = projectId;
+            if (projectUUID) query.projectUUID = projectUUID;
+
+            const record = await Model.findOne(query).lean();
 
             if (!record) {
               return res.status(404).json({ error: 'Record not found' });
@@ -302,11 +342,18 @@ static async listEntities(req, res) {
 
             const validation = DynamicCrudController.validateRecord(req.body, entity.schema, true);
             if (!validation.valid) {
-              return res.status(400).json({ error: 'Validation failed', details: validation.errors });
+              return res.status(400).json({
+                error: 'Validation failed',
+                details: validation.errors
+              });
             }
 
+            const query = { _id: recordId, organizationId };
+            if (projectId) query.projectId = projectId;
+            if (projectUUID) query.projectUUID = projectUUID;
+
             const updated = await Model.findOneAndUpdate(
-              { _id: recordId, projectId, organizationId },
+              query,
               { ...req.body, updatedBy: userId },
               { new: true, runValidators: true, lean: true }
             );
@@ -325,17 +372,21 @@ static async listEntities(req, res) {
               return res.status(400).json({ error: 'Invalid record ID' });
             }
 
-            const deleted = await Model.findOneAndDelete({
-              _id: recordId,
-              projectId,
-              organizationId
-            });
+            const query = { _id: recordId, organizationId };
+            if (projectId) query.projectId = projectId;
+            if (projectUUID) query.projectUUID = projectUUID;
+
+            const deleted = await Model.findOneAndDelete(query);
 
             if (!deleted) {
               return res.status(404).json({ error: 'Record not found' });
             }
 
-            return res.json({ success: true, message: 'Record deleted', deletedId: recordId });
+            return res.json({
+              success: true,
+              message: 'Record deleted',
+              deletedId: recordId
+            });
           }
 
           default:
@@ -343,7 +394,10 @@ static async listEntities(req, res) {
         }
       } catch (error) {
         console.error(`[${operation.toUpperCase()}] Error:`, error);
-        res.status(500).json({ error: 'Internal server error', message: error.message });
+        res.status(500).json({
+          error: 'Internal server error',
+          message: error.message
+        });
       }
     };
   }
@@ -352,7 +406,17 @@ static async listEntities(req, res) {
   static validateRecord(data, schemaMap, isPartial = false) {
     const errors = {};
 
-    for (const [fieldName, fieldSchema] of schemaMap.entries()) {
+    // ✅ Convert to entries array if it's a plain object
+    let schemaEntries;
+    if (schemaMap instanceof Map) {
+      schemaEntries = Array.from(schemaMap.entries());
+    } else if (typeof schemaMap === 'object') {
+      schemaEntries = Object.entries(schemaMap);
+    } else {
+      return { valid: false, errors: { schema: 'Invalid schema format' } };
+    }
+
+    for (const [fieldName, fieldSchema] of schemaEntries) {
       const value = data[fieldName];
 
       // Required check
@@ -369,7 +433,6 @@ static async listEntities(req, res) {
         if (fieldSchema.type === 'string' && typeof value !== 'string') {
           errors[fieldName] = `${fieldName} must be a string`;
         }
-        // boolean/date/array/object checks can be added similarly
 
         // Custom validation rules
         if (fieldSchema.validation) {
@@ -391,6 +454,167 @@ static async listEntities(req, res) {
     }
 
     return { valid: Object.keys(errors).length === 0, errors };
+  }
+
+  static async updateEntity(req, res) {
+    try {
+      const { entityId } = req.params;
+      const { entityName, schema, operations } = req.body;
+      const { organizationId, userId } = req.user;
+
+      if (!mongoose.isValidObjectId(entityId)) {
+        return res.status(400).json({ error: 'Invalid entity ID' });
+      }
+
+      // Find existing entity
+      const entity = await DynamicEntity.findOne({
+        _id: entityId,
+        organizationId
+      });
+
+      if (!entity) {
+        return res.status(404).json({ error: 'Entity not found' });
+      }
+
+      // ⚠️ Check if entity name is changing
+      if (entityName && entityName !== entity.entityName) {
+        // Validate new name
+        if (!/^[a-z][a-z0-9_]*$/.test(entityName)) {
+          return res.status(400).json({
+            error: "Invalid entityName (lowercase, numbers, underscores only)"
+          });
+        }
+
+        // Update slug
+        const projectIdentifier = entity.projectUUID || entity.projectId?.toString() || '';
+        const newSlug = projectIdentifier
+          ? `${organizationId}-${projectIdentifier}-${entityName}`
+          : `${organizationId}-${entityName}`;
+
+        // Check if new slug already exists
+        const existing = await DynamicEntity.findOne({
+          slug: newSlug,
+          _id: { $ne: entityId }
+        });
+
+        if (existing) {
+          return res.status(409).json({
+            error: `Entity "${entityName}" already exists`
+          });
+        }
+
+        entity.entityName = entityName;
+        entity.slug = newSlug;
+      }
+
+      // Update schema if provided
+      if (schema) {
+        entity.schema = new Map(Object.entries(schema));
+      }
+
+      // Update operations if provided
+      if (operations) {
+        entity.operations = operations;
+      }
+
+      entity.updatedBy = userId;
+      await entity.save();
+
+      // Clear model cache so new schema takes effect
+      const modelCache = require('./dynamicCrudController').modelCache || new Map();
+      if (modelCache.has(entity.slug)) {
+        modelCache.delete(entity.slug);
+        console.log(`🗑️ Cleared model cache for ${entity.slug}`);
+      }
+
+      // Update API config
+      const apiKey = `crud_${entity.slug}`;
+      await APIConfig.findOneAndUpdate(
+        { key: apiKey },
+        {
+          name: `Dynamic CRUD: ${entity.entityName}`,
+          baseUrl: `/api/crud/${organizationId}/${entity.entityName}`,
+          methods: entity.operations.map(op => op.toUpperCase()),
+          updatedBy: userId
+        }
+      );
+
+      console.log(`✅ Entity updated: ${entity.entityName}`);
+
+      res.json({
+        success: true,
+        entity: {
+          ...entity.toObject(),
+          schema: Object.fromEntries(entity.schema)
+        },
+        message: 'Entity updated successfully'
+      });
+
+    } catch (error) {
+      console.error('❌ updateEntity failed:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // ✅ NEW: Delete entity definition
+  static async deleteEntity(req, res) {
+    try {
+      const { entityId } = req.params;
+      const { organizationId } = req.user;
+
+      if (!mongoose.isValidObjectId(entityId)) {
+        return res.status(400).json({ error: 'Invalid entity ID' });
+      }
+
+      // Find entity
+      const entity = await DynamicEntity.findOne({
+        _id: entityId,
+        organizationId
+      });
+
+      if (!entity) {
+        return res.status(404).json({ error: 'Entity not found' });
+      }
+
+      // ⚠️ Check if there are any records in the collection
+      const Model = getDynamicModel(entity);
+      const recordCount = await Model.countDocuments();
+
+      if (recordCount > 0) {
+        return res.status(400).json({
+          error: `Cannot delete entity. It has ${recordCount} existing records. Delete all records first.`,
+          recordCount
+        });
+      }
+
+      // Delete the entity definition
+      await DynamicEntity.deleteOne({ _id: entityId });
+
+      // Clear model cache
+      const modelCache = require('./dynamicCrudController').modelCache || new Map();
+      if (modelCache.has(entity.slug)) {
+        modelCache.delete(entity.slug);
+      }
+
+      // Delete API config
+      const apiKey = `crud_${entity.slug}`;
+      await APIConfig.deleteOne({ key: apiKey });
+
+      // Drop the collection (optional - only if you want to clean up completely)
+      // await Model.collection.drop().catch(() => {});
+
+      console.log(`🗑️ Entity deleted: ${entity.entityName}`);
+
+      res.json({
+        success: true,
+        message: `Entity "${entity.entityName}" deleted successfully`,
+        deletedEntity: entity.entityName
+      });
+
+    } catch (error) {
+      console.error('❌ deleteEntity failed:', error);
+      res.status(500).json({ error: error.message });
+    }
   }
 }
 

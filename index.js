@@ -71,6 +71,9 @@ const organizationRoutes = require("./routes/organizationRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const dynamicCrudRoutes = require("./routes/dynamicCrudRoutes");
+// server.js
+const projectRoutes = require('./routes/projectRoutes');
+
 
 
 
@@ -84,6 +87,7 @@ app.get("/", (req, res) => {
 });
 
 // Mount routes
+app.use('/api/projects', projectRoutes);
 app.use("/api/crud", dynamicCrudRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/users", userRoutes);
