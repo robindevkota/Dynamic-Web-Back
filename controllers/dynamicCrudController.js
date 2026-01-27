@@ -1,18 +1,18 @@
 // backend/controllers/dynamicCrudController.js
 
-const mongoose = require('mongoose');
-const DynamicEntity = require('../models/DynamicEntity');
-const APIConfig = require('../models/APIConfig');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs').promises;
+const mongoose = require("mongoose");
+const DynamicEntity = require("../models/DynamicEntity");
+const APIConfig = require("../models/APIConfig");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs").promises;
 
 // ───────────────────────────────────────────────
 //  FILE UPLOAD CONFIGURATION
 // ───────────────────────────────────────────────
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../uploads/dynamic');
+    const uploadDir = path.join(__dirname, "../uploads/dynamic");
     try {
       await fs.mkdir(uploadDir, { recursive: true });
       cb(null, uploadDir);
@@ -21,9 +21,12 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname),
+    );
+  },
 });
 
 const upload = multer({
@@ -31,15 +34,17 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp|pdf|doc|docx/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = allowedTypes.test(
+      path.extname(file.originalname).toLowerCase(),
+    );
     const mimetype = allowedTypes.test(file.mimetype);
 
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only images and documents allowed.'));
+      cb(new Error("Invalid file type. Only images and documents allowed."));
     }
-  }
+  },
 });
 
 // ───────────────────────────────────────────────
@@ -51,60 +56,65 @@ const upload = multer({
  */
 function convertToSchemaType(value, fieldSchema) {
   // Skip conversion for files
-  if (fieldSchema.type === 'file' || 
-      (fieldSchema.type === 'array' && fieldSchema.items?.type === 'file')) {
+  if (
+    fieldSchema.type === "file" ||
+    (fieldSchema.type === "array" && fieldSchema.items?.type === "file")
+  ) {
     return value;
   }
 
   // Handle null/undefined
-  if (value === null || value === undefined || value === '') {
+  if (value === null || value === undefined || value === "") {
     return value;
   }
 
   switch (fieldSchema.type) {
-    case 'number':
+    case "number":
       const num = Number(value);
       return isNaN(num) ? value : num;
-    
-    case 'boolean':
-      if (typeof value === 'boolean') return value;
-      if (value === 'true') return true;
-      if (value === 'false') return false;
+
+    case "boolean":
+      if (typeof value === "boolean") return value;
+      if (value === "true") return true;
+      if (value === "false") return false;
       return Boolean(value);
-    
-    case 'date':
+
+    case "date":
       if (value instanceof Date) return value;
       try {
         return new Date(value);
       } catch (e) {
         return value;
       }
-    
-    case 'array':
+
+    case "array":
       // If it's already an array, return it
       if (Array.isArray(value)) return value;
-      
+
       // If it's a JSON string, parse it
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         try {
           const parsed = JSON.parse(value);
           return Array.isArray(parsed) ? parsed : [value];
         } catch (e) {
           // If not JSON, split by comma (for simple arrays)
-          return value.split(',').map(v => v.trim()).filter(Boolean);
+          return value
+            .split(",")
+            .map((v) => v.trim())
+            .filter(Boolean);
         }
       }
-      
+
       return [value];
-    
-    case 'object':
-      if (typeof value === 'object') return value;
+
+    case "object":
+      if (typeof value === "object") return value;
       try {
         return JSON.parse(value);
       } catch (e) {
         return value;
       }
-    
+
     default:
       return value;
   }
@@ -115,24 +125,27 @@ function convertToSchemaType(value, fieldSchema) {
  */
 function processRecordData(data, schema) {
   const processed = { ...data };
-  
+
   // Get schema entries
   let schemaEntries;
   if (schema instanceof Map) {
     schemaEntries = Array.from(schema.entries());
-  } else if (typeof schema === 'object') {
+  } else if (typeof schema === "object") {
     schemaEntries = Object.entries(schema);
   } else {
     return processed;
   }
-  
+
   // Convert each field to its proper type
   for (const [fieldName, fieldSchema] of schemaEntries) {
     if (processed[fieldName] !== undefined) {
-      processed[fieldName] = convertToSchemaType(processed[fieldName], fieldSchema);
+      processed[fieldName] = convertToSchemaType(
+        processed[fieldName],
+        fieldSchema,
+      );
     }
   }
-  
+
   return processed;
 }
 
@@ -153,27 +166,27 @@ function getDynamicModel(entity) {
       type: mongoose.Schema.Types.ObjectId,
       required: false,
       index: true,
-      default: null
+      default: null,
     },
     projectUUID: {
       type: String,
       required: false,
       index: true,
-      default: null
+      default: null,
     },
     organizationId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      index: true
+      index: true,
     },
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   };
 
   let schemaEntries;
   if (entity.schema instanceof Map) {
     schemaEntries = Array.from(entity.schema.entries());
-  } else if (typeof entity.schema === 'object' && entity.schema !== null) {
+  } else if (typeof entity.schema === "object" && entity.schema !== null) {
     schemaEntries = Object.entries(entity.schema);
   } else {
     throw new Error(`Invalid schema format for entity ${entity.entityName}`);
@@ -185,12 +198,12 @@ function getDynamicModel(entity) {
 
   const schema = new mongoose.Schema(schemaDef, {
     timestamps: true,
-    collection: `dyn_${entity.slug.replace(/[^a-zA-Z0-9_]/g, '_')}`
+    collection: `dyn_${entity.slug.replace(/[^a-zA-Z0-9_]/g, "_")}`,
   });
 
   const Model = mongoose.model(
-    `Dynamic_${entity.slug.replace(/[^a-zA-Z0-9_]/g, '_')}`,
-    schema
+    `Dynamic_${entity.slug.replace(/[^a-zA-Z0-9_]/g, "_")}`,
+    schema,
   );
 
   modelCache.set(cacheKey, Model);
@@ -205,33 +218,35 @@ function mapFieldType(fieldDef) {
 
   const baseSchema = {
     required: fieldDef.required || false,
-    default: fieldDef.default !== undefined ? fieldDef.default : undefined
+    default: fieldDef.default !== undefined ? fieldDef.default : undefined,
   };
 
   // Apply validation rules
   if (validation) {
     if (validation.min !== undefined) baseSchema.min = validation.min;
     if (validation.max !== undefined) baseSchema.max = validation.max;
-    if (validation.minLength !== undefined) baseSchema.minlength = validation.minLength;
-    if (validation.maxLength !== undefined) baseSchema.maxlength = validation.maxLength;
+    if (validation.minLength !== undefined)
+      baseSchema.minlength = validation.minLength;
+    if (validation.maxLength !== undefined)
+      baseSchema.maxlength = validation.maxLength;
     if (validation.enum) baseSchema.enum = validation.enum;
   }
 
   switch (type) {
-    case 'string':
+    case "string":
       return { type: String, ...baseSchema };
 
-    case 'number':
+    case "number":
       return { type: Number, ...baseSchema };
 
-    case 'boolean':
+    case "boolean":
       return { type: Boolean, ...baseSchema };
 
-    case 'date':
+    case "date":
       return { type: Date, ...baseSchema };
 
     // ✅ File type (stores metadata + path)
-    case 'file':
+    case "file":
       return {
         type: {
           url: { type: String, required: true },
@@ -239,53 +254,55 @@ function mapFieldType(fieldDef) {
           originalName: String,
           mimetype: String,
           size: Number,
-          uploadedAt: { type: Date, default: Date.now }
+          uploadedAt: { type: Date, default: Date.now },
         },
         required: baseSchema.required,
-        default: baseSchema.default
+        default: baseSchema.default,
       };
 
     // ✅ Enum type
-    case 'enum':
+    case "enum":
       return {
         type: String,
         enum: validation?.enum || [],
-        ...baseSchema
+        ...baseSchema,
       };
 
     // ✅ Array type - supports file arrays too
-    case 'array':
-      const itemType = fieldDef.items?.type || 'string';
-      
+    case "array":
+      const itemType = fieldDef.items?.type || "string";
+
       // Special handling for file arrays
-      if (itemType === 'file') {
+      if (itemType === "file") {
         return {
-          type: [{
-            url: { type: String, required: true },
-            filename: { type: String, required: true },
-            originalName: String,
-            mimetype: String,
-            size: Number,
-            uploadedAt: { type: Date, default: Date.now }
-          }],
-          default: []
+          type: [
+            {
+              url: { type: String, required: true },
+              filename: { type: String, required: true },
+              originalName: String,
+              mimetype: String,
+              size: Number,
+              uploadedAt: { type: Date, default: Date.now },
+            },
+          ],
+          default: [],
         };
       }
-      
+
       return {
         type: [mapFieldType({ type: itemType, ...fieldDef.items })],
-        default: []
+        default: [],
       };
 
     // ✅ Relation type (reference to another entity)
-    case 'relation':
+    case "relation":
       return {
         type: mongoose.Schema.Types.ObjectId,
-        ref: fieldDef.ref || 'DynamicRecord',
-        ...baseSchema
+        ref: fieldDef.ref || "DynamicRecord",
+        ...baseSchema,
       };
 
-    case 'object':
+    case "object":
       return { type: mongoose.Schema.Types.Mixed, ...baseSchema };
 
     default:
@@ -297,7 +314,6 @@ function mapFieldType(fieldDef) {
 //  Controller Class (ENHANCED)
 // ───────────────────────────────────────────────
 class DynamicCrudController {
-
   // ✅ LIST ENTITIES (unchanged)
   static async listEntities(req, res) {
     try {
@@ -305,23 +321,26 @@ class DynamicCrudController {
       const query = { organizationId };
 
       const entities = await DynamicEntity.find(query)
-        .select('entityName slug schema operations projectUUID projectId createdAt updatedAt params')
+        .select(
+          "entityName slug schema operations projectUUID projectId createdAt updatedAt params",
+        )
         .lean();
 
-      const entitiesWithSchema = entities.map(entity => ({
+      const entitiesWithSchema = entities.map((entity) => ({
         ...entity,
         schema: entity.schema || {},
-        scope: entity.projectUUID || entity.projectId ? 'project' : 'organization'
+        scope:
+          entity.projectUUID || entity.projectId ? "project" : "organization",
       }));
 
       res.json({
         success: true,
         count: entitiesWithSchema.length,
         entities: entitiesWithSchema,
-        context: { organizationId }
+        context: { organizationId },
       });
     } catch (error) {
-      console.error('❌ listEntities failed:', error);
+      console.error("❌ listEntities failed:", error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -329,15 +348,20 @@ class DynamicCrudController {
   // ✅ DEFINE ENTITY (Enhanced with params support)
   static async defineEntity(req, res) {
     try {
-      const { entityName, schema, operations, projectUUID, projectId, params } = req.body;
+      const { entityName, schema, operations, projectUUID, projectId, params } =
+        req.body;
       const { organizationId, userId } = req.user;
 
       const finalProjectId = projectId || req.user.projectId || null;
       const finalProjectUUID = projectUUID || req.user.projectUUID || null;
 
-      if (!entityName || typeof entityName !== 'string' || !/^[a-z][a-z0-9_]*$/.test(entityName)) {
+      if (
+        !entityName ||
+        typeof entityName !== "string" ||
+        !/^[a-z][a-z0-9_]*$/.test(entityName)
+      ) {
         return res.status(400).json({
-          error: "Invalid entityName (lowercase, numbers, underscores only)"
+          error: "Invalid entityName (lowercase, numbers, underscores only)",
         });
       }
 
@@ -354,7 +378,7 @@ class DynamicCrudController {
       if (existing) {
         return res.status(409).json({
           error: `Entity "${entityName}" already exists`,
-          existingSlug: existing.slug
+          existingSlug: existing.slug,
         });
       }
 
@@ -366,9 +390,15 @@ class DynamicCrudController {
         entityName,
         slug,
         schema: new Map(Object.entries(schema)),
-        operations: operations || ['create', 'read', 'update', 'delete', 'list'],
+        operations: operations || [
+          "create",
+          "read",
+          "update",
+          "delete",
+          "list",
+        ],
         params: params || [],
-        createdBy: userId
+        createdBy: userId,
       });
 
       // Auto-register API config
@@ -379,17 +409,17 @@ class DynamicCrudController {
           key: apiKey,
           name: `Dynamic CRUD: ${entityName}`,
           description: `Auto-generated CRUD API for ${entityName}`,
-          type: 'dynamic',
+          type: "dynamic",
           baseUrl: `/api/crud/${organizationId}/${entityName}`,
-          methods: entity.operations.map(op => op.toUpperCase()),
+          methods: entity.operations.map((op) => op.toUpperCase()),
           isActive: true,
           projectUUID: finalProjectUUID,
           organizationId,
           authRequired: true,
           createdBy: userId,
-          tags: ['dynamic', 'crud', entityName]
+          tags: ["dynamic", "crud", entityName],
         },
-        { upsert: true, new: true }
+        { upsert: true, new: true },
       );
 
       console.log(`✅ Entity created: ${entityName} | slug: ${slug}`);
@@ -398,13 +428,13 @@ class DynamicCrudController {
         success: true,
         entity: {
           ...entity.toObject(),
-          schema: Object.fromEntries(entity.schema)
+          schema: Object.fromEntries(entity.schema),
         },
         apiEndpoint: `/api/crud/${organizationId}/${entityName}`,
-        apiConfigKey: apiKey
+        apiConfigKey: apiKey,
       });
     } catch (error) {
-      console.error('❌ defineEntity failed:', error);
+      console.error("❌ defineEntity failed:", error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -419,25 +449,29 @@ class DynamicCrudController {
         // ✅ Get entity definition
         const entity = await DynamicEntity.findOne({
           organizationId,
-          entityName
+          entityName,
         }).lean();
 
         if (!entity) {
-          return res.status(404).json({ error: `Entity "${entityName}" not found` });
+          return res
+            .status(404)
+            .json({ error: `Entity "${entityName}" not found` });
         }
 
         // Convert schema
-        if (entity.schema && typeof entity.schema === 'object') {
-          if (entity.schema.$__ || entity.schema.constructor.name === 'Map') {
+        if (entity.schema && typeof entity.schema === "object") {
+          if (entity.schema.$__ || entity.schema.constructor.name === "Map") {
             entity.schema = Object.fromEntries(
-              Object.entries(entity.schema).filter(([key]) => !key.startsWith('$'))
+              Object.entries(entity.schema).filter(
+                ([key]) => !key.startsWith("$"),
+              ),
             );
           }
         }
 
         if (!entity.operations.includes(operation)) {
           return res.status(403).json({
-            error: `Operation "${operation}" not allowed`
+            error: `Operation "${operation}" not allowed`,
           });
         }
 
@@ -447,52 +481,109 @@ class DynamicCrudController {
 
         switch (operation) {
           // ── LIST ───────────────────────────────────────
-          case 'list': {
+          case "list": {
             const query = { organizationId };
             if (projectId) query.projectId = projectId;
             if (projectUUID) query.projectUUID = projectUUID;
 
-            // ✅ Support query params for filtering
-            Object.keys(req.query).forEach(key => {
-              if (entity.schema[key]) {
+            // ✅ SEARCH: Global text search across string fields
+            if (req.query.search) {
+              const searchTerm = String(req.query.search).trim();
+              const searchFields = Object.entries(entity.schema)
+                .filter(
+                  ([_, config]) =>
+                    config.type === "string" ||
+                    config.type === "text" ||
+                    config.type === "email",
+                )
+                .map(([field]) => field);
+
+              if (searchFields.length > 0) {
+                query.$or = searchFields.map((field) => ({
+                  [field]: { $regex: searchTerm, $options: "i" },
+                }));
+              }
+            }
+
+            // ✅ FILTER: Field-specific filters
+            Object.keys(req.query).forEach((key) => {
+              if (
+                entity.schema[key] &&
+                key !== "search" &&
+                key !== "sort" &&
+                key !== "page" &&
+                key !== "limit"
+              ) {
                 query[key] = req.query[key];
               }
             });
 
-            const items = await Model.find(query).lean();
+            // ✅ PAGINATION
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 10;
+            const skip = (page - 1) * limit;
 
-            // ✅ Transform file fields to include full URLs
-            const itemsWithUrls = items.map(item => 
-              transformFileFields(item, entity.schema, req)
+            // ✅ SORT
+            let sortOptions = { createdAt: -1 }; // Default
+            if (req.query.sort) {
+              const sortField = String(req.query.sort);
+              const isDescending = sortField.startsWith("-");
+              const fieldName = isDescending
+                ? sortField.substring(1)
+                : sortField;
+
+              if (entity.schema[fieldName]) {
+                sortOptions = { [fieldName]: isDescending ? -1 : 1 };
+              }
+            }
+
+            // Execute query
+            const [items, totalCount] = await Promise.all([
+              Model.find(query)
+                .sort(sortOptions)
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+              Model.countDocuments(query),
+            ]);
+
+            const itemsWithUrls = items.map((item) =>
+              transformFileFields(item, entity.schema, req),
             );
 
-            return res.json({ 
-              success: true, 
-              count: itemsWithUrls.length, 
-              data: itemsWithUrls 
+            return res.json({
+              success: true,
+              count: itemsWithUrls.length,
+              total: totalCount,
+              page,
+              limit,
+              totalPages: Math.ceil(totalCount / limit),
+              data: itemsWithUrls,
             });
           }
 
           // ── CREATE ─────────────────────────────────────
-          case 'create': {
+          case "create": {
             let recordData = { ...req.body };
 
             // ✅ Process uploaded files (single and arrays)
             if (req.files) {
               const filesByField = {};
-              
-              req.files.forEach(file => {
-                const isArrayField = file.fieldname.endsWith('[]');
-                const fieldName = isArrayField ? file.fieldname.slice(0, -2) : file.fieldname;
-                
+
+              req.files.forEach((file) => {
+                const isArrayField = file.fieldname.endsWith("[]");
+                const fieldName = isArrayField
+                  ? file.fieldname.slice(0, -2)
+                  : file.fieldname;
+
                 const fileObj = {
                   url: `/uploads/dynamic/${file.filename}`,
                   filename: file.filename,
                   originalName: file.originalname,
                   mimetype: file.mimetype,
-                  size: file.size
+                  size: file.size,
                 };
-                
+
                 if (isArrayField) {
                   if (!filesByField[fieldName]) {
                     filesByField[fieldName] = [];
@@ -502,18 +593,22 @@ class DynamicCrudController {
                   filesByField[fieldName] = fileObj;
                 }
               });
-              
+
               Object.assign(recordData, filesByField);
             }
 
             // ✅ Convert types based on schema (fixes the number issue!)
             recordData = processRecordData(recordData, entity.schema);
 
-            const validation = DynamicCrudController.validateRecord(recordData, entity.schema, false);
+            const validation = DynamicCrudController.validateRecord(
+              recordData,
+              entity.schema,
+              false,
+            );
             if (!validation.valid) {
               return res.status(400).json({
-                error: 'Validation failed',
-                details: validation.errors
+                error: "Validation failed",
+                details: validation.errors,
               });
             }
 
@@ -522,24 +617,28 @@ class DynamicCrudController {
               projectId: projectId || null,
               projectUUID: projectUUID || null,
               organizationId,
-              createdBy: userId
+              createdBy: userId,
             });
 
             await record.save();
 
-            const recordWithUrls = transformFileFields(record.toObject(), entity.schema, req);
+            const recordWithUrls = transformFileFields(
+              record.toObject(),
+              entity.schema,
+              req,
+            );
 
             return res.status(201).json({
               success: true,
-              record: recordWithUrls
+              record: recordWithUrls,
             });
           }
 
           // ── READ ONE ───────────────────────────────────
-          case 'read': {
+          case "read": {
             const { recordId } = req.params;
             if (!mongoose.isValidObjectId(recordId)) {
-              return res.status(400).json({ error: 'Invalid record ID' });
+              return res.status(400).json({ error: "Invalid record ID" });
             }
 
             const query = { _id: recordId, organizationId };
@@ -549,19 +648,23 @@ class DynamicCrudController {
             const record = await Model.findOne(query).lean();
 
             if (!record) {
-              return res.status(404).json({ error: 'Record not found' });
+              return res.status(404).json({ error: "Record not found" });
             }
 
-            const recordWithUrls = transformFileFields(record, entity.schema, req);
+            const recordWithUrls = transformFileFields(
+              record,
+              entity.schema,
+              req,
+            );
 
             return res.json({ success: true, record: recordWithUrls });
           }
 
           // ── UPDATE ─────────────────────────────────────
-          case 'update': {
+          case "update": {
             const { recordId } = req.params;
             if (!mongoose.isValidObjectId(recordId)) {
-              return res.status(400).json({ error: 'Invalid record ID' });
+              return res.status(400).json({ error: "Invalid record ID" });
             }
 
             let updateData = { ...req.body };
@@ -569,19 +672,21 @@ class DynamicCrudController {
             // ✅ Process uploaded files (single and arrays)
             if (req.files) {
               const filesByField = {};
-              
-              req.files.forEach(file => {
-                const isArrayField = file.fieldname.endsWith('[]');
-                const fieldName = isArrayField ? file.fieldname.slice(0, -2) : file.fieldname;
-                
+
+              req.files.forEach((file) => {
+                const isArrayField = file.fieldname.endsWith("[]");
+                const fieldName = isArrayField
+                  ? file.fieldname.slice(0, -2)
+                  : file.fieldname;
+
                 const fileObj = {
                   url: `/uploads/dynamic/${file.filename}`,
                   filename: file.filename,
                   originalName: file.originalname,
                   mimetype: file.mimetype,
-                  size: file.size
+                  size: file.size,
                 };
-                
+
                 if (isArrayField) {
                   if (!filesByField[fieldName]) {
                     filesByField[fieldName] = [];
@@ -591,18 +696,22 @@ class DynamicCrudController {
                   filesByField[fieldName] = fileObj;
                 }
               });
-              
+
               Object.assign(updateData, filesByField);
             }
 
             // ✅ Convert types based on schema (fixes the number issue!)
             updateData = processRecordData(updateData, entity.schema);
 
-            const validation = DynamicCrudController.validateRecord(updateData, entity.schema, true);
+            const validation = DynamicCrudController.validateRecord(
+              updateData,
+              entity.schema,
+              true,
+            );
             if (!validation.valid) {
               return res.status(400).json({
-                error: 'Validation failed',
-                details: validation.errors
+                error: "Validation failed",
+                details: validation.errors,
               });
             }
 
@@ -613,23 +722,27 @@ class DynamicCrudController {
             const updated = await Model.findOneAndUpdate(
               query,
               { ...updateData, updatedBy: userId },
-              { new: true, runValidators: true, lean: true }
+              { new: true, runValidators: true, lean: true },
             );
 
             if (!updated) {
-              return res.status(404).json({ error: 'Record not found' });
+              return res.status(404).json({ error: "Record not found" });
             }
 
-            const updatedWithUrls = transformFileFields(updated, entity.schema, req);
+            const updatedWithUrls = transformFileFields(
+              updated,
+              entity.schema,
+              req,
+            );
 
             return res.json({ success: true, record: updatedWithUrls });
           }
 
           // ── DELETE ─────────────────────────────────────
-          case 'delete': {
+          case "delete": {
             const { recordId } = req.params;
             if (!mongoose.isValidObjectId(recordId)) {
-              return res.status(400).json({ error: 'Invalid record ID' });
+              return res.status(400).json({ error: "Invalid record ID" });
             }
 
             const query = { _id: recordId, organizationId };
@@ -639,29 +752,43 @@ class DynamicCrudController {
             const deleted = await Model.findOneAndDelete(query);
 
             if (!deleted) {
-              return res.status(404).json({ error: 'Record not found' });
+              return res.status(404).json({ error: "Record not found" });
             }
 
             // ✅ Delete associated files (single and arrays)
             Object.keys(entity.schema).forEach(async (fieldName) => {
               const fieldSchema = entity.schema[fieldName];
-              
+
               // Single file
-              if (fieldSchema.type === 'file' && deleted[fieldName]?.filename) {
-                const filePath = path.join(__dirname, '../uploads/dynamic', deleted[fieldName].filename);
+              if (fieldSchema.type === "file" && deleted[fieldName]?.filename) {
+                const filePath = path.join(
+                  __dirname,
+                  "../uploads/dynamic",
+                  deleted[fieldName].filename,
+                );
                 try {
                   await fs.unlink(filePath);
-                  console.log(`🗑️ Deleted file: ${deleted[fieldName].filename}`);
+                  console.log(
+                    `🗑️ Deleted file: ${deleted[fieldName].filename}`,
+                  );
                 } catch (err) {
                   console.error(`Failed to delete file: ${err.message}`);
                 }
               }
-              
+
               // File array
-              if (fieldSchema.type === 'array' && fieldSchema.items?.type === 'file' && Array.isArray(deleted[fieldName])) {
+              if (
+                fieldSchema.type === "array" &&
+                fieldSchema.items?.type === "file" &&
+                Array.isArray(deleted[fieldName])
+              ) {
                 for (const file of deleted[fieldName]) {
                   if (file.filename) {
-                    const filePath = path.join(__dirname, '../uploads/dynamic', file.filename);
+                    const filePath = path.join(
+                      __dirname,
+                      "../uploads/dynamic",
+                      file.filename,
+                    );
                     try {
                       await fs.unlink(filePath);
                       console.log(`🗑️ Deleted file: ${file.filename}`);
@@ -675,19 +802,19 @@ class DynamicCrudController {
 
             return res.json({
               success: true,
-              message: 'Record deleted',
-              deletedId: recordId
+              message: "Record deleted",
+              deletedId: recordId,
             });
           }
 
           default:
-            return res.status(400).json({ error: 'Invalid operation' });
+            return res.status(400).json({ error: "Invalid operation" });
         }
       } catch (error) {
         console.error(`[${operation.toUpperCase()}] Error:`, error);
         res.status(500).json({
-          error: 'Internal server error',
-          message: error.message
+          error: "Internal server error",
+          message: error.message,
         });
       }
     };
@@ -700,30 +827,39 @@ class DynamicCrudController {
     let schemaEntries;
     if (schemaMap instanceof Map) {
       schemaEntries = Array.from(schemaMap.entries());
-    } else if (typeof schemaMap === 'object') {
+    } else if (typeof schemaMap === "object") {
       schemaEntries = Object.entries(schemaMap);
     } else {
-      return { valid: false, errors: { schema: 'Invalid schema format' } };
+      return { valid: false, errors: { schema: "Invalid schema format" } };
     }
 
     for (const [fieldName, fieldSchema] of schemaEntries) {
       const value = data[fieldName];
 
-      if (fieldSchema.required && !isPartial && (value === undefined || value === null)) {
+      if (
+        fieldSchema.required &&
+        !isPartial &&
+        (value === undefined || value === null)
+      ) {
         errors[fieldName] = `${fieldName} is required`;
         continue;
       }
 
       if (value !== undefined && value !== null) {
         // Type-specific validation
-        if (fieldSchema.type === 'number' && typeof value !== 'number') {
+        if (fieldSchema.type === "number" && typeof value !== "number") {
           errors[fieldName] = `${fieldName} must be a number`;
         }
-        if (fieldSchema.type === 'string' && typeof value !== 'string') {
+        if (fieldSchema.type === "string" && typeof value !== "string") {
           errors[fieldName] = `${fieldName} must be a string`;
         }
-        if (fieldSchema.type === 'enum' && fieldSchema.validation?.enum && !fieldSchema.validation.enum.includes(value)) {
-          errors[fieldName] = `${fieldName} must be one of: ${fieldSchema.validation.enum.join(', ')}`;
+        if (
+          fieldSchema.type === "enum" &&
+          fieldSchema.validation?.enum &&
+          !fieldSchema.validation.enum.includes(value)
+        ) {
+          errors[fieldName] =
+            `${fieldName} must be one of: ${fieldSchema.validation.enum.join(", ")}`;
         }
 
         // Validation rules
@@ -735,11 +871,19 @@ class DynamicCrudController {
           if (val.max !== undefined && value > val.max) {
             errors[fieldName] = `${fieldName} must be at most ${val.max}`;
           }
-          if (val.minLength !== undefined && String(value).length < val.minLength) {
-            errors[fieldName] = `${fieldName} must be at least ${val.minLength} characters`;
+          if (
+            val.minLength !== undefined &&
+            String(value).length < val.minLength
+          ) {
+            errors[fieldName] =
+              `${fieldName} must be at least ${val.minLength} characters`;
           }
-          if (val.maxLength !== undefined && String(value).length > val.maxLength) {
-            errors[fieldName] = `${fieldName} must be at most ${val.maxLength} characters`;
+          if (
+            val.maxLength !== undefined &&
+            String(value).length > val.maxLength
+          ) {
+            errors[fieldName] =
+              `${fieldName} must be at most ${val.maxLength} characters`;
           }
         }
       }
@@ -756,38 +900,39 @@ class DynamicCrudController {
       const { organizationId, userId } = req.user;
 
       if (!mongoose.isValidObjectId(entityId)) {
-        return res.status(400).json({ error: 'Invalid entity ID' });
+        return res.status(400).json({ error: "Invalid entity ID" });
       }
 
       const entity = await DynamicEntity.findOne({
         _id: entityId,
-        organizationId
+        organizationId,
       });
 
       if (!entity) {
-        return res.status(404).json({ error: 'Entity not found' });
+        return res.status(404).json({ error: "Entity not found" });
       }
 
       if (entityName && entityName !== entity.entityName) {
         if (!/^[a-z][a-z0-9_]*$/.test(entityName)) {
           return res.status(400).json({
-            error: "Invalid entityName (lowercase, numbers, underscores only)"
+            error: "Invalid entityName (lowercase, numbers, underscores only)",
           });
         }
 
-        const projectIdentifier = entity.projectUUID || entity.projectId?.toString() || '';
+        const projectIdentifier =
+          entity.projectUUID || entity.projectId?.toString() || "";
         const newSlug = projectIdentifier
           ? `${organizationId}-${projectIdentifier}-${entityName}`
           : `${organizationId}-${entityName}`;
 
         const existing = await DynamicEntity.findOne({
           slug: newSlug,
-          _id: { $ne: entityId }
+          _id: { $ne: entityId },
         });
 
         if (existing) {
           return res.status(409).json({
-            error: `Entity "${entityName}" already exists`
+            error: `Entity "${entityName}" already exists`,
           });
         }
 
@@ -817,9 +962,9 @@ class DynamicCrudController {
         {
           name: `Dynamic CRUD: ${entity.entityName}`,
           baseUrl: `/api/crud/${organizationId}/${entity.entityName}`,
-          methods: entity.operations.map(op => op.toUpperCase()),
-          updatedBy: userId
-        }
+          methods: entity.operations.map((op) => op.toUpperCase()),
+          updatedBy: userId,
+        },
       );
 
       console.log(`✅ Entity updated: ${entity.entityName}`);
@@ -828,13 +973,12 @@ class DynamicCrudController {
         success: true,
         entity: {
           ...entity.toObject(),
-          schema: Object.fromEntries(entity.schema)
+          schema: Object.fromEntries(entity.schema),
         },
-        message: 'Entity updated successfully'
+        message: "Entity updated successfully",
       });
-
     } catch (error) {
-      console.error('❌ updateEntity failed:', error);
+      console.error("❌ updateEntity failed:", error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -846,16 +990,16 @@ class DynamicCrudController {
       const { organizationId } = req.user;
 
       if (!mongoose.isValidObjectId(entityId)) {
-        return res.status(400).json({ error: 'Invalid entity ID' });
+        return res.status(400).json({ error: "Invalid entity ID" });
       }
 
       const entity = await DynamicEntity.findOne({
         _id: entityId,
-        organizationId
+        organizationId,
       });
 
       if (!entity) {
-        return res.status(404).json({ error: 'Entity not found' });
+        return res.status(404).json({ error: "Entity not found" });
       }
 
       const Model = getDynamicModel(entity);
@@ -864,7 +1008,7 @@ class DynamicCrudController {
       if (recordCount > 0) {
         return res.status(400).json({
           error: `Cannot delete entity. It has ${recordCount} existing records. Delete all records first.`,
-          recordCount
+          recordCount,
         });
       }
 
@@ -882,11 +1026,10 @@ class DynamicCrudController {
       res.json({
         success: true,
         message: `Entity "${entity.entityName}" deleted successfully`,
-        deletedEntity: entity.entityName
+        deletedEntity: entity.entityName,
       });
-
     } catch (error) {
-      console.error('❌ deleteEntity failed:', error);
+      console.error("❌ deleteEntity failed:", error);
       res.status(500).json({ error: error.message });
     }
   }
@@ -897,23 +1040,27 @@ class DynamicCrudController {
 // ───────────────────────────────────────────────
 function transformFileFields(record, schema, req) {
   const result = { ...record };
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  const baseUrl = `${req.protocol}://${req.get("host")}`;
 
-  Object.keys(schema).forEach(fieldName => {
+  Object.keys(schema).forEach((fieldName) => {
     const fieldSchema = schema[fieldName];
-    
+
     // Single file
-    if (fieldSchema.type === 'file' && result[fieldName]?.url) {
-      result[fieldName].url = result[fieldName].url.startsWith('http')
+    if (fieldSchema.type === "file" && result[fieldName]?.url) {
+      result[fieldName].url = result[fieldName].url.startsWith("http")
         ? result[fieldName].url
         : `${baseUrl}${result[fieldName].url}`;
     }
-    
+
     // File array
-    if (fieldSchema.type === 'array' && fieldSchema.items?.type === 'file' && Array.isArray(result[fieldName])) {
-      result[fieldName] = result[fieldName].map(file => ({
+    if (
+      fieldSchema.type === "array" &&
+      fieldSchema.items?.type === "file" &&
+      Array.isArray(result[fieldName])
+    ) {
+      result[fieldName] = result[fieldName].map((file) => ({
         ...file,
-        url: file.url.startsWith('http') ? file.url : `${baseUrl}${file.url}`
+        url: file.url.startsWith("http") ? file.url : `${baseUrl}${file.url}`,
       }));
     }
   });
