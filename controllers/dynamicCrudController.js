@@ -3,9 +3,141 @@
 const mongoose = require('mongoose');
 const DynamicEntity = require('../models/DynamicEntity');
 const APIConfig = require('../models/APIConfig');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs').promises;
 
 // ───────────────────────────────────────────────
-//  Dynamic Model Factory (cached per entity slug)
+//  FILE UPLOAD CONFIGURATION
+// ───────────────────────────────────────────────
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../uploads/dynamic');
+    try {
+      await fs.mkdir(uploadDir, { recursive: true });
+      cb(null, uploadDir);
+    } catch (err) {
+      cb(err);
+    }
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp|pdf|doc|docx/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only images and documents allowed.'));
+    }
+  }
+});
+
+// ───────────────────────────────────────────────
+//  TYPE CONVERSION HELPERS
+// ───────────────────────────────────────────────
+
+/**
+ * Convert FormData string values to their proper types based on schema
+ */
+function convertToSchemaType(value, fieldSchema) {
+  // Skip conversion for files
+  if (fieldSchema.type === 'file' || 
+      (fieldSchema.type === 'array' && fieldSchema.items?.type === 'file')) {
+    return value;
+  }
+
+  // Handle null/undefined
+  if (value === null || value === undefined || value === '') {
+    return value;
+  }
+
+  switch (fieldSchema.type) {
+    case 'number':
+      const num = Number(value);
+      return isNaN(num) ? value : num;
+    
+    case 'boolean':
+      if (typeof value === 'boolean') return value;
+      if (value === 'true') return true;
+      if (value === 'false') return false;
+      return Boolean(value);
+    
+    case 'date':
+      if (value instanceof Date) return value;
+      try {
+        return new Date(value);
+      } catch (e) {
+        return value;
+      }
+    
+    case 'array':
+      // If it's already an array, return it
+      if (Array.isArray(value)) return value;
+      
+      // If it's a JSON string, parse it
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed : [value];
+        } catch (e) {
+          // If not JSON, split by comma (for simple arrays)
+          return value.split(',').map(v => v.trim()).filter(Boolean);
+        }
+      }
+      
+      return [value];
+    
+    case 'object':
+      if (typeof value === 'object') return value;
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        return value;
+      }
+    
+    default:
+      return value;
+  }
+}
+
+/**
+ * Process record data and convert types based on schema
+ */
+function processRecordData(data, schema) {
+  const processed = { ...data };
+  
+  // Get schema entries
+  let schemaEntries;
+  if (schema instanceof Map) {
+    schemaEntries = Array.from(schema.entries());
+  } else if (typeof schema === 'object') {
+    schemaEntries = Object.entries(schema);
+  } else {
+    return processed;
+  }
+  
+  // Convert each field to its proper type
+  for (const [fieldName, fieldSchema] of schemaEntries) {
+    if (processed[fieldName] !== undefined) {
+      processed[fieldName] = convertToSchemaType(processed[fieldName], fieldSchema);
+    }
+  }
+  
+  return processed;
+}
+
+// ───────────────────────────────────────────────
+//  Dynamic Model Factory (ENHANCED)
 // ───────────────────────────────────────────────
 const modelCache = new Map();
 
@@ -19,7 +151,7 @@ function getDynamicModel(entity) {
   const schemaDef = {
     projectId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: false,  // ✅ CHANGED FROM true TO false
+      required: false,
       index: true,
       default: null
     },
@@ -38,7 +170,6 @@ function getDynamicModel(entity) {
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
   };
 
-  // ✅ Handle both Map and plain object for schema
   let schemaEntries;
   if (entity.schema instanceof Map) {
     schemaEntries = Array.from(entity.schema.entries());
@@ -48,20 +179,8 @@ function getDynamicModel(entity) {
     throw new Error(`Invalid schema format for entity ${entity.entityName}`);
   }
 
-  // Convert schema entries to mongoose fields
   for (const [fieldName, fieldDef] of schemaEntries) {
-    const fieldSchema = {
-      type: mapFieldType(fieldDef.type),
-      required: fieldDef.required || false,
-      default: fieldDef.default !== undefined ? fieldDef.default : undefined
-    };
-
-    if (fieldDef.validation) {
-      if (fieldDef.validation.min !== undefined) fieldSchema.min = fieldDef.validation.min;
-      if (fieldDef.validation.max !== undefined) fieldSchema.max = fieldDef.validation.max;
-    }
-
-    schemaDef[fieldName] = fieldSchema;
+    schemaDef[fieldName] = mapFieldType(fieldDef);
   }
 
   const schema = new mongoose.Schema(schemaDef, {
@@ -75,48 +194,118 @@ function getDynamicModel(entity) {
   );
 
   modelCache.set(cacheKey, Model);
-
   console.log(`✅ Dynamic model created: ${entity.entityName}`);
 
   return Model;
 }
 
-function mapFieldType(type) {
-  const typeMap = {
-    string: String,
-    number: Number,
-    boolean: Boolean,
-    date: Date,
-    array: [mongoose.Schema.Types.Mixed],
-    object: mongoose.Schema.Types.Mixed
-    // Future: file → { url: String, name: String, size: Number }, relation → ObjectId
+// ✅ ENHANCED: Support file, enum, array (including file arrays), relation types
+function mapFieldType(fieldDef) {
+  const { type, validation } = fieldDef;
+
+  const baseSchema = {
+    required: fieldDef.required || false,
+    default: fieldDef.default !== undefined ? fieldDef.default : undefined
   };
-  return typeMap[type] || String;
+
+  // Apply validation rules
+  if (validation) {
+    if (validation.min !== undefined) baseSchema.min = validation.min;
+    if (validation.max !== undefined) baseSchema.max = validation.max;
+    if (validation.minLength !== undefined) baseSchema.minlength = validation.minLength;
+    if (validation.maxLength !== undefined) baseSchema.maxlength = validation.maxLength;
+    if (validation.enum) baseSchema.enum = validation.enum;
+  }
+
+  switch (type) {
+    case 'string':
+      return { type: String, ...baseSchema };
+
+    case 'number':
+      return { type: Number, ...baseSchema };
+
+    case 'boolean':
+      return { type: Boolean, ...baseSchema };
+
+    case 'date':
+      return { type: Date, ...baseSchema };
+
+    // ✅ File type (stores metadata + path)
+    case 'file':
+      return {
+        type: {
+          url: { type: String, required: true },
+          filename: { type: String, required: true },
+          originalName: String,
+          mimetype: String,
+          size: Number,
+          uploadedAt: { type: Date, default: Date.now }
+        },
+        required: baseSchema.required,
+        default: baseSchema.default
+      };
+
+    // ✅ Enum type
+    case 'enum':
+      return {
+        type: String,
+        enum: validation?.enum || [],
+        ...baseSchema
+      };
+
+    // ✅ Array type - supports file arrays too
+    case 'array':
+      const itemType = fieldDef.items?.type || 'string';
+      
+      // Special handling for file arrays
+      if (itemType === 'file') {
+        return {
+          type: [{
+            url: { type: String, required: true },
+            filename: { type: String, required: true },
+            originalName: String,
+            mimetype: String,
+            size: Number,
+            uploadedAt: { type: Date, default: Date.now }
+          }],
+          default: []
+        };
+      }
+      
+      return {
+        type: [mapFieldType({ type: itemType, ...fieldDef.items })],
+        default: []
+      };
+
+    // ✅ Relation type (reference to another entity)
+    case 'relation':
+      return {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: fieldDef.ref || 'DynamicRecord',
+        ...baseSchema
+      };
+
+    case 'object':
+      return { type: mongoose.Schema.Types.Mixed, ...baseSchema };
+
+    default:
+      return { type: String, ...baseSchema };
+  }
 }
 
 // ───────────────────────────────────────────────
-//  Controller Class
+//  Controller Class (ENHANCED)
 // ───────────────────────────────────────────────
 class DynamicCrudController {
 
-
-
-  // controllers/dynamicCrudController.js
-
+  // ✅ LIST ENTITIES (unchanged)
   static async listEntities(req, res) {
     try {
-      const { organizationId, projectId, projectUUID } = req.user;
-
-      // ✅ SIMPLIFIED: Just get all entities for this organization
-      // The frontend can filter by project if needed
-      const query = {
-        organizationId
-      };
-
-      console.log('🔍 Fetching all entities for org:', organizationId);
+      const { organizationId } = req.user;
+      const query = { organizationId };
 
       const entities = await DynamicEntity.find(query)
-        .select('entityName slug schema operations projectUUID projectId createdAt updatedAt')
+        .select('entityName slug schema operations projectUUID projectId createdAt updatedAt params')
         .lean();
 
       const entitiesWithSchema = entities.map(entity => ({
@@ -125,33 +314,24 @@ class DynamicCrudController {
         scope: entity.projectUUID || entity.projectId ? 'project' : 'organization'
       }));
 
-      console.log(`✅ Found ${entitiesWithSchema.length} entities`);
-
       res.json({
         success: true,
         count: entitiesWithSchema.length,
         entities: entitiesWithSchema,
-        context: {
-          organizationId,
-          projectId: projectId || null,
-          projectUUID: projectUUID || null
-        }
+        context: { organizationId }
       });
     } catch (error) {
       console.error('❌ listEntities failed:', error);
       res.status(500).json({ error: error.message });
     }
   }
-  // ── 1. Define new entity (creates metadata + auto APIConfig)
+
+  // ✅ DEFINE ENTITY (Enhanced with params support)
   static async defineEntity(req, res) {
     try {
-      const { entityName, schema, operations, projectUUID, projectId } = req.body;
+      const { entityName, schema, operations, projectUUID, projectId, params } = req.body;
       const { organizationId, userId } = req.user;
 
-      // ✅ Project is now OPTIONAL - can come from:
-      // 1. Request body (user explicitly specifies)
-      // 2. User's JWT token (current active project)
-      // 3. Neither (organization-level entity)
       const finalProjectId = projectId || req.user.projectId || null;
       const finalProjectUUID = projectUUID || req.user.projectUUID || null;
 
@@ -161,29 +341,24 @@ class DynamicCrudController {
         });
       }
 
-      // ✅ Create slug based on available identifiers
       let slug;
       if (finalProjectUUID) {
         slug = `${organizationId}-${finalProjectUUID}-${entityName}`;
       } else if (finalProjectId) {
         slug = `${organizationId}-${finalProjectId}-${entityName}`;
       } else {
-        // Organization-level entity (no project)
         slug = `${organizationId}-${entityName}`;
       }
 
-      console.log(`🏗️  Creating entity with slug: ${slug}`);
-
-      // Check for duplicates
       const existing = await DynamicEntity.findOne({ slug });
       if (existing) {
         return res.status(409).json({
-          error: `Entity "${entityName}" already exists in this scope`,
+          error: `Entity "${entityName}" already exists`,
           existingSlug: existing.slug
         });
       }
 
-      // ✅ Create entity - projectId/projectUUID are optional
+      // ✅ Create entity with params support
       const entity = await DynamicEntity.create({
         organizationId,
         projectId: finalProjectId,
@@ -192,6 +367,7 @@ class DynamicCrudController {
         slug,
         schema: new Map(Object.entries(schema)),
         operations: operations || ['create', 'read', 'update', 'delete', 'list'],
+        params: params || [],
         createdBy: userId
       });
 
@@ -225,8 +401,7 @@ class DynamicCrudController {
           schema: Object.fromEntries(entity.schema)
         },
         apiEndpoint: `/api/crud/${organizationId}/${entityName}`,
-        apiConfigKey: apiKey,
-        scope: finalProjectUUID || finalProjectId ? 'project' : 'organization'
+        apiConfigKey: apiKey
       });
     } catch (error) {
       console.error('❌ defineEntity failed:', error);
@@ -234,28 +409,25 @@ class DynamicCrudController {
     }
   }
 
-  // ── Generic CRUD handler factory
+  // ✅ CRUD HANDLER (Enhanced with file array support + type conversion)
   static createCrudHandler(operation) {
     return async (req, res) => {
       try {
         const { organizationId, entityName } = req.params;
-        const { projectId: userProjectId, projectUUID: userProjectUUID, userId } = req.user;
+        const { userId } = req.user;
 
-        // ✅ FIXED: Query entity by organizationId and entityName only
-        // Don't filter by projectId here since entity metadata doesn't need it
+        // ✅ Get entity definition
         const entity = await DynamicEntity.findOne({
           organizationId,
           entityName
         }).lean();
 
         if (!entity) {
-          return res.status(404).json({
-            error: `Entity "${entityName}" not found`
-          });
+          return res.status(404).json({ error: `Entity "${entityName}" not found` });
         }
 
-        // ✅ Convert schema to plain object if needed
-        if (entity.schema && typeof entity.schema === 'object' && !Array.isArray(entity.schema)) {
+        // Convert schema
+        if (entity.schema && typeof entity.schema === 'object') {
           if (entity.schema.$__ || entity.schema.constructor.name === 'Map') {
             entity.schema = Object.fromEntries(
               Object.entries(entity.schema).filter(([key]) => !key.startsWith('$'))
@@ -263,16 +435,13 @@ class DynamicCrudController {
           }
         }
 
-        // Check if operation is allowed
         if (!entity.operations.includes(operation)) {
           return res.status(403).json({
-            error: `Operation "${operation}" not allowed for this entity`
+            error: `Operation "${operation}" not allowed`
           });
         }
 
         const Model = getDynamicModel(entity);
-
-        // ✅ Use the entity's projectId for data operations (not user's)
         const projectId = entity.projectId;
         const projectUUID = entity.projectUUID;
 
@@ -283,13 +452,64 @@ class DynamicCrudController {
             if (projectId) query.projectId = projectId;
             if (projectUUID) query.projectUUID = projectUUID;
 
+            // ✅ Support query params for filtering
+            Object.keys(req.query).forEach(key => {
+              if (entity.schema[key]) {
+                query[key] = req.query[key];
+              }
+            });
+
             const items = await Model.find(query).lean();
-            return res.json({ success: true, count: items.length, data: items });
+
+            // ✅ Transform file fields to include full URLs
+            const itemsWithUrls = items.map(item => 
+              transformFileFields(item, entity.schema, req)
+            );
+
+            return res.json({ 
+              success: true, 
+              count: itemsWithUrls.length, 
+              data: itemsWithUrls 
+            });
           }
 
           // ── CREATE ─────────────────────────────────────
           case 'create': {
-            const validation = DynamicCrudController.validateRecord(req.body, entity.schema, false);
+            let recordData = { ...req.body };
+
+            // ✅ Process uploaded files (single and arrays)
+            if (req.files) {
+              const filesByField = {};
+              
+              req.files.forEach(file => {
+                const isArrayField = file.fieldname.endsWith('[]');
+                const fieldName = isArrayField ? file.fieldname.slice(0, -2) : file.fieldname;
+                
+                const fileObj = {
+                  url: `/uploads/dynamic/${file.filename}`,
+                  filename: file.filename,
+                  originalName: file.originalname,
+                  mimetype: file.mimetype,
+                  size: file.size
+                };
+                
+                if (isArrayField) {
+                  if (!filesByField[fieldName]) {
+                    filesByField[fieldName] = [];
+                  }
+                  filesByField[fieldName].push(fileObj);
+                } else {
+                  filesByField[fieldName] = fileObj;
+                }
+              });
+              
+              Object.assign(recordData, filesByField);
+            }
+
+            // ✅ Convert types based on schema (fixes the number issue!)
+            recordData = processRecordData(recordData, entity.schema);
+
+            const validation = DynamicCrudController.validateRecord(recordData, entity.schema, false);
             if (!validation.valid) {
               return res.status(400).json({
                 error: 'Validation failed',
@@ -298,7 +518,7 @@ class DynamicCrudController {
             }
 
             const record = new Model({
-              ...req.body,
+              ...recordData,
               projectId: projectId || null,
               projectUUID: projectUUID || null,
               organizationId,
@@ -307,9 +527,11 @@ class DynamicCrudController {
 
             await record.save();
 
+            const recordWithUrls = transformFileFields(record.toObject(), entity.schema, req);
+
             return res.status(201).json({
               success: true,
-              record: record.toObject()
+              record: recordWithUrls
             });
           }
 
@@ -330,7 +552,9 @@ class DynamicCrudController {
               return res.status(404).json({ error: 'Record not found' });
             }
 
-            return res.json({ success: true, record });
+            const recordWithUrls = transformFileFields(record, entity.schema, req);
+
+            return res.json({ success: true, record: recordWithUrls });
           }
 
           // ── UPDATE ─────────────────────────────────────
@@ -340,7 +564,41 @@ class DynamicCrudController {
               return res.status(400).json({ error: 'Invalid record ID' });
             }
 
-            const validation = DynamicCrudController.validateRecord(req.body, entity.schema, true);
+            let updateData = { ...req.body };
+
+            // ✅ Process uploaded files (single and arrays)
+            if (req.files) {
+              const filesByField = {};
+              
+              req.files.forEach(file => {
+                const isArrayField = file.fieldname.endsWith('[]');
+                const fieldName = isArrayField ? file.fieldname.slice(0, -2) : file.fieldname;
+                
+                const fileObj = {
+                  url: `/uploads/dynamic/${file.filename}`,
+                  filename: file.filename,
+                  originalName: file.originalname,
+                  mimetype: file.mimetype,
+                  size: file.size
+                };
+                
+                if (isArrayField) {
+                  if (!filesByField[fieldName]) {
+                    filesByField[fieldName] = [];
+                  }
+                  filesByField[fieldName].push(fileObj);
+                } else {
+                  filesByField[fieldName] = fileObj;
+                }
+              });
+              
+              Object.assign(updateData, filesByField);
+            }
+
+            // ✅ Convert types based on schema (fixes the number issue!)
+            updateData = processRecordData(updateData, entity.schema);
+
+            const validation = DynamicCrudController.validateRecord(updateData, entity.schema, true);
             if (!validation.valid) {
               return res.status(400).json({
                 error: 'Validation failed',
@@ -354,7 +612,7 @@ class DynamicCrudController {
 
             const updated = await Model.findOneAndUpdate(
               query,
-              { ...req.body, updatedBy: userId },
+              { ...updateData, updatedBy: userId },
               { new: true, runValidators: true, lean: true }
             );
 
@@ -362,7 +620,9 @@ class DynamicCrudController {
               return res.status(404).json({ error: 'Record not found' });
             }
 
-            return res.json({ success: true, record: updated });
+            const updatedWithUrls = transformFileFields(updated, entity.schema, req);
+
+            return res.json({ success: true, record: updatedWithUrls });
           }
 
           // ── DELETE ─────────────────────────────────────
@@ -381,6 +641,37 @@ class DynamicCrudController {
             if (!deleted) {
               return res.status(404).json({ error: 'Record not found' });
             }
+
+            // ✅ Delete associated files (single and arrays)
+            Object.keys(entity.schema).forEach(async (fieldName) => {
+              const fieldSchema = entity.schema[fieldName];
+              
+              // Single file
+              if (fieldSchema.type === 'file' && deleted[fieldName]?.filename) {
+                const filePath = path.join(__dirname, '../uploads/dynamic', deleted[fieldName].filename);
+                try {
+                  await fs.unlink(filePath);
+                  console.log(`🗑️ Deleted file: ${deleted[fieldName].filename}`);
+                } catch (err) {
+                  console.error(`Failed to delete file: ${err.message}`);
+                }
+              }
+              
+              // File array
+              if (fieldSchema.type === 'array' && fieldSchema.items?.type === 'file' && Array.isArray(deleted[fieldName])) {
+                for (const file of deleted[fieldName]) {
+                  if (file.filename) {
+                    const filePath = path.join(__dirname, '../uploads/dynamic', file.filename);
+                    try {
+                      await fs.unlink(filePath);
+                      console.log(`🗑️ Deleted file: ${file.filename}`);
+                    } catch (err) {
+                      console.error(`Failed to delete file: ${err.message}`);
+                    }
+                  }
+                }
+              }
+            });
 
             return res.json({
               success: true,
@@ -402,11 +693,10 @@ class DynamicCrudController {
     };
   }
 
-  // ── Keep your excellent validation logic ───────────────
+  // ✅ VALIDATION (Enhanced)
   static validateRecord(data, schemaMap, isPartial = false) {
     const errors = {};
 
-    // ✅ Convert to entries array if it's a plain object
     let schemaEntries;
     if (schemaMap instanceof Map) {
       schemaEntries = Array.from(schemaMap.entries());
@@ -419,22 +709,24 @@ class DynamicCrudController {
     for (const [fieldName, fieldSchema] of schemaEntries) {
       const value = data[fieldName];
 
-      // Required check
       if (fieldSchema.required && !isPartial && (value === undefined || value === null)) {
         errors[fieldName] = `${fieldName} is required`;
         continue;
       }
 
       if (value !== undefined && value !== null) {
-        // Type check
+        // Type-specific validation
         if (fieldSchema.type === 'number' && typeof value !== 'number') {
           errors[fieldName] = `${fieldName} must be a number`;
         }
         if (fieldSchema.type === 'string' && typeof value !== 'string') {
           errors[fieldName] = `${fieldName} must be a string`;
         }
+        if (fieldSchema.type === 'enum' && fieldSchema.validation?.enum && !fieldSchema.validation.enum.includes(value)) {
+          errors[fieldName] = `${fieldName} must be one of: ${fieldSchema.validation.enum.join(', ')}`;
+        }
 
-        // Custom validation rules
+        // Validation rules
         if (fieldSchema.validation) {
           const val = fieldSchema.validation;
           if (val.min !== undefined && value < val.min) {
@@ -456,6 +748,7 @@ class DynamicCrudController {
     return { valid: Object.keys(errors).length === 0, errors };
   }
 
+  // ✅ UPDATE ENTITY
   static async updateEntity(req, res) {
     try {
       const { entityId } = req.params;
@@ -466,7 +759,6 @@ class DynamicCrudController {
         return res.status(400).json({ error: 'Invalid entity ID' });
       }
 
-      // Find existing entity
       const entity = await DynamicEntity.findOne({
         _id: entityId,
         organizationId
@@ -476,22 +768,18 @@ class DynamicCrudController {
         return res.status(404).json({ error: 'Entity not found' });
       }
 
-      // ⚠️ Check if entity name is changing
       if (entityName && entityName !== entity.entityName) {
-        // Validate new name
         if (!/^[a-z][a-z0-9_]*$/.test(entityName)) {
           return res.status(400).json({
             error: "Invalid entityName (lowercase, numbers, underscores only)"
           });
         }
 
-        // Update slug
         const projectIdentifier = entity.projectUUID || entity.projectId?.toString() || '';
         const newSlug = projectIdentifier
           ? `${organizationId}-${projectIdentifier}-${entityName}`
           : `${organizationId}-${entityName}`;
 
-        // Check if new slug already exists
         const existing = await DynamicEntity.findOne({
           slug: newSlug,
           _id: { $ne: entityId }
@@ -507,12 +795,10 @@ class DynamicCrudController {
         entity.slug = newSlug;
       }
 
-      // Update schema if provided
       if (schema) {
         entity.schema = new Map(Object.entries(schema));
       }
 
-      // Update operations if provided
       if (operations) {
         entity.operations = operations;
       }
@@ -520,14 +806,11 @@ class DynamicCrudController {
       entity.updatedBy = userId;
       await entity.save();
 
-      // Clear model cache so new schema takes effect
-      const modelCache = require('./dynamicCrudController').modelCache || new Map();
       if (modelCache.has(entity.slug)) {
         modelCache.delete(entity.slug);
         console.log(`🗑️ Cleared model cache for ${entity.slug}`);
       }
 
-      // Update API config
       const apiKey = `crud_${entity.slug}`;
       await APIConfig.findOneAndUpdate(
         { key: apiKey },
@@ -556,7 +839,7 @@ class DynamicCrudController {
     }
   }
 
-  // ✅ NEW: Delete entity definition
+  // ✅ DELETE ENTITY
   static async deleteEntity(req, res) {
     try {
       const { entityId } = req.params;
@@ -566,7 +849,6 @@ class DynamicCrudController {
         return res.status(400).json({ error: 'Invalid entity ID' });
       }
 
-      // Find entity
       const entity = await DynamicEntity.findOne({
         _id: entityId,
         organizationId
@@ -576,7 +858,6 @@ class DynamicCrudController {
         return res.status(404).json({ error: 'Entity not found' });
       }
 
-      // ⚠️ Check if there are any records in the collection
       const Model = getDynamicModel(entity);
       const recordCount = await Model.countDocuments();
 
@@ -587,21 +868,14 @@ class DynamicCrudController {
         });
       }
 
-      // Delete the entity definition
       await DynamicEntity.deleteOne({ _id: entityId });
 
-      // Clear model cache
-      const modelCache = require('./dynamicCrudController').modelCache || new Map();
       if (modelCache.has(entity.slug)) {
         modelCache.delete(entity.slug);
       }
 
-      // Delete API config
       const apiKey = `crud_${entity.slug}`;
       await APIConfig.deleteOne({ key: apiKey });
-
-      // Drop the collection (optional - only if you want to clean up completely)
-      // await Model.collection.drop().catch(() => {});
 
       console.log(`🗑️ Entity deleted: ${entity.entityName}`);
 
@@ -618,4 +892,35 @@ class DynamicCrudController {
   }
 }
 
+// ───────────────────────────────────────────────
+//  HELPER: Transform file fields to full URLs (handles arrays)
+// ───────────────────────────────────────────────
+function transformFileFields(record, schema, req) {
+  const result = { ...record };
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+  Object.keys(schema).forEach(fieldName => {
+    const fieldSchema = schema[fieldName];
+    
+    // Single file
+    if (fieldSchema.type === 'file' && result[fieldName]?.url) {
+      result[fieldName].url = result[fieldName].url.startsWith('http')
+        ? result[fieldName].url
+        : `${baseUrl}${result[fieldName].url}`;
+    }
+    
+    // File array
+    if (fieldSchema.type === 'array' && fieldSchema.items?.type === 'file' && Array.isArray(result[fieldName])) {
+      result[fieldName] = result[fieldName].map(file => ({
+        ...file,
+        url: file.url.startsWith('http') ? file.url : `${baseUrl}${file.url}`
+      }));
+    }
+  });
+
+  return result;
+}
+
 module.exports = DynamicCrudController;
+module.exports.upload = upload;
+module.exports.modelCache = modelCache;

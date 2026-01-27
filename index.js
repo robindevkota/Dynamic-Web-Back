@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const app = express();
+const path = require('path');
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  🔧 MIDDLEWARE - ORDER MATTERS!
@@ -24,7 +25,7 @@ app.use(
 // 2️⃣ Body Parsers - BEFORE routes
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // 3️⃣ Cookie Parser
 app.use(cookieParser());
 

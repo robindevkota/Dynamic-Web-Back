@@ -1,8 +1,6 @@
 // models/DynamicEntity.js
 const mongoose = require('mongoose');
 
-// models/DynamicEntity.js
-
 const dynamicEntitySchema = new mongoose.Schema({
   entityName: { 
     type: String, 
@@ -17,18 +15,7 @@ const dynamicEntitySchema = new mongoose.Schema({
   },
   schema: {
     type: Map,
-    of: {
-      type: { type: String, required: true },
-      required: { type: Boolean, default: false },
-      default: mongoose.Schema.Types.Mixed,
-      validation: {
-        min: Number,
-        max: Number,
-        minLength: Number,
-        maxLength: Number,
-        pattern: String
-      }
-    },
+    of: mongoose.Schema.Types.Mixed,
     required: true
   },
   operations: {
@@ -36,26 +23,25 @@ const dynamicEntitySchema = new mongoose.Schema({
     enum: ['create', 'read', 'update', 'delete', 'list'],
     default: ['create', 'read', 'update', 'delete', 'list']
   },
-  
-  // ✅ All project fields are now OPTIONAL
+  params: {
+    type: mongoose.Schema.Types.Mixed,  // ✅ Simplest solution
+    default: []
+  },
   projectId: { 
     type: mongoose.Schema.Types.ObjectId, 
     index: true,
-    default: null  // ✅ Can be null
+    default: null
   },
   projectUUID: {
     type: String,
     index: true,
-    default: null  // ✅ Can be null
+    default: null
   },
-  
-  // Organization is still required
   organizationId: { 
     type: mongoose.Schema.Types.ObjectId, 
-    required: true,  // ✅ This is required
+    required: true,
     index: true 
   },
-  
   createdBy: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User' 
@@ -68,7 +54,6 @@ const dynamicEntitySchema = new mongoose.Schema({
   timestamps: true 
 });
 
-// ✅ Update indexes
 dynamicEntitySchema.index({ organizationId: 1, entityName: 1 });
 dynamicEntitySchema.index({ organizationId: 1, projectUUID: 1 });
 dynamicEntitySchema.index({ organizationId: 1, projectId: 1 });
