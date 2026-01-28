@@ -486,79 +486,115 @@ class DynamicCrudController {
             if (projectId) query.projectId = projectId;
             if (projectUUID) query.projectUUID = projectUUID;
 
-            // ✅ SEARCH: Global text search across string fields
-            if (req.query.search) {
-              const searchTerm = String(req.query.search).trim();
-              const searchFields = Object.entries(entity.schema)
-                .filter(
-                  ([_, config]) =>
-                    config.type === "string" ||
-                    config.type === "text" ||
-                    config.type === "email",
-                )
-                .map(([field]) => field);
-
-              if (searchFields.length > 0) {
-                query.$or = searchFields.map((field) => ({
-                  [field]: { $regex: searchTerm, $options: "i" },
-                }));
-              }
-            }
-
-            // ✅ FILTER: Field-specific filters
-            Object.keys(req.query).forEach((key) => {
-              if (
-                entity.schema[key] &&
-                key !== "search" &&
-                key !== "sort" &&
-                key !== "page" &&
-                key !== "limit"
-              ) {
-                query[key] = req.query[key];
-              }
-            });
-
-            // ✅ PAGINATION
+            // ✅ PAGINATION PARAMETERS
             const page = parseInt(req.query.page) || 1;
             const limit = parseInt(req.query.limit) || 10;
             const skip = (page - 1) * limit;
 
-            // ✅ SORT
-            let sortOptions = { createdAt: -1 }; // Default
-            if (req.query.sort) {
-              const sortField = String(req.query.sort);
-              const isDescending = sortField.startsWith("-");
-              const fieldName = isDescending
-                ? sortField.substring(1)
-                : sortField;
+            // ✅ SEARCH FUNCTIONALITY
+            if (req.query.search && req.query.search.trim()) {
+              const searchTerm = req.query.search.trim();
+              const searchRegex = new RegExp(searchTerm, "i");
 
-              if (entity.schema[fieldName]) {
-                sortOptions = { [fieldName]: isDescending ? -1 : 1 };
+              // Search across all string fields in schema
+              const searchFields = [];
+              Object.entries(entity.schema).forEach(
+                ([fieldName, fieldSchema]) => {
+                  if (
+                    fieldSchema.type === "string" ||
+                    fieldSchema.type === "enum"
+                  ) {
+                    searchFields.push({ [fieldName]: searchRegex });
+                  }
+                },
+              );
+
+              if (searchFields.length > 0) {
+                query.$or = searchFields;
               }
             }
 
-            // Execute query
-            const [items, totalCount] = await Promise.all([
-              Model.find(query)
-                .sort(sortOptions)
-                .skip(skip)
-                .limit(limit)
-                .lean(),
-              Model.countDocuments(query),
-            ]);
+            // ✅ FILTERING BY SPECIFIC FIELDS
+            Object.keys(req.query).forEach((key) => {
+              // Skip pagination and search params
+              if (["page", "limit", "search", "sort", "order"].includes(key))
+                return;
 
+              // Only filter by fields that exist in schema
+              if (entity.schema[key]) {
+                const fieldSchema = entity.schema[key];
+
+                // Handle different field types
+                if (fieldSchema.type === "number") {
+                  // Support range queries for numbers
+                  if (key.startsWith("min")) {
+                    const fieldName = key.substring(3).toLowerCase();
+                    if (entity.schema[fieldName]) {
+                      query[fieldName] = {
+                        ...query[fieldName],
+                        $gte: parseFloat(req.query[key]),
+                      };
+                    }
+                  } else if (key.startsWith("max")) {
+                    const fieldName = key.substring(3).toLowerCase();
+                    if (entity.schema[fieldName]) {
+                      query[fieldName] = {
+                        ...query[fieldName],
+                        $lte: parseFloat(req.query[key]),
+                      };
+                    }
+                  } else {
+                    query[key] = parseFloat(req.query[key]);
+                  }
+                } else if (fieldSchema.type === "boolean") {
+                  query[key] = req.query[key] === "true";
+                } else {
+                  query[key] = req.query[key];
+                }
+              }
+            });
+
+            // ✅ SORTING
+            let sort = {};
+            if (req.query.sort) {
+              const sortField = req.query.sort;
+              const sortOrder = req.query.order === "desc" ? -1 : 1;
+              sort[sortField] = sortOrder;
+            } else {
+              sort = { createdAt: -1 }; // Default sort by newest first
+            }
+
+            console.log("📊 List Query:", JSON.stringify(query, null, 2));
+            console.log("📄 Pagination:", { page, limit, skip });
+            console.log("🔀 Sort:", sort);
+
+            // ✅ GET TOTAL COUNT (for pagination info)
+            const total = await Model.countDocuments(query);
+
+            // ✅ GET PAGINATED DATA
+            const items = await Model.find(query)
+              .sort(sort)
+              .skip(skip)
+              .limit(limit)
+              .lean();
+
+            // Transform file fields to include full URLs
             const itemsWithUrls = items.map((item) =>
               transformFileFields(item, entity.schema, req),
             );
 
+            // ✅ RETURN PAGINATED RESPONSE
             return res.json({
               success: true,
-              count: itemsWithUrls.length,
-              total: totalCount,
-              page,
-              limit,
-              totalPages: Math.ceil(totalCount / limit),
               data: itemsWithUrls,
+              pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+                hasNextPage: page < Math.ceil(total / limit),
+                hasPrevPage: page > 1,
+              },
             });
           }
 
