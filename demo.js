@@ -6443,10 +6443,67 @@ input:focus, textarea:focus, select:focus {
       ],
 
       actions: {
-        // Add this simpler action:
 
-        // Add this simpler action:
-        // In your page config initialization.actions:
+updateRoom: `
+  console.log("📝 === UPDATE ROOM ACTION ===");
+  
+  // ✅ CRITICAL: Get fresh data from modalFormData
+  const formData = context.modalFormData || {};
+  
+  console.log("📦 Modal form data:", formData);
+  
+  // Validate that we have an ID
+  if (!formData._id) {
+    context.handlers.showNotification({
+      type: "toast",
+      message: "❌ Room ID missing",
+      background: "#ef4444"
+    });
+    return;
+  }
+  
+  // ✅ Clean the payload - convert types properly
+  const payload = {
+    _id: formData._id,
+    roomNumber: formData.roomNumber,
+    roomType: formData.roomType,
+    price: parseFloat(formData.price),
+    status: formData.status,
+    capacity: parseInt(formData.capacity),
+    floor: parseInt(formData.floor),
+    description: formData.description || ''
+  };
+  
+  console.log("🚀 Sending payload:", payload);
+  
+  // Call the UPDATE API resource
+  await context.handlers.handleApiCall('rooms.update', payload);
+  
+  console.log("✅ Update completed");
+`,
+        deleteRoom: `
+  const roomId = context.row?._id || context.payload?._id;
+  
+  if (!roomId) {
+    context.handlers.showNotification({
+      type: "toast",
+      message: "Room ID missing",
+      background: "#ef4444"
+    });
+    return;
+  }
+
+  // Confirm before delete
+  if (!confirm('Are you sure you want to delete this room? This action cannot be undone.')) {
+    console.log("🚫 Delete cancelled by user");
+    return;
+  }
+
+  console.log("🗑️ Deleting room:", roomId);
+  
+  // Call the DELETE API resource
+  await context.handlers.handleApiCall('rooms.delete', { _id: roomId });
+`,
         openEditModal: `
       console.log("📝 === OPEN EDIT MODAL ===");
       
@@ -6726,30 +6783,30 @@ input:focus, textarea:focus, select:focus {
 
         // API action
      api: `
-  console.log("🚀 === API ACTION START ===");
-  const apiKey = context.actionParams?.apiKey;
-  
-  // ✅ FIX: Include actionConfig.row in the payload chain
-  const formDataToUse = context.payload 
-    || context.actionConfig?.row 
-    || context.modalFormData 
-    || context.formData 
-    || {};
-  
-  console.log("📦 Payload for API:", formDataToUse);
-  
-  if (!apiKey) {
-    console.error("❌ No apiKey provided");
-    return;
-  }
+          console.log("🚀 === API ACTION START ===");
+          const apiKey = context.actionParams?.apiKey;
 
-  try {
-    await context.handlers.handleApiCall(apiKey, formDataToUse, context.actionConfig);
-    console.log("✅ API call completed");
-  } catch (error) {
-    console.error("❌ API call failed:", error);
-  }
-`,
+          // ✅ FIX: Include actionConfig.row in the payload chain
+          const formDataToUse = context.payload
+            || context.actionConfig?.row
+            || context.modalFormData
+            || context.formData
+            || {};
+
+          console.log("📦 Payload for API:", formDataToUse);
+
+          if (!apiKey) {
+            console.error("❌ No apiKey provided");
+            return;
+          }
+
+          try {
+            await context.handlers.handleApiCall(apiKey, formDataToUse, context.actionConfig);
+            console.log("✅ API call completed");
+          } catch (error) {
+            console.error("❌ API call failed:", error);
+          }
+        `,
 
         reload: `
         console.log("🔄 Reloading page");
@@ -7642,20 +7699,18 @@ input:focus, textarea:focus, select:focus {
                 "ui:actions": [
                   {
                     label: "Update Room",
-                    action: "api",
-                    actionParams: { apiKey: "rooms.update" },
+                    action: "updateRoom",
                     variant: "primary",
                     styles: {
                       width: "100%",
-                      padding: "14px 0",
-                      background:
-                        "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                      padding: "14px 24px",
+                      background: "#667eea",
                       color: "white",
-                      fontSize: "16px",
-                      fontWeight: "600",
-                      borderRadius: "8px",
                       border: "none",
-                      marginTop: "10px",
+                      borderRadius: "8px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                      cursor: "pointer",
                     },
                   },
                   {
@@ -7994,15 +8049,10 @@ input:focus, textarea:focus, select:focus {
                         variant: "primary",
                       },
                       {
-                        label: "🗑️ Delete",
-                        action: "api",
-                        actionParams: {
-                          apiKey: "rooms.delete",
-                        },
+                        label: "Delete",
+                        action: "deleteRoom",
                         variant: "danger",
                         confirm: true,
-                        confirmMessage:
-                          "Are you sure you want to delete this room?",
                       },
                     ],
                   },

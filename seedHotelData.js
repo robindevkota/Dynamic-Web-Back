@@ -302,76 +302,66 @@ const configureAPIs = async () => {
 
   const roomsAPIConfigs = [
     // ✅ GET ENTITY SCHEMA (dynamic for any entity)
+
+// ✅ DELETE ROOM
 {
-  key: "entity.schema",
-  name: "Get Entity Schema",
-  description: "Fetches schema for any dynamic entity (e.g., enums for dropdowns)",
-  url: "http://localhost:5000/api/dynamic/entities",
-  method: "GET",
-  headers: {},
-
-  transformPayload: `
-    (payload) => {
-      const entityName = payload.entityName || "room";
-      return \`http://localhost:5000/api/dynamic/entities/\${entityName}\`;
-    }
-  `,
-
-  successNotification: { type: "none" },
-  errorNotification: { type: "none" },
-  storeResponse: true,
-  storeKey: "entity.schema",  // Store as entity.schema
-  onSuccess: [],
-  onError: ["console:Failed to fetch schema"],
-  tags: ["dynamic", "schema", "crud"],
-  projectUUID: "hotel-hotelhub",
-  isActive: true
-},
-// ✅ GET SINGLE ROOM (for editing)
-// ✅ DELETE ROOM - FIXED
-// ✅ DELETE ROOM - FIXED with better logging
-// ✅ DELETE ROOM - FIXED with better logging
-
-{
-  key: "rooms.getOne",
-  name: "Get Single Room",
-  description: "Fetches a single room by ID for editing",
+  key: "rooms.delete",
+  name: "Delete Room",
+  description: "Deletes a room by ID",
   url: "http://localhost:5000/api/crud/000000000000000000000001/room",
-  method: "GET",
-  headers: {},
+  method: "DELETE",
+  headers: {
+    "Content-Type": "application/json"
+  },
   
   transformPayload: `
     (payload) => {
       const roomId = payload._id || payload.id;
       if (!roomId) {
-        throw new Error("Room ID is required");
+        throw new Error("Room ID is required for deletion");
       }
+      
+      console.log("🗑️ Deleting room:", roomId);
+      
+      // Return the full URL with room ID
       return \`http://localhost:5000/api/crud/000000000000000000000001/room/\${roomId}\`;
     }
   `,
   
-  successNotification: { type: "none" },
+  successNotification: {
+    type: "toast",
+    message: "✅ Room deleted successfully!",
+    background: "#10b981",
+    duration: 3000
+  },
+  
   errorNotification: {
     type: "toast",
-    message: "Failed to load room details",
+    message: "❌ Failed to delete room",
     background: "#ef4444",
     duration: 3000
   },
   
-  storeResponse: true,
-  storeKey: "selectedRoom",
+  storeResponse: false,  // No need to store delete response
   
   onSuccess: [
     {
-      action: "openModal",
-      actionParams: { modal: "editRoom" }
+      action: "api",
+      actionParams: {
+        apiKey: "rooms.list",
+        payload: { page: 1, limit: 10 }
+      }
     }
   ],
   
-  tags: ["hotel", "rooms", "crud", "read"],
+  onError: ["console:Failed to delete room"],
+  
+  tags: ["hotel", "rooms", "crud", "delete"],
   projectUUID: "hotel-hotelhub",
   isActive: true
 },
+
+
     // ✅ AUTH LOGIN
     {
       key: "auth.login",
@@ -655,81 +645,71 @@ const configureAPIs = async () => {
     },
     
     // ✅ UPDATE ROOM
+   // ✅ UPDATE ROOM - FIXED
+// ✅ UPDATE ROOM - WORKAROUND (returns URL as string)
+{
+  key: "rooms.update",
+  name: "Update Room",
+  description: "Updates an existing room",
+  url: "http://localhost:5000/api/crud/000000000000000000000001/room",
+  method: "PUT",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  
+  transformPayload: `
+    (payload) => {
+      const roomId = payload._id || payload.id;
+      if (!roomId) {
+        throw new Error("Room ID is required");
+      }
+      
+      console.log("📝 Updating room:", roomId);
+      
+      // ✅ RETURN THE FULL URL AS A STRING
+      // When a string is returned, handleApiCall uses it as the URL
+      // and sends the original payload as the request body
+      return \`http://localhost:5000/api/crud/000000000000000000000001/room/\${roomId}\`;
+    }
+  `,
+  
+  successNotification: {
+    type: "toast",
+    message: "✅ Room updated successfully!",
+    background: "#10b981",
+    duration: 3000
+  },
+  
+  errorNotification: {
+    type: "toast",
+    message: "❌ Failed to update room",
+    background: "#ef4444",
+    duration: 3000
+  },
+  
+  storeResponse: true,
+  storeKey: "rooms.updated",
+  
+  onSuccess: [
     {
-      key: "rooms.update",
-      name: "Update Room",
-      description: "Updates an existing room",
-      url: "http://localhost:5000/api/crud/000000000000000000000001/room",
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      
-      transformPayload: `
-        (payload) => {
-          const roomId = payload._id || payload.id;
-          if (!roomId) {
-            throw new Error("Room ID is required");
-          }
-          
-          const url = \`http://localhost:5000/api/crud/000000000000000000000001/room/\${roomId}\`;
-          
-          return {
-            url: url,
-            body: {
-              roomNumber: payload.roomNumber,
-              roomType: payload.roomType,
-              price: parseFloat(payload.price),
-              status: payload.status,
-              description: payload.description || "",
-              capacity: parseInt(payload.capacity) || 2,
-              amenities: Array.isArray(payload.amenities) 
-                ? payload.amenities 
-                : (payload.amenities ? payload.amenities.split(",").map(a => a.trim()) : []),
-              floor: parseInt(payload.floor) || 1
-            }
-          };
-        }
-      `,
-      
-      successNotification: {
-        type: "toast",
-        message: "✅ Room updated successfully!",
-        background: "#10b981",
-        duration: 3000
-      },
-      
-      errorNotification: {
-        type: "toast",
-        message: "❌ Failed to update room",
-        background: "#ef4444",
-        duration: 3000
-      },
-      
-      closeModalOnSuccess: true,
-      storeResponse: true,
-      storeKey: "rooms.updated",
-      
-      onSuccess: [
-        {
-          action: "closeModal",
-          actionParams: {}
-        },
-        {
-          action: "api",
-          actionParams: {
-            apiKey: "rooms.list",
-            payload: { page: 1, limit: 10 }
-          }
-        }
-      ],
-      
-      onError: ["console:Failed to update room"],
-      
-      tags: ["hotel", "rooms", "crud", "update"],
-      projectUUID: "hotel-hotelhub",
-      isActive: true
+      action: "closeModal",
+      actionParams: {}
     },
+    {
+      action: "api",
+      actionParams: {
+        apiKey: "rooms.list",
+        payload: { page: 1, limit: 10 }
+      }
+    }
+  ],
+  
+  onError: ["console:Failed to update room"],
+  
+  tags: ["hotel", "rooms", "crud", "update"],
+  projectUUID: "hotel-hotelhub",
+  isActive: true
+}
   
    
   ];
