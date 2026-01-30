@@ -6443,310 +6443,207 @@ input:focus, textarea:focus, select:focus {
       ],
 
       actions: {
-
-updateRoom: `
-  console.log("📝 === UPDATE ROOM ACTION ===");
-  
-  // ✅ CRITICAL: Get fresh data from modalFormData
-  const formData = context.modalFormData || {};
-  
-  console.log("📦 Modal form data:", formData);
-  
-  // Validate that we have an ID
-  if (!formData._id) {
-    context.handlers.showNotification({
-      type: "toast",
-      message: "❌ Room ID missing",
-      background: "#ef4444"
-    });
-    return;
-  }
-  
-  // ✅ Clean the payload - convert types properly
-  const payload = {
-    _id: formData._id,
-    roomNumber: formData.roomNumber,
-    roomType: formData.roomType,
-    price: parseFloat(formData.price),
-    status: formData.status,
-    capacity: parseInt(formData.capacity),
-    floor: parseInt(formData.floor),
-    description: formData.description || ''
-  };
-  
-  console.log("🚀 Sending payload:", payload);
-  
-  // Call the UPDATE API resource
-  await context.handlers.handleApiCall('rooms.update', payload);
-  
-  console.log("✅ Update completed");
-`,
-        deleteRoom: `
-  const roomId = context.row?._id || context.payload?._id;
-  
-  if (!roomId) {
-    context.handlers.showNotification({
-      type: "toast",
-      message: "Room ID missing",
-      background: "#ef4444"
-    });
-    return;
-  }
-
-  // Confirm before delete
-  if (!confirm('Are you sure you want to delete this room? This action cannot be undone.')) {
-    console.log("🚫 Delete cancelled by user");
-    return;
-  }
-
-  console.log("🗑️ Deleting room:", roomId);
-  
-  // Call the DELETE API resource
-  await context.handlers.handleApiCall('rooms.delete', { _id: roomId });
-`,
-        openEditModal: `
-      console.log("📝 === OPEN EDIT MODAL ===");
-      
-      const roomData = context.actionConfig?.row || context.payload;
-      
-      if (!roomData || !roomData._id) {
-        console.error("❌ No room data provided");
-        return;
+        openModal: `
+    const modalName = context.actionParams?.modal || context.actionParams?.modalName;
+    if (!modalName) {
+      console.error("❌ No modal name provided");
+      return;
+    }
+    
+    console.log("🎭 Opening modal:", modalName);
+    
+    // ✅ CRITICAL: Clear modal data FIRST (prevents data leakage)
+    context.handlers.setModalFormData({});
+    context.handlers.setFieldErrors({});
+    
+    // Get modal config to check for entityName
+    const allModals = {};
+    Object.values(context.config?.components || {}).forEach((comp) => {
+      if (comp?.modal && typeof comp.modal === "object") {
+        Object.assign(allModals, comp.modal);
       }
-      
-      console.log("✅ Room data:", roomData);
-      
-      // Prefill modal form
-      context.handlers.setModalFormData({
-        _id: roomData._id,
-        roomNumber: roomData.roomNumber,
-        roomType: roomData.roomType,
-        price: roomData.price,
-        status: roomData.status,
-        capacity: roomData.capacity,
-        floor: roomData.floor,
-        description: roomData.description || ''
+    });
+    
+    if (context.config?.pages) {
+      Object.values(context.config.pages).forEach((page) => {
+        if (page.components) {
+          Object.values(page.components).forEach((comp) => {
+            if (comp?.modal && typeof comp.modal === "object") {
+              Object.assign(allModals, comp.modal);
+            }
+          });
+        }
       });
+    }
+    
+    const modalConfig = allModals[modalName];
+    const entityName = modalConfig?.["ui:entityName"];
+    
+    // ✅ Fetch schema if entity is specified
+    if (entityName) {
+      console.log(\`📡 Fetching schema for entity: \${entityName}\`);
       
-      // Open modal
-      context.handlers.setActiveModal('editRoom');
-      
-      console.log("✅ Edit modal opened with prefilled data");
-    `,
+      try {
+        const response = await fetch(
+          \`http://localhost:5000/api/crud/entities/\${entityName}/schema\`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log("✅ Schema fetched:", data.schema);
+          context.handlers.setData(\`schema.\${entityName}\`, data.schema);
+          console.log(\`💾 Stored at: api.schema.\${entityName}\`);
+        } else {
+          console.error("❌ Failed to fetch schema:", response.statusText);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching schema:", error);
+      }
+    }
+    
+    // Open the modal
+    context.handlers.setActiveModal(modalName);
+    
+    console.log("✅ Modal opened (clean slate)");
+  `,
+
+        closeModal: `
+    console.log("❌ Closing modal");
+    
+    // ✅ Clear ALL modal-related data
+    context.handlers.setModalFormData({});
+    context.handlers.setFieldErrors({});
+    
+    // Close the modal
+    context.handlers.setActiveModal(null);
+    
+    console.log("✅ Modal closed and cleaned up");
+  `,
+
+        openEditModal: `
+    console.log("📝 === OPEN EDIT MODAL ===");
+    
+    const roomData = context.actionConfig?.row || context.payload;
+    
+    if (!roomData || !roomData._id) {
+      console.error("❌ No room data provided");
+      return;
+    }
+    
+    console.log("✅ Room data:", roomData);
+    
+    // ✅ FIRST: Clear any existing modal data
+    context.handlers.setModalFormData({});
+    context.handlers.setFieldErrors({});
+    
+    // ✅ THEN: Prefill with selected room data
+    context.handlers.setModalFormData({
+      _id: roomData._id,
+      roomNumber: roomData.roomNumber,
+      roomType: roomData.roomType,
+      price: roomData.price,
+      status: roomData.status,
+      capacity: roomData.capacity,
+      floor: roomData.floor,
+      description: roomData.description || '',
+      amenities: roomData.amenities || []
+    });
+    
+    // ✅ Open the edit modal
+    context.handlers.setActiveModal('editRoom');
+    
+    console.log("✅ Edit modal opened with prefilled data");
+  `,
+
+        // ========================================
+        // CRUD OPERATIONS (with proper payload)
+        // ========================================
+
+        updateRoom: `
+    console.log("📝 === UPDATE ROOM ACTION ===");
+    
+    // ✅ Get fresh data from modalFormData
+    const formData = context.modalFormData || {};
+    
+    console.log("📦 Modal form data:", formData);
+    
+    if (!formData._id) {
+      context.handlers.showNotification({
+        type: "toast",
+        message: "❌ Room ID missing",
+        background: "#ef4444"
+      });
+      return;
+    }
+    
+    // ✅ Clean and type-convert the payload
+    const payload = {
+      _id: formData._id,  // Needed for URL construction
+      roomNumber: formData.roomNumber,
+      roomType: formData.roomType,
+      price: parseFloat(formData.price),
+      status: formData.status,
+      capacity: parseInt(formData.capacity),
+      floor: parseInt(formData.floor),
+      description: formData.description || '',
+      amenities: formData.amenities || []
+    };
+    
+    console.log("🚀 Sending payload:", payload);
+    
+    // Call the UPDATE API resource
+    await context.handlers.handleApiCall('rooms.update', payload);
+    
+    console.log("✅ Update completed");
+  `,
+
+        deleteRoom: `
+    const roomId = context.row?._id || context.payload?._id;
+    
+    if (!roomId) {
+      context.handlers.showNotification({
+        type: "toast",
+        message: "❌ Room ID missing",
+        background: "#ef4444"
+      });
+      return;
+    }
+
+    // Confirm before delete
+    if (!confirm('Are you sure you want to delete this room? This action cannot be undone.')) {
+      console.log("🚫 Delete cancelled by user");
+      return;
+    }
+
+    console.log("🗑️ Deleting room:", roomId);
+    
+    // Call the DELETE API resource
+    await context.handlers.handleApiCall('rooms.delete', { _id: roomId });
+  `,
+
+        // ========================================
+        // Other existing actions (keep as-is)
+        // ========================================
 
         fetchSchema: `
-  console.log("📡 === FETCH SCHEMA ACTION ===");
-  
-  const entityName = context.actionParams?.entityName || context.actionParams?.source;
-  const organizationId = context.actionParams?.organizationId || "000000000000000000000001";
-  const storeKey = context.actionParams?.storeKey || \`schema.\${entityName}\`;
-  
-  if (!entityName) {
-    console.error("❌ No entity name provided");
-    return;
-  }
-  
-  try {
-    console.log(\`📡 Fetching schema for: \${entityName}\`);
+    console.log("📡 === FETCH SCHEMA ACTION ===");
     
-    const response = await fetch(
-      \`http://localhost:5000/api/crud/entities/\${entityName}/schema\`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      }
-    );
+    const entityName = context.actionParams?.entityName || context.actionParams?.source;
+    const storeKey = context.actionParams?.storeKey || \`schema.\${entityName}\`;
     
-    if (!response.ok) {
-      throw new Error(\`Failed to fetch schema: \${response.statusText}\`);
+    if (!entityName) {
+      console.error("❌ No entity name provided");
+      return;
     }
-    
-    const data = await response.json();
-    console.log("✅ Schema fetched:", data.schema);
-    
-    // Store schema in DataStore
-    context.handlers.setData(storeKey, data.schema);
-    console.log(\`💾 Stored schema at: api.\${storeKey}\`);
-    
-    return data.schema;
-  } catch (error) {
-    console.error("❌ Error fetching schema:", error);
-    throw error;
-  }
-`,
-        // ✅ SEARCH ROOMS ACTION
-        searchRooms: `
-        console.log("🔍 === SEARCH ROOMS ACTION ===");
-        
-        const filters = context.formData || {};
-        console.log("📋 Search filters:", filters);
-        
-        const payload = {
-          page: 1,
-          limit: 10,
-          ...filters
-        };
-        
-        // Remove empty values
-        Object.keys(payload).forEach(key => {
-          if (payload[key] === '' || payload[key] === null || payload[key] === undefined) {
-            delete payload[key];
-          }
-        });
-        
-        console.log("🚀 API payload:", payload);
-        await context.handlers.handleApiCall('rooms.list', payload);
-        console.log("✅ Search completed");
-      `,
-
-        // ✅ RESET FILTERS ACTION
-        resetFilters: `
-        console.log("🔄 === RESET FILTERS ACTION ===");
-        context.handlers.setFormData({});
-        
-        const payload = {
-          page: 1,
-          limit: 10
-        };
-        
-        await context.handlers.handleApiCall('rooms.list', payload);
-        console.log("✅ Filters reset");
-      `,
-
-        // ✅ CHANGE PAGE ACTION
-        changePage: `
-        console.log("📄 === CHANGE PAGE ACTION ===");
-        
-        const newPage = context.actionParams?.page || 1;
-        const limit = context.actionParams?.limit || 10;
-        
-        console.log("📄 New page:", newPage);
-        
-        const currentFilters = context.formData || {};
-        
-        const payload = {
-          page: newPage,
-          limit: limit,
-          ...currentFilters
-        };
-        
-        Object.keys(payload).forEach(key => {
-          if (payload[key] === '' || payload[key] === null || payload[key] === undefined) {
-            delete payload[key];
-          }
-        });
-        
-        console.log("🚀 API payload:", payload);
-        await context.handlers.handleApiCall('rooms.list', payload);
-        console.log("✅ Page changed");
-      `,
-
-        // Navigation actions
-        navigateToPage: `
-        const url = context.actionParams?.url;
-        if (!url) {
-          console.error("❌ No URL provided");
-          return;
-        }
-        console.log("🧭 Navigating to:", url);
-        window.location.href = url;
-      `,
-
-        // Auth actions
-        validateThenApi: `
-        console.log("✅ Validating form before API call");
-        const fields = context.actionParams?.fields || [];
-        const formData = context.formData || {};
-        const apiKey = context.actionParams?.apiKey;
-        
-        if (!fields || fields.length === 0) {
-          return await context.handlers.handleApiCall(apiKey, formData);
-        }
-        
-        const { isValid, errors } = context.handlers.validateAllFields(fields, formData);
-        
-        if (!isValid) {
-          console.error("❌ Validation failed:", errors);
-          context.handlers.setFieldErrors(errors);
-          const firstError = Object.values(errors)[0];
-          context.handlers.showNotification({
-            type: "toast",
-            message: firstError,
-            background: "#ef4444",
-            duration: 3000,
-          });
-          return { success: false, errors };
-        }
-        
-        console.log("✅ Validation passed, calling API");
-        context.handlers.setFieldErrors({});
-        return await context.handlers.handleApiCall(apiKey, formData);
-      `,
-
-        setAuthToken: `
-        const token = context.actionParams?.token || \`mock-jwt-\${Date.now()}\`;
-        context.handlers.setAuthData('token', token);
-      `,
-
-        setAuthUser: `
-        const email = context.payload?.email || context.actionParams?.email;
-        if (email) {
-          context.handlers.setAuthData('user', email);
-        }
-      `,
-
-        clearAuth: `
-        console.log("🚪 Logging out...");
-        context.handlers.clearAuthData();
-        context.handlers.showNotification({
-          type: "toast",
-          message: "✅ Logged out successfully",
-          background: "#10b981",
-          duration: 2000,
-        });
-        console.log("✅ Logout complete");
-      `,
-
-        // Modal actions
-        openModal: `
-  const modalName = context.actionParams?.modal || context.actionParams?.modalName;
-  if (!modalName) {
-    console.error("❌ No modal name provided");
-    return;
-  }
-  
-  console.log("🎭 Opening modal:", modalName);
-  
-  // ✅ Get modal config to check for entityName
-  const allModals = {};
-  Object.values(context.config?.components || {}).forEach((comp) => {
-    if (comp?.modal && typeof comp.modal === "object") {
-      Object.assign(allModals, comp.modal);
-    }
-  });
-  
-  // Check sub-pages too
-  if (context.config?.pages) {
-    Object.values(context.config.pages).forEach((page) => {
-      if (page.components) {
-        Object.values(page.components).forEach((comp) => {
-          if (comp?.modal && typeof comp.modal === "object") {
-            Object.assign(allModals, comp.modal);
-          }
-        });
-      }
-    });
-  }
-  
-  const modalConfig = allModals[modalName];
-  const entityName = modalConfig?.["ui:entityName"];
-  
-  // ✅ If modal has an entityName, fetch its schema first
-  if (entityName) {
-    console.log(\`📡 Fetching schema for entity: \${entityName}\`);
     
     try {
+      console.log(\`📡 Fetching schema for: \${entityName}\`);
+      
       const response = await fetch(
         \`http://localhost:5000/api/crud/entities/\${entityName}/schema\`,
         {
@@ -6756,62 +6653,180 @@ updateRoom: `
         }
       );
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log("✅ Schema fetched:", data.schema);
-        
-        // Store schema in DataStore
-        context.handlers.setData(\`schema.\${entityName}\`, data.schema);
-        console.log(\`💾 Stored schema at: api.schema.\${entityName}\`);
-      } else {
-        console.error("❌ Failed to fetch schema:", response.statusText);
+      if (!response.ok) {
+        throw new Error(\`Failed to fetch schema: \${response.statusText}\`);
       }
+      
+      const data = await response.json();
+      console.log("✅ Schema fetched:", data.schema);
+      
+      context.handlers.setData(storeKey, data.schema);
+      console.log(\`💾 Stored schema at: api.\${storeKey}\`);
+      
+      return data.schema;
     } catch (error) {
       console.error("❌ Error fetching schema:", error);
+      throw error;
     }
-  }
-  
-  // Now open the modal
-  context.handlers.setActiveModal(modalName);
-`,
+  `,
 
-        closeModal: `
-        console.log("❌ Closing modal");
-        context.handlers.setActiveModal(null);
-        context.handlers.setFormData({});
-      `,
+        searchRooms: `
+    console.log("🔍 === SEARCH ROOMS ACTION ===");
+    
+    const filters = context.formData || {};
+    console.log("📋 Search filters:", filters);
+    
+    const payload = {
+      page: 1,
+      limit: 10,
+      ...filters
+    };
+    
+    // Remove empty values
+    Object.keys(payload).forEach(key => {
+      if (payload[key] === '' || payload[key] === null || payload[key] === undefined) {
+        delete payload[key];
+      }
+    });
+    
+    console.log("🚀 API payload:", payload);
+    await context.handlers.handleApiCall('rooms.list', payload);
+    console.log("✅ Search completed");
+  `,
 
-        // API action
-     api: `
-          console.log("🚀 === API ACTION START ===");
-          const apiKey = context.actionParams?.apiKey;
+        resetFilters: `
+    console.log("🔄 === RESET FILTERS ACTION ===");
+    context.handlers.setFormData({});
+    
+    const payload = {
+      page: 1,
+      limit: 10
+    };
+    
+    await context.handlers.handleApiCall('rooms.list', payload);
+    console.log("✅ Filters reset");
+  `,
 
-          // ✅ FIX: Include actionConfig.row in the payload chain
-          const formDataToUse = context.payload
-            || context.actionConfig?.row
-            || context.modalFormData
-            || context.formData
-            || {};
+        changePage: `
+    console.log("📄 === CHANGE PAGE ACTION ===");
+    
+    const newPage = context.actionParams?.page || 1;
+    const limit = context.actionParams?.limit || 10;
+    
+    console.log("📄 New page:", newPage);
+    
+    const currentFilters = context.formData || {};
+    
+    const payload = {
+      page: newPage,
+      limit: limit,
+      ...currentFilters
+    };
+    
+    Object.keys(payload).forEach(key => {
+      if (payload[key] === '' || payload[key] === null || payload[key] === undefined) {
+        delete payload[key];
+      }
+    });
+    
+    console.log("🚀 API payload:", payload);
+    await context.handlers.handleApiCall('rooms.list', payload);
+    console.log("✅ Page changed");
+  `,
 
-          console.log("📦 Payload for API:", formDataToUse);
+        navigateToPage: `
+    const url = context.actionParams?.url;
+    if (!url) {
+      console.error("❌ No URL provided");
+      return;
+    }
+    console.log("🧭 Navigating to:", url);
+    window.location.href = url;
+  `,
 
-          if (!apiKey) {
-            console.error("❌ No apiKey provided");
-            return;
-          }
+        validateThenApi: `
+    console.log("✅ Validating form before API call");
+    const fields = context.actionParams?.fields || [];
+    const formData = context.formData || {};
+    const apiKey = context.actionParams?.apiKey;
+    
+    if (!fields || fields.length === 0) {
+      return await context.handlers.handleApiCall(apiKey, formData);
+    }
+    
+    const { isValid, errors } = context.handlers.validateAllFields(fields, formData);
+    
+    if (!isValid) {
+      console.error("❌ Validation failed:", errors);
+      context.handlers.setFieldErrors(errors);
+      const firstError = Object.values(errors)[0];
+      context.handlers.showNotification({
+        type: "toast",
+        message: firstError,
+        background: "#ef4444",
+        duration: 3000,
+      });
+      return { success: false, errors };
+    }
+    
+    console.log("✅ Validation passed, calling API");
+    context.handlers.setFieldErrors({});
+    return await context.handlers.handleApiCall(apiKey, formData);
+  `,
 
-          try {
-            await context.handlers.handleApiCall(apiKey, formDataToUse, context.actionConfig);
-            console.log("✅ API call completed");
-          } catch (error) {
-            console.error("❌ API call failed:", error);
-          }
-        `,
+        setAuthToken: `
+    const token = context.actionParams?.token || \`mock-jwt-\${Date.now()}\`;
+    context.handlers.setAuthData('token', token);
+  `,
+
+        setAuthUser: `
+    const email = context.payload?.email || context.actionParams?.email;
+    if (email) {
+      context.handlers.setAuthData('user', email);
+    }
+  `,
+
+        clearAuth: `
+    console.log("🚪 Logging out...");
+    context.handlers.clearAuthData();
+    context.handlers.showNotification({
+      type: "toast",
+      message: "✅ Logged out successfully",
+      background: "#10b981",
+      duration: 2000,
+    });
+    console.log("✅ Logout complete");
+  `,
+
+        api: `
+    console.log("🚀 === API ACTION START ===");
+    const apiKey = context.actionParams?.apiKey;
+
+    const formDataToUse = context.payload
+      || context.actionConfig?.row
+      || context.modalFormData
+      || context.formData
+      || {};
+
+    console.log("📦 Payload for API:", formDataToUse);
+
+    if (!apiKey) {
+      console.error("❌ No apiKey provided");
+      return;
+    }
+
+    try {
+      await context.handlers.handleApiCall(apiKey, formDataToUse, context.actionConfig);
+      console.log("✅ API call completed");
+    } catch (error) {
+      console.error("❌ API call failed:", error);
+    }
+  `,
 
         reload: `
-        console.log("🔄 Reloading page");
-        window.location.reload();
-      `,
+    console.log("🔄 Reloading page");
+    window.location.reload();
+  `,
       },
     },
 
