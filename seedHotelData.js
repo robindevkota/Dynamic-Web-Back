@@ -301,6 +301,77 @@ const configureAPIs = async () => {
   console.log("\n🔧 === STEP 3: CONFIGURING API RESOURCES ===");
 
   const roomsAPIConfigs = [
+    // ✅ GET ENTITY SCHEMA (dynamic for any entity)
+{
+  key: "entity.schema",
+  name: "Get Entity Schema",
+  description: "Fetches schema for any dynamic entity (e.g., enums for dropdowns)",
+  url: "http://localhost:5000/api/dynamic/entities",
+  method: "GET",
+  headers: {},
+
+  transformPayload: `
+    (payload) => {
+      const entityName = payload.entityName || "room";
+      return \`http://localhost:5000/api/dynamic/entities/\${entityName}\`;
+    }
+  `,
+
+  successNotification: { type: "none" },
+  errorNotification: { type: "none" },
+  storeResponse: true,
+  storeKey: "entity.schema",  // Store as entity.schema
+  onSuccess: [],
+  onError: ["console:Failed to fetch schema"],
+  tags: ["dynamic", "schema", "crud"],
+  projectUUID: "hotel-hotelhub",
+  isActive: true
+},
+// ✅ GET SINGLE ROOM (for editing)
+// ✅ DELETE ROOM - FIXED
+// ✅ DELETE ROOM - FIXED with better logging
+// ✅ DELETE ROOM - FIXED with better logging
+
+{
+  key: "rooms.getOne",
+  name: "Get Single Room",
+  description: "Fetches a single room by ID for editing",
+  url: "http://localhost:5000/api/crud/000000000000000000000001/room",
+  method: "GET",
+  headers: {},
+  
+  transformPayload: `
+    (payload) => {
+      const roomId = payload._id || payload.id;
+      if (!roomId) {
+        throw new Error("Room ID is required");
+      }
+      return \`http://localhost:5000/api/crud/000000000000000000000001/room/\${roomId}\`;
+    }
+  `,
+  
+  successNotification: { type: "none" },
+  errorNotification: {
+    type: "toast",
+    message: "Failed to load room details",
+    background: "#ef4444",
+    duration: 3000
+  },
+  
+  storeResponse: true,
+  storeKey: "selectedRoom",
+  
+  onSuccess: [
+    {
+      action: "openModal",
+      actionParams: { modal: "editRoom" }
+    }
+  ],
+  
+  tags: ["hotel", "rooms", "crud", "read"],
+  projectUUID: "hotel-hotelhub",
+  isActive: true
+},
     // ✅ AUTH LOGIN
     {
       key: "auth.login",
@@ -659,59 +730,8 @@ const configureAPIs = async () => {
       projectUUID: "hotel-hotelhub",
       isActive: true
     },
-    
-    // ✅ DELETE ROOM
-    {
-      key: "rooms.delete",
-      name: "Delete Room",
-      description: "Deletes a room",
-      url: "http://localhost:5000/api/crud/000000000000000000000001/room",
-      method: "DELETE",
-      headers: {},
-      
-      transformPayload: `
-        (payload) => {
-          const roomId = payload._id || payload.id;
-          if (!roomId) {
-            throw new Error("Room ID is required");
-          }
-          
-          return \`http://localhost:5000/api/crud/000000000000000000000001/room/\${roomId}\`;
-        }
-      `,
-      
-      successNotification: {
-        type: "toast",
-        message: "✅ Room deleted successfully!",
-        background: "#10b981",
-        duration: 3000
-      },
-      
-      errorNotification: {
-        type: "toast",
-        message: "❌ Failed to delete room",
-        background: "#ef4444",
-        duration: 3000
-      },
-      
-      storeResponse: false,
-      
-      onSuccess: [
-        {
-          action: "api",
-          actionParams: {
-            apiKey: "rooms.list",
-            payload: { page: 1, limit: 10 }
-          }
-        }
-      ],
-      
-      onError: ["console:Failed to delete room"],
-      
-      tags: ["hotel", "rooms", "crud", "delete"],
-      projectUUID: "hotel-hotelhub",
-      isActive: true
-    }
+  
+   
   ];
 
   for (const config of roomsAPIConfigs) {

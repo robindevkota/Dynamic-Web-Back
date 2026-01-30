@@ -1,410 +1,377 @@
+// ✅ COMPLETE ROOMS PAGE CONFIG
+// Includes: Schema loading via trigger, enum dropdowns in modal, pagination API calls
 
-
-const mongoose = require('mongoose');
-const PageConfig = require('../models/PageConfig');
-const Organization = require('../models/Organization');
-
-// Helper function to resolve component references (keep existing)
-function resolveComponentReferences(pageObject) {
-  // ... keep your existing implementation
-  return pageObject;
-}
-
-// ✅ GET all pages (filtered by role)
-exports.getAllPages = async (req, res) => {
-  try {
-    const { role, organizationId } = req.user;
-
-    let query = { status: { $ne: 'Deleted' } };
-
-    // SUPER_ADMIN sees everything
-    if (role === 'SUPER_ADMIN') {
-      // No filter needed
-    }
-    // CLIENT_ADMIN sees: templates + their org's projects
-    else if (role === 'CLIENT_ADMIN') {
-      query = {
-        ...query,
-        $or: [
-          { isTemplate: true }, // All templates
-          { organizationId: organizationId } // Their projects
-        ]
-      };
-    }
-    // DEVELOPER sees: templates + projects they're assigned to
-    else if (role === 'DEVELOPER') {
-      // For now, developers see templates + their org's projects
-      // You can add assignedProjects logic later
-      query = {
-        ...query,
-        $or: [
-          { isTemplate: true },
-          { organizationId: organizationId }
-        ]
-      };
-    }
-
-    const pages = await PageConfig.find(query)
-      .select('title slug projectUUID taskUUID status isTemplate templateCategory organizationId createdAt')
-      .populate('organizationId', 'name')
-      .sort({ isTemplate: -1, createdAt: -1 }); // Templates first
-
-    const pagesWithPermissions = pages.map(page => ({
-      ...page.toObject(),
-      canEdit: role === 'SUPER_ADMIN' || 
-               (!page.isTemplate && page.organizationId?._id.toString() === organizationId),
-      canDelete: role === 'SUPER_ADMIN' || 
-                 (!page.isTemplate && page.organizationId?._id.toString() === organizationId)
-    }));
-
-    res.json(pagesWithPermissions);
-
-  } catch (err) {
-    console.error('Error fetching pages:', err);
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// ✅ GET single page (keep existing but add ownership info)
-exports.getPageBySlug = async (req, res) => {
-  try {
-    const { role, organizationId } = req.user || {};
-    
-    const page = await PageConfig.findOne({ 
-      slug: req.params.slug,
-      status: { $ne: 'Deleted' } 
-    }).populate('organizationId', 'name');
-    
-    if (!page) return res.status(404).json({ message: 'Page not found' });
-
-    // Check permissions
-    const canEdit = role === 'SUPER_ADMIN' || 
-                    (!page.isTemplate && page.organizationId?._id.toString() === organizationId);
-
-    console.log(`📤 Sending page config for: ${page.slug}`);
-    
-    const pageObject = page.toObject();
-    
-    if (pageObject.pages && pageObject.pages instanceof Map) {
-      pageObject.pages = Object.fromEntries(pageObject.pages);
-    }
-    
-    const resolvedPageObject = resolveComponentReferences(pageObject);
-    
-    // Resolve API references (keep existing logic)
-    if (resolvedPageObject.initialization?.resources && Array.isArray(resolvedPageObject.initialization.resources)) {
-      // ... keep your existing API resolution logic
-    }
-    
-    res.json({
-      ...resolvedPageObject,
-      canEdit,
-      canDelete: canEdit && !page.isTemplate
-    });
-    
-  } catch (err) {
-    console.error('❌ Error fetching page:', err);
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// ✅ CREATE new page
-exports.createPage = async (req, res) => {
-  try {
-    const { role, organizationId, userId } = req.user;
-
-    // Process components (keep existing logic)
-    const components = req.body.components || {};
-    const processedComponents = {};
-    
-    ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
-      if (components[compName]) {
-        processedComponents[compName] = {
-          _id: components[compName]._id || undefined,
-          $ref: components[compName].$ref || undefined,
-          table: components[compName].table || {},
-          modal: components[compName].modal || {},
-          uiSchema: components[compName].uiSchema || {},
-          styles: components[compName].styles || {},
-          triggers: components[compName].triggers || []
-        };
-      }
-    });
-    
-    const initialization = req.body.initialization || {};
-    const processedInitialization = {
-      globalCSS: initialization.globalCSS || '',
-      resources: initialization.resources || [],
-      actions: initialization.actions || {}
-    };
-    
-    const pages = req.body.pages || {};
-    const processedPages = {};
-    
-    Object.entries(pages).forEach(([pageName, pageData]) => {
-      processedPages[pageName] = {
-        title: pageData.title,
-        components: {}
-      };
+rooms: {
+  title: "Rooms - HotelHub",
+  requireAuth: true,
+  redirectIfNotAuth: "/hotelhub/login",
+  components: {
+    navbar: {
+      // ... (keep your existing navbar config)
+    },
+    sidebar: {
+      // ... (keep your existing sidebar config)
+    },
+    main: {
+      table: {},
       
-      ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
-        if (pageData.components && pageData.components[compName]) {
-          const comp = pageData.components[compName];
+      // ✅ MODAL CONFIGURATION
+      modal: {
+        addRoom: {
+          "ui:title": "Add New Room",
+          "ui:theme": "light",
+          "ui:entityName": "room",  // ✅ CRITICAL: This tells modal which schema to use
+          "ui:styles": {
+            maxWidth: "500px",
+            padding: "40px",
+          },
           
-          if (comp.$ref) {
-            processedPages[pageName].components[compName] = { $ref: comp.$ref };
-          } else {
-            processedPages[pageName].components[compName] = {
-              table: comp.table || {},
-              modal: comp.modal || {},
-              uiSchema: comp.uiSchema || {},
-              styles: comp.styles || {},
-              triggers: comp.triggers || []
-            };
-          }
-        }
-      });
-    });
-
-    // ✅ Set ownership
-    const pageData = {
-      ...req.body,
-      components: processedComponents,
-      initialization: processedInitialization,
-      pages: processedPages,
-      createdBy: userId,
-      organizationId: role === 'SUPER_ADMIN' ? (req.body.organizationId || null) : organizationId,
-      isTemplate: role === 'SUPER_ADMIN' ? (req.body.isTemplate || false) : false
-    };
-    
-    const page = new PageConfig(pageData);
-    await page.save();
-
-    // ✅ Increment project count (if not template)
-    if (!page.isTemplate && page.organizationId) {
-      await Organization.findByIdAndUpdate(
-        page.organizationId,
-        { $inc: { currentProjects: 1 } }
-      );
-    }
-    
-    console.log(`✅ Created page: ${page.slug}`);
-    
-    res.status(201).json(page);
-  } catch (err) {
-    if (err.code === 11000) {
-      return res.status(400).json({ message: 'Slug already exists' });
-    }
-    console.error('❌ Create error:', err);
-    res.status(400).json({ message: err.message });
-  }
-};
-
-// ✅ UPDATE page
-exports.updatePage = async (req, res) => {
-  try {
-    const { role } = req.user;
-
-    // Process components (keep existing logic)
-    const components = req.body.components || {};
-    const processedComponents = {};
-    
-    ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
-      if (components[compName]) {
-        processedComponents[compName] = {
-          _id: components[compName]._id || undefined,
-          $ref: components[compName].$ref || undefined,
-          table: components[compName].table || {},
-          modal: components[compName].modal || {},
-          uiSchema: components[compName].uiSchema || {},
-          styles: components[compName].styles || {},
-          triggers: components[compName].triggers || []
-        };
-      }
-    });
-
-    const initialization = req.body.initialization || {};
-    const processedInitialization = {
-      globalCSS: initialization.globalCSS || '',
-      resources: initialization.resources || [],
-      actions: initialization.actions || {}
-    };
-
-    const pages = req.body.pages || {};
-    const processedPages = {};
-    
-    Object.entries(pages).forEach(([pageName, pageData]) => {
-      processedPages[pageName] = {
-        title: pageData.title,
-        components: {}
-      };
-      
-      ['navbar', 'sidebar', 'main', 'modals', 'footer'].forEach(compName => {
-        if (pageData.components && pageData.components[compName]) {
-          const comp = pageData.components[compName];
+          // ✅ FIELDS: Simple definition, schema will provide enum values
+          "ui:fields": [
+            {
+              name: "roomNumber",
+              label: "Room Number",
+              type: "text",
+              placeholder: "101",
+              required: true,
+            },
+            {
+              name: "roomType",
+              label: "Room Type",
+              type: "text",  // Will become dropdown via schema
+              placeholder: "Select room type",
+              required: true,
+            },
+            {
+              name: "price",
+              label: "Price per Night",
+              type: "number",
+              placeholder: "150",
+              required: true,
+            },
+            {
+              name: "status",
+              label: "Status",
+              type: "text",  // Will become dropdown via schema
+              placeholder: "Select status",
+              required: true,
+            },
+            {
+              name: "capacity",
+              label: "Capacity",
+              type: "number",
+              placeholder: "2",
+              required: true,
+            },
+            {
+              name: "floor",
+              label: "Floor",
+              type: "number",
+              placeholder: "1",
+              required: true,
+            },
+            {
+              name: "description",
+              label: "Description",
+              type: "text",
+              placeholder: "Room description",
+              required: false,
+            },
+          ],
           
-          if (comp.$ref) {
-            processedPages[pageName].components[compName] = { $ref: comp.$ref };
-          } else {
-            processedPages[pageName].components[compName] = {
-              table: comp.table || {},
-              modal: comp.modal || {},
-              uiSchema: comp.uiSchema || {},
-              styles: comp.styles || {},
-              triggers: comp.triggers || []
-            };
-          }
-        }
-      });
-    });
-
-    const updateData = {
-      ...req.body,
-      components: processedComponents,
-      initialization: processedInitialization,
-      pages: processedPages
-    };
-
-    // ✅ SUPER_ADMIN can update template status
-    if (role !== 'SUPER_ADMIN') {
-      delete updateData.isTemplate;
-      delete updateData.organizationId;
-    }
-
-    const page = await PageConfig.findOneAndUpdate(
-      { slug: req.params.slug },
-      {
-        $set: updateData,
-        $inc: { version: 1 }
+          "ui:actions": [
+            {
+              label: "Add Room",
+              action: "api",
+              actionParams: { apiKey: "rooms.create" },
+              variant: "primary",
+              styles: {
+                width: "100%",
+                padding: "14px 0",
+                background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                color: "white",
+                fontSize: "16px",
+                fontWeight: "600",
+                borderRadius: "8px",
+                border: "none",
+                marginTop: "10px",
+              },
+            },
+            {
+              label: "Cancel",
+              action: "closeModal",
+              variant: "outline",
+              styles: {
+                width: "100%",
+                padding: "14px 0",
+                background: "transparent",
+                color: "#64748b",
+                fontSize: "16px",
+                fontWeight: "600",
+                borderRadius: "8px",
+                border: "2px solid #e2e8f0",
+              },
+            },
+          ],
+          
+          // ✅ TRIGGERS: Load schema when modal is defined
+          triggers: [
+            {
+              event: "load",
+              action: "fetchSchema",
+              source: "room",  // Entity name
+              storeKey: "schema.room",  // Where to store in DataStore
+            },
+          ],
+        },
       },
-      { new: true, runValidators: true }
-    );
-
-    if (!page) {
-      return res.status(404).json({ message: "Page not found" });
-    }
-
-    console.log(`✅ Updated page: ${page.slug} (v${page.version})`);
-    
-    res.json(page);
-
-  } catch (err) {
-    console.error("❌ Update Error:", err);
-    res.status(400).json({ message: err.message });
-  }
-};
-
-// ✅ SOFT DELETE
-exports.deletePage = async (req, res) => {
-  try {
-    const page = await PageConfig.findOneAndUpdate(
-      { slug: req.params.slug },
-      { status: 'Deleted' },
-      { new: true }
-    );
-    
-    if (!page) return res.status(404).json({ message: 'Page not found' });
-
-    // ✅ Decrement project count (if not template)
-    if (!page.isTemplate && page.organizationId) {
-      await Organization.findByIdAndUpdate(
-        page.organizationId,
-        { $inc: { currentProjects: -1 } }
-      );
-    }
-    
-    console.log(`🗑️ Deleted page: ${page.slug}`);
-    res.json({ message: 'Page deleted' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// ✅ NEW: Clone template
-exports.cloneTemplate = async (req, res) => {
-  try {
-    const { slug } = req.params;
-    const { newTitle, newSlug } = req.body;
-    const { role, organizationId, userId } = req.user;
-
-    // Find template
-    const template = await PageConfig.findOne({ slug, isTemplate: true });
-    
-    if (!template) {
-      return res.status(404).json({ error: "Template not found" });
-    }
-
-    // Check project limits
-    if (role === 'CLIENT_ADMIN') {
-      const organization = await Organization.findById(organizationId);
       
-      if (organization.currentProjects >= organization.maxProjects) {
-        return res.status(403).json({ 
-          error: `Project limit reached (${organization.maxProjects})` 
-        });
-      }
-    }
+      uiSchema: {
+        // ✅ PAGE HEADER
+        pageHeader: {
+          "ui:widget": "flexLayout",
+          "ui:direction": "row",
+          "ui:justify": "space-between",
+          "ui:align": "center",
+          "ui:styles": {
+            marginBottom: "30px",
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "🛏️ Rooms Management",
+              "ui:level": "h1",
+              "ui:styles": {
+                margin: "0",
+              },
+            },
+            {
+              "ui:widget": "button",
+              "ui:label": "➕ Add Room",
+              "ui:action": "openModal",
+              "ui:actionParams": { modal: "addRoom" },
+              "ui:variant": "primary",
+              "ui:styles": {
+                padding: "12px 24px",
+                background: "#0ea5e9",
+                color: "white",
+                borderRadius: "8px",
+                border: "none",
+                fontWeight: "600",
+              },
+            },
+          ],
+        },
 
-    // Clone template
-    const clonedData = template.toObject();
-    delete clonedData._id;
-    delete clonedData.createdAt;
-    delete clonedData.updatedAt;
+        // ✅ SEARCH & FILTER SECTION
+        searchFilters: {
+          "ui:widget": "filterWidget",
+          "ui:title": "🔍 Search & Filter Rooms",
+          "ui:styles": {
+            background: "white",
+            padding: "24px",
+            borderRadius: "12px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            marginBottom: "24px",
+          },
+          "ui:fields": [
+            {
+              "ui:widget": "inputField",
+              "ui:label": "Search",
+              "ui:placeholder": "Search by room number, type, or description...",
+              "ui:type": "text",
+              "ui:name": "search",
+              "ui:flex": "2",
+              "ui:minWidth": "300px",
+              "ui:styles": {
+                marginBottom: "0",
+              },
+            },
+            {
+              "ui:widget": "selectField",
+              "ui:label": "Room Type",
+              "ui:name": "roomType",
+              "ui:placeholder": "All Types",
+              "ui:flex": "1",
+              "ui:minWidth": "150px",
+              "ui:options": [
+                { value: "", label: "All Types" },
+                { value: "Standard", label: "Standard" },
+                { value: "Deluxe", label: "Deluxe" },
+                { value: "Suite", label: "Suite" },
+                { value: "Presidential", label: "Presidential" },
+              ],
+              "ui:styles": {
+                marginBottom: "0",
+              },
+            },
+            {
+              "ui:widget": "selectField",
+              "ui:label": "Status",
+              "ui:name": "status",
+              "ui:placeholder": "All Statuses",
+              "ui:flex": "1",
+              "ui:minWidth": "150px",
+              "ui:options": [
+                { value: "", label: "All Statuses" },
+                { value: "Available", label: "Available" },
+                { value: "Occupied", label: "Occupied" },
+                { value: "Maintenance", label: "Maintenance" },
+                { value: "Reserved", label: "Reserved" },
+              ],
+              "ui:styles": {
+                marginBottom: "0",
+              },
+            },
+          ],
+          "ui:actions": [
+            {
+              label: "🔍 Apply",
+              variant: "filter",
+              action: "api",
+              actionParams: {
+                apiKey: "rooms.list",
+              },
+              styles: {
+                padding: "12px 24px",
+                background: "#0ea5e9",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "15px",
+                fontWeight: "600",
+              },
+            },
+            {
+              label: "🔄 Reset",
+              variant: "reset",
+              action: "api",
+              actionParams: {
+                apiKey: "rooms.list",
+                payload: { page: 1, limit: 10 },
+              },
+              styles: {
+                padding: "12px 24px",
+                background: "transparent",
+                color: "#64748b",
+                border: "2px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "15px",
+                fontWeight: "600",
+              },
+            },
+          ],
+        },
+
+        // ✅ DATA TABLE WITH PROPER CONFIG
+        roomsTable: {
+          "ui:widget": "dataTable",
+          "ui:title": "Room List",
+          "ui:id": "roomsTable",
+          "ui:description": "Manage all hotel rooms",
+          "ui:emptyText": "No rooms found. Try adjusting your filters or click 'Add Room' to create one.",
+          "ui:dataSource": "rooms.api",  // Data comes from here
+          "ui:apiKey": "rooms.list",     // ✅ CRITICAL: API to call for pagination
+          "ui:searchEnabled": false,
+          "ui:pagination": {
+            enabled: true,
+            pageSize: 10,
+            serverSide: true,  // ✅ Enable server-side pagination
+          },
+          "ui:columns": [
+            {
+              key: "roomNumber",
+              title: "Room #",
+              dataIndex: "roomNumber",
+              width: "100px",
+            },
+            {
+              key: "roomType",
+              title: "Type",
+              dataIndex: "roomType",
+              width: "120px",
+            },
+            {
+              key: "price",
+              title: "Price/Night",
+              dataIndex: "price",
+              width: "120px",
+            },
+            {
+              key: "status",
+              title: "Status",
+              dataIndex: "status",
+              width: "120px",
+            },
+            {
+              key: "capacity",
+              title: "Capacity",
+              dataIndex: "capacity",
+              width: "100px",
+            },
+            {
+              key: "floor",
+              title: "Floor",
+              dataIndex: "floor",
+              width: "80px",
+            },
+            {
+              key: "description",
+              title: "Description",
+              dataIndex: "description",
+            },
+            {
+              key: "actions",
+              title: "Actions",
+              type: "actions",
+              align: "center",
+              width: "200px",
+              actions: [
+                {
+                  label: "✏️ Edit",
+                  action: "openModal",
+                  actionParams: { modal: "editRoom" },
+                  variant: "primary",
+                },
+                {
+                  label: "🗑️ Delete",
+                  action: "api",
+                  actionParams: {
+                    apiKey: "rooms.delete",
+                  },
+                  variant: "danger",
+                  confirm: true,
+                  confirmMessage: "Are you sure you want to delete this room?",
+                },
+              ],
+            },
+          ],
+        },
+      },
+      
+      styles: {
+        marginLeft: "250px",
+        padding: "120px 40px 40px",
+        background: "#ffffff",
+        minHeight: "100vh",
+      },
+      
+      // ✅ TRIGGERS: Load rooms on page load
+      triggers: [
+        {
+          event: "load",
+          action: "api",
+          source: "rooms.api",
+          params: {
+            page: 1,
+            limit: 10,
+          },
+        },
+      ],
+    },
     
-    const newPage = new PageConfig({
-      ...clonedData,
-      title: newTitle,
-      slug: newSlug,
-      isTemplate: false,
-      organizationId: role === 'SUPER_ADMIN' ? (req.body.organizationId || null) : organizationId,
-      createdBy: userId,
-      status: 'Draft'
-    });
-
-    await newPage.save();
-
-    // Increment project count
-    if (newPage.organizationId) {
-      await Organization.findByIdAndUpdate(
-        newPage.organizationId,
-        { $inc: { currentProjects: 1 } }
-      );
-    }
-
-    console.log(`✅ Cloned template: ${template.slug} → ${newPage.slug}`);
-    
-    res.status(201).json(newPage);
-
-  } catch (err) {
-    console.error('❌ Clone error:', err);
-    res.status(400).json({ message: err.message });
-  }
-};
-
-// ========================================
-// 4. UPDATE pageConfigRoutes.js
-// ========================================
-// backend/routes/pageConfigRoutes.js
-
-const express = require('express');
-const router = express.Router();
-const authMiddleware = require('../middleware/authMiddleware');
-const { canCreateProject, canEditProject, canDeleteProject } = require('../middleware/projectPermissions');
-const {
-  getAllPages,
-  getPageBySlug,
-  createPage,
-  updatePage,
-  deletePage,
-  cloneTemplate
-} = require('../controllers/pageConfigController');
-
-// ✅ Protected routes (require authentication)
-router.get('/', authMiddleware, getAllPages);
-router.get('/:slug', authMiddleware, getPageBySlug);
-router.post('/', authMiddleware, canCreateProject, createPage);
-router.post('/clone/:slug', authMiddleware, canCreateProject, cloneTemplate);
-router.put('/:slug', authMiddleware, canEditProject, updatePage);
-router.delete('/:slug', authMiddleware, canDeleteProject, deletePage);
-
-module.exports = router;
+    footer: {
+      // ... (keep your existing footer config)
+    },
+  },
+}

@@ -1069,6 +1069,32 @@ class DynamicCrudController {
       res.status(500).json({ error: error.message });
     }
   }
+  // GET SINGLE ENTITY SCHEMA
+// In DynamicCrudController
+static async getEntity(req, res) {
+  try {
+    const { entityName } = req.params;
+    const { organizationId } = req.user; // ✅ Get from req.user, not params
+
+    const entity = await DynamicEntity.findOne({
+      entityName,
+      organizationId
+    });
+
+    if (!entity) {
+      return res.status(404).json({ error: "Entity not found" });
+    }
+
+    res.json({
+      success: true,
+      schema: Object.fromEntries(entity.schema),
+      operations: entity.operations
+    });
+  } catch (error) {
+    console.error("❌ getEntity failed:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
 }
 
 // ───────────────────────────────────────────────
