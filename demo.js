@@ -6343,9 +6343,9 @@ context.handlers.setFormData({});`,
     "redirectIfNotAuth": "/hotelhub/login",
     
     "initialization": {
-        "globalCSS": `
+       "globalCSS": `
 /* ============================================ */
-/* HOTELHUB GLOBAL CSS - Enhanced with Dark Mode */
+/* HOTELHUB GLOBAL CSS - Enhanced Dark Mode */
 /* ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -6370,7 +6370,6 @@ body {
   transition: background 0.4s ease, color 0.4s ease;
 }
 
-/* Improved Typography */
 h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.2; }
 h2 { font-size: 1.8rem; font-weight: 700; line-height: 1.3; }
 h3 { font-size: 1.4rem; font-weight: 600; line-height: 1.4; }
@@ -6378,56 +6377,113 @@ h4 { font-size: 1.2rem; font-weight: 600; line-height: 1.4; }
 p { font-size: 1rem; color: #64748b; }
 
 /* ============================================ */
-/* NAVBAR & SIDEBAR FIXES */
+/* DARK MODE - Full Implementation */
 /* ============================================ */
-/* Light mode nav */
-body:not(.dark-mode) nav,
-body:not(.dark-mode) header,
-body:not(.dark-mode) nav > *,
-body:not(.dark-mode) header > * {
-  background: rgba(255, 255, 255, 0.98) !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-  backdrop-filter: blur(10px);
+body.dark-mode {
+  background: #0f172a !important;
+  color: #f1f5f9 !important;
 }
 
-/* Dark mode nav */
+/* Force all major containers to transparent in dark mode */
+body.dark-mode > div,
+body.dark-mode section,
+body.dark-mode main,
+body.dark-mode aside {
+  background: transparent !important;
+}
+
+/* ============================================ */
+/* NAVBAR - Dark Mode */
+/* ============================================ */
 body.dark-mode nav,
 body.dark-mode header,
-body.dark-mode nav > *,
-body.dark-mode header > * {
+body.dark-mode nav > div,
+body.dark-mode header > div {
   background: rgba(17, 24, 39, 0.98) !important;
   border-bottom: 1px solid #374151 !important;
+  backdrop-filter: blur(10px) !important;
 }
 
-/* Navbar links */
-body:not(.dark-mode) nav a,
-body:not(.dark-mode) .nav-links a {
-  color: #4b5563 !important;
-  font-weight: 500 !important;
+body.dark-mode nav *,
+body.dark-mode header * {
+  color: #e5e7eb !important;
 }
 
 body.dark-mode nav a,
-body.dark-mode .nav-links a {
+body.dark-mode header a {
   color: #e5e7eb !important;
   font-weight: 500 !important;
 }
 
+body.dark-mode nav a:hover,
+body.dark-mode header a:hover {
+  color: #60a5fa !important;
+}
+
+/* Light mode nav */
+body:not(.dark-mode) nav,
+body:not(.dark-mode) header {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+body:not(.dark-mode) nav a,
+body:not(.dark-mode) header a {
+  color: #4b5563 !important;
+}
+
 /* ============================================ */
-/* SIDEBAR FIXES */
+/* SIDEBAR - Dark Mode FIX */
 /* ============================================ */
+body.dark-mode aside,
+body.dark-mode aside > div,
+body.dark-mode .sidebar-fixed {
+  background: rgba(17, 24, 39, 0.95) !important;
+  border-right: 1px solid #374151 !important;
+}
+
+body.dark-mode aside *,
+body.dark-mode .sidebar-fixed * {
+  color: #e5e7eb !important;
+}
+
+body.dark-mode aside button,
+body.dark-mode .sidebar-fixed button {
+  color: #e5e7eb !important;
+  background: transparent !important;
+}
+
+body.dark-mode aside button:hover,
+body.dark-mode .sidebar-fixed button:hover {
+  background: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Active sidebar button */
+body.dark-mode aside button[style*="background: #e0f2fe"],
+body.dark-mode aside button[style*="background:#e0f2fe"] {
+  background: rgba(59, 130, 246, 0.3) !important;
+  color: #60a5fa !important;
+}
+
+/* Light mode sidebar */
+body:not(.dark-mode) aside,
+body:not(.dark-mode) .sidebar-fixed {
+  background: #f8fafc !important;
+  border-right: 1px solid #e2e8f0 !important;
+}
+
 .sidebar-fixed {
   position: fixed !important;
   left: 0 !important;
-  top: 70px !important; /* Adjusted to account for navbar height */
+  top: 70px !important;
   height: calc(100vh - 70px) !important;
-  width: 260px !important; /* Reduced from 250px for better fit */
+  width: 260px !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   z-index: 50 !important;
   transition: all 0.3s ease !important;
 }
 
-/* Hide scrollbar but allow scrolling */
 .sidebar-fixed::-webkit-scrollbar {
   width: 4px;
 }
@@ -6440,37 +6496,48 @@ body.dark-mode .nav-links a {
 }
 
 /* ============================================ */
-/* DARK MODE - Full Implementation */
+/* MAIN CONTENT - Dark Mode FIX */
 /* ============================================ */
-body.dark-mode {
-  background: #0f172a !important;
-  color: #f1f5f9 !important;
-}
-
-body.dark-mode > div,
-body.dark-mode section,
 body.dark-mode main,
-body.dark-mode aside,
-body.dark-mode article {
+body.dark-mode main > div,
+body.dark-mode [style*="marginLeft"] {
   background: transparent !important;
 }
 
-/* Dark mode cards and containers */
+/* ============================================ */
+/* CARDS & CONTAINERS - Dark Mode FIX */
+/* ============================================ */
 body.dark-mode article,
 body.dark-mode [class*="card"],
 body.dark-mode div[style*="background: white"],
-body.dark-mode div[style*="background:white"] {
+body.dark-mode div[style*="background:white"],
+body.dark-mode div[style*="background: #fff"],
+body.dark-mode div[style*="background:#fff"],
+body.dark-mode div[style*="background: rgba(255"],
+body.dark-mode div[style*="background:rgba(255"] {
   background: rgba(30, 41, 59, 0.9) !important;
   border-color: #475569 !important;
   color: #f1f5f9 !important;
   backdrop-filter: blur(10px);
 }
 
-/* Dark mode text */
+/* Force white backgrounds in dark mode to dark */
+body.dark-mode [style*="background-color: white"],
+body.dark-mode [style*="background-color:white"],
+body.dark-mode [style*="backgroundColor: white"],
+body.dark-mode [style*="backgroundColor:white"] {
+  background: rgba(30, 41, 59, 0.9) !important;
+  background-color: rgba(30, 41, 59, 0.9) !important;
+}
+
+/* ============================================ */
+/* TEXT - Dark Mode */
+/* ============================================ */
 body.dark-mode p,
-body.dark-mode span,
+body.dark-mode span:not([class*="gradient"]),
 body.dark-mode div,
-body.dark-mode li {
+body.dark-mode li,
+body.dark-mode td {
   color: #cbd5e1 !important;
 }
 
@@ -6483,7 +6550,9 @@ body.dark-mode h6 {
   color: #ffffff !important;
 }
 
-/* Dark mode forms */
+/* ============================================ */
+/* FORMS - Dark Mode */
+/* ============================================ */
 body.dark-mode input,
 body.dark-mode textarea,
 body.dark-mode select {
@@ -6497,12 +6566,21 @@ body.dark-mode textarea::placeholder {
   color: #94a3b8 !important;
 }
 
-/* Dark mode buttons */
+/* ============================================ */
+/* BUTTONS - Dark Mode */
+/* ============================================ */
 body.dark-mode button {
   color: #f1f5f9 !important;
 }
 
-/* Dark mode tables */
+/* Primary buttons keep their gradient */
+body.dark-mode button[style*="gradient"] {
+  /* Keep gradient as is */
+}
+
+/* ============================================ */
+/* TABLES - Dark Mode */
+/* ============================================ */
 body.dark-mode table {
   color: #f1f5f9 !important;
   background: rgba(30, 41, 59, 0.9) !important;
@@ -6515,12 +6593,28 @@ body.dark-mode th {
 
 body.dark-mode td {
   border-color: #475569 !important;
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode tr:hover {
+  background: rgba(51, 65, 85, 0.5) !important;
 }
 
 /* ============================================ */
-/* BACKGROUND EFFECTS (From Portfolio) */
+/* MODALS - Dark Mode */
 /* ============================================ */
-/* Stars */
+body.dark-mode [style*="position: fixed"][style*="z-index"] {
+  background: rgba(30, 41, 59, 0.95) !important;
+}
+
+/* Modal overlay */
+body.dark-mode div[style*="rgba(0,0,0,0.6)"] {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* ============================================ */
+/* BACKGROUND EFFECTS */
+/* ============================================ */
 .stars {
   position: fixed;
   top: 0;
@@ -6561,7 +6655,6 @@ body.dark-mode td {
   50% { opacity: 1; }
 }
 
-/* Shooting Stars */
 .shooting-stars {
   position: fixed;
   top: 0;
@@ -6597,7 +6690,6 @@ body.dark-mode td {
   }
 }
 
-/* Snowfall */
 .snowfall {
   position: fixed;
   top: 0;
@@ -6623,61 +6715,15 @@ body.dark-mode td {
 }
 
 /* ============================================ */
-/* UTILITY CLASSES */
+/* Z-INDEX MANAGEMENT */
 /* ============================================ */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.text-center { text-align: center; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-6 { margin-top: 1.5rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
-
-/* ============================================ */
-/* CARD STYLES */
-/* ============================================ */
-.card {
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
-  border: 1px solid;
-}
-
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+body.dark-mode > *:not(.stars):not(.shooting-stars):not(.snowfall) {
+  position: relative;
+  z-index: 10 !important;
 }
 
 /* ============================================ */
-/* BUTTON STYLES */
-/* ============================================ */
-.btn-primary {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
-  color: white !important;
-  border: none !important;
-  padding: 12px 24px !important;
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  font-size: 14px !important;
-  transition: all 0.3s ease !important;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3) !important;
-}
-
-/* ============================================ */
-/* SCROLLBAR STYLES */
+/* SCROLLBAR */
 /* ============================================ */
 ::-webkit-scrollbar {
   width: 8px;
@@ -6709,7 +6755,35 @@ body.dark-mode::-webkit-scrollbar-thumb {
 body.dark-mode::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
-        `,
+
+/* ============================================ */
+/* UTILITY CLASSES */
+/* ============================================ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-center { text-align: center; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-6 { margin-top: 1.5rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-4 { margin-bottom: 1rem; }
+.mb-6 { margin-bottom: 1.5rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+
+/* ============================================ */
+/* GRADIENTS - Keep in both modes */
+/* ============================================ */
+.gradient-text,
+[style*="WebkitBackgroundClip: text"],
+[style*="-webkit-background-clip: text"] {
+  /* Gradients are preserved */
+}
+  `,
 
         "resources": [
             "auth.login",
