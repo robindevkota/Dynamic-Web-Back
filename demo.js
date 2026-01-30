@@ -6326,24 +6326,24 @@ context.handlers.setFormData({});`,
 
   // Add this to your demo.js websites array
 
-{
-    "title": "HotelHub - Reservation Management",
-    "slug": "hotelhub",
-    "projectUUID": "hotel-hotelhub",
-    "taskUUID": "hotel001",
-    "status": "Active",
-    "isTemplate": true,
-    "templateCategory": "E-commerce",
-    "organizationId": null,
-    "createdBy": "000000000000000000000000",
-    "accountValidation": true,
-    "otpValidation": false,
-    "isAnonymous": false,
-    "requireAuth": false,
-    "redirectIfNotAuth": "/hotelhub/login",
-    
-    "initialization": {
-       "globalCSS": `
+  {
+    title: "HotelHub - Reservation Management",
+    slug: "hotelhub",
+    projectUUID: "hotel-hotelhub",
+    taskUUID: "hotel001",
+    status: "Active",
+    isTemplate: true,
+    templateCategory: "E-commerce",
+    organizationId: null,
+    createdBy: "000000000000000000000000",
+    accountValidation: true,
+    otpValidation: false,
+    isAnonymous: false,
+    requireAuth: false,
+    redirectIfNotAuth: "/hotelhub/login",
+
+    initialization: {
+      globalCSS: `
 /* ============================================ */
 /* HOTELHUB GLOBAL CSS - Enhanced Dark Mode */
 /* ============================================ */
@@ -6785,18 +6785,18 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
 }
   `,
 
-        "resources": [
-            "auth.login",
-            "auth.signup",
-            "rooms.api",
-            "rooms.list",
-            "rooms.create",
-            "rooms.update",
-            "rooms.delete"
-        ],
+      resources: [
+        "auth.login",
+        "auth.signup",
+        "rooms.api",
+        "rooms.list",
+        "rooms.create",
+        "rooms.update",
+        "rooms.delete",
+      ],
 
-        "actions": {
-            "toggleTheme": `
+      actions: {
+        toggleTheme: `
     console.log('🌓 Toggling theme');
     const body = document.body;
     const isDark = body.classList.contains('dark-mode');
@@ -6867,7 +6867,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     }
 `,
 
-            "loadTheme": `
+        loadTheme: `
     console.log('🎨 Loading theme');
     const saved = localStorage.getItem('hotelhub-theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -6902,7 +6902,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     }
 `,
 
-            "openModal": `
+        openModal: `
     const modalName = context.actionParams?.modal || context.actionParams?.modalName;
     if (!modalName) {
         console.error("❌ No modal name provided");
@@ -6921,7 +6921,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     console.log("✅ Modal opened");
 `,
 
-            "closeModal": `
+        closeModal: `
     console.log("❌ Closing modal");
     context.handlers.setModalFormData({});
     context.handlers.setFieldErrors({});
@@ -6929,7 +6929,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     console.log("✅ Modal closed");
 `,
 
-            "openEditModal": `
+        openEditModal: `
     console.log("📝 Opening edit modal");
     const roomData = context.actionConfig?.row || context.payload;
     
@@ -6958,7 +6958,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     console.log("✅ Edit modal opened");
 `,
 
-            "updateRoom": `
+        updateRoom: `
     console.log("📝 Updating room");
     const formData = context.modalFormData || {};
     
@@ -6988,7 +6988,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     console.log("✅ Update completed");
 `,
 
-            "deleteRoom": `
+        deleteRoom: `
     const roomId = context.row?._id || context.payload?._id;
     
     if (!roomId) {
@@ -7009,7 +7009,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     await context.handlers.handleApiCall('rooms.delete', { _id: roomId });
 `,
 
-            "searchRooms": `
+        searchRooms: `
     console.log("🔍 Searching rooms");
     const filters = context.formData || {};
     const payload = {
@@ -7028,13 +7028,13 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     await context.handlers.handleApiCall('rooms.list', payload);
 `,
 
-            "resetFilters": `
+        resetFilters: `
     console.log("🔄 Resetting filters");
     context.handlers.setFormData({});
     await context.handlers.handleApiCall('rooms.list', { page: 1, limit: 10 });
 `,
 
-            "changePage": `
+        changePage: `
     const newPage = context.actionParams?.page || 1;
     const limit = context.actionParams?.limit || 10;
     const currentFilters = context.formData || {};
@@ -7055,7 +7055,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     await context.handlers.handleApiCall('rooms.list', payload);
 `,
 
-            "navigateToPage": `
+        navigateToPage: `
     const url = context.actionParams?.url;
     if (!url) {
         console.error("❌ No URL provided");
@@ -7065,7 +7065,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     window.location.href = url;
 `,
 
-            "validateThenApi": `
+        validateThenApi: `
     const fields = context.actionParams?.fields || [];
     const formData = context.formData || {};
     const apiKey = context.actionParams?.apiKey;
@@ -7094,19 +7094,19 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     return await context.handlers.handleApiCall(apiKey, formData);
 `,
 
-            "setAuthToken": `
+        setAuthToken: `
     const token = context.actionParams?.token || \`mock-jwt-\${Date.now()}\`;
     context.handlers.setAuthData('token', token);
 `,
 
-            "setAuthUser": `
+        setAuthUser: `
     const email = context.payload?.email || context.actionParams?.email;
     if (email) {
         context.handlers.setAuthData('user', email);
     }
 `,
 
-            "clearAuth": `
+        clearAuth: `
     console.log("🚪 Logging out...");
     context.handlers.clearAuthData();
     context.handlers.showNotification({
@@ -7117,7 +7117,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     });
 `,
 
-            "api": `
+        api: `
     const apiKey = context.actionParams?.apiKey;
     const formDataToUse = context.payload
         || context.actionConfig?.row
@@ -7138,1578 +7138,1616 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     }
 `,
 
-            "reload": `
+        reload: `
     console.log("🔄 Reloading page");
     window.location.reload();
-`
-        }
+`,
+      },
     },
 
-    "pages": {
-        "login": {
-            "title": "Login - HotelHub",
-            "components": {
-                "navbar": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "logo": {
-                            "ui:widget": "text",
-                            "ui:content": "🏨 HotelHub",
-                            "ui:styles": {
-                                "fontSize": "26px",
-                                "fontWeight": "800",
-                                "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                                "WebkitBackgroundClip": "text",
-                                "WebkitTextFillColor": "transparent",
-                                "cursor": "pointer"
-                            },
-                            "ui:action": "navigateToPage",
-                            "ui:actionParams": { "url": "/hotelhub" }
-                        },
-                        "themeToggle": {
-                            "ui:widget": "toggle",
-                            "ui:label": "",
-                            "ui:size": "medium",
-                            "ui:onChange": "toggleTheme",
-                            "ui:styles": {
-                                "marginLeft": "auto",
-                                "marginRight": "20px"
-                            }
-                        },
-                        "links": {
-                            "ui:widget": "navLinks",
-                            "ui:theme": "light",
-                            "ui:links": [
-                                {
-                                    "label": "Home",
-                                    "action": "navigateToPage",
-                                    "actionParams": { "url": "/hotelhub" }
-                                },
-                                {
-                                    "label": "Sign Up",
-                                    "action": "navigateToPage",
-                                    "actionParams": { "url": "/hotelhub/signup" }
-                                }
-                            ]
-                        }
+    pages: {
+      login: {
+        title: "Login - HotelHub",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🏨 HotelHub",
+                "ui:styles": {
+                  fontSize: "26px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+                "ui:action": "navigateToPage",
+                "ui:actionParams": { url: "/hotelhub" },
+              },
+              themeToggle: {
+                "ui:widget": "toggle",
+                "ui:label": "",
+                "ui:size": "medium",
+                "ui:onChange": "toggleTheme",
+                "ui:styles": {
+                  marginLeft: "auto",
+                  marginRight: "20px",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub" },
+                  },
+                  {
+                    label: "Sign Up",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub/signup" },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(255, 255, 255, 0.95)",
+              borderBottom: "1px solid #e2e8f0",
+              padding: "18px 40px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              height: "70px",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              loginForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🏨 Welcome Back",
+                "ui:description": "Sign in to manage your hotel",
+                "ui:id": "loginForm",
+                "ui:styles": {
+                  maxWidth: "420px",
+                  margin: "100px auto 0",
+                  padding: "40px 36px",
+                  background: "white",
+                  borderRadius: "16px",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+                  border: "1px solid #e2e8f0",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "manager@hotelhub.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    validation: {
+                      required: true,
+                      requiredMessage: "📧 Email is required",
+                      email: true,
+                      emailMessage: "📧 Please enter a valid email",
                     },
-                    "styles": {
-                        "background": "rgba(255, 255, 255, 0.95)",
-                        "borderBottom": "1px solid #e2e8f0",
-                        "padding": "18px 40px",
-                        "position": "fixed",
-                        "width": "100%",
-                        "zIndex": "1000",
-                        "display": "flex",
-                        "justifyContent": "space-between",
-                        "alignItems": "center",
-                        "backdropFilter": "blur(8px)",
-                        "height": "70px"
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Enter your password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    validation: {
+                      required: true,
+                      requiredMessage: "🔒 Password is required",
+                      minLength: 6,
+                      minLengthMessage:
+                        "🔒 Password must be at least 6 characters",
                     },
-                    "triggers": [
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Sign In",
+                    action: "validateThenApi",
+                    actionParams: {
+                      apiKey: "auth.login",
+                      fields: [
                         {
-                            "event": "load",
-                            "action": "loadTheme"
-                        }
-                    ]
-                },
-                "sidebar": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {},
-                    "styles": { "display": "none" },
-                    "triggers": []
-                },
-                "main": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "loginForm": {
-                            "ui:widget": "formContainer",
-                            "ui:title": "🏨 Welcome Back",
-                            "ui:description": "Sign in to manage your hotel",
-                            "ui:id": "loginForm",
-                            "ui:styles": {
-                                "maxWidth": "420px",
-                                "margin": "100px auto 0",
-                                "padding": "40px 36px",
-                                "background": "white",
-                                "borderRadius": "16px",
-                                "boxShadow": "0 8px 32px rgba(0,0,0,0.1)",
-                                "border": "1px solid #e2e8f0"
-                            },
-                            "ui:fields": [
-                                {
-                                    "ui:widget": "inputField",
-                                    "ui:label": "Email Address",
-                                    "ui:placeholder": "manager@hotelhub.com",
-                                    "ui:type": "email",
-                                    "ui:name": "email",
-                                    "ui:required": true,
-                                    "validation": {
-                                        "required": true,
-                                        "requiredMessage": "📧 Email is required",
-                                        "email": true,
-                                        "emailMessage": "📧 Please enter a valid email"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "inputField",
-                                    "ui:label": "Password",
-                                    "ui:placeholder": "Enter your password",
-                                    "ui:type": "password",
-                                    "ui:name": "password",
-                                    "ui:required": true,
-                                    "validation": {
-                                        "required": true,
-                                        "requiredMessage": "🔒 Password is required",
-                                        "minLength": 6,
-                                        "minLengthMessage": "🔒 Password must be at least 6 characters"
-                                    }
-                                }
-                            ],
-                            "ui:actions": [
-                                {
-                                    "label": "Sign In",
-                                    "action": "validateThenApi",
-                                    "actionParams": {
-                                        "apiKey": "auth.login",
-                                        "fields": [
-                                            {
-                                                "name": "email",
-                                                "label": "Email",
-                                                "validation": {
-                                                    "required": true,
-                                                    "requiredMessage": "📧 Email is required",
-                                                    "email": true,
-                                                    "emailMessage": "📧 Please enter a valid email"
-                                                }
-                                            },
-                                            {
-                                                "name": "password",
-                                                "label": "Password",
-                                                "validation": {
-                                                    "required": true,
-                                                    "requiredMessage": "🔒 Password is required",
-                                                    "minLength": 6,
-                                                    "minLengthMessage": "🔒 Password must be at least 6 characters"
-                                                }
-                                            }
-                                        ]
-                                    },
-                                    "variant": "primary",
-                                    "styles": {
-                                        "width": "100%",
-                                        "padding": "14px 0",
-                                        "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                                        "color": "white",
-                                        "fontSize": "15px",
-                                        "fontWeight": "600",
-                                        "borderRadius": "8px",
-                                        "border": "none"
-                                    }
-                                }
-                            ]
+                          name: "email",
+                          label: "Email",
+                          validation: {
+                            required: true,
+                            requiredMessage: "📧 Email is required",
+                            email: true,
+                            emailMessage: "📧 Please enter a valid email",
+                          },
                         },
-                        "authLinks": {
-                            "ui:widget": "authLinks",
-                            "ui:alignment": "center",
-                            "ui:direction": "column",
-                            "ui:links": [
-                                {
-                                    "prefix": "Don't have an account?",
-                                    "label": "Sign Up",
-                                    "action": "navigateToPage",
-                                    "actionParams": { "url": "/hotelhub/signup" }
-                                }
-                            ],
-                            "ui:styles": {
-                                "maxWidth": "420px",
-                                "margin": "24px auto",
-                                "padding": "16px",
-                                "background": "rgba(248, 250, 252, 0.8)",
-                                "borderRadius": "12px"
-                            }
-                        }
+                        {
+                          name: "password",
+                          label: "Password",
+                          validation: {
+                            required: true,
+                            requiredMessage: "🔒 Password is required",
+                            minLength: 6,
+                            minLengthMessage:
+                              "🔒 Password must be at least 6 characters",
+                          },
+                        },
+                      ],
                     },
-                    "styles": {
-                        "padding": "100px 40px 60px",
-                        "background": "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                        "minHeight": "100vh"
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                      color: "white",
+                      fontSize: "15px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
                     },
-                    "triggers": []
+                  },
+                ],
+              },
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:direction": "column",
+                "ui:links": [
+                  {
+                    prefix: "Don't have an account?",
+                    label: "Sign Up",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub/signup" },
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "420px",
+                  margin: "24px auto",
+                  padding: "16px",
+                  background: "rgba(248, 250, 252, 0.8)",
+                  borderRadius: "12px",
                 },
-                "footer": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "footerText": {
-                            "ui:widget": "text",
-                            "ui:content": "© 2024 HotelHub. All rights reserved.",
-                            "ui:styles": { "textAlign": "center", "color": "#94a3b8", "fontSize": "14px" }
-                        }
-                    },
-                    "styles": {
-                        "background": "#1e293b",
-                        "padding": "24px",
-                        "textAlign": "center"
-                    },
-                    "triggers": []
-                }
-            }
+              },
+            },
+            styles: {
+              padding: "100px 40px 60px",
+              background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 HotelHub. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#94a3b8",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "24px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
         },
+      },
 
-        "signup": {
-            "title": "Sign Up - HotelHub",
-            "components": {
-                "navbar": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "logo": {
-                            "ui:widget": "text",
-                            "ui:content": "🏨 HotelHub",
-                            "ui:styles": {
-                                "fontSize": "26px",
-                                "fontWeight": "800",
-                                "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                                "WebkitBackgroundClip": "text",
-                                "WebkitTextFillColor": "transparent",
-                                "cursor": "pointer"
-                            },
-                            "ui:action": "navigateToPage",
-                            "ui:actionParams": { "url": "/hotelhub" }
-                        },
-                        "themeToggle": {
-                            "ui:widget": "toggle",
-                            "ui:label": "",
-                            "ui:size": "medium",
-                            "ui:onChange": "toggleTheme",
-                            "ui:styles": {
-                                "marginLeft": "auto",
-                                "marginRight": "20px"
-                            }
-                        },
-                        "links": {
-                            "ui:widget": "navLinks",
-                            "ui:theme": "light",
-                            "ui:links": [
-                                {
-                                    "label": "Home",
-                                    "action": "navigateToPage",
-                                    "actionParams": { "url": "/hotelhub" }
-                                },
-                                {
-                                    "label": "Login",
-                                    "action": "navigateToPage",
-                                    "actionParams": { "url": "/hotelhub/login" }
-                                }
-                            ]
-                        }
-                    },
-                    "styles": {
-                        "background": "rgba(255, 255, 255, 0.95)",
-                        "borderBottom": "1px solid #e2e8f0",
-                        "padding": "18px 40px",
-                        "position": "fixed",
-                        "width": "100%",
-                        "zIndex": "1000",
-                        "display": "flex",
-                        "justifyContent": "space-between",
-                        "alignItems": "center",
-                        "backdropFilter": "blur(8px)",
-                        "height": "70px"
-                    },
-                    "triggers": [
-                        {
-                            "event": "load",
-                            "action": "loadTheme"
-                        }
-                    ]
+      signup: {
+        title: "Sign Up - HotelHub",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🏨 HotelHub",
+                "ui:styles": {
+                  fontSize: "26px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
                 },
-                "sidebar": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {},
-                    "styles": { "display": "none" },
-                    "triggers": []
+                "ui:action": "navigateToPage",
+                "ui:actionParams": { url: "/hotelhub" },
+              },
+              themeToggle: {
+                "ui:widget": "toggle",
+                "ui:label": "",
+                "ui:size": "medium",
+                "ui:onChange": "toggleTheme",
+                "ui:styles": {
+                  marginLeft: "auto",
+                  marginRight: "20px",
                 },
-                "main": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "signupForm": {
-                            "ui:widget": "formContainer",
-                            "ui:title": "✨ Create Account",
-                            "ui:description": "Join HotelHub and start managing",
-                            "ui:id": "signupForm",
-                            "ui:styles": {
-                                "maxWidth": "420px",
-                                "margin": "100px auto 0",
-                                "padding": "40px 36px",
-                                "background": "white",
-                                "borderRadius": "16px",
-                                "boxShadow": "0 8px 32px rgba(0,0,0,0.1)",
-                                "border": "1px solid #e2e8f0"
-                            },
-                            "ui:fields": [
-                                {
-                                    "ui:widget": "inputField",
-                                    "ui:label": "Full Name",
-                                    "ui:placeholder": "John Doe",
-                                    "ui:type": "text",
-                                    "ui:name": "name",
-                                    "ui:required": true
-                                },
-                                {
-                                    "ui:widget": "inputField",
-                                    "ui:label": "Email Address",
-                                    "ui:placeholder": "you@example.com",
-                                    "ui:type": "email",
-                                    "ui:name": "email",
-                                    "ui:required": true
-                                },
-                                {
-                                    "ui:widget": "inputField",
-                                    "ui:label": "Password",
-                                    "ui:placeholder": "Create a password",
-                                    "ui:type": "password",
-                                    "ui:name": "password",
-                                    "ui:required": true
-                                }
-                            ],
-                            "ui:actions": [
-                                {
-                                    "label": "Create Account",
-                                    "action": "api",
-                                    "actionParams": { "apiKey": "auth.signup" },
-                                    "variant": "primary",
-                                    "styles": {
-                                        "width": "100%",
-                                        "padding": "14px 0",
-                                        "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                                        "color": "white",
-                                        "fontSize": "15px",
-                                        "fontWeight": "600",
-                                        "borderRadius": "8px",
-                                        "border": "none"
-                                    }
-                                }
-                            ]
-                        },
-                        "authLinks": {
-                            "ui:widget": "authLinks",
-                            "ui:alignment": "center",
-                            "ui:links": [
-                                {
-                                    "prefix": "Already have an account?",
-                                    "label": "Login",
-                                    "action": "navigateToPage",
-                                    "actionParams": { "url": "/hotelhub/login" }
-                                }
-                            ],
-                            "ui:styles": {
-                                "maxWidth": "420px",
-                                "margin": "24px auto",
-                                "padding": "16px",
-                                "background": "rgba(248, 250, 252, 0.8)",
-                                "borderRadius": "12px"
-                            }
-                        }
-                    },
-                    "styles": {
-                        "padding": "100px 40px 60px",
-                        "background": "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
-                        "minHeight": "100vh"
-                    },
-                    "triggers": []
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub" },
+                  },
+                  {
+                    label: "Login",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub/login" },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(255, 255, 255, 0.95)",
+              borderBottom: "1px solid #e2e8f0",
+              padding: "18px 40px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              height: "70px",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              signupForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "✨ Create Account",
+                "ui:description": "Join HotelHub and start managing",
+                "ui:id": "signupForm",
+                "ui:styles": {
+                  maxWidth: "420px",
+                  margin: "100px auto 0",
+                  padding: "40px 36px",
+                  background: "white",
+                  borderRadius: "16px",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+                  border: "1px solid #e2e8f0",
                 },
-                "footer": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "footerText": {
-                            "ui:widget": "text",
-                            "ui:content": "© 2024 HotelHub. All rights reserved.",
-                            "ui:styles": { "textAlign": "center", "color": "#94a3b8", "fontSize": "14px" }
-                        }
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Full Name",
+                    "ui:placeholder": "John Doe",
+                    "ui:type": "text",
+                    "ui:name": "name",
+                    "ui:required": true,
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "you@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Create a password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Create Account",
+                    action: "api",
+                    actionParams: { apiKey: "auth.signup" },
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                      color: "white",
+                      fontSize: "15px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
                     },
-                    "styles": {
-                        "background": "#1e293b",
-                        "padding": "24px",
-                        "textAlign": "center"
-                    },
-                    "triggers": []
-                }
-            }
+                  },
+                ],
+              },
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    prefix: "Already have an account?",
+                    label: "Login",
+                    action: "navigateToPage",
+                    actionParams: { url: "/hotelhub/login" },
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "420px",
+                  margin: "24px auto",
+                  padding: "16px",
+                  background: "rgba(248, 250, 252, 0.8)",
+                  borderRadius: "12px",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 60px",
+              background: "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 HotelHub. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#94a3b8",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              background: "#1e293b",
+              padding: "24px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
         },
+      },
 
-        "dashboard": {
-            "title": "Dashboard - HotelHub",
-            "requireAuth": true,
-            "redirectIfNotAuth": "/hotelhub/login",
-            "components": {
-                "navbar": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "logo": {
-                            "ui:widget": "text",
-                            "ui:content": "🏨 HotelHub",
-                            "ui:styles": {
-                                "fontSize": "24px",
-                                "fontWeight": "800",
-                                "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                                "WebkitBackgroundClip": "text",
-                                "WebkitTextFillColor": "transparent",
-                                "cursor": "pointer"
-                            },
-                            "ui:action": "navigateToPage",
-                            "ui:actionParams": { "url": "/hotelhub/dashboard" }
-                        },
-                        "themeToggle": {
-                            "ui:widget": "toggle",
-                            "ui:label": "",
-                            "ui:size": "medium",
-                            "ui:onChange": "toggleTheme",
-                            "ui:styles": {
-                                "marginLeft": "auto",
-                                "marginRight": "20px"
-                            }
-                        },
-                        "userInfo": {
-                            "ui:widget": "navLinks",
-                            "ui:theme": "light",
-                            "ui:links": [
-                                {
-                                    "label": "{{auth.user?.email || 'User'}}",
-                                    "action": "",
-                                    "actionParams": {},
-                                    "styles": {
-                                        "fontWeight": "500",
-                                        "color": "inherit"
-                                    }
-                                },
-                                {
-                                    "label": "Logout",
-                                    "action": "clearAuth+reload",
-                                    "actionParams": {},
-                                    "styles": {
-                                        "color": "#ef4444",
-                                        "fontWeight": "500"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "styles": {
-                        "background": "rgba(255, 255, 255, 0.95)",
-                        "borderBottom": "1px solid #e2e8f0",
-                        "padding": "16px 40px",
-                        "position": "fixed",
-                        "width": "100%",
-                        "zIndex": "1000",
-                        "display": "flex",
-                        "justifyContent": "space-between",
-                        "alignItems": "center",
-                        "backdropFilter": "blur(8px)",
-                        "height": "70px"
-                    },
-                    "triggers": [
-                        {
-                            "event": "load",
-                            "action": "loadTheme"
-                        }
-                    ]
+      dashboard: {
+        title: "Dashboard - HotelHub",
+        requireAuth: true,
+        redirectIfNotAuth: "/hotelhub/login",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🏨 HotelHub",
+                "ui:styles": {
+                  fontSize: "24px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
                 },
-                "sidebar": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "menuHeading": {
-                            "ui:widget": "heading",
-                            "ui:text": "📋 Menu",
-                            "ui:level": "h3",
-                            "ui:styles": {
-                                "marginBottom": "24px",
-                                "fontSize": "1.1rem",
-                                "color": "inherit",
-                                "padding": "0 12px"
-                            }
-                        },
-                        "menuContainer": {
-                            "ui:widget": "container",
-                            "ui:direction": "column",
-                            "ui:gap": "6px",
-                            "ui:styles": {
-                                "width": "100%"
-                            },
-                            "ui:children": [
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "🏠 Dashboard",
-                                    "ui:action": "navigateToPage",
-                                    "ui:actionParams": { "url": "/hotelhub/dashboard" },
-                                    "ui:styles": {
-                                        "width": "100%",
-                                        "padding": "12px 16px",
-                                        "background": "#e0f2fe",
-                                        "color": "#0284c7",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "500",
-                                        "textAlign": "left",
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "gap": "10px",
-                                        "transition": "all 0.2s"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "🛏️ Rooms",
-                                    "ui:action": "navigateToPage",
-                                    "ui:actionParams": { "url": "/hotelhub/rooms" },
-                                    "ui:styles": {
-                                        "width": "100%",
-                                        "padding": "12px 16px",
-                                        "background": "transparent",
-                                        "color": "inherit",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "500",
-                                        "textAlign": "left",
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "gap": "10px",
-                                        "transition": "all 0.2s"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "📅 Reservations",
-                                    "ui:action": "navigateToPage",
-                                    "ui:actionParams": { "url": "/hotelhub/reservations" },
-                                    "ui:styles": {
-                                        "width": "100%",
-                                        "padding": "12px 16px",
-                                        "background": "transparent",
-                                        "color": "inherit",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "500",
-                                        "textAlign": "left",
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "gap": "10px",
-                                        "transition": "all 0.2s"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "👥 Guests",
-                                    "ui:action": "navigateToPage",
-                                    "ui:actionParams": { "url": "/hotelhub/guests" },
-                                    "ui:styles": {
-                                        "width": "100%",
-                                        "padding": "12px 16px",
-                                        "background": "transparent",
-                                        "color": "inherit",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "500",
-                                        "textAlign": "left",
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "gap": "10px",
-                                        "transition": "all 0.2s"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "styles": {
-                        "width": "260px",
-                        "background": "#f8fafc",
-                        "padding": "90px 16px 20px",
-                        "minHeight": "calc(100vh - 70px)",
-                        "borderRight": "1px solid #e2e8f0",
-                        "position": "fixed",
-                        "top": "70px",
-                        "left": "0",
-                        "className": "sidebar-fixed"
-                    },
-                    "triggers": []
+                "ui:action": "navigateToPage",
+                "ui:actionParams": { url: "/hotelhub/dashboard" },
+              },
+              themeToggle: {
+                "ui:widget": "toggle",
+                "ui:label": "",
+                "ui:size": "medium",
+                "ui:onChange": "toggleTheme",
+                "ui:styles": {
+                  marginLeft: "auto",
+                  marginRight: "20px",
                 },
-                "main": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "welcomeCard": {
-                            "ui:widget": "card",
-                            "ui:title": "👋 Welcome to HotelHub Dashboard",
-                            "ui:description": "Logged in as: {{auth.user?.email || 'User'}}",
-                            "ui:styles": {
-                                "padding": "32px",
-                                "textAlign": "left",
-                                "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                                "color": "white",
-                                "border": "none",
-                                "marginBottom": "24px",
-                                "borderRadius": "12px"
-                            }
-                        },
-                        "statsGrid": {
-                            "ui:widget": "gridLayout",
-                            "ui:columns": 3,
-                            "ui:gap": "20px",
-                            "ui:styles": {
-                                "marginBottom": "32px"
-                            },
-                            "ui:children": [
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "🛏️ Total Rooms",
-                                    "ui:description": "15 Rooms",
-                                    "ui:styles": {
-                                        "padding": "24px",
-                                        "textAlign": "center",
-                                        "background": "#e0f2fe",
-                                        "border": "1px solid #0ea5e9",
-                                        "borderRadius": "12px"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "✅ Available",
-                                    "ui:description": "10 Rooms",
-                                    "ui:styles": {
-                                        "padding": "24px",
-                                        "textAlign": "center",
-                                        "background": "#d1fae5",
-                                        "border": "1px solid #10b981",
-                                        "borderRadius": "12px"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "🔒 Occupied",
-                                    "ui:description": "5 Rooms",
-                                    "ui:styles": {
-                                        "padding": "24px",
-                                        "textAlign": "center",
-                                        "background": "#fee2e2",
-                                        "border": "1px solid #ef4444",
-                                        "borderRadius": "12px"
-                                    }
-                                }
-                            ]
-                        },
-                        "recentActivity": {
-                            "ui:widget": "card",
-                            "ui:title": "📈 Recent Activity",
-                            "ui:description": "• 5 new reservations today\\n• 2 rooms cleaned\\n• 1 maintenance request\\n• Revenue: $2,450",
-                            "ui:styles": {
-                                "padding": "24px",
-                                "background": "inherit",
-                                "borderRadius": "12px",
-                                "border": "1px solid #e2e8f0"
-                            }
-                        }
+              },
+              userInfo: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "{{auth.user?.email || 'User'}}",
+                    action: "",
+                    actionParams: {},
+                    styles: {
+                      fontWeight: "500",
+                      color: "inherit",
                     },
-                    "styles": {
-                        "marginLeft": "260px",
-                        "padding": "90px 32px 40px",
-                        "background": "inherit",
-                        "minHeight": "calc(100vh - 70px)"
+                  },
+                  {
+                    label: "Logout",
+                    action: "clearAuth+reload",
+                    actionParams: {},
+                    styles: {
+                      color: "#ef4444",
+                      fontWeight: "500",
                     },
-                    "triggers": [
-                        {
-                            "event": "load",
-                            "action": "loadTheme"
-                        }
-                    ]
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(255, 255, 255, 0.95)",
+              borderBottom: "1px solid #e2e8f0",
+              padding: "16px 40px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              height: "70px",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              menuHeading: {
+                "ui:widget": "heading",
+                "ui:text": "📋 Menu",
+                "ui:level": "h3",
+                "ui:styles": {
+                  marginBottom: "24px",
+                  fontSize: "1.1rem",
+                  color: "inherit",
+                  padding: "0 12px",
                 },
-                "footer": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "footerText": {
-                            "ui:widget": "text",
-                            "ui:content": "© 2024 HotelHub. All rights reserved.",
-                            "ui:styles": { "textAlign": "center", "color": "#94a3b8", "fontSize": "14px" }
-                        }
-                    },
-                    "styles": {
-                        "marginLeft": "260px",
-                        "background": "#1e293b",
-                        "padding": "24px",
-                        "textAlign": "center"
-                    },
-                    "triggers": []
-                }
-            }
-        },
-
-        "rooms": {
-            "title": "Rooms - HotelHub",
-            "requireAuth": true,
-            "redirectIfNotAuth": "/hotelhub/login",
-            "components": {
-                "navbar": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "logo": {
-                            "ui:widget": "text",
-                            "ui:content": "🏨 HotelHub",
-                            "ui:styles": {
-                                "fontSize": "24px",
-                                "fontWeight": "800",
-                                "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                                "WebkitBackgroundClip": "text",
-                                "WebkitTextFillColor": "transparent",
-                                "cursor": "pointer"
-                            },
-                            "ui:action": "navigateToPage",
-                            "ui:actionParams": { "url": "/hotelhub/dashboard" }
-                        },
-                        "themeToggle": {
-                            "ui:widget": "toggle",
-                            "ui:label": "",
-                            "ui:size": "medium",
-                            "ui:onChange": "toggleTheme",
-                            "ui:styles": {
-                                "marginLeft": "auto",
-                                "marginRight": "20px"
-                            }
-                        },
-                        "userInfo": {
-                            "ui:widget": "navLinks",
-                            "ui:theme": "light",
-                            "ui:links": [
-                                {
-                                    "label": "{{auth.user?.email || 'User'}}",
-                                    "action": "",
-                                    "actionParams": {},
-                                    "styles": {
-                                        "fontWeight": "500",
-                                        "color": "inherit"
-                                    }
-                                },
-                                {
-                                    "label": "Logout",
-                                    "action": "clearAuth+reload",
-                                    "actionParams": {},
-                                    "styles": {
-                                        "color": "#ef4444",
-                                        "fontWeight": "500"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "styles": {
-                        "background": "rgba(255, 255, 255, 0.95)",
-                        "borderBottom": "1px solid #e2e8f0",
-                        "padding": "16px 40px",
-                        "position": "fixed",
-                        "width": "100%",
-                        "zIndex": "1000",
-                        "display": "flex",
-                        "justifyContent": "space-between",
-                        "alignItems": "center",
-                        "backdropFilter": "blur(8px)",
-                        "height": "70px"
-                    },
-                    "triggers": [
-                        {
-                            "event": "load",
-                            "action": "loadTheme"
-                        }
-                    ]
+              },
+              menuContainer: {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "6px",
+                "ui:styles": {
+                  width: "100%",
                 },
-                "sidebar": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "menuHeading": {
-                            "ui:widget": "heading",
-                            "ui:text": "📋 Menu",
-                            "ui:level": "h3",
-                            "ui:styles": {
-                                "marginBottom": "24px",
-                                "fontSize": "1.1rem",
-                                "color": "inherit",
-                                "padding": "0 12px"
-                            }
-                        },
-                        "menuContainer": {
-                            "ui:widget": "container",
-                            "ui:direction": "column",
-                            "ui:gap": "6px",
-                            "ui:styles": {
-                                "width": "100%"
-                            },
-                            "ui:children": [
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "🏠 Dashboard",
-                                    "ui:action": "navigateToPage",
-                                    "ui:actionParams": { "url": "/hotelhub/dashboard" },
-                                    "ui:styles": {
-                                        "width": "100%",
-                                        "padding": "12px 16px",
-                                        "background": "transparent",
-                                        "color": "inherit",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "500",
-                                        "textAlign": "left",
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "gap": "10px",
-                                        "transition": "all 0.2s"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "🛏️ Rooms",
-                                    "ui:action": "navigateToPage",
-                                    "ui:actionParams": { "url": "/hotelhub/rooms" },
-                                    "ui:styles": {
-                                        "width": "100%",
-                                        "padding": "12px 16px",
-                                        "background": "#e0f2fe",
-                                        "color": "#0284c7",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "500",
-                                        "textAlign": "left",
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "gap": "10px",
-                                        "transition": "all 0.2s"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "📅 Reservations",
-                                    "ui:action": "navigateToPage",
-                                    "ui:actionParams": { "url": "/hotelhub/reservations" },
-                                    "ui:styles": {
-                                        "width": "100%",
-                                        "padding": "12px 16px",
-                                        "background": "transparent",
-                                        "color": "inherit",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "500",
-                                        "textAlign": "left",
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "gap": "10px",
-                                        "transition": "all 0.2s"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "👥 Guests",
-                                    "ui:action": "navigateToPage",
-                                    "ui:actionParams": { "url": "/hotelhub/guests" },
-                                    "ui:styles": {
-                                        "width": "100%",
-                                        "padding": "12px 16px",
-                                        "background": "transparent",
-                                        "color": "inherit",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "500",
-                                        "textAlign": "left",
-                                        "display": "flex",
-                                        "alignItems": "center",
-                                        "gap": "10px",
-                                        "transition": "all 0.2s"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "styles": {
-                        "width": "260px",
-                        "background": "#f8fafc",
-                        "padding": "90px 16px 20px",
-                        "minHeight": "calc(100vh - 70px)",
-                        "borderRight": "1px solid #e2e8f0",
-                        "position": "fixed",
-                        "top": "70px",
-                        "left": "0",
-                        "className": "sidebar-fixed"
-                    },
-                    "triggers": []
-                },
-                "main": {
-                    "table": {},
-                    "modal": {
-                        "editRoom": {
-                            "ui:title": "Edit Room",
-                            "ui:theme": "light",
-                            "ui:entityName": "room",
-                            "ui:styles": {
-                                "maxWidth": "480px",
-                                "padding": "32px"
-                            },
-                            "ui:fields": [
-                                {
-                                    "name": "roomNumber",
-                                    "label": "Room Number",
-                                    "type": "text",
-                                    "placeholder": "101",
-                                    "required": true
-                                },
-                                {
-                                    "name": "roomType",
-                                    "label": "Room Type",
-                                    "type": "text",
-                                    "placeholder": "Select room type",
-                                    "required": true
-                                },
-                                {
-                                    "name": "price",
-                                    "label": "Price per Night",
-                                    "type": "number",
-                                    "placeholder": "150",
-                                    "required": true
-                                },
-                                {
-                                    "name": "status",
-                                    "label": "Status",
-                                    "type": "text",
-                                    "placeholder": "Select status",
-                                    "required": true
-                                },
-                                {
-                                    "name": "capacity",
-                                    "label": "Capacity",
-                                    "type": "number",
-                                    "placeholder": "2",
-                                    "required": true
-                                },
-                                {
-                                    "name": "floor",
-                                    "label": "Floor",
-                                    "type": "number",
-                                    "placeholder": "1",
-                                    "required": true
-                                },
-                                {
-                                    "name": "description",
-                                    "label": "Description",
-                                    "type": "text",
-                                    "placeholder": "Room description",
-                                    "required": false
-                                },
-                                {
-                                    "name": "_id",
-                                    "type": "hidden"
-                                }
-                            ],
-                            "ui:actions": [
-                                {
-                                    "label": "Update Room",
-                                    "action": "updateRoom",
-                                    "variant": "primary",
-                                    "styles": {
-                                        "width": "100%",
-                                        "padding": "14px 24px",
-                                        "background": "#667eea",
-                                        "color": "white",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "1rem",
-                                        "fontWeight": "600",
-                                        "cursor": "pointer"
-                                    }
-                                },
-                                {
-                                    "label": "Cancel",
-                                    "action": "closeModal",
-                                    "variant": "outline",
-                                    "styles": {
-                                        "width": "100%",
-                                        "padding": "14px 0",
-                                        "background": "transparent",
-                                        "color": "#64748b",
-                                        "fontSize": "16px",
-                                        "fontWeight": "600",
-                                        "borderRadius": "8px",
-                                        "border": "1px solid #e2e8f0"
-                                    }
-                                }
-                            ]
-                        },
-                        "addRoom": {
-                            "ui:title": "Add New Room",
-                            "ui:theme": "light",
-                            "ui:entityName": "room",
-                            "ui:styles": {
-                                "maxWidth": "480px",
-                                "padding": "32px"
-                            },
-                            "ui:fields": [
-                                {
-                                    "name": "roomNumber",
-                                    "label": "Room Number",
-                                    "type": "text",
-                                    "placeholder": "101",
-                                    "required": true
-                                },
-                                {
-                                    "name": "roomType",
-                                    "label": "Room Type",
-                                    "type": "text",
-                                    "placeholder": "Select room type",
-                                    "required": true
-                                },
-                                {
-                                    "name": "price",
-                                    "label": "Price per Night",
-                                    "type": "number",
-                                    "placeholder": "150",
-                                    "required": true
-                                },
-                                {
-                                    "name": "status",
-                                    "label": "Status",
-                                    "type": "text",
-                                    "placeholder": "Select status",
-                                    "required": true
-                                },
-                                {
-                                    "name": "capacity",
-                                    "label": "Capacity",
-                                    "type": "number",
-                                    "placeholder": "2",
-                                    "required": true
-                                },
-                                {
-                                    "name": "floor",
-                                    "label": "Floor",
-                                    "type": "number",
-                                    "placeholder": "1",
-                                    "required": true
-                                },
-                                {
-                                    "name": "description",
-                                    "label": "Description",
-                                    "type": "text",
-                                    "placeholder": "Room description",
-                                    "required": false
-                                }
-                            ],
-                            "ui:actions": [
-                                {
-                                    "label": "Add Room",
-                                    "action": "api",
-                                    "actionParams": { "apiKey": "rooms.create" },
-                                    "variant": "primary",
-                                    "styles": {
-                                        "width": "100%",
-                                        "padding": "14px 0",
-                                        "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                                        "color": "white",
-                                        "fontSize": "16px",
-                                        "fontWeight": "600",
-                                        "borderRadius": "8px",
-                                        "border": "none",
-                                        "marginTop": "10px"
-                                    }
-                                },
-                                {
-                                    "label": "Cancel",
-                                    "action": "closeModal",
-                                    "variant": "outline",
-                                    "styles": {
-                                        "width": "100%",
-                                        "padding": "14px 0",
-                                        "background": "transparent",
-                                        "color": "#64748b",
-                                        "fontSize": "16px",
-                                        "fontWeight": "600",
-                                        "borderRadius": "8px",
-                                        "border": "1px solid #e2e8f0"
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "uiSchema": {
-                        "pageHeader": {
-                            "ui:widget": "flexLayout",
-                            "ui:direction": "row",
-                            "ui:justify": "space-between",
-                            "ui:align": "center",
-                            "ui:styles": {
-                                "marginBottom": "24px"
-                            },
-                            "ui:children": [
-                                {
-                                    "ui:widget": "heading",
-                                    "ui:text": "🛏️ Rooms Management",
-                                    "ui:level": "h1",
-                                    "ui:styles": {
-                                        "margin": "0",
-                                        "fontSize": "1.8rem"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "button",
-                                    "ui:label": "➕ Add Room",
-                                    "ui:action": "openModal",
-                                    "ui:actionParams": { "modal": "addRoom" },
-                                    "ui:variant": "primary",
-                                    "ui:styles": {
-                                        "padding": "10px 20px",
-                                        "background": "#0ea5e9",
-                                        "color": "white",
-                                        "borderRadius": "8px",
-                                        "border": "none",
-                                        "fontWeight": "600",
-                                        "fontSize": "14px"
-                                    }
-                                }
-                            ]
-                        },
-                        "searchFilters": {
-                            "ui:widget": "filterWidget",
-                            "ui:title": "🔍 Search & Filter Rooms",
-                            "ui:styles": {
-                                "background": "white",
-                                "padding": "20px",
-                                "borderRadius": "12px",
-                                "boxShadow": "0 2px 8px rgba(0,0,0,0.08)",
-                                "marginBottom": "24px",
-                                "border": "1px solid #e2e8f0"
-                            },
-                            "ui:fields": [
-                                {
-                                    "ui:widget": "inputField",
-                                    "ui:label": "Search",
-                                    "ui:placeholder": "Search by room number, type, or description...",
-                                    "ui:type": "text",
-                                    "ui:name": "search",
-                                    "ui:flex": "2",
-                                    "ui:minWidth": "280px",
-                                    "ui:styles": {
-                                        "marginBottom": "0"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "selectField",
-                                    "ui:label": "Room Type",
-                                    "ui:name": "roomType",
-                                    "ui:placeholder": "All Types",
-                                    "ui:flex": "1",
-                                    "ui:minWidth": "140px",
-                                    "ui:options": [
-                                        { "value": "", "label": "All Types" },
-                                        { "value": "Standard", "label": "Standard" },
-                                        { "value": "Deluxe", "label": "Deluxe" },
-                                        { "value": "Suite", "label": "Suite" },
-                                        { "value": "Presidential", "label": "Presidential" }
-                                    ],
-                                    "ui:styles": {
-                                        "marginBottom": "0"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "selectField",
-                                    "ui:label": "Status",
-                                    "ui:name": "status",
-                                    "ui:placeholder": "All Statuses",
-                                    "ui:flex": "1",
-                                    "ui:minWidth": "140px",
-                                    "ui:options": [
-                                        { "value": "", "label": "All Statuses" },
-                                        { "value": "Available", "label": "Available" },
-                                        { "value": "Occupied", "label": "Occupied" },
-                                        { "value": "Maintenance", "label": "Maintenance" },
-                                        { "value": "Reserved", "label": "Reserved" }
-                                    ],
-                                    "ui:styles": {
-                                        "marginBottom": "0"
-                                    }
-                                }
-                            ],
-                            "ui:actions": [
-                                {
-                                    "label": "🔍 Apply",
-                                    "variant": "filter",
-                                    "action": "api",
-                                    "actionParams": {
-                                        "apiKey": "rooms.list"
-                                    },
-                                    "styles": {
-                                        "padding": "10px 20px",
-                                        "background": "#0ea5e9",
-                                        "color": "white",
-                                        "border": "none",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "600"
-                                    }
-                                },
-                                {
-                                    "label": "🔄 Reset",
-                                    "variant": "reset",
-                                    "action": "api",
-                                    "actionParams": {
-                                        "apiKey": "rooms.list",
-                                        "payload": { "page": 1, "limit": 10 }
-                                    },
-                                    "styles": {
-                                        "padding": "10px 20px",
-                                        "background": "transparent",
-                                        "color": "#64748b",
-                                        "border": "1px solid #e2e8f0",
-                                        "borderRadius": "8px",
-                                        "fontSize": "14px",
-                                        "fontWeight": "600"
-                                    }
-                                }
-                            ]
-                        },
-                        "roomsTable": {
-                            "ui:widget": "dataTable",
-                            "ui:title": "Room List",
-                            "ui:id": "roomsTable",
-                            "ui:description": "Manage all hotel rooms",
-                            "ui:emptyText": "No rooms found. Try adjusting your filters or click 'Add Room' to create one.",
-                            "ui:dataSource": "rooms.api",
-                            "ui:apiKey": "rooms.list",
-                            "ui:searchEnabled": false,
-                            "ui:pagination": {
-                                "enabled": true,
-                                "pageSize": 10,
-                                "serverSide": true
-                            },
-                            "ui:columns": [
-                                {
-                                    "key": "roomNumber",
-                                    "title": "Room #",
-                                    "dataIndex": "roomNumber",
-                                    "width": "100px"
-                                },
-                                {
-                                    "key": "roomType",
-                                    "title": "Type",
-                                    "dataIndex": "roomType",
-                                    "width": "120px"
-                                },
-                                {
-                                    "key": "price",
-                                    "title": "Price/Night",
-                                    "dataIndex": "price",
-                                    "width": "120px"
-                                },
-                                {
-                                    "key": "status",
-                                    "title": "Status",
-                                    "dataIndex": "status",
-                                    "width": "120px"
-                                },
-                                {
-                                    "key": "capacity",
-                                    "title": "Capacity",
-                                    "dataIndex": "capacity",
-                                    "width": "100px"
-                                },
-                                {
-                                    "key": "floor",
-                                    "title": "Floor",
-                                    "dataIndex": "floor",
-                                    "width": "80px"
-                                },
-                                {
-                                    "key": "description",
-                                    "title": "Description",
-                                    "dataIndex": "description"
-                                },
-                                {
-                                    "key": "actions",
-                                    "title": "Actions",
-                                    "type": "actions",
-                                    "align": "center",
-                                    "width": "200px",
-                                    "actions": [
-                                        {
-                                            "label": "✏️ Edit",
-                                            "action": "openEditModal",
-                                            "variant": "primary"
-                                        },
-                                        {
-                                            "label": "Delete",
-                                            "action": "deleteRoom",
-                                            "variant": "danger",
-                                            "confirm": true
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    },
-                    "styles": {
-                        "marginLeft": "260px",
-                        "padding": "90px 32px 40px",
-                        "background": "inherit",
-                        "minHeight": "calc(100vh - 70px)"
-                    },
-                    "triggers": [
-                        {
-                            "event": "load",
-                            "action": "api",
-                            "source": "rooms.api",
-                            "params": {
-                                "page": 1,
-                                "limit": 10
-                            }
-                        },
-                        {
-                            "event": "load",
-                            "action": "loadTheme"
-                        }
-                    ]
-                },
-                "footer": {
-                    "table": {},
-                    "modal": {},
-                    "uiSchema": {
-                        "footerText": {
-                            "ui:widget": "text",
-                            "ui:content": "© 2024 HotelHub. All rights reserved.",
-                            "ui:styles": { "textAlign": "center", "color": "#94a3b8", "fontSize": "14px" }
-                        }
-                    },
-                    "styles": {
-                        "marginLeft": "260px",
-                        "background": "#1e293b",
-                        "padding": "24px",
-                        "textAlign": "center"
-                    },
-                    "triggers": []
-                }
-            }
-        }
-    },
-
-    "components": {
-        "navbar": {
-            "table": {},
-            "modal": {},
-            "uiSchema": {
-                "logo": {
-                    "ui:widget": "text",
-                    "ui:content": "🏨 HotelHub",
-                    "ui:styles": {
-                        "fontSize": "26px",
-                        "fontWeight": "800",
-                        "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                        "WebkitBackgroundClip": "text",
-                        "WebkitTextFillColor": "transparent",
-                        "cursor": "pointer"
-                    },
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🏠 Dashboard",
                     "ui:action": "navigateToPage",
-                    "ui:actionParams": { "url": "/hotelhub" }
-                },
-                "themeToggle": {
-                    "ui:widget": "toggle",
-                    "ui:label": "",
-                    "ui:size": "medium",
-                    "ui:onChange": "toggleTheme",
+                    "ui:actionParams": { url: "/hotelhub/dashboard" },
                     "ui:styles": {
-                        "marginLeft": "auto",
-                        "marginRight": "20px"
-                    }
-                },
-                "links": {
-                    "ui:widget": "navLinks",
-                    "ui:theme": "light",
-                    "ui:links": [
-                        {
-                            "label": "{{auth.token ? '' : 'Login'}}",
-                            "action": "{{auth.token ? '' : 'navigateToPage'}}",
-                            "actionParams": { "url": "/hotelhub/login" }
-                        },
-                        {
-                            "label": "{{auth.token ? 'Dashboard' : ''}}",
-                            "action": "{{auth.token ? 'navigateToPage' : ''}}",
-                            "actionParams": { "url": "/hotelhub/dashboard" }
-                        },
-                        {
-                            "label": "{{auth.token ? 'Logout' : ''}}",
-                            "action": "{{auth.token ? 'clearAuth+reload' : ''}}"
-                        }
-                    ]
-                }
-            },
-            "styles": {
-                "background": "rgba(255, 255, 255, 0.95)",
-                "borderBottom": "1px solid #e2e8f0",
-                "padding": "18px 40px",
-                "position": "fixed",
-                "width": "100%",
-                "zIndex": "1000",
-                "display": "flex",
-                "justifyContent": "space-between",
-                "alignItems": "center",
-                "backdropFilter": "blur(8px)",
-                "height": "70px"
-            },
-            "triggers": [
-                {
-                    "event": "load",
-                    "action": "loadTheme"
-                }
-            ]
-        },
-        "sidebar": {
-            "table": {},
-            "modal": {},
-            "uiSchema": {},
-            "styles": { "display": "none" },
-            "triggers": []
-        },
-        "main": {
-            "table": {},
-            "modal": {},
-            "uiSchema": {
-                "hero": {
-                    "ui:widget": "hero",
-                    "ui:title": "Welcome to HotelHub",
-                    "ui:subtitle": "Modern hotel management made simple. Manage rooms, reservations, and guests all in one place.",
-                    "ui:cta": {
-                        "label": "Get Started",
-                        "action": "navigateToPage",
-                        "actionParams": { "url": "/hotelhub/login" }
+                      width: "100%",
+                      padding: "12px 16px",
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      transition: "all 0.2s",
                     },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🛏️ Rooms",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/rooms" },
                     "ui:styles": {
-                        "textAlign": "center",
-                        "padding": "150px 40px 100px",
-                        "background": "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                        "color": "white",
-                        "minHeight": "600px",
-                        "display": "flex",
-                        "flexDirection": "column",
-                        "justifyContent": "center",
-                        "alignItems": "center"
-                    }
-                },
-                "featuresSection": {
-                    "ui:widget": "container",
-                    "ui:direction": "column",
-                    "ui:gap": "40px",
-                    "ui:styles": {
-                        "padding": "80px 40px",
-                        "background": "#f8fafc"
+                      width: "100%",
+                      padding: "12px 16px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      transition: "all 0.2s",
                     },
-                    "ui:children": [
-                        {
-                            "ui:widget": "heading",
-                            "ui:text": "✨ Features",
-                            "ui:level": "h2",
-                            "ui:styles": {
-                                "textAlign": "center",
-                                "marginBottom": "40px"
-                            }
-                        },
-                        {
-                            "ui:widget": "gridLayout",
-                            "ui:columns": 3,
-                            "ui:gap": "30px",
-                            "ui:children": [
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "🛏️ Room Management",
-                                    "ui:description": "Easily manage all your hotel rooms with our intuitive interface",
-                                    "ui:styles": {
-                                        "padding": "32px",
-                                        "textAlign": "center",
-                                        "background": "white",
-                                        "borderRadius": "12px",
-                                        "border": "1px solid #e2e8f0"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "📅 Reservations",
-                                    "ui:description": "Track and manage reservations with real-time availability",
-                                    "ui:styles": {
-                                        "padding": "32px",
-                                        "textAlign": "center",
-                                        "background": "white",
-                                        "borderRadius": "12px",
-                                        "border": "1px solid #e2e8f0"
-                                    }
-                                },
-                                {
-                                    "ui:widget": "card",
-                                    "ui:title": "👥 Guest Management",
-                                    "ui:description": "Keep track of all your guests and their preferences",
-                                    "ui:styles": {
-                                        "padding": "32px",
-                                        "textAlign": "center",
-                                        "background": "white",
-                                        "borderRadius": "12px",
-                                        "border": "1px solid #e2e8f0"
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                }
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "📅 Reservations",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/reservations" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "12px 16px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "👥 Guests",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/guests" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "12px 16px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                ],
+              },
             },
-            "styles": {
-                "padding": "0",
-                "background": "#ffffff",
-                "minHeight": "100vh"
+            styles: {
+              width: "260px",
+              background: "#f8fafc",
+              padding: "90px 16px 20px",
+              minHeight: "calc(100vh - 70px)",
+              borderRight: "1px solid #e2e8f0",
+              position: "fixed",
+              top: "70px",
+              left: "0",
+              className: "sidebar-fixed",
             },
-            "triggers": [
-                {
-                    "event": "load",
-                    "action": "loadTheme"
-                }
-            ]
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              welcomeCard: {
+                "ui:widget": "card",
+                "ui:title": "👋 Welcome to HotelHub Dashboard",
+                "ui:description":
+                  "Logged in as: {{auth.user?.email || 'User'}}",
+                "ui:styles": {
+                  padding: "32px",
+                  textAlign: "left",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  color: "white",
+                  border: "none",
+                  marginBottom: "24px",
+                  borderRadius: "12px",
+                },
+              },
+              statsGrid: {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "20px",
+                "ui:styles": {
+                  marginBottom: "32px",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🛏️ Total Rooms",
+                    "ui:description": "15 Rooms",
+                    "ui:styles": {
+                      padding: "24px",
+                      textAlign: "center",
+                      background: "#e0f2fe",
+                      border: "1px solid #0ea5e9",
+                      borderRadius: "12px",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "✅ Available",
+                    "ui:description": "10 Rooms",
+                    "ui:styles": {
+                      padding: "24px",
+                      textAlign: "center",
+                      background: "#d1fae5",
+                      border: "1px solid #10b981",
+                      borderRadius: "12px",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🔒 Occupied",
+                    "ui:description": "5 Rooms",
+                    "ui:styles": {
+                      padding: "24px",
+                      textAlign: "center",
+                      background: "#fee2e2",
+                      border: "1px solid #ef4444",
+                      borderRadius: "12px",
+                    },
+                  },
+                ],
+              },
+              recentActivity: {
+                "ui:widget": "card",
+                "ui:title": "📈 Recent Activity",
+                "ui:description":
+                  "• 5 new reservations today\\n• 2 rooms cleaned\\n• 1 maintenance request\\n• Revenue: $2,450",
+                "ui:styles": {
+                  padding: "24px",
+                  background: "inherit",
+                  borderRadius: "12px",
+                  border: "1px solid #e2e8f0",
+                },
+              },
+            },
+            styles: {
+              marginLeft: "260px",
+              padding: "90px 32px 40px",
+              background: "inherit",
+              minHeight: "calc(100vh - 70px)",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 HotelHub. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#94a3b8",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              marginLeft: "260px",
+              background: "#1e293b",
+              padding: "24px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
         },
-        "footer": {
-            "table": {},
-            "modal": {},
-            "uiSchema": {
-                "footerText": {
-                    "ui:widget": "text",
-                    "ui:content": "© 2024 HotelHub. All rights reserved.",
-                    "ui:styles": { "textAlign": "center", "color": "#94a3b8", "fontSize": "14px" }
-                }
+      },
+
+      rooms: {
+        title: "Rooms - HotelHub",
+        requireAuth: true,
+        redirectIfNotAuth: "/hotelhub/login",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🏨 HotelHub",
+                "ui:styles": {
+                  fontSize: "24px",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+                "ui:action": "navigateToPage",
+                "ui:actionParams": { url: "/hotelhub/dashboard" },
+              },
+              themeToggle: {
+                "ui:widget": "toggle",
+                "ui:label": "",
+                "ui:size": "medium",
+                "ui:onChange": "toggleTheme",
+                "ui:styles": {
+                  marginLeft: "auto",
+                  marginRight: "20px",
+                },
+              },
+              userInfo: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "{{auth.user?.email || 'User'}}",
+                    action: "",
+                    actionParams: {},
+                    styles: {
+                      fontWeight: "500",
+                      color: "inherit",
+                    },
+                  },
+                  {
+                    label: "Logout",
+                    action: "clearAuth+reload",
+                    actionParams: {},
+                    styles: {
+                      color: "#ef4444",
+                      fontWeight: "500",
+                    },
+                  },
+                ],
+              },
             },
-            "styles": {
-                "background": "#1e293b",
-                "padding": "32px",
-                "textAlign": "center"
+            styles: {
+              background: "rgba(255, 255, 255, 0.95)",
+              borderBottom: "1px solid #e2e8f0",
+              padding: "16px 40px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              height: "70px",
             },
-            "triggers": []
-        }
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              menuHeading: {
+                "ui:widget": "heading",
+                "ui:text": "📋 Menu",
+                "ui:level": "h3",
+                "ui:styles": {
+                  marginBottom: "24px",
+                  fontSize: "1.1rem",
+                  color: "inherit",
+                  padding: "0 12px",
+                },
+              },
+              menuContainer: {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "6px",
+                "ui:styles": {
+                  width: "100%",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🏠 Dashboard",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/dashboard" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "12px 16px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🛏️ Rooms",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/rooms" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "12px 16px",
+                      background: "#e0f2fe",
+                      color: "#0284c7",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "📅 Reservations",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/reservations" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "12px 16px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "👥 Guests",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/hotelhub/guests" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "12px 16px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                ],
+              },
+            },
+            styles: {
+              width: "260px",
+              background: "#f8fafc",
+              padding: "90px 16px 20px",
+              minHeight: "calc(100vh - 70px)",
+              borderRight: "1px solid #e2e8f0",
+              position: "fixed",
+              top: "70px",
+              left: "0",
+              className: "sidebar-fixed",
+            },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {
+              editRoom: {
+                "ui:title": "Edit Room",
+                "ui:theme": "light",
+                "ui:entityName": "room",
+                "ui:styles": {
+                  maxWidth: "480px",
+                  padding: "32px",
+                },
+                "ui:fields": [
+                  {
+                    name: "roomNumber",
+                    label: "Room Number",
+                    type: "text",
+                    placeholder: "101",
+                    required: true,
+                  },
+                  {
+                    name: "roomType",
+                    label: "Room Type",
+                    type: "text",
+                    placeholder: "Select room type",
+                    required: true,
+                  },
+                  {
+                    name: "price",
+                    label: "Price per Night",
+                    type: "number",
+                    placeholder: "150",
+                    required: true,
+                  },
+                  {
+                    name: "status",
+                    label: "Status",
+                    type: "text",
+                    placeholder: "Select status",
+                    required: true,
+                  },
+                  {
+                    name: "capacity",
+                    label: "Capacity",
+                    type: "number",
+                    placeholder: "2",
+                    required: true,
+                  },
+                  {
+                    name: "floor",
+                    label: "Floor",
+                    type: "number",
+                    placeholder: "1",
+                    required: true,
+                  },
+                  {
+                    name: "description",
+                    label: "Description",
+                    type: "text",
+                    placeholder: "Room description",
+                    required: false,
+                  },
+                  {
+                    name: "_id",
+                    type: "hidden",
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Update Room",
+                    action: "updateRoom",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 24px",
+                      background: "#667eea",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "1rem",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                    },
+                  },
+                  {
+                    label: "Cancel",
+                    action: "closeModal",
+                    variant: "outline",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background: "transparent",
+                      color: "#64748b",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                    },
+                  },
+                ],
+              },
+              addRoom: {
+                "ui:title": "Add New Room",
+                "ui:theme": "light",
+                "ui:entityName": "room",
+                "ui:styles": {
+                  maxWidth: "480px",
+                  padding: "32px",
+                },
+                "ui:fields": [
+                  {
+                    name: "roomNumber",
+                    label: "Room Number",
+                    type: "text",
+                    placeholder: "101",
+                    required: true,
+                  },
+                  {
+                    name: "roomType",
+                    label: "Room Type",
+                    type: "text",
+                    placeholder: "Select room type",
+                    required: true,
+                  },
+                  {
+                    name: "price",
+                    label: "Price per Night",
+                    type: "number",
+                    placeholder: "150",
+                    required: true,
+                  },
+                  {
+                    name: "status",
+                    label: "Status",
+                    type: "text",
+                    placeholder: "Select status",
+                    required: true,
+                  },
+                  {
+                    name: "capacity",
+                    label: "Capacity",
+                    type: "number",
+                    placeholder: "2",
+                    required: true,
+                  },
+                  {
+                    name: "floor",
+                    label: "Floor",
+                    type: "number",
+                    placeholder: "1",
+                    required: true,
+                  },
+                  {
+                    name: "description",
+                    label: "Description",
+                    type: "text",
+                    placeholder: "Room description",
+                    required: false,
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Add Room",
+                    action: "api",
+                    actionParams: { apiKey: "rooms.create" },
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "none",
+                      marginTop: "10px",
+                    },
+                  },
+                  {
+                    label: "Cancel",
+                    action: "closeModal",
+                    variant: "outline",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background: "transparent",
+                      color: "#64748b",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      borderRadius: "8px",
+                      border: "1px solid #e2e8f0",
+                    },
+                  },
+                ],
+              },
+            },
+            uiSchema: {
+              pageHeader: {
+                "ui:widget": "flexLayout",
+                "ui:direction": "row",
+                "ui:justify": "space-between",
+                "ui:align": "center",
+                "ui:styles": {
+                  marginBottom: "24px",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "🛏️ Rooms Management",
+                    "ui:level": "h1",
+                    "ui:styles": {
+                      margin: "0",
+                      fontSize: "1.8rem",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "➕ Add Room",
+                    "ui:action": "openModal",
+                    "ui:actionParams": { modal: "addRoom" },
+                    "ui:variant": "primary",
+                    "ui:styles": {
+                      padding: "10px 20px",
+                      background: "#0ea5e9",
+                      color: "white",
+                      borderRadius: "8px",
+                      border: "none",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                    },
+                  },
+                ],
+              },
+              searchFilters: {
+                "ui:widget": "filterWidget",
+                "ui:title": "🔍 Search & Filter Rooms",
+                "ui:styles": {
+                  background: "white",
+                  padding: "20px",
+                  borderRadius: "12px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  marginBottom: "24px",
+                  border: "1px solid #e2e8f0",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Search",
+                    "ui:placeholder":
+                      "Search by room number, type, or description...",
+                    "ui:type": "text",
+                    "ui:name": "search",
+                    "ui:flex": "2",
+                    "ui:minWidth": "280px",
+                    "ui:styles": {
+                      marginBottom: "0",
+                    },
+                  },
+                  {
+                    "ui:widget": "selectField",
+                    "ui:label": "Room Type",
+                    "ui:name": "roomType",
+                    "ui:placeholder": "All Types",
+                    "ui:flex": "1",
+                    "ui:minWidth": "140px",
+                    "ui:options": [
+                      { value: "", label: "All Types" },
+                      { value: "Standard", label: "Standard" },
+                      { value: "Deluxe", label: "Deluxe" },
+                      { value: "Suite", label: "Suite" },
+                      { value: "Presidential", label: "Presidential" },
+                    ],
+                    "ui:styles": {
+                      marginBottom: "0",
+                    },
+                  },
+                  {
+                    "ui:widget": "selectField",
+                    "ui:label": "Status",
+                    "ui:name": "status",
+                    "ui:placeholder": "All Statuses",
+                    "ui:flex": "1",
+                    "ui:minWidth": "140px",
+                    "ui:options": [
+                      { value: "", label: "All Statuses" },
+                      { value: "Available", label: "Available" },
+                      { value: "Occupied", label: "Occupied" },
+                      { value: "Maintenance", label: "Maintenance" },
+                      { value: "Reserved", label: "Reserved" },
+                    ],
+                    "ui:styles": {
+                      marginBottom: "0",
+                    },
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "🔍 Apply",
+                    variant: "filter",
+                    action: "api",
+                    actionParams: {
+                      apiKey: "rooms.list",
+                    },
+                    styles: {
+                      padding: "10px 20px",
+                      background: "#0ea5e9",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    },
+                  },
+                  {
+                    label: "🔄 Reset",
+                    variant: "reset",
+                    action: "api",
+                    actionParams: {
+                      apiKey: "rooms.list",
+                      payload: { page: 1, limit: 10 },
+                    },
+                    styles: {
+                      padding: "10px 20px",
+                      background: "transparent",
+                      color: "#64748b",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: "8px",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                    },
+                  },
+                ],
+              },
+              roomsTable: {
+                "ui:widget": "dataTable",
+                "ui:title": "Room List",
+                "ui:id": "roomsTable",
+                "ui:description": "Manage all hotel rooms",
+                "ui:emptyText":
+                  "No rooms found. Try adjusting your filters or click 'Add Room' to create one.",
+                "ui:dataSource": "rooms.api",
+                "ui:apiKey": "rooms.list",
+                "ui:searchEnabled": false,
+                "ui:pagination": {
+                  enabled: true,
+                  pageSize: 10,
+                  serverSide: true,
+                },
+                "ui:columns": [
+                  {
+                    key: "roomNumber",
+                    title: "Room #",
+                    dataIndex: "roomNumber",
+                    width: "100px",
+                  },
+                  {
+                    key: "roomType",
+                    title: "Type",
+                    dataIndex: "roomType",
+                    width: "120px",
+                  },
+                  {
+                    key: "price",
+                    title: "Price/Night",
+                    dataIndex: "price",
+                    width: "120px",
+                  },
+                  {
+                    key: "status",
+                    title: "Status",
+                    dataIndex: "status",
+                    width: "120px",
+                  },
+                  {
+                    key: "capacity",
+                    title: "Capacity",
+                    dataIndex: "capacity",
+                    width: "100px",
+                  },
+                  {
+                    key: "floor",
+                    title: "Floor",
+                    dataIndex: "floor",
+                    width: "80px",
+                  },
+                  {
+                    key: "description",
+                    title: "Description",
+                    dataIndex: "description",
+                  },
+                  {
+                    key: "actions",
+                    title: "Actions",
+                    type: "actions",
+                    align: "center",
+                    width: "200px",
+                    actions: [
+                      {
+                        label: "✏️ Edit",
+                        action: "openEditModal",
+                        variant: "primary",
+                      },
+                      {
+                        label: "Delete",
+                        action: "deleteRoom",
+                        variant: "danger",
+                        confirm: true,
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            styles: {
+              marginLeft: "260px",
+              padding: "90px 32px 40px",
+              background: "inherit",
+              minHeight: "calc(100vh - 70px)",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "api",
+                source: "rooms.api",
+                params: {
+                  page: 1,
+                  limit: 10,
+                },
+              },
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 HotelHub. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#94a3b8",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              marginLeft: "260px",
+              background: "#1e293b",
+              padding: "24px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
     },
 
-    "resolvedAPIs": {}
-},
+    components: {
+      navbar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "🏨 HotelHub",
+            "ui:styles": {
+              fontSize: "26px",
+              fontWeight: "800",
+              background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              cursor: "pointer",
+            },
+            "ui:action": "navigateToPage",
+            "ui:actionParams": { url: "/hotelhub" },
+          },
+          themeToggle: {
+            "ui:widget": "toggle",
+            "ui:label": "",
+            "ui:size": "medium",
+            "ui:onChange": "toggleTheme",
+            "ui:styles": {
+              marginLeft: "auto",
+              marginRight: "20px",
+            },
+          },
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:links": [
+              {
+                label: "{{auth.token ? '' : 'Login'}}",
+                action: "{{auth.token ? '' : 'navigateToPage'}}",
+                actionParams: { url: "/hotelhub/login" },
+              },
+              {
+                label: "{{auth.token ? 'Dashboard' : ''}}",
+                action: "{{auth.token ? 'navigateToPage' : ''}}",
+                actionParams: { url: "/hotelhub/dashboard" },
+              },
+              {
+                label: "{{auth.token ? 'Logout' : ''}}",
+                action: "{{auth.token ? 'clearAuth+reload' : ''}}",
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "rgba(255, 255, 255, 0.95)",
+          borderBottom: "1px solid #e2e8f0",
+          padding: "18px 40px",
+          position: "fixed",
+          width: "100%",
+          zIndex: "1000",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          backdropFilter: "blur(8px)",
+          height: "70px",
+        },
+        triggers: [
+          {
+            event: "load",
+            action: "loadTheme",
+          },
+        ],
+      },
+      sidebar: {
+        table: {},
+        modal: {},
+        uiSchema: {},
+        styles: { display: "none" },
+        triggers: [],
+      },
+      main: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          hero: {
+            "ui:widget": "hero",
+            "ui:title": "Welcome to HotelHub",
+            "ui:subtitle":
+              "Modern hotel management made simple. Manage rooms, reservations, and guests all in one place.",
+            "ui:cta": {
+              label: "Get Started",
+              action: "navigateToPage",
+              actionParams: { url: "/hotelhub/login" },
+            },
+            "ui:styles": {
+              textAlign: "center",
+              padding: "150px 40px 100px",
+              background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+              color: "white",
+              minHeight: "600px",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            },
+          },
+          featuresSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "40px",
+            "ui:styles": {
+              padding: "80px 40px",
+              background: "#f8fafc",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "✨ Features",
+                "ui:level": "h2",
+                "ui:styles": {
+                  textAlign: "center",
+                  marginBottom: "40px",
+                },
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "30px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🛏️ Room Management",
+                    "ui:description":
+                      "Easily manage all your hotel rooms with our intuitive interface",
+                    "ui:styles": {
+                      padding: "32px",
+                      textAlign: "center",
+                      background: "white",
+                      borderRadius: "12px",
+                      border: "1px solid #e2e8f0",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "📅 Reservations",
+                    "ui:description":
+                      "Track and manage reservations with real-time availability",
+                    "ui:styles": {
+                      padding: "32px",
+                      textAlign: "center",
+                      background: "white",
+                      borderRadius: "12px",
+                      border: "1px solid #e2e8f0",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "👥 Guest Management",
+                    "ui:description":
+                      "Keep track of all your guests and their preferences",
+                    "ui:styles": {
+                      padding: "32px",
+                      textAlign: "center",
+                      background: "white",
+                      borderRadius: "12px",
+                      border: "1px solid #e2e8f0",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        styles: {
+          padding: "0",
+          background: "#ffffff",
+          minHeight: "100vh",
+        },
+        triggers: [
+          {
+            event: "load",
+            action: "loadTheme",
+          },
+        ],
+      },
+      footer: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          footerText: {
+            "ui:widget": "text",
+            "ui:content": "© 2024 HotelHub. All rights reserved.",
+            "ui:styles": {
+              textAlign: "center",
+              color: "#94a3b8",
+              fontSize: "14px",
+            },
+          },
+        },
+        styles: {
+          background: "#1e293b",
+          padding: "32px",
+          textAlign: "center",
+        },
+        triggers: [],
+      },
+    },
+
+    resolvedAPIs: {},
+  },
 
   // backend/seeds/platform-auth.js (REPLACE ENTIRE FILE)
   {
