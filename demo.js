@@ -33,13 +33,12 @@ const websites = [
     redirectIfNotAuth: "/hotelhub/login",
 
     initialization: {
-      globalCSS: `
+globalCSS:`
 /* ============================================ */
-/* HOTELHUB GLOBAL CSS - Enhanced Dark Mode */
+/* ENHANCED HOTELHUB CSS - COMPLETE DARK MODE FIX */
 /* ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 * {
   margin: 0;
@@ -48,264 +47,309 @@ const websites = [
 }
 
 /* ============================================ */
-/* BASE STYLES - Light Mode (Default) */
+/* BASE STYLES - Fixed */
 /* ============================================ */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 15px;
   line-height: 1.5;
-  background: #f8fafc !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  background-attachment: fixed !important;
   color: #1e293b !important;
   min-height: 100vh;
-  transition: background 0.4s ease, color 0.4s ease;
+  transition: background 0.6s ease, color 0.6s ease;
+  overflow-x: hidden;
 }
 
-h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.2; }
-h2 { font-size: 1.8rem; font-weight: 700; line-height: 1.3; }
-h3 { font-size: 1.4rem; font-weight: 600; line-height: 1.4; }
-h4 { font-size: 1.2rem; font-weight: 600; line-height: 1.4; }
-p { font-size: 1rem; color: #64748b; }
-
 /* ============================================ */
-/* DARK MODE - Full Implementation */
+/* DARK MODE - COMPLETE REDESIGN */
 /* ============================================ */
 body.dark-mode {
-  background: #0f172a !important;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 70%, #0f172a 100%) !important;
+  background-attachment: fixed !important;
   color: #f1f5f9 !important;
 }
 
-/* Force all major containers to transparent in dark mode */
-body.dark-mode > div,
+/* Force ALL backgrounds to dark in dark mode */
+body.dark-mode main,
 body.dark-mode section,
-body.dark-mode main,
-body.dark-mode aside {
+body.dark-mode div:not(.glass):not(.card):not([class*="modal"]),
+body.dark-mode [style*="background"]:not([style*="background: linear-gradient"]):not([style*="background: url"]),
+body.dark-mode [style*="background:"]:not([style*="background: linear-gradient"]):not([style*="background: url"]) {
   background: transparent !important;
 }
 
-/* ============================================ */
-/* NAVBAR - Dark Mode */
-/* ============================================ */
-body.dark-mode nav,
-body.dark-mode header,
-body.dark-mode nav > div,
-body.dark-mode header > div {
-  background: rgba(17, 24, 39, 0.98) !important;
-  border-bottom: 1px solid #374151 !important;
-  backdrop-filter: blur(10px) !important;
+/* Fix hero background in dark mode */
+body.dark-mode #hero-background {
+  background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop') !important;
 }
 
-body.dark-mode nav *,
-body.dark-mode header * {
-  color: #e5e7eb !important;
-}
-
-body.dark-mode nav a,
-body.dark-mode header a {
-  color: #e5e7eb !important;
-  font-weight: 500 !important;
-}
-
-body.dark-mode nav a:hover,
-body.dark-mode header a:hover {
-  color: #60a5fa !important;
-}
-
-/* Light mode nav */
-body:not(.dark-mode) nav,
-body:not(.dark-mode) header {
-  background: rgba(255, 255, 255, 0.98) !important;
-  border-bottom: 1px solid #e2e8f0 !important;
-}
-
-body:not(.dark-mode) nav a,
-body:not(.dark-mode) header a {
-  color: #4b5563 !important;
+body.dark-mode #hero-background > div:first-child {
+  background: rgba(15, 23, 42, 0.85) !important;
+  backdrop-filter: blur(5px) !important;
 }
 
 /* ============================================ */
-/* SIDEBAR - Dark Mode FIX */
+/* FIX: STATS CARDS TO MATCH FEATURES CARD */
 /* ============================================ */
-body.dark-mode aside,
-body.dark-mode aside > div,
-body.dark-mode .sidebar-fixed {
-  background: rgba(17, 24, 39, 0.95) !important;
-  border-right: 1px solid #374151 !important;
+
+/* Target the stats container specifically */
+body #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] {
+  background: rgba(255, 255, 255, 0.1) !important; /* Same as features card */
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37) !important;
+  border-radius: 25px !important;
 }
 
-body.dark-mode aside *,
-body.dark-mode .sidebar-fixed * {
-  color: #e5e7eb !important;
+/* Fix text in stats cards for light mode */
+body #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] h2,
+body #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] p,
+body #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] span,
+body #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] div {
+  color: #1e293b !important;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8) !important;
 }
 
-body.dark-mode aside button,
-body.dark-mode .sidebar-fixed button {
-  color: #e5e7eb !important;
-  background: transparent !important;
+/* Fix for dark mode stats cards */
+body.dark-mode #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] {
+  background: rgba(15, 23, 42, 0.7) !important;
+  backdrop-filter: blur(25px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) !important;
 }
 
-body.dark-mode aside button:hover,
-body.dark-mode .sidebar-fixed button:hover {
-  background: rgba(59, 130, 246, 0.2) !important;
-}
-
-/* Active sidebar button */
-body.dark-mode aside button[style*="background: #e0f2fe"],
-body.dark-mode aside button[style*="background:#e0f2fe"] {
-  background: rgba(59, 130, 246, 0.3) !important;
-  color: #60a5fa !important;
-}
-
-/* Light mode sidebar */
-body:not(.dark-mode) aside,
-body:not(.dark-mode) .sidebar-fixed {
-  background: #f8fafc !important;
-  border-right: 1px solid #e2e8f0 !important;
-}
-
-.sidebar-fixed {
-  position: fixed !important;
-  left: 0 !important;
-  top: 70px !important;
-  height: calc(100vh - 70px) !important;
-  width: 260px !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  z-index: 50 !important;
-  transition: all 0.3s ease !important;
-}
-
-.sidebar-fixed::-webkit-scrollbar {
-  width: 4px;
-}
-.sidebar-fixed::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 2px;
-}
-.sidebar-fixed:hover::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-}
-
-/* ============================================ */
-/* MAIN CONTENT - Dark Mode FIX */
-/* ============================================ */
-body.dark-mode main,
-body.dark-mode main > div,
-body.dark-mode [style*="marginLeft"] {
-  background: transparent !important;
-}
-
-/* ============================================ */
-/* CARDS & CONTAINERS - Dark Mode FIX */
-/* ============================================ */
-body.dark-mode article,
-body.dark-mode [class*="card"],
-body.dark-mode div[style*="background: white"],
-body.dark-mode div[style*="background:white"],
-body.dark-mode div[style*="background: #fff"],
-body.dark-mode div[style*="background:#fff"],
-body.dark-mode div[style*="background: rgba(255"],
-body.dark-mode div[style*="background:rgba(255"] {
-  background: rgba(30, 41, 59, 0.9) !important;
-  border-color: #475569 !important;
+/* Fix text in dark mode stats cards */
+body.dark-mode #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] h2,
+body.dark-mode #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] p,
+body.dark-mode #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] span,
+body.dark-mode #hero-content [style*="background: rgba(255, 255, 255, 0.08)"] div {
   color: #f1f5f9 !important;
-  backdrop-filter: blur(10px);
-}
-
-/* Force white backgrounds in dark mode to dark */
-body.dark-mode [style*="background-color: white"],
-body.dark-mode [style*="background-color:white"],
-body.dark-mode [style*="backgroundColor: white"],
-body.dark-mode [style*="backgroundColor:white"] {
-  background: rgba(30, 41, 59, 0.9) !important;
-  background-color: rgba(30, 41, 59, 0.9) !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* ============================================ */
-/* TEXT - Dark Mode */
+/* COMPLETE CARD FIX FOR DARK MODE */
 /* ============================================ */
-body.dark-mode p,
-body.dark-mode span:not([class*="gradient"]),
-body.dark-mode div,
-body.dark-mode li,
-body.dark-mode td {
-  color: #cbd5e1 !important;
+
+/* Base glass effect for all cards */
+[style*="background: rgba(255, 255, 255, 0.1)"],
+[style*="background: rgba(255, 255, 255, 0.08)"],
+[style*="background: rgba(255, 255, 255, 0.15)"],
+[style*="background: rgba(255,255,255,0.1)"],
+[style*="background: rgba(255,255,255,0.08)"],
+[style*="background: rgba(255,255,255,0.15)"],
+.glass-card,
+.card {
+  position: relative;
+  z-index: 2;
 }
 
-body.dark-mode h1,
-body.dark-mode h2,
-body.dark-mode h3,
-body.dark-mode h4,
-body.dark-mode h5,
-body.dark-mode h6 {
+/* LIGHT MODE: Semi-transparent white with dark text */
+[style*="background: rgba(255, 255, 255, 0.1)"],
+[style*="background: rgba(255, 255, 255, 0.08)"],
+[style*="background: rgba(255, 255, 255, 0.15)"] {
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2) !important;
+}
+
+/* Force text visibility in light mode cards */
+[style*="background: rgba(255, 255, 255, 0.1)"] h1,
+[style*="background: rgba(255, 255, 255, 0.1)"] h2,
+[style*="background: rgba(255, 255, 255, 0.1)"] h3,
+[style*="background: rgba(255, 255, 255, 0.1)"] h4,
+[style*="background: rgba(255, 255, 255, 0.1)"] p,
+[style*="background: rgba(255, 255, 255, 0.1)"] span,
+[style*="background: rgba(255, 255, 255, 0.1)"] div:not([class]),
+[style*="background: rgba(255, 255, 255, 0.08)"] h1,
+[style*="background: rgba(255, 255, 255, 0.08)"] h2,
+[style*="background: rgba(255, 255, 255, 0.08)"] h3,
+[style*="background: rgba(255, 255, 255, 0.08)"] h4,
+[style*="background: rgba(255, 255, 255, 0.08)"] p,
+[style*="background: rgba(255, 255, 255, 0.08)"] span,
+[style*="background: rgba(255, 255, 255, 0.08)"] div:not([class]),
+[style*="background: rgba(255, 255, 255, 0.15)"] h1,
+[style*="background: rgba(255, 255, 255, 0.15)"] h2,
+[style*="background: rgba(255, 255, 255, 0.15)"] h3,
+[style*="background: rgba(255, 255, 255, 0.15)"] h4,
+[style*="background: rgba(255, 255, 255, 0.15)"] p,
+[style*="background: rgba(255, 255, 255, 0.15)"] span,
+[style*="background: rgba(255, 255, 255, 0.15)"] div:not([class]) {
+  color: #1e293b !important;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* DARK MODE: Complete card overhaul */
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.1)"],
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.08)"],
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.15)"],
+body.dark-mode [style*="background: rgba(255,255,255,0.1)"],
+body.dark-mode [style*="background: rgba(255,255,255,0.08)"],
+body.dark-mode [style*="background: rgba(255,255,255,0.15)"] {
+  background: rgba(15, 23, 42, 0.7) !important;
+  backdrop-filter: blur(25px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(200%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Force ALL text in dark mode cards to be visible */
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.1)"] *,
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.08)"] *,
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.15)"] *,
+body.dark-mode [style*="background: rgba(255,255,255,0.1)"] *,
+body.dark-mode [style*="background: rgba(255,255,255,0.08)"] *,
+body.dark-mode [style*="background: rgba(255,255,255,0.15)"] * {
+  color: #f1f5f9 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Special handling for specific card content */
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.1)"] h2,
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.1)"] h3,
+body.dark-mode [style*="background: rgba(255, 255, 255, 0.1)"] p {
   color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Features section specific fix */
+body.dark-mode #featuresSection [style*="background: rgba(255, 255, 255, 0.1)"] {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+
+body.dark-mode #featuresSection [style*="background: rgba(255, 255, 255, 0.1)"] h2,
+body.dark-mode #featuresSection [style*="background: rgba(255, 255, 255, 0.1)"] p {
+  color: #e2e8f0 !important;
+}
+
+/* CTA section special styling */
+body.dark-mode [style*="background: rgba(14, 165, 233, 0.2)"] {
+  background: rgba(14, 165, 233, 0.15) !important;
+  border: 1px solid rgba(14, 165, 233, 0.3) !important;
+}
+
+body.dark-mode [style*="background: rgba(14, 165, 233, 0.2)"] h2,
+body.dark-mode [style*="background: rgba(14, 165, 233, 0.2)"] p {
+  color: #ffffff !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* ============================================ */
-/* FORMS - Dark Mode */
+/* FIX: TABLE AND FILTER WIDGET IN DARK MODE */
 /* ============================================ */
-body.dark-mode input,
-body.dark-mode textarea,
-body.dark-mode select {
+
+/* Filter widget in rooms page */
+body.dark-mode [style*="background: white"] {
+  background: rgba(15, 23, 42, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Fix filter widget text in dark mode */
+body.dark-mode [style*="background: white"] h1,
+body.dark-mode [style*="background: white"] h2,
+body.dark-mode [style*="background: white"] h3,
+body.dark-mode [style*="background: white"] h4,
+body.dark-mode [style*="background: white"] p,
+body.dark-mode [style*="background: white"] span,
+body.dark-mode [style*="background: white"] label,
+body.dark-mode [style*="background: white"] div {
+  color: #f1f5f9 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Fix input fields in filter widget */
+body.dark-mode [style*="background: white"] input,
+body.dark-mode [style*="background: white"] select,
+body.dark-mode [style*="background: white"] textarea {
   background: rgba(30, 41, 59, 0.8) !important;
-  border-color: #475569 !important;
+  border: 1px solid rgba(148, 163, 184, 0.4) !important;
   color: #f1f5f9 !important;
 }
 
-body.dark-mode input::placeholder,
-body.dark-mode textarea::placeholder {
-  color: #94a3b8 !important;
+body.dark-mode [style*="background: white"] input::placeholder,
+body.dark-mode [style*="background: white"] select::placeholder,
+body.dark-mode [style*="background: white"] textarea::placeholder {
+  color: rgba(148, 163, 184, 0.7) !important;
 }
 
-/* ============================================ */
-/* BUTTONS - Dark Mode */
-/* ============================================ */
-body.dark-mode button {
+/* Table styling for dark mode */
+body.dark-mode table,
+body.dark-mode .dataTable,
+body.dark-mode [style*="border-collapse: collapse"],
+body.dark-mode [role="table"] {
+  background: rgba(15, 23, 42, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
   color: #f1f5f9 !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
 }
 
-/* Primary buttons keep their gradient */
-body.dark-mode button[style*="gradient"] {
-  /* Keep gradient as is */
-}
-
-/* ============================================ */
-/* TABLES - Dark Mode */
-/* ============================================ */
-body.dark-mode table {
-  color: #f1f5f9 !important;
+/* Table header styling */
+body.dark-mode table th,
+body.dark-mode .dataTable th,
+body.dark-mode [role="columnheader"] {
   background: rgba(30, 41, 59, 0.9) !important;
+  color: #e2e8f0 !important;
+  border-bottom: 2px solid rgba(148, 163, 184, 0.4) !important;
 }
 
-body.dark-mode th {
-  background: rgba(51, 65, 85, 0.9) !important;
+/* Table cell styling */
+body.dark-mode table td,
+body.dark-mode .dataTable td,
+body.dark-mode [role="cell"] {
+  background: rgba(15, 23, 42, 0.7) !important;
   color: #f1f5f9 !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
 }
 
-body.dark-mode td {
-  border-color: #475569 !important;
-  color: #cbd5e1 !important;
+/* Table row hover effect */
+body.dark-mode table tr:hover,
+body.dark-mode .dataTable tr:hover {
+  background: rgba(148, 163, 184, 0.1) !important;
 }
 
-body.dark-mode tr:hover {
-  background: rgba(51, 65, 85, 0.5) !important;
+/* Table pagination and controls */
+body.dark-mode .pagination,
+body.dark-mode [class*="pagination"],
+body.dark-mode [role="navigation"] {
+  background: rgba(15, 23, 42, 0.8) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+
+body.dark-mode .pagination button,
+body.dark-mode [class*="pagination"] button {
+  background: rgba(30, 41, 59, 0.9) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(148, 163, 184, 0.4) !important;
+}
+
+body.dark-mode .pagination button:hover,
+body.dark-mode [class*="pagination"] button:hover {
+  background: rgba(14, 165, 233, 0.3) !important;
 }
 
 /* ============================================ */
-/* MODALS - Dark Mode */
+/* COLORFUL SNOWFALL EFFECTS - DARK MODE ONLY */
 /* ============================================ */
-body.dark-mode [style*="position: fixed"][style*="z-index"] {
-  background: rgba(30, 41, 59, 0.95) !important;
-}
-
-/* Modal overlay */
-body.dark-mode div[style*="rgba(0,0,0,0.6)"] {
-  background: rgba(0, 0, 0, 0.8) !important;
-}
-
-/* ============================================ */
-/* BACKGROUND EFFECTS */
-/* ============================================ */
-.stars {
+.stars,
+.snowfall,
+.shooting-stars {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -315,58 +359,71 @@ body.dark-mode div[style*="rgba(0,0,0,0.6)"] {
   z-index: 1;
 }
 
-.stars::before,
-.stars::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
-    radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 90px 40px, #ddd, rgba(0,0,0,0));
-  background-repeat: repeat;
-  background-size: 200px 200px;
-  animation: twinkle 8s ease-in-out infinite;
+body.dark-mode .stars,
+body.dark-mode .snowfall,
+body.dark-mode .shooting-stars {
+  display: block;
 }
 
-.stars::after {
-  background-image: 
-    radial-gradient(1px 1px at 50px 160px, #ccc, rgba(0,0,0,0)),
-    radial-gradient(1px 1px at 90px 40px, #ddd, rgba(0,0,0,0));
-  animation: twinkle 12s ease-in-out infinite;
-  animation-delay: 4s;
-}
-
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
-
-.shooting-stars {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.shooting-star {
-  position: absolute;
-  width: 100px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.8), rgba(255,255,255,0));
-  animation: shooting 3s linear infinite;
-}
-
-@keyframes shooting {
+/* Colorful snowflake animations */
+@keyframes colorfulFall {
   0% {
-    transform: translateX(-100px) translateY(0) rotate(45deg);
+    transform: translateY(-100px) translateX(0) rotate(0deg);
+    opacity: 0.8;
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    filter: hue-rotate(180deg);
+  }
+  100% {
+    transform: translateY(100vh) translateX(100px) rotate(360deg);
     opacity: 0;
+    filter: hue-rotate(360deg);
+  }
+}
+
+.snowflake {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: colorfulFall linear infinite;
+  background: radial-gradient(circle at 30% 30%, 
+    var(--snow-color, #ff0080), 
+    transparent 70%);
+}
+
+/* Create colorful snowflakes */
+body.dark-mode .snowflake:nth-child(3n) {
+  --snow-color: #ff0080; /* Pink */
+}
+body.dark-mode .snowflake:nth-child(3n+1) {
+  --snow-color: #00ffff; /* Cyan */
+}
+body.dark-mode .snowflake:nth-child(3n+2) {
+  --snow-color: #ffff00; /* Yellow */
+}
+body.dark-mode .snowflake:nth-child(5n) {
+  --snow-color: #ff00ff; /* Magenta */
+}
+body.dark-mode .snowflake:nth-child(5n+1) {
+  --snow-color: #00ff00; /* Green */
+}
+body.dark-mode .snowflake:nth-child(5n+2) {
+  --snow-color: #ff6600; /* Orange */
+}
+body.dark-mode .snowflake:nth-child(5n+3) {
+  --snow-color: #0080ff; /* Blue */
+}
+body.dark-mode .snowflake:nth-child(5n+4) {
+  --snow-color: #ff0040; /* Red-Pink */
+}
+
+/* Shooting stars with rainbow trail */
+@keyframes colorfulShoot {
+  0% {
+    transform: translateX(-100px) translateY(-100px) scale(0);
+    opacity: 0;
+    filter: hue-rotate(0deg);
   }
   10% {
     opacity: 1;
@@ -375,105 +432,276 @@ body.dark-mode div[style*="rgba(0,0,0,0.6)"] {
     opacity: 1;
   }
   100% {
-    transform: translateX(calc(100vw + 100px)) translateY(calc(100vh + 100px)) rotate(45deg);
+    transform: translateX(100vw) translateY(100vh) scale(1.5);
     opacity: 0;
+    filter: hue-rotate(360deg);
   }
 }
 
-.snowfall {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 3;
-}
-
-.snowflake {
+.shooting-star {
   position: absolute;
-  background: white;
+  width: 4px;
+  height: 4px;
+  background: linear-gradient(45deg, 
+    #ff0080, #00ffff, #ffff00, #ff00ff, #00ff00);
   border-radius: 50%;
-  opacity: 0.8;
-  animation: fall linear infinite;
+  box-shadow: 
+    0 0 20px 8px rgba(255, 0, 128, 0.7),
+    0 0 30px 12px rgba(0, 255, 255, 0.5),
+    0 0 40px 16px rgba(255, 255, 0, 0.3),
+    0 0 50px 20px rgba(255, 0, 255, 0.2);
+  animation: colorfulShoot 4s linear infinite;
+  animation-delay: var(--delay, 0s);
 }
 
-@keyframes fall {
+/* ============================================ */
+/* NAVBAR - Fixed for both modes */
+/* ============================================ */
+body nav,
+body header {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15) !important;
+}
+
+body.dark-mode nav,
+body.dark-mode header {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.3) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+body nav a,
+body header a,
+body nav button,
+body header button,
+body nav span,
+body header span {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8) !important;
+}
+
+body.dark-mode nav a,
+body.dark-mode header a,
+body.dark-mode nav button,
+body.dark-mode header button,
+body.dark-mode nav span,
+body.dark-mode header span {
+  color: #f1f5f9 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
   to {
-    transform: translateY(100vh);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-/* ============================================ */
-/* Z-INDEX MANAGEMENT */
-/* ============================================ */
-body.dark-mode > *:not(.stars):not(.shooting-stars):not(.snowfall) {
-  position: relative;
-  z-index: 10 !important;
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+  }
+  50% {
+    box-shadow: 0 8px 40px 0 rgba(14, 165, 233, 0.6);
+  }
+}
+
+/* Apply float animation to cards */
+[style*="backdropFilter"][style*="blur"] {
+  animation: float 6s ease-in-out infinite;
 }
 
 /* ============================================ */
-/* SCROLLBAR */
+/* SCROLLBAR - Enhanced */
 /* ============================================ */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: rgba(255, 255, 255, 0.5);
 }
 
 body.dark-mode::-webkit-scrollbar-track {
-  background: #1e293b;
+  background: rgba(15, 23, 42, 0.4);
 }
 
 body.dark-mode::-webkit-scrollbar-thumb {
-  background: #475569;
+  background: linear-gradient(45deg, #ff0080, #00ffff, #ffff00);
+  border-radius: 10px;
 }
 
 body.dark-mode::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
+  background: linear-gradient(45deg, #ff40a0, #40ffff, #ffff40);
+}
+
+/* ============================================ */
+/* RESPONSIVE DESIGN */
+/* ============================================ */
+@media (max-width: 1024px) {
+  #hero-content h1 {
+    font-size: 3.5rem !important;
+  }
+  
+  #hero-content p {
+    font-size: 1.3rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  #hero-content h1 {
+    font-size: 2.5rem !important;
+  }
+  
+  #hero-content p {
+    font-size: 1.1rem !important;
+  }
+  
+  #hero-content button {
+    padding: 16px 35px !important;
+    font-size: 1rem !important;
+  }
+  
+  #hero-content > div:first-child {
+    padding: 40px 30px !important;
+  }
+  
+  [style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #hero-content h1 {
+    font-size: 2rem !important;
+  }
+  
+  #hero-content {
+    padding: 100px 20px 60px !important;
+  }
+  
+  #hero-content > div:first-child {
+    padding: 30px 20px !important;
+  }
+}
+
+/* ============================================ */
+/* TEXT ENHANCEMENTS */
+/* ============================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 900 !important;
+  letter-spacing: -0.5px !important;
+}
+
+p {
+  font-weight: 400 !important;
+  line-height: 1.7 !important;
+}
+
+/* ============================================ */
+/* BUTTON ENHANCEMENTS */
+/* ============================================ */
+button {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+button:hover {
+  filter: brightness(1.1) !important;
+  transform: translateY(-2px) !important;
+}
+
+button:active {
+  transform: scale(0.95) !important;
 }
 
 /* ============================================ */
 /* UTILITY CLASSES */
 /* ============================================ */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+.blur-effect {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
-.text-center { text-align: center; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-4 { margin-top: 1rem; }
-.mt-6 { margin-top: 1.5rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-4 { margin-bottom: 1rem; }
-.mb-6 { margin-bottom: 1.5rem; }
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
+.text-glow {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.5),
+               0 0 40px rgba(255, 255, 255, 0.3);
+}
+
+.card-glow:hover {
+  animation: glow 2s ease-in-out infinite;
+}
 
 /* ============================================ */
-/* GRADIENTS - Keep in both modes */
+/* SELECTION STYLING */
 /* ============================================ */
-.gradient-text,
-[style*="WebkitBackgroundClip: text"],
-[style*="-webkit-background-clip: text"] {
-  /* Gradients are preserved */
+::selection {
+  background: rgba(14, 165, 233, 0.5);
+  color: white;
 }
-  `,
+
+::-moz-selection {
+  background: rgba(14, 165, 233, 0.5);
+  color: white;
+}
+
+body.dark-mode ::selection {
+  background: rgba(255, 0, 128, 0.5);
+  color: white;
+}
+
+body.dark-mode ::-moz-selection {
+  background: rgba(255, 0, 128, 0.5);
+  color: white;
+}
+
+/* ============================================ */
+/* FOCUS STATES */
+/* ============================================ */
+*:focus {
+  outline: 2px solid rgba(14, 165, 233, 0.5);
+  outline-offset: 2px;
+}
+
+button:focus,
+a:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+}
+`,
 
       resources: [
         "global.enduser.signup",
@@ -2530,127 +2758,675 @@ handleLoginSuccess: `
         styles: { display: "none" },
         triggers: [],
       },
-      main: {
-        table: {},
-        modal: {},
-        uiSchema: {
-          hero: {
-            backgroundEffect: {
-              "ui:widget": "backgroundEffect",
-              "ui:effect": "bubbles",
-              "ui:intensity": "high",
-              "ui:color": [
-                "#ff0000",
-                "#ff9900",
-                "#ffff00",
-                "#00ff00",
-                "#0099ff",
-                "#6600ff",
-                "#ff00ff",
-              ],
-              "ui:speed": "medium",
-              "ui:animationMode": "both",
-            },
-            "ui:widget": "hero",
-            "ui:title": "Welcome to HotelHub",
-            "ui:subtitle":
-              "Modern hotel management made simple. Manage rooms, reservations, and guests all in one place.",
-            "ui:cta": {
-              label: "Get Started",
-              action: "navigateToPage",
-              actionParams: { url: "/hotelhub/login" },
-            },
-            "ui:styles": {
-              textAlign: "center",
-              padding: "150px 40px 100px",
-              background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-              color: "white",
-              minHeight: "600px",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            },
-          },
-          featuresSection: {
+     "main": {
+    "table": {},
+    "modal": {},
+    "uiSchema": {
+      "backgroundEffect": {
+        "ui:widget": "backgroundEffect",
+        "ui:effect": "snowfall",
+        "ui:intensity": "high",
+        "ui:color": [
+          "#ff0080",
+          "#00ffff",
+          "#ffff00",
+          "#ff00ff",
+          "#00ff00",
+          "#ff6600",
+          "#0080ff",
+          "#ff0040",
+          "#80ff00",
+          "#ff0080"
+        ],
+        "ui:speed": "medium",
+        "ui:animationMode": "both"
+      },
+      "heroSection": {
+        "ui:widget": "container",
+        "ui:direction": "column",
+        "ui:gap": "0",
+        "ui:id": "hero-container",
+        "ui:styles": {
+          "position": "relative",
+          "width": "100%",
+          "minHeight": "100vh",
+          "overflow": "hidden",
+          "padding": "0",
+          "margin": "0"
+        },
+        "ui:children": [
+          {
             "ui:widget": "container",
             "ui:direction": "column",
-            "ui:gap": "40px",
+            "ui:id": "hero-background",
             "ui:styles": {
-              padding: "80px 40px",
-              background: "#f8fafc",
+              "position": "absolute",
+              "top": "0",
+              "left": "0",
+              "width": "100%",
+              "height": "100%",
+              "backgroundImage": "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')",
+              "backgroundSize": "cover",
+              "backgroundPosition": "center",
+              "backgroundRepeat": "no-repeat",
+              "zIndex": "0"
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:styles": {
+                  "position": "absolute",
+                  "top": "0",
+                  "left": "0",
+                  "width": "100%",
+                  "height": "100%",
+                  "background": "rgba(14, 165, 233, 0.3)",
+                  "backdropFilter": "blur(2px)",
+                  "zIndex": "1"
+                },
+                "ui:children": []
+              }
+            ]
+          },
+          {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "50px",
+            "ui:id": "hero-content",
+            "ui:styles": {
+              "position": "relative",
+              "zIndex": "10",
+              "display": "flex",
+              "flexDirection": "column",
+              "alignItems": "center",
+              "justifyContent": "center",
+              "minHeight": "100vh",
+              "padding": "120px 40px 80px",
+              "textAlign": "center"
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "30px",
+                "ui:styles": {
+                  "background": "rgba(255, 255, 255, 0.1)",
+                  "backdropFilter": "blur(20px) saturate(180%)",
+                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
+                  "border": "1px solid rgba(255, 255, 255, 0.3)",
+                  "borderRadius": "30px",
+                  "padding": "60px 50px",
+                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                  "maxWidth": "900px",
+                  "animation": "fadeInUp 1s ease-out"
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "Welcome to HotelHub",
+                    "ui:level": "h1",
+                    "ui:styles": {
+                      "fontSize": "4.5rem",
+                      "fontWeight": "900",
+                      "color": "white",
+                      "textShadow": "0 4px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)",
+                      "marginBottom": "0",
+                      "letterSpacing": "-2px",
+                      "lineHeight": "1.1"
+                    }
+                  },
+                  {
+                    "ui:widget": "paragraph",
+                    "ui:text": "Modern hotel management made simple",
+                    "ui:styles": {
+                      "fontSize": "1.8rem",
+                      "color": "rgba(255, 255, 255, 0.95)",
+                      "lineHeight": "1.5",
+                      "marginBottom": "10px",
+                      "textShadow": "0 2px 15px rgba(0,0,0,0.4)",
+                      "fontWeight": "500"
+                    }
+                  },
+                  {
+                    "ui:widget": "paragraph",
+                    "ui:text": "Manage rooms, reservations, and guests all in one place",
+                    "ui:styles": {
+                      "fontSize": "1.3rem",
+                      "color": "rgba(255, 255, 255, 0.9)",
+                      "lineHeight": "1.6",
+                      "marginBottom": "20px",
+                      "textShadow": "0 2px 10px rgba(0,0,0,0.3)",
+                      "fontWeight": "400"
+                    }
+                  }
+                ]
+              },
+              {
+                "ui:widget": "flexLayout",
+                "ui:direction": "row",
+                "ui:gap": "25px",
+                "ui:justify": "center",
+                "ui:wrap": true,
+                "ui:styles": {
+                  "animation": "fadeInUp 1s ease-out 0.3s backwards"
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🚀 Get Started",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": {
+                      "url": "/hotelhub/signup"
+                    },
+                    "ui:styles": {
+                      "padding": "20px 45px",
+                      "fontSize": "1.2rem",
+                      "fontWeight": "700",
+                      "background": "rgba(255, 255, 255, 0.95)",
+                      "color": "#0284c7",
+                      "border": "2px solid rgba(255, 255, 255, 0.5)",
+                      "borderRadius": "50px",
+                      "cursor": "pointer",
+                      "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      "backdropFilter": "blur(10px)",
+                      "transition": "all 0.3s ease",
+                      "transform": "translateY(0)"
+                    },
+                    "ui:hoverTransform": "translateY(-5px) scale(1.05)",
+                    "ui:hoverShadow": "0 15px 40px rgba(255,255,255,0.4)"
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "📖 Learn More",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": {
+                      "url": "/hotelhub/login"
+                    },
+                    "ui:styles": {
+                      "padding": "20px 45px",
+                      "fontSize": "1.2rem",
+                      "fontWeight": "700",
+                      "background": "rgba(255, 255, 255, 0.15)",
+                      "color": "white",
+                      "border": "2px solid rgba(255, 255, 255, 0.5)",
+                      "borderRadius": "50px",
+                      "cursor": "pointer",
+                      "backdropFilter": "blur(10px)",
+                      "transition": "all 0.3s ease",
+                      "transform": "translateY(0)"
+                    },
+                    "ui:hoverTransform": "translateY(-5px) scale(1.05)",
+                    "ui:hoverShadow": "0 15px 40px rgba(255,255,255,0.3)"
+                  }
+                ]
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "row",
+                "ui:gap": "50px",
+                "ui:styles": {
+                  "marginTop": "40px",
+                  "animation": "fadeInUp 1s ease-out 0.6s backwards",
+                  "display": "flex",
+                  "flexWrap": "wrap",
+                  "justifyContent": "center",
+                  "background": "rgba(255, 255, 255, 0.08)",
+                  "backdropFilter": "blur(15px)",
+                  "borderRadius": "25px",
+                  "padding": "40px 50px",
+                  "border": "1px solid rgba(255, 255, 255, 0.2)"
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:gap": "10px",
+                    "ui:styles": {
+                      "textAlign": "center",
+                      "minWidth": "150px"
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "500+",
+                        "ui:level": "h2",
+                        "ui:styles": {
+                          "fontSize": "3.5rem",
+                          "fontWeight": "900",
+                          "color": "white",
+                          "margin": "0",
+                          "textShadow": "0 0 20px rgba(255,255,255,0.5)"
+                        }
+                      },
+                      {
+                        "ui:widget": "text",
+                        "ui:content": "Hotels Using HotelHub",
+                        "ui:styles": {
+                          "fontSize": "1.1rem",
+                          "color": "rgba(255,255,255,0.95)",
+                          "fontWeight": "500",
+                          "textShadow": "0 2px 10px rgba(0,0,0,0.3)"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:gap": "10px",
+                    "ui:styles": {
+                      "textAlign": "center",
+                      "minWidth": "150px"
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "50K+",
+                        "ui:level": "h2",
+                        "ui:styles": {
+                          "fontSize": "3.5rem",
+                          "fontWeight": "900",
+                          "color": "white",
+                          "margin": "0",
+                          "textShadow": "0 0 20px rgba(255,255,255,0.5)"
+                        }
+                      },
+                      {
+                        "ui:widget": "text",
+                        "ui:content": "Rooms Managed",
+                        "ui:styles": {
+                          "fontSize": "1.1rem",
+                          "color": "rgba(255,255,255,0.95)",
+                          "fontWeight": "500",
+                          "textShadow": "0 2px 10px rgba(0,0,0,0.3)"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:gap": "10px",
+                    "ui:styles": {
+                      "textAlign": "center",
+                      "minWidth": "150px"
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "99.9%",
+                        "ui:level": "h2",
+                        "ui:styles": {
+                          "fontSize": "3.5rem",
+                          "fontWeight": "900",
+                          "color": "white",
+                          "margin": "0",
+                          "textShadow": "0 0 20px rgba(255,255,255,0.5)"
+                        }
+                      },
+                      {
+                        "ui:widget": "text",
+                        "ui:content": "Uptime Guarantee",
+                        "ui:styles": {
+                          "fontSize": "1.1rem",
+                          "color": "rgba(255,255,255,0.95)",
+                          "fontWeight": "500",
+                          "textShadow": "0 2px 10px rgba(0,0,0,0.3)"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "featuresSection": {
+        "ui:widget": "container",
+        "ui:direction": "column",
+        "ui:gap": "70px",
+        "ui:styles": {
+          "padding": "100px 40px",
+          "background": "transparent",
+          "position": "relative"
+        },
+        "ui:children": [
+          {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "25px",
+            "ui:styles": {
+              "textAlign": "center",
+              "maxWidth": "900px",
+              "margin": "0 auto",
+              "background": "rgba(255, 255, 255, 0.08)",
+              "backdropFilter": "blur(15px)",
+              "borderRadius": "25px",
+              "padding": "50px 40px",
+              "border": "1px solid rgba(255, 255, 255, 0.2)"
             },
             "ui:children": [
               {
                 "ui:widget": "heading",
-                "ui:text": "✨ Features",
+                "ui:text": "✨ Powerful Features",
                 "ui:level": "h2",
                 "ui:styles": {
-                  textAlign: "center",
-                  marginBottom: "40px",
-                },
+                  "fontSize": "3.5rem",
+                  "fontWeight": "900",
+                  "color": "white",
+                  "textShadow": "0 4px 20px rgba(0,0,0,0.3)",
+                  "marginBottom": "10px"
+                }
               },
               {
-                "ui:widget": "gridLayout",
-                "ui:columns": 3,
-                "ui:gap": "30px",
-                "ui:children": [
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "🛏️ Room Management",
-                    "ui:description":
-                      "Easily manage all your hotel rooms with our intuitive interface",
-                    "ui:styles": {
-                      padding: "32px",
-                      textAlign: "center",
-                      background: "white",
-                      borderRadius: "12px",
-                      border: "1px solid #e2e8f0",
-                    },
-                  },
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "📅 Reservations",
-                    "ui:description":
-                      "Track and manage reservations with real-time availability",
-                    "ui:styles": {
-                      padding: "32px",
-                      textAlign: "center",
-                      background: "white",
-                      borderRadius: "12px",
-                      border: "1px solid #e2e8f0",
-                    },
-                  },
-                  {
-                    "ui:widget": "card",
-                    "ui:title": "👥 Guest Management",
-                    "ui:description":
-                      "Keep track of all your guests and their preferences",
-                    "ui:styles": {
-                      padding: "32px",
-                      textAlign: "center",
-                      background: "white",
-                      borderRadius: "12px",
-                      border: "1px solid #e2e8f0",
-                    },
-                  },
-                ],
-              },
-            ],
+                "ui:widget": "paragraph",
+                "ui:text": "Everything you need to manage your hotel efficiently and professionally",
+                "ui:styles": {
+                  "fontSize": "1.4rem",
+                  "color": "rgba(255, 255, 255, 0.9)",
+                  "lineHeight": "1.6",
+                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)"
+                }
+              }
+            ]
           },
-        },
-        styles: {
-          padding: "0",
-          background: "#ffffff",
-          minHeight: "100vh",
-        },
-        triggers: [
           {
-            event: "load",
-            action: "loadTheme",
-          },
-        ],
+            "ui:widget": "gridLayout",
+            "ui:columns": 3,
+            "ui:gap": "30px",
+            "ui:styles": {
+              "maxWidth": "1400px",
+              "margin": "0 auto"
+            },
+            "ui:children": [
+              {
+                "ui:widget": "card",
+                "ui:title": "🛏️ Room Management",
+                "ui:description": "Easily manage all your hotel rooms with our intuitive interface. Track availability, pricing, and room details in real-time.",
+                "ui:styles": {
+                  "padding": "40px",
+                  "textAlign": "center",
+                  "background": "rgba(255, 255, 255, 0.1)",
+                  "backdropFilter": "blur(20px) saturate(180%)",
+                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
+                  "borderRadius": "25px",
+                  "border": "1px solid rgba(255, 255, 255, 0.3)",
+                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "cursor": "pointer"
+                },
+                "ui:titleStyles": {
+                  "color": "white",
+                  "fontSize": "1.6rem",
+                  "fontWeight": "700",
+                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
+                  "marginBottom": "15px"
+                },
+                "ui:descriptionStyles": {
+                  "color": "rgba(255, 255, 255, 0.85)",
+                  "fontSize": "1.05rem",
+                  "lineHeight": "1.6",
+                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
+                },
+                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "📅 Smart Reservations",
+                "ui:description": "Track and manage reservations with real-time availability. Automated booking confirmations and calendar sync.",
+                "ui:styles": {
+                  "padding": "40px",
+                  "textAlign": "center",
+                  "background": "rgba(255, 255, 255, 0.1)",
+                  "backdropFilter": "blur(20px) saturate(180%)",
+                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
+                  "borderRadius": "25px",
+                  "border": "1px solid rgba(255, 255, 255, 0.3)",
+                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "cursor": "pointer"
+                },
+                "ui:titleStyles": {
+                  "color": "white",
+                  "fontSize": "1.6rem",
+                  "fontWeight": "700",
+                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
+                  "marginBottom": "15px"
+                },
+                "ui:descriptionStyles": {
+                  "color": "rgba(255, 255, 255, 0.85)",
+                  "fontSize": "1.05rem",
+                  "lineHeight": "1.6",
+                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
+                },
+                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "👥 Guest Management",
+                "ui:description": "Keep track of all your guests and their preferences. Build lasting relationships with personalized service.",
+                "ui:styles": {
+                  "padding": "40px",
+                  "textAlign": "center",
+                  "background": "rgba(255, 255, 255, 0.1)",
+                  "backdropFilter": "blur(20px) saturate(180%)",
+                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
+                  "borderRadius": "25px",
+                  "border": "1px solid rgba(255, 255, 255, 0.3)",
+                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "cursor": "pointer"
+                },
+                "ui:titleStyles": {
+                  "color": "white",
+                  "fontSize": "1.6rem",
+                  "fontWeight": "700",
+                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
+                  "marginBottom": "15px"
+                },
+                "ui:descriptionStyles": {
+                  "color": "rgba(255, 255, 255, 0.85)",
+                  "fontSize": "1.05rem",
+                  "lineHeight": "1.6",
+                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
+                },
+                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "📊 Analytics Dashboard",
+                "ui:description": "Get insights into your hotel performance with detailed reports and analytics. Make data-driven decisions.",
+                "ui:styles": {
+                  "padding": "40px",
+                  "textAlign": "center",
+                  "background": "rgba(255, 255, 255, 0.1)",
+                  "backdropFilter": "blur(20px) saturate(180%)",
+                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
+                  "borderRadius": "25px",
+                  "border": "1px solid rgba(255, 255, 255, 0.3)",
+                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "cursor": "pointer"
+                },
+                "ui:titleStyles": {
+                  "color": "white",
+                  "fontSize": "1.6rem",
+                  "fontWeight": "700",
+                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
+                  "marginBottom": "15px"
+                },
+                "ui:descriptionStyles": {
+                  "color": "rgba(255, 255, 255, 0.85)",
+                  "fontSize": "1.05rem",
+                  "lineHeight": "1.6",
+                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
+                },
+                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "💳 Payment Processing",
+                "ui:description": "Secure payment processing with multiple payment methods. Automated invoicing and receipt generation.",
+                "ui:styles": {
+                  "padding": "40px",
+                  "textAlign": "center",
+                  "background": "rgba(255, 255, 255, 0.1)",
+                  "backdropFilter": "blur(20px) saturate(180%)",
+                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
+                  "borderRadius": "25px",
+                  "border": "1px solid rgba(255, 255, 255, 0.3)",
+                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "cursor": "pointer"
+                },
+                "ui:titleStyles": {
+                  "color": "white",
+                  "fontSize": "1.6rem",
+                  "fontWeight": "700",
+                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
+                  "marginBottom": "15px"
+                },
+                "ui:descriptionStyles": {
+                  "color": "rgba(255, 255, 255, 0.85)",
+                  "fontSize": "1.05rem",
+                  "lineHeight": "1.6",
+                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
+                },
+                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
+              },
+              {
+                "ui:widget": "card",
+                "ui:title": "🔔 Smart Notifications",
+                "ui:description": "Stay informed with real-time notifications for bookings, check-ins, and important updates across all channels.",
+                "ui:styles": {
+                  "padding": "40px",
+                  "textAlign": "center",
+                  "background": "rgba(255, 255, 255, 0.1)",
+                  "backdropFilter": "blur(20px) saturate(180%)",
+                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
+                  "borderRadius": "25px",
+                  "border": "1px solid rgba(255, 255, 255, 0.3)",
+                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                  "cursor": "pointer"
+                },
+                "ui:titleStyles": {
+                  "color": "white",
+                  "fontSize": "1.6rem",
+                  "fontWeight": "700",
+                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
+                  "marginBottom": "15px"
+                },
+                "ui:descriptionStyles": {
+                  "color": "rgba(255, 255, 255, 0.85)",
+                  "fontSize": "1.05rem",
+                  "lineHeight": "1.6",
+                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
+                },
+                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
+              }
+            ]
+          }
+        ]
       },
+      "ctaSection": {
+        "ui:widget": "container",
+        "ui:direction": "column",
+        "ui:gap": "35px",
+        "ui:styles": {
+          "padding": "80px 40px 100px",
+          "background": "transparent",
+          "textAlign": "center",
+          "position": "relative"
+        },
+        "ui:children": [
+          {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "30px",
+            "ui:styles": {
+              "maxWidth": "900px",
+              "margin": "0 auto",
+              "background": "rgba(14, 165, 233, 0.2)",
+              "backdropFilter": "blur(25px) saturate(180%)",
+              "borderRadius": "30px",
+              "padding": "60px 50px",
+              "border": "1px solid rgba(255, 255, 255, 0.3)",
+              "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)"
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "Ready to Transform Your Hotel Management?",
+                "ui:level": "h2",
+                "ui:styles": {
+                  "fontSize": "3.2rem",
+                  "fontWeight": "900",
+                  "color": "white",
+                  "marginBottom": "15px",
+                  "textShadow": "0 4px 20px rgba(0,0,0,0.3)",
+                  "lineHeight": "1.2"
+                }
+              },
+              {
+                "ui:widget": "paragraph",
+                "ui:text": "Join hundreds of hotels already using HotelHub to streamline their operations",
+                "ui:styles": {
+                  "fontSize": "1.4rem",
+                  "color": "rgba(255,255,255,0.95)",
+                  "lineHeight": "1.6",
+                  "marginBottom": "20px",
+                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)"
+                }
+              },
+              {
+                "ui:widget": "button",
+                "ui:label": "🌟 Start Free Trial",
+                "ui:action": "navigateToPage",
+                "ui:actionParams": {
+                  "url": "/hotelhub/signup"
+                },
+                "ui:styles": {
+                  "padding": "20px 55px",
+                  "fontSize": "1.3rem",
+                  "fontWeight": "700",
+                  "background": "rgba(255, 255, 255, 0.95)",
+                  "color": "#0284c7",
+                  "border": "2px solid rgba(255, 255, 255, 0.5)",
+                  "borderRadius": "50px",
+                  "cursor": "pointer",
+                  "boxShadow": "0 10px 40px rgba(255,255,255,0.3)",
+                  "backdropFilter": "blur(10px)",
+                  "transition": "all 0.4s ease",
+                  "margin": "0 auto"
+                },
+                "ui:hoverTransform": "translateY(-5px) scale(1.08)",
+                "ui:hoverShadow": "0 20px 60px rgba(255,255,255,0.5)"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "styles": {
+      "padding": "0",
+      "background": "transparent",
+      "minHeight": "100vh"
+    },
+    "triggers": [
+      {
+        "event": "load",
+        "action": "loadTheme"
+      }
+    ]
+  },
       footer: {
         table: {},
         modal: {},

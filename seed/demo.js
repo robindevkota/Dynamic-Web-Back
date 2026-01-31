@@ -6326,7 +6326,7 @@ context.handlers.setFormData({});`,
 
   // Add this to your demo.js websites array
 
-  {
+    {
     title: "HotelHub - Reservation Management",
     slug: "hotelhub",
     projectUUID: "hotel-hotelhub",
@@ -6334,7 +6334,7 @@ context.handlers.setFormData({});`,
     status: "Active",
     isTemplate: true,
     templateCategory: "E-commerce",
-    organizationId: null,
+    organizationId: "696fd6f8a216cc192d63b84a",
     createdBy: "000000000000000000000000",
     accountValidation: true,
     otpValidation: false,
@@ -6786,8 +6786,13 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
   `,
 
       resources: [
-        "auth.login",
-        "auth.signup",
+        "global.enduser.signup",
+        "global.enduser.login",
+        "global.enduser.logout",
+        "global.enduser.forgotPassword",
+        "global.enduser.resetPassword",
+        "global.enduser.verifyEmail",
+
         "rooms.api",
         "rooms.list",
         "rooms.create",
@@ -6796,6 +6801,209 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
       ],
 
       actions: {
+        // ✅ Add this to your initialization.actions in HotelHub template
+// In demo.js - handleLogin action
+handleLogin: `
+console.log('🔐 End-user login action triggered');
+const email = context.formData?.email;
+const password = context.formData?.password;
+
+if (!email || !password) {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Please enter email and password',
+    background: '#ef4444'
+  });
+  return;
+}
+
+try {
+  const response = await fetch('/api/enduser-auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ 
+      email, 
+      password,
+      websiteSlug: 'hotelhub'
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: data.error || '❌ Login failed',
+      background: '#ef4444'
+    });
+    return;
+  }
+
+  console.log('✅ Login successful:', data);
+
+  // ✅ Store user data
+  context.handlers.setData('user', data.user);
+
+  // ✅ Show notification
+  context.handlers.showNotification({
+    type: 'toast',
+    message: \`Welcome back, \${data.user.firstName || 'Guest'}! 🎉\`,
+    background: '#10b981'
+  });
+
+  // ✅ Redirect to DASHBOARD (protected page)
+  setTimeout(() => {
+    window.location.href = '/hotelhub/dashboard';
+  }, 1000);
+
+} catch (error) {
+  console.error('Login error:', error);
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Network error. Please try again.',
+    background: '#ef4444'
+  });
+}
+`,
+        logout: `
+  console.log("🚪 Calling logout API...");
+  
+  try {
+    // Use the API resource from your seed file
+    await context.handlers.handleApiCall('global.enduser.logout', {});
+    
+    // The onSuccess in the API resource will handle clearAuth and reload
+  } catch (error) {
+    console.error('❌ Logout API failed:', error);
+    
+    // Fallback: clear auth data locally
+    context.handlers.clearAuthData();
+    localStorage.removeItem('hotelhub_user');
+    localStorage.removeItem('hotelhub_logged_in');
+    localStorage.removeItem('hotelhub_org_id');
+    
+    context.handlers.showNotification({
+      type: "toast",
+      message: "✅ Logged out (local session cleared)",
+      background: "#10b981",
+      duration: 2000,
+    });
+    
+    setTimeout(() => {
+      window.location.href = '/hotelhub';
+    }, 500);
+  }
+`,
+
+        //     console.log('🏨 Initializing HotelHub template');
+
+        //     // Get organizationId from page config
+        //     const orgId = context.config?.organizationId ||
+        //                   '{{config.organizationId}}' ||
+        //                   localStorage.getItem('hotelhub_org_id');
+
+        //     if (orgId && orgId !== '{{config.organizationId}}') {
+        //       localStorage.setItem('hotelhub_org_id', orgId);
+        //       console.log('✅ Stored organizationId:', orgId);
+        //     } else {
+        //       console.warn('⚠️ No organizationId found in template config');
+        //     }
+        //   `,
+
+        // ✅ UPDATE THIS - Include organizationId in signup
+handleSignup: `
+  console.log('📝 Handling signup');
+  const { email, password, firstName, lastName, name } = context.formData || {};
+  
+  if (!email || !password) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '❌ Email and password are required',
+      background: '#ef4444'
+    });
+    return;
+  }
+  
+  // ✅ AUTO-DETECT websiteSlug from current URL
+  const currentPath = window.location.pathname;
+  const websiteSlug = currentPath.split('/').filter(Boolean)[0]; // "hotelhub"
+  
+  console.log('🌐 Detected website:', websiteSlug);
+  
+  // ✅ Get organizationId from localStorage or config
+  const organizationId = localStorage.getItem('hotelhub_org_id') ||
+                        context.config?.organizationId ||
+                        '696fd6f8a216cc192d63b84a';
+  
+  console.log('📦 Signup payload:', { 
+    email, 
+    organizationId,
+    websiteSlug, // ✅ ADDED
+    firstName: firstName || name 
+  });
+  
+  try {
+  // ✅ Use END USER signup endpoint
+  const response = await fetch('/api/enduser-auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      email: email.trim().toLowerCase(),
+      password,
+      name: \`\${firstName?.trim() || ''} \${lastName?.trim() || ''}\`.trim(),
+      organizationId: '696fd6f8a216cc192d63b84a',  // ✅ Your org ID
+      websiteSlug: 'hotelhub'  // ✅ Pass slug!
+    })
+  });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      context.handlers.showNotification({
+        type: 'toast',
+        message: data.error || '❌ Signup failed',
+        background: '#ef4444',
+        duration: 4000
+      });
+      return;
+    }
+    
+    console.log('✅ Signup successful:', data);
+    
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '✅ Account created! Check your email to verify.',
+      background: '#10b981',
+      duration: 4000
+    });
+    
+  setTimeout(() => {
+      window.location.href = '/hotelhub/login';  // ✅ Fixed
+    }, 2000);
+    
+  } catch (error) {
+    console.error('❌ Signup error:', error);
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '❌ Network error. Please try again.',
+      background: '#ef4444'
+    });
+  }
+`,
+        showSignupSuccess: `
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '✅ Account created! Check your email.',
+    background: '#10b981',
+    duration: 4000
+  });
+  
+  setTimeout(() => {
+    window.location.href = '/hotelhub/login';
+  }, 2000);
+`,
         toggleTheme: `
     console.log('🌓 Toggling theme');
     const body = document.body;
@@ -7105,17 +7313,64 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
         context.handlers.setAuthData('user', email);
     }
 `,
-
-        clearAuth: `
-    console.log("🚪 Logging out...");
-    context.handlers.clearAuthData();
-    context.handlers.showNotification({
+clearAuth: `
+  console.log("🚪 End-user logging out from hotelhub...");
+  
+  try {
+    // ✅ Call end-user logout API with websiteSlug
+    const response = await fetch('/api/enduser-auth/logout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ websiteSlug: 'hotelhub' })  // ✅ Pass slug!
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      // Clear local auth state
+      context.handlers.clearAuthData();
+      
+      context.handlers.showNotification({
         type: "toast",
         message: "✅ Logged out successfully",
         background: "#10b981",
         duration: 2000,
+      });
+      
+      // ✅ Redirect to website home
+      setTimeout(() => {
+        window.location.href = data.redirectUrl || '/hotelhub';
+      }, 1000);
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    context.handlers.showNotification({
+      type: "toast",
+      message: "❌ Logout failed",
+      background: "#ef4444"
     });
+  }
 `,
+handleLoginSuccess: `
+  // ✅ After end user logs in, redirect to dashboard
+  const user = context.payload?.user;
+  
+  if (user) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: \`Welcome back, \${user.firstName || 'Guest'}! 🎉\`,
+      background: '#10b981'
+    });
+    
+    // ✅ Redirect to dashboard (protected page)
+    setTimeout(() => {
+      window.location.href = '/hotelhub/dashboard';
+    }, 1000);
+  }
+`,
+        // Replace the existing clearAuth action with this
+// In demo.js - clearAuth action
 
         api: `
     const apiKey = context.actionParams?.apiKey;
@@ -7146,6 +7401,8 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
     },
 
     pages: {
+      // ✅ FIXED Login Page for HotelHub (End User Auth)
+
       login: {
         title: "Login - HotelHub",
         components: {
@@ -7248,12 +7505,6 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
                     "ui:type": "email",
                     "ui:name": "email",
                     "ui:required": true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "📧 Email is required",
-                      email: true,
-                      emailMessage: "📧 Please enter a valid email",
-                    },
                   },
                   {
                     "ui:widget": "inputField",
@@ -7262,45 +7513,13 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
                     "ui:type": "password",
                     "ui:name": "password",
                     "ui:required": true,
-                    validation: {
-                      required: true,
-                      requiredMessage: "🔒 Password is required",
-                      minLength: 6,
-                      minLengthMessage:
-                        "🔒 Password must be at least 6 characters",
-                    },
                   },
                 ],
+                // ✅ FIXED: Removed validation fields and wrong apiKey
                 "ui:actions": [
                   {
                     label: "Sign In",
-                    action: "validateThenApi",
-                    actionParams: {
-                      apiKey: "auth.login",
-                      fields: [
-                        {
-                          name: "email",
-                          label: "Email",
-                          validation: {
-                            required: true,
-                            requiredMessage: "📧 Email is required",
-                            email: true,
-                            emailMessage: "📧 Please enter a valid email",
-                          },
-                        },
-                        {
-                          name: "password",
-                          label: "Password",
-                          validation: {
-                            required: true,
-                            requiredMessage: "🔒 Password is required",
-                            minLength: 6,
-                            minLengthMessage:
-                              "🔒 Password must be at least 6 characters",
-                          },
-                        },
-                      ],
-                    },
+                    action: "handleLogin", // ✅ CHANGED: Custom action instead of validateThenApi
                     variant: "primary",
                     styles: {
                       width: "100%",
@@ -7312,6 +7531,7 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
                       fontWeight: "600",
                       borderRadius: "8px",
                       border: "none",
+                      cursor: "pointer",
                     },
                   },
                 ],
@@ -7492,7 +7712,9 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
                   {
                     label: "Create Account",
                     action: "api",
-                    actionParams: { apiKey: "auth.signup" },
+                    actionParams: {
+                      apiKey: "global.enduser.signup",
+                    },
                     variant: "primary",
                     styles: {
                       width: "100%",
@@ -7593,30 +7815,30 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
                   marginRight: "20px",
                 },
               },
-              userInfo: {
-                "ui:widget": "navLinks",
-                "ui:theme": "light",
-                "ui:links": [
-                  {
-                    label: "{{auth.user?.email || 'User'}}",
-                    action: "",
-                    actionParams: {},
-                    styles: {
-                      fontWeight: "500",
-                      color: "inherit",
-                    },
-                  },
-                  {
-                    label: "Logout",
-                    action: "clearAuth+reload",
-                    actionParams: {},
-                    styles: {
-                      color: "#ef4444",
-                      fontWeight: "500",
-                    },
-                  },
-                ],
-              },
+             userInfo: {
+  "ui:widget": "navLinks",
+  "ui:theme": "light",
+  "ui:links": [
+    {
+      label: "{{auth.user?.email || 'User'}}",
+      action: "",
+      actionParams: {},
+      styles: {
+        fontWeight: "500",
+        color: "inherit",
+      },
+    },
+    {
+      label: "Logout",
+      action: "clearAuth",  // ✅ FIXED - removed +reload
+      actionParams: {},
+      styles: {
+        color: "#ef4444",
+        fontWeight: "500",
+      },
+    },
+  ],
+},
             },
             styles: {
               background: "rgba(255, 255, 255, 0.95)",
@@ -8570,26 +8792,22 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
               marginRight: "20px",
             },
           },
-          links: {
-            "ui:widget": "navLinks",
-            "ui:theme": "light",
-            "ui:links": [
-              {
-                label: "{{auth.token ? '' : 'Login'}}",
-                action: "{{auth.token ? '' : 'navigateToPage'}}",
-                actionParams: { url: "/hotelhub/login" },
-              },
-              {
-                label: "{{auth.token ? 'Dashboard' : ''}}",
-                action: "{{auth.token ? 'navigateToPage' : ''}}",
-                actionParams: { url: "/hotelhub/dashboard" },
-              },
-              {
-                label: "{{auth.token ? 'Logout' : ''}}",
-                action: "{{auth.token ? 'clearAuth+reload' : ''}}",
-              },
-            ],
-          },
+         links: {
+  "ui:widget": "navLinks",
+  "ui:theme": "light",
+  "ui:links": [
+    {
+      label: "Login",
+      action: "navigateToPage",
+      actionParams: { url: "/hotelhub/login" },
+    },
+    {
+      label: "Sign Up",
+      action: "navigateToPage",
+      actionParams: { url: "/hotelhub/signup" },
+    },
+  ],
+},
         },
         styles: {
           background: "rgba(255, 255, 255, 0.95)",
@@ -8609,6 +8827,10 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
             event: "load",
             action: "loadTheme",
           },
+          {
+            event: "load",
+            action: "initializeTemplate", // ✅ ADD THIS
+          },
         ],
       },
       sidebar: {
@@ -8623,22 +8845,22 @@ body.dark-mode::-webkit-scrollbar-thumb:hover {
         modal: {},
         uiSchema: {
           hero: {
-             "backgroundEffect": {
-        "ui:widget": "backgroundEffect",
-        "ui:effect": "bubbles",
-        "ui:intensity": "high",
-         "ui:color": [
-              "#ff0000",
-              "#ff9900",
-              "#ffff00",
-              "#00ff00",
-              "#0099ff",
-              "#6600ff",
-              "#ff00ff",
-            ],
-        "ui:speed": "medium",
-        "ui:animationMode": "both"
-      },
+            backgroundEffect: {
+              "ui:widget": "backgroundEffect",
+              "ui:effect": "bubbles",
+              "ui:intensity": "high",
+              "ui:color": [
+                "#ff0000",
+                "#ff9900",
+                "#ffff00",
+                "#00ff00",
+                "#0099ff",
+                "#6600ff",
+                "#ff00ff",
+              ],
+              "ui:speed": "medium",
+              "ui:animationMode": "both",
+            },
             "ui:widget": "hero",
             "ui:title": "Welcome to HotelHub",
             "ui:subtitle":
