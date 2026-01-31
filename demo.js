@@ -508,7 +508,6 @@ if (!email || !password) {
 }
 
 try {
-  // ✅ Call END USER login with websiteSlug
   const response = await fetch('/api/enduser-auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -516,7 +515,7 @@ try {
     body: JSON.stringify({ 
       email, 
       password,
-      websiteSlug: 'hotelhub'  // ✅ Pass slug!
+      websiteSlug: 'hotelhub'
     })
   });
 
@@ -533,15 +532,19 @@ try {
 
   console.log('✅ Login successful:', data);
 
+  // ✅ Store user data
+  context.handlers.setData('user', data.user);
+
+  // ✅ Show notification
   context.handlers.showNotification({
     type: 'toast',
-    message: \`✅ Welcome back, \${data.user.firstName || 'Guest'}!\`,
+    message: \`Welcome back, \${data.user.firstName || 'Guest'}! 🎉\`,
     background: '#10b981'
   });
 
-  // ✅ Redirect to website home (NOT dashboard!)
+  // ✅ Redirect to DASHBOARD (protected page)
   setTimeout(() => {
-    window.location.href = '/hotelhub';
+    window.location.href = '/hotelhub/dashboard';
   }, 1000);
 
 } catch (error) {
@@ -666,9 +669,8 @@ handleSignup: `
       duration: 4000
     });
     
-    setTimeout(() => {
-      // ✅ Redirect to same website's login
-      window.location.href = \`/\${websiteSlug}/login\`;
+  setTimeout(() => {
+      window.location.href = '/hotelhub/login';  // ✅ Fixed
     }, 2000);
     
   } catch (error) {
@@ -1038,6 +1040,23 @@ clearAuth: `
       message: "❌ Logout failed",
       background: "#ef4444"
     });
+  }
+`,
+handleLoginSuccess: `
+  // ✅ After end user logs in, redirect to dashboard
+  const user = context.payload?.user;
+  
+  if (user) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: \`Welcome back, \${user.firstName || 'Guest'}! 🎉\`,
+      background: '#10b981'
+    });
+    
+    // ✅ Redirect to dashboard (protected page)
+    setTimeout(() => {
+      window.location.href = '/hotelhub/dashboard';
+    }, 1000);
   }
 `,
         // Replace the existing clearAuth action with this
@@ -1486,30 +1505,30 @@ clearAuth: `
                   marginRight: "20px",
                 },
               },
-              userInfo: {
-                "ui:widget": "navLinks",
-                "ui:theme": "light",
-                "ui:links": [
-                  {
-                    label: "{{auth.user?.email || 'User'}}",
-                    action: "",
-                    actionParams: {},
-                    styles: {
-                      fontWeight: "500",
-                      color: "inherit",
-                    },
-                  },
-                  {
-                    label: "Logout",
-                    action: "clearAuth+reload",
-                    actionParams: {},
-                    styles: {
-                      color: "#ef4444",
-                      fontWeight: "500",
-                    },
-                  },
-                ],
-              },
+             userInfo: {
+  "ui:widget": "navLinks",
+  "ui:theme": "light",
+  "ui:links": [
+    {
+      label: "{{auth.user?.email || 'User'}}",
+      action: "",
+      actionParams: {},
+      styles: {
+        fontWeight: "500",
+        color: "inherit",
+      },
+    },
+    {
+      label: "Logout",
+      action: "clearAuth",  // ✅ FIXED - removed +reload
+      actionParams: {},
+      styles: {
+        color: "#ef4444",
+        fontWeight: "500",
+      },
+    },
+  ],
+},
             },
             styles: {
               background: "rgba(255, 255, 255, 0.95)",
@@ -2463,27 +2482,22 @@ clearAuth: `
               marginRight: "20px",
             },
           },
-          links: {
-            "ui:widget": "navLinks",
-            "ui:theme": "light",
-            "ui:links": [
-              {
-                label: "{{auth.token ? '' : 'Login'}}",
-                action: "{{auth.token ? '' : 'navigateToPage'}}",
-                actionParams: { url: "/hotelhub/login" },
-              },
-              {
-                label: "{{auth.token ? 'Dashboard' : ''}}",
-                action: "{{auth.token ? 'navigateToPage' : ''}}",
-                actionParams: { url: "/hotelhub/dashboard" },
-              },
-              {
-                label: "{{auth.token ? 'Logout' : ''}}",
-                action: "logout", // Use the new logout action
-                actionParams: {},
-              },
-            ],
-          },
+         links: {
+  "ui:widget": "navLinks",
+  "ui:theme": "light",
+  "ui:links": [
+    {
+      label: "Login",
+      action: "navigateToPage",
+      actionParams: { url: "/hotelhub/login" },
+    },
+    {
+      label: "Sign Up",
+      action: "navigateToPage",
+      actionParams: { url: "/hotelhub/signup" },
+    },
+  ],
+},
         },
         styles: {
           background: "rgba(255, 255, 255, 0.95)",
