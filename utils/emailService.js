@@ -1,4 +1,5 @@
 // backend/utils/emailService.js
+// ✅ UPDATED - Added separate end user verification email
 
 const nodemailer = require('nodemailer');
 
@@ -10,7 +11,6 @@ async function getTransporter() {
 
   try {
     if (process.env.NODE_ENV === 'production') {
-      // Real service later
       transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -42,7 +42,6 @@ async function getTransporter() {
       console.log('✅ Ethereal ready');
     }
 
-    // Quick connection check
     await transporter.verify();
     console.log('SMTP connection verified');
 
@@ -53,9 +52,12 @@ async function getTransporter() {
   }
 }
 
+// ═══════════════════════════════════════════════════════
+// PLATFORM USER VERIFICATION EMAIL (Admin/Developer signup)
+// ═══════════════════════════════════════════════════════
 exports.sendVerificationEmail = async ({ to, name, verificationUrl }) => {
   try {
-    const tp = await getTransporter();  // ← ensures it's ready
+    const tp = await getTransporter();
 
     const mailOptions = {
       from: `"BuilderPlatform" <${etherealFrom}>`,
@@ -73,6 +75,7 @@ exports.sendVerificationEmail = async ({ to, name, verificationUrl }) => {
           </p>
           <p>Or copy this link: ${verificationUrl}</p>
           <p>This link will expire in 24 hours.</p>
+          <p><strong>Next step:</strong> After verification, you'll be taken to the payment page to activate your account.</p>
           <p>If you didn't create an account, please ignore this email.</p>
         </div>
       `
@@ -80,12 +83,10 @@ exports.sendVerificationEmail = async ({ to, name, verificationUrl }) => {
 
     const info = await tp.sendMail(mailOptions);
 
-    console.log('✅ Verification "sent" to:', to);
+    console.log('✅ Platform verification sent to:', to);
     const preview = nodemailer.getTestMessageUrl(info);
     if (preview) {
       console.log('📬 Preview URL:', preview);
-    } else {
-      console.log('No preview URL generated (non-Ethereal transport?)');
     }
 
   } catch (error) {
@@ -96,13 +97,60 @@ exports.sendVerificationEmail = async ({ to, name, verificationUrl }) => {
   }
 };
 
-// ✅ FIXED: Now calls getTransporter() and uses etherealFrom
-exports.sendDeveloperInvitation = async ({ to, organizationName, invitationUrl }) => {
+// ═══════════════════════════════════════════════════════
+// END USER VERIFICATION EMAIL (Hotel guests, shoppers, etc.)
+// ═══════════════════════════════════════════════════════
+exports.sendEndUserVerificationEmail = async ({ to, name, verificationUrl, appName = 'HotelHub' }) => {
   try {
-    const tp = await getTransporter();  // ← FIX: Get transporter first
+    const tp = await getTransporter();
 
     const mailOptions = {
-      from: `"BuilderPlatform" <${etherealFrom}>`,  // ← FIX: Use etherealFrom
+      from: `"${appName}" <${etherealFrom}>`,
+      to,
+      subject: `Verify Your Email - ${appName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>Welcome to ${appName}, ${name}!</h2>
+          <p>Thank you for signing up. Please verify your email address to activate your account.</p>
+          <p>
+            <a href="${verificationUrl}" 
+               style="background: #0ea5e9; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              Verify Email
+            </a>
+          </p>
+          <p>Or copy this link: ${verificationUrl}</p>
+          <p>This link will expire in 24 hours.</p>
+          <p><strong>After verification,</strong> you can log in and start using ${appName}!</p>
+          <p>If you didn't create an account, please ignore this email.</p>
+        </div>
+      `
+    };
+
+    const info = await tp.sendMail(mailOptions);
+
+    console.log('✅ End user verification sent to:', to);
+    const preview = nodemailer.getTestMessageUrl(info);
+    if (preview) {
+      console.log('📬 Preview URL:', preview);
+    }
+
+  } catch (error) {
+    console.error('❌ sendEndUserVerificationEmail failed:', error.message);
+    if (error.code) console.error('Error code:', error.code);
+    if (error.response) console.error('Response:', error.response);
+    throw error;
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// DEVELOPER INVITATION EMAIL
+// ═══════════════════════════════════════════════════════
+exports.sendDeveloperInvitation = async ({ to, organizationName, invitationUrl }) => {
+  try {
+    const tp = await getTransporter();
+
+    const mailOptions = {
+      from: `"BuilderPlatform" <${etherealFrom}>`,
       to,
       subject: `You've been invited to join ${organizationName}`,
       html: `

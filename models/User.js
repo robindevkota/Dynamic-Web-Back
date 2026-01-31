@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
     
     role: {
       type: String,
-      enum: ["SUPER_ADMIN", "CLIENT_ADMIN", "DEVELOPER"],
+      enum: ["SUPER_ADMIN", "CLIENT_ADMIN", "DEVELOPER","END_USER"],
       required: true,
     },
     
@@ -51,6 +51,13 @@ const userSchema = new mongoose.Schema(
       default: "PENDING_VERIFICATION"
     },
     
+    // backend/models/User.js
+websiteSlug: {
+  type: String,
+  required: function() {
+    return this.role === 'END_USER'; // Only required for end users
+  }
+},
     lastLogin: { type: Date },
     
     // Developer-specific
