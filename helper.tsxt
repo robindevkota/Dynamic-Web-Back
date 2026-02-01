@@ -1,377 +1,124 @@
-// ✅ COMPLETE ROOMS PAGE CONFIG
-// Includes: Schema loading via trigger, enum dropdowns in modal, pagination API calls
-
-rooms: {
-  title: "Rooms - HotelHub",
-  requireAuth: true,
-  redirectIfNotAuth: "/hotelhub/login",
-  components: {
-    navbar: {
-      // ... (keep your existing navbar config)
+// In your main page components.navbar:
+navbar: {
+  uiSchema: {
+    logo: {
+      "ui:widget": "text",
+      "ui:content": "🍵 Chiyaz",
+      "ui:styles": {
+        fontSize: "28px",
+        fontWeight: "800",
+        fontFamily: "'Playfair Display', serif",
+        background: "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        cursor: "pointer",
+      },
     },
-    sidebar: {
-      // ... (keep your existing sidebar config)
+    themeToggle: {
+      "ui:widget": "toggle",
+      "ui:size": "medium",
+      "ui:onChange": "toggleTheme",
+      "ui:styles": {
+        marginLeft: "auto",
+        marginRight: "20px",
+      },
     },
-    main: {
-      table: {},
-      
-      // ✅ MODAL CONFIGURATION
-      modal: {
-        addRoom: {
-          "ui:title": "Add New Room",
-          "ui:theme": "light",
-          "ui:entityName": "room",  // ✅ CRITICAL: This tells modal which schema to use
-          "ui:styles": {
-            maxWidth: "500px",
-            padding: "40px",
-          },
-          
-          // ✅ FIELDS: Simple definition, schema will provide enum values
-          "ui:fields": [
-            {
-              name: "roomNumber",
-              label: "Room Number",
-              type: "text",
-              placeholder: "101",
-              required: true,
-            },
-            {
-              name: "roomType",
-              label: "Room Type",
-              type: "text",  // Will become dropdown via schema
-              placeholder: "Select room type",
-              required: true,
-            },
-            {
-              name: "price",
-              label: "Price per Night",
-              type: "number",
-              placeholder: "150",
-              required: true,
-            },
-            {
-              name: "status",
-              label: "Status",
-              type: "text",  // Will become dropdown via schema
-              placeholder: "Select status",
-              required: true,
-            },
-            {
-              name: "capacity",
-              label: "Capacity",
-              type: "number",
-              placeholder: "2",
-              required: true,
-            },
-            {
-              name: "floor",
-              label: "Floor",
-              type: "number",
-              placeholder: "1",
-              required: true,
-            },
-            {
-              name: "description",
-              label: "Description",
-              type: "text",
-              placeholder: "Room description",
-              required: false,
-            },
-          ],
-          
-          "ui:actions": [
-            {
-              label: "Add Room",
-              action: "api",
-              actionParams: { apiKey: "rooms.create" },
-              variant: "primary",
-              styles: {
-                width: "100%",
-                padding: "14px 0",
-                background: "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
-                color: "white",
-                fontSize: "16px",
-                fontWeight: "600",
-                borderRadius: "8px",
-                border: "none",
-                marginTop: "10px",
-              },
-            },
-            {
-              label: "Cancel",
-              action: "closeModal",
-              variant: "outline",
-              styles: {
-                width: "100%",
-                padding: "14px 0",
-                background: "transparent",
-                color: "#64748b",
-                fontSize: "16px",
-                fontWeight: "600",
-                borderRadius: "8px",
-                border: "2px solid #e2e8f0",
-              },
-            },
-          ],
-          
-          // ✅ TRIGGERS: Load schema when modal is defined
-          triggers: [
-            {
-              event: "load",
-              action: "fetchSchema",
-              source: "room",  // Entity name
-              storeKey: "schema.room",  // Where to store in DataStore
-            },
-          ],
-        },
-      },
-      
-      uiSchema: {
-        // ✅ PAGE HEADER
-        pageHeader: {
-          "ui:widget": "flexLayout",
-          "ui:direction": "row",
-          "ui:justify": "space-between",
-          "ui:align": "center",
-          "ui:styles": {
-            marginBottom: "30px",
-          },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "🛏️ Rooms Management",
-              "ui:level": "h1",
-              "ui:styles": {
-                margin: "0",
-              },
-            },
-            {
-              "ui:widget": "button",
-              "ui:label": "➕ Add Room",
-              "ui:action": "openModal",
-              "ui:actionParams": { modal: "addRoom" },
-              "ui:variant": "primary",
-              "ui:styles": {
-                padding: "12px 24px",
-                background: "#0ea5e9",
-                color: "white",
-                borderRadius: "8px",
-                border: "none",
-                fontWeight: "600",
-              },
-            },
-          ],
-        },
-
-        // ✅ SEARCH & FILTER SECTION
-        searchFilters: {
-          "ui:widget": "filterWidget",
-          "ui:title": "🔍 Search & Filter Rooms",
-          "ui:styles": {
-            background: "white",
-            padding: "24px",
-            borderRadius: "12px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-            marginBottom: "24px",
-          },
-          "ui:fields": [
-            {
-              "ui:widget": "inputField",
-              "ui:label": "Search",
-              "ui:placeholder": "Search by room number, type, or description...",
-              "ui:type": "text",
-              "ui:name": "search",
-              "ui:flex": "2",
-              "ui:minWidth": "300px",
-              "ui:styles": {
-                marginBottom: "0",
-              },
-            },
-            {
-              "ui:widget": "selectField",
-              "ui:label": "Room Type",
-              "ui:name": "roomType",
-              "ui:placeholder": "All Types",
-              "ui:flex": "1",
-              "ui:minWidth": "150px",
-              "ui:options": [
-                { value: "", label: "All Types" },
-                { value: "Standard", label: "Standard" },
-                { value: "Deluxe", label: "Deluxe" },
-                { value: "Suite", label: "Suite" },
-                { value: "Presidential", label: "Presidential" },
-              ],
-              "ui:styles": {
-                marginBottom: "0",
-              },
-            },
-            {
-              "ui:widget": "selectField",
-              "ui:label": "Status",
-              "ui:name": "status",
-              "ui:placeholder": "All Statuses",
-              "ui:flex": "1",
-              "ui:minWidth": "150px",
-              "ui:options": [
-                { value: "", label: "All Statuses" },
-                { value: "Available", label: "Available" },
-                { value: "Occupied", label: "Occupied" },
-                { value: "Maintenance", label: "Maintenance" },
-                { value: "Reserved", label: "Reserved" },
-              ],
-              "ui:styles": {
-                marginBottom: "0",
-              },
-            },
-          ],
-          "ui:actions": [
-            {
-              label: "🔍 Apply",
-              variant: "filter",
-              action: "api",
-              actionParams: {
-                apiKey: "rooms.list",
-              },
-              styles: {
-                padding: "12px 24px",
-                background: "#0ea5e9",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                fontSize: "15px",
-                fontWeight: "600",
-              },
-            },
-            {
-              label: "🔄 Reset",
-              variant: "reset",
-              action: "api",
-              actionParams: {
-                apiKey: "rooms.list",
-                payload: { page: 1, limit: 10 },
-              },
-              styles: {
-                padding: "12px 24px",
-                background: "transparent",
-                color: "#64748b",
-                border: "2px solid #e2e8f0",
-                borderRadius: "8px",
-                fontSize: "15px",
-                fontWeight: "600",
-              },
-            },
-          ],
-        },
-
-        // ✅ DATA TABLE WITH PROPER CONFIG
-        roomsTable: {
-          "ui:widget": "dataTable",
-          "ui:title": "Room List",
-          "ui:id": "roomsTable",
-          "ui:description": "Manage all hotel rooms",
-          "ui:emptyText": "No rooms found. Try adjusting your filters or click 'Add Room' to create one.",
-          "ui:dataSource": "rooms.api",  // Data comes from here
-          "ui:apiKey": "rooms.list",     // ✅ CRITICAL: API to call for pagination
-          "ui:searchEnabled": false,
-          "ui:pagination": {
-            enabled: true,
-            pageSize: 10,
-            serverSide: true,  // ✅ Enable server-side pagination
-          },
-          "ui:columns": [
-            {
-              key: "roomNumber",
-              title: "Room #",
-              dataIndex: "roomNumber",
-              width: "100px",
-            },
-            {
-              key: "roomType",
-              title: "Type",
-              dataIndex: "roomType",
-              width: "120px",
-            },
-            {
-              key: "price",
-              title: "Price/Night",
-              dataIndex: "price",
-              width: "120px",
-            },
-            {
-              key: "status",
-              title: "Status",
-              dataIndex: "status",
-              width: "120px",
-            },
-            {
-              key: "capacity",
-              title: "Capacity",
-              dataIndex: "capacity",
-              width: "100px",
-            },
-            {
-              key: "floor",
-              title: "Floor",
-              dataIndex: "floor",
-              width: "80px",
-            },
-            {
-              key: "description",
-              title: "Description",
-              dataIndex: "description",
-            },
-            {
-              key: "actions",
-              title: "Actions",
-              type: "actions",
-              align: "center",
-              width: "200px",
-              actions: [
-                {
-                  label: "✏️ Edit",
-                  action: "openModal",
-                  actionParams: { modal: "editRoom" },
-                  variant: "primary",
-                },
-                {
-                  label: "🗑️ Delete",
-                  action: "api",
-                  actionParams: {
-                    apiKey: "rooms.delete",
-                  },
-                  variant: "danger",
-                  confirm: true,
-                  confirmMessage: "Are you sure you want to delete this room?",
-                },
-              ],
-            },
-          ],
-        },
-      },
-      
-      styles: {
-        marginLeft: "250px",
-        padding: "120px 40px 40px",
-        background: "#ffffff",
-        minHeight: "100vh",
-      },
-      
-      // ✅ TRIGGERS: Load rooms on page load
-      triggers: [
-        {
-          event: "load",
-          action: "api",
-          source: "rooms.api",
-          params: {
-            page: 1,
-            limit: 10,
-          },
-        },
+    links: {
+      "ui:widget": "navLinks",
+      "ui:theme": "dark",  // Changed to dark for cream text
+      "ui:links": [
+        { label: "Login", action: "navigateToPage", actionParams: { url: "/chiyaz/login" } },
+        { label: "Sign Up", action: "navigateToPage", actionParams: { url: "/chiyaz/signup" } },
       ],
     },
-    
-    footer: {
-      // ... (keep your existing footer config)
+  },
+  styles: {
+    // ✅ TEA/COFFEE THEMED NAVBAR
+    background: "rgba(44, 24, 16, 0.95)",  // Dark brown coffee color
+    backdropFilter: "blur(20px) saturate(180%)",
+    borderBottom: "2px solid rgba(212, 185, 150, 0.3)",  // Gold/cream border
+    padding: "18px 40px",
+    position: "fixed",
+    width: "100%",
+    zIndex: "1000",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    boxShadow: "0 4px 20px rgba(139, 69, 19, 0.2)",
+    height: "70px",
+  },
+}
+
+// For dashboard sidebar (pages.dashboard.components.sidebar):
+sidebar: {
+  uiSchema: {
+    menuHeading: {
+      "ui:widget": "heading",
+      "ui:text": "🍵 Menu",
+      "ui:level": "h3",
+      "ui:styles": {
+        marginBottom: "24px",
+        fontSize: "1.3rem",
+        color: "#F5E9D9",  // Cream color
+        padding: "0 12px",
+        fontFamily: "'Playfair Display', serif",
+        textShadow: "0 2px 8px rgba(0,0,0,0.3)",
+      },
     },
+    menuContainer: {
+      "ui:widget": "container",
+      "ui:direction": "column",
+      "ui:gap": "10px",
+      "ui:children": [
+        {
+          "ui:widget": "button",
+          "ui:label": "🏠 Dashboard",
+          "ui:action": "navigateToPage",
+          "ui:actionParams": { url: "/chiyaz/dashboard" },
+          "ui:styles": {
+            width: "100%",
+            padding: "14px 20px",
+            background: "rgba(212, 185, 150, 0.2)",  // Active: cream highlight
+            color: "#F5E9D9",
+            border: "1px solid rgba(212, 185, 150, 0.3)",
+            borderRadius: "12px",
+            fontSize: "15px",
+            fontWeight: "600",
+            textAlign: "left",
+            boxShadow: "0 2px 8px rgba(139, 69, 19, 0.2)",
+            transition: "all 0.3s ease",
+          },
+        },
+        {
+          "ui:widget": "button",
+          "ui:label": "🛒 My Orders",
+          "ui:styles": {
+            width: "100%",
+            padding: "14px 20px",
+            background: "transparent",
+            color: "rgba(245, 233, 217, 0.8)",  // Softer cream
+            border: "1px solid transparent",
+            borderRadius: "12px",
+            fontSize: "15px",
+            fontWeight: "500",
+            textAlign: "left",
+            transition: "all 0.3s ease",
+          },
+        },
+        // ... other menu items with same styling
+      ],
+    },
+  },
+  styles: {
+    width: "280px",
+    background: "rgba(44, 24, 16, 0.95)",  // Dark brown coffee
+    backdropFilter: "blur(15px)",
+    padding: "90px 20px 30px",
+    minHeight: "calc(100vh - 70px)",
+    borderRight: "2px solid rgba(212, 185, 150, 0.2)",
+    position: "fixed",
+    top: "70px",
+    left: "0",
+    boxShadow: "4px 0 20px rgba(0, 0, 0, 0.3)",
   },
 }

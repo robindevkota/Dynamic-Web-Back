@@ -3550,6 +3550,40 @@ body {
 /* ============================================ */
 /* DARK MODE - Coffee Shop Vibes */
 /* ============================================ */
+
+/* Enhanced Menu Buttons */
+body.dark-mode .menu-button,
+.menu-button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark-mode .menu-button:hover,
+.menu-button:hover {
+  background: rgba(212, 185, 150, 0.25) !important;
+  border-color: rgba(212, 185, 150, 0.4) !important;
+  transform: translateX(8px);
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.3) !important;
+}
+
+/* Active menu item */
+.menu-button-active {
+  background: rgba(212, 185, 150, 0.25) !important;
+  border: 1px solid rgba(212, 185, 150, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25) !important;
+}
+
+/* Navbar links in dark mode */
+body.dark-mode nav a,
+body.dark-mode nav button {
+  color: #F5E9D9 !important;  /* Cream text */
+  transition: all 0.2s ease;
+}
+
+body.dark-mode nav a:hover,
+body.dark-mode nav button:hover {
+  color: #D2691E !important;  /* Coffee gold on hover */
+  background: rgba(212, 185, 150, 0.1) !important;
+}
 body.dark-mode {
   background: linear-gradient(135deg, #1A120B 0%, #3E2723 70%, #1A120B 100%) !important;
   background-attachment: fixed !important;
@@ -4753,8 +4787,6 @@ try {
 
     components: {
       navbar: {
-        table: {},
-        modal: {},
         uiSchema: {
           logo: {
             "ui:widget": "text",
@@ -4768,12 +4800,9 @@ try {
               WebkitTextFillColor: "transparent",
               cursor: "pointer",
             },
-            "ui:action": "navigateToPage",
-            "ui:actionParams": { url: "/chiyaz" },
           },
           themeToggle: {
             "ui:widget": "toggle",
-            "ui:label": "",
             "ui:size": "medium",
             "ui:onChange": "toggleTheme",
             "ui:styles": {
@@ -4783,7 +4812,7 @@ try {
           },
           links: {
             "ui:widget": "navLinks",
-            "ui:theme": "light",
+            "ui:theme": "dark", // Changed to dark for cream text
             "ui:links": [
               {
                 label: "Login",
@@ -4799,8 +4828,10 @@ try {
           },
         },
         styles: {
-          background: "rgba(255, 255, 255, 0.95)",
-          borderBottom: "1px solid rgba(139, 69, 19, 0.2)",
+          // ✅ TEA/COFFEE THEMED NAVBAR
+          background: "rgba(44, 24, 16, 0.95)", // Dark brown coffee color
+          backdropFilter: "blur(20px) saturate(180%)",
+          borderBottom: "2px solid rgba(212, 185, 150, 0.3)", // Gold/cream border
           padding: "18px 40px",
           position: "fixed",
           width: "100%",
@@ -4808,15 +4839,9 @@ try {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          backdropFilter: "blur(8px)",
+          boxShadow: "0 4px 20px rgba(139, 69, 19, 0.2)",
           height: "70px",
         },
-        triggers: [
-          {
-            event: "load",
-            action: "loadTheme",
-          },
-        ],
       },
       sidebar: {
         table: {},
@@ -5453,11 +5478,9 @@ try {
             "ui:widget": "container",
             "ui:direction": "column",
             "ui:gap": "70px",
-            "ui:id": "reviews-container",
             "ui:styles": {
               padding: "100px 40px",
               background: "transparent",
-              position: "relative",
             },
             "ui:children": [
               {
@@ -5483,20 +5506,7 @@ try {
                       fontSize: "3.5rem",
                       fontWeight: "900",
                       color: "#F5E9D9",
-                      textShadow: "0 4px 20px rgba(0,0,0,0.3)",
-                      marginBottom: "10px",
                       fontFamily: "'Playfair Display', serif",
-                    },
-                  },
-                  {
-                    "ui:widget": "paragraph",
-                    "ui:text":
-                      "See what tea and coffee lovers are saying about Chiyaz",
-                    "ui:styles": {
-                      fontSize: "1.4rem",
-                      color: "rgba(245, 233, 217, 0.9)",
-                      lineHeight: "1.6",
-                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
                     },
                   },
                 ],
@@ -5504,32 +5514,13 @@ try {
               {
                 "ui:widget": "customerReviews",
                 "ui:id": "chiyaz-reviews",
-                "ui:dataSource": "chiyaz.reviews",
-                "ui:title": "",
-                "ui:subtitle": "",
+                "ui:dataSource": "chiyaz.reviews.list", // ✅ FIXED: Point to actual data
                 "ui:maxReviews": 6,
                 "ui:layout": "grid",
                 "ui:showRatingSummary": true,
                 "ui:showWriteReview": true,
                 "ui:writeReviewAction": "openModal:writeReview",
-                "ui:animated": true,
-                "ui:showLoadMore": true,
-                "ui:sortBy": "latest",
                 "ui:sectionBg": "transparent",
-                "ui:styles": {
-                  maxWidth: "1400px",
-                  margin: "0 auto",
-                },
-                "ui:cardStyles": {
-                  background: "rgba(44, 24, 16, 0.85)",
-                  backdropFilter: "blur(20px) saturate(180%)",
-                  border: "1px solid rgba(212, 185, 150, 0.2)",
-                  borderRadius: "20px",
-                  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.2)",
-                  color: "#F5E9D9",
-                },
-                "ui:ratingColor": "#D2691E",
-                "ui:avatarFallbackColor": "#8B4513",
               },
             ],
           },
