@@ -56,6 +56,11 @@ const dynamicEntitySchema = new mongoose.Schema({
     default: false,
     index: true
   },
+  isPublic: {
+    type: Boolean,
+    default: false,
+    description: "Allow public unauthenticated access to this entity"
+  },
   templateCategory: {
     type: String,
     enum: ['E-commerce', 'Hotel', 'CRM', 'Inventory', 'HR', 'Custom', null],

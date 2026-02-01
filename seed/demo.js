@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const PageConfig = require("./models/PageConfig");
+const PageConfig = require("../models/PageConfig");
 
 mongoose.connect(
   "mongodb+srv://admin:sjITV8nazkocOrCX@cluster0.sunkcl4.mongodb.net/",
@@ -11019,7 +11019,7 @@ try {
 const seed = async () => {
   try {
     // ✅ Find a SUPER_ADMIN user
-    const User = require("./models/User");
+    const User = require("../models/User");
     let systemUser = await User.findOne({ role: "SUPER_ADMIN" });
 
     if (!systemUser) {

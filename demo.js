@@ -33,7 +33,7 @@ const websites = [
     redirectIfNotAuth: "/hotelhub/login",
 
     initialization: {
-globalCSS:`
+      globalCSS: `
 /* ============================================ */
 /* ENHANCED HOTELHUB CSS - COMPLETE DARK MODE FIX */
 /* ============================================ */
@@ -720,8 +720,8 @@ a:focus {
 
       actions: {
         // ✅ Add this to your initialization.actions in HotelHub template
-// In demo.js - handleLogin action
-handleLogin: `
+        // In demo.js - handleLogin action
+        handleLogin: `
 console.log('🔐 End-user login action triggered');
 const email = context.formData?.email;
 const password = context.formData?.password;
@@ -830,7 +830,7 @@ try {
         //   `,
 
         // ✅ UPDATE THIS - Include organizationId in signup
-handleSignup: `
+        handleSignup: `
   console.log('📝 Handling signup');
   const { email, password, firstName, lastName, name } = context.formData || {};
   
@@ -1231,7 +1231,7 @@ handleSignup: `
         context.handlers.setAuthData('user', email);
     }
 `,
-clearAuth: `
+        clearAuth: `
   console.log("🚪 End-user logging out from hotelhub...");
   
   try {
@@ -1270,7 +1270,7 @@ clearAuth: `
     });
   }
 `,
-handleLoginSuccess: `
+        handleLoginSuccess: `
   // ✅ After end user logs in, redirect to dashboard
   const user = context.payload?.user;
   
@@ -1288,7 +1288,7 @@ handleLoginSuccess: `
   }
 `,
         // Replace the existing clearAuth action with this
-// In demo.js - clearAuth action
+        // In demo.js - clearAuth action
 
         api: `
     const apiKey = context.actionParams?.apiKey;
@@ -1733,30 +1733,30 @@ handleLoginSuccess: `
                   marginRight: "20px",
                 },
               },
-             userInfo: {
-  "ui:widget": "navLinks",
-  "ui:theme": "light",
-  "ui:links": [
-    {
-      label: "{{auth.user?.email || 'User'}}",
-      action: "",
-      actionParams: {},
-      styles: {
-        fontWeight: "500",
-        color: "inherit",
-      },
-    },
-    {
-      label: "Logout",
-      action: "clearAuth",  // ✅ FIXED - removed +reload
-      actionParams: {},
-      styles: {
-        color: "#ef4444",
-        fontWeight: "500",
-      },
-    },
-  ],
-},
+              userInfo: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "{{auth.user?.email || 'User'}}",
+                    action: "",
+                    actionParams: {},
+                    styles: {
+                      fontWeight: "500",
+                      color: "inherit",
+                    },
+                  },
+                  {
+                    label: "Logout",
+                    action: "clearAuth", // ✅ FIXED - removed +reload
+                    actionParams: {},
+                    styles: {
+                      color: "#ef4444",
+                      fontWeight: "500",
+                    },
+                  },
+                ],
+              },
             },
             styles: {
               background: "rgba(255, 255, 255, 0.95)",
@@ -2710,22 +2710,22 @@ handleLoginSuccess: `
               marginRight: "20px",
             },
           },
-         links: {
-  "ui:widget": "navLinks",
-  "ui:theme": "light",
-  "ui:links": [
-    {
-      label: "Login",
-      action: "navigateToPage",
-      actionParams: { url: "/hotelhub/login" },
-    },
-    {
-      label: "Sign Up",
-      action: "navigateToPage",
-      actionParams: { url: "/hotelhub/signup" },
-    },
-  ],
-},
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:links": [
+              {
+                label: "Login",
+                action: "navigateToPage",
+                actionParams: { url: "/hotelhub/login" },
+              },
+              {
+                label: "Sign Up",
+                action: "navigateToPage",
+                actionParams: { url: "/hotelhub/signup" },
+              },
+            ],
+          },
         },
         styles: {
           background: "rgba(255, 255, 255, 0.95)",
@@ -2758,91 +2758,629 @@ handleLoginSuccess: `
         styles: { display: "none" },
         triggers: [],
       },
-     "main": {
-    "table": {},
-    "modal": {},
-    "uiSchema": {
-      "backgroundEffect": {
-        "ui:widget": "backgroundEffect",
-        "ui:effect": "snowfall",
-        "ui:intensity": "high",
-        "ui:color": [
-          "#ff0080",
-          "#00ffff",
-          "#ffff00",
-          "#ff00ff",
-          "#00ff00",
-          "#ff6600",
-          "#0080ff",
-          "#ff0040",
-          "#80ff00",
-          "#ff0080"
-        ],
-        "ui:speed": "medium",
-        "ui:animationMode": "both"
-      },
-      "heroSection": {
-        "ui:widget": "container",
-        "ui:direction": "column",
-        "ui:gap": "0",
-        "ui:id": "hero-container",
-        "ui:styles": {
-          "position": "relative",
-          "width": "100%",
-          "minHeight": "100vh",
-          "overflow": "hidden",
-          "padding": "0",
-          "margin": "0"
-        },
-        "ui:children": [
-          {
+      main: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          backgroundEffect: {
+            "ui:widget": "backgroundEffect",
+            "ui:effect": "snowfall",
+            "ui:intensity": "high",
+            "ui:color": [
+              "#ff0080",
+              "#00ffff",
+              "#ffff00",
+              "#ff00ff",
+              "#00ff00",
+              "#ff6600",
+              "#0080ff",
+              "#ff0040",
+              "#80ff00",
+              "#ff0080",
+            ],
+            "ui:speed": "medium",
+            "ui:animationMode": "both",
+          },
+          backgroundEffect1: {
+            "ui:widget": "backgroundEffect",
+            "ui:effect": "bubbles",
+            "ui:intensity": "high",
+            "ui:color": [
+              "#ff0080",
+              "#00ffff",
+              "#ffff00",
+              "#ff00ff",
+              "#00ff00",
+              "#ff6600",
+              "#0080ff",
+              "#ff0040",
+              "#80ff00",
+              "#ff0080",
+            ],
+            "ui:speed": "medium",
+            "ui:animationMode": "both",
+          },
+
+          heroSection: {
             "ui:widget": "container",
             "ui:direction": "column",
-            "ui:id": "hero-background",
+            "ui:gap": "0",
+            "ui:id": "hero-container",
             "ui:styles": {
-              "position": "absolute",
-              "top": "0",
-              "left": "0",
-              "width": "100%",
-              "height": "100%",
-              "backgroundImage": "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')",
-              "backgroundSize": "cover",
-              "backgroundPosition": "center",
-              "backgroundRepeat": "no-repeat",
-              "zIndex": "0"
+              position: "relative",
+              width: "100%",
+              minHeight: "100vh",
+              overflow: "hidden",
+              padding: "0",
+              margin: "0",
             },
             "ui:children": [
               {
                 "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:id": "hero-background",
                 "ui:styles": {
-                  "position": "absolute",
-                  "top": "0",
-                  "left": "0",
-                  "width": "100%",
-                  "height": "100%",
-                  "background": "rgba(14, 165, 233, 0.3)",
-                  "backdropFilter": "blur(2px)",
-                  "zIndex": "1"
+                  position: "absolute",
+                  top: "0",
+                  left: "0",
+                  width: "100%",
+                  height: "100%",
+                  backgroundImage:
+                    "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  zIndex: "0",
                 },
-                "ui:children": []
-              }
-            ]
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:styles": {
+                      position: "absolute",
+                      top: "0",
+                      left: "0",
+                      width: "100%",
+                      height: "100%",
+                      background: "rgba(14, 165, 233, 0.3)",
+                      backdropFilter: "blur(2px)",
+                      zIndex: "1",
+                    },
+                    "ui:children": [],
+                  },
+                ],
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "50px",
+                "ui:id": "hero-content",
+                "ui:styles": {
+                  position: "relative",
+                  zIndex: "10",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: "100vh",
+                  padding: "120px 40px 80px",
+                  textAlign: "center",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:gap": "30px",
+                    "ui:styles": {
+                      background: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      borderRadius: "30px",
+                      padding: "60px 50px",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      maxWidth: "900px",
+                      animation: "fadeInUp 1s ease-out",
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "Welcome to HotelHub",
+                        "ui:level": "h1",
+                        "ui:styles": {
+                          fontSize: "4.5rem",
+                          fontWeight: "900",
+                          color: "white",
+                          textShadow:
+                            "0 4px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)",
+                          marginBottom: "0",
+                          letterSpacing: "-2px",
+                          lineHeight: "1.1",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text": "Modern hotel management made simple",
+                        "ui:styles": {
+                          fontSize: "1.8rem",
+                          color: "rgba(255, 255, 255, 0.95)",
+                          lineHeight: "1.5",
+                          marginBottom: "10px",
+                          textShadow: "0 2px 15px rgba(0,0,0,0.4)",
+                          fontWeight: "500",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text":
+                          "Manage rooms, reservations, and guests all in one place",
+                        "ui:styles": {
+                          fontSize: "1.3rem",
+                          color: "rgba(255, 255, 255, 0.9)",
+                          lineHeight: "1.6",
+                          marginBottom: "20px",
+                          textShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                          fontWeight: "400",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    "ui:widget": "flexLayout",
+                    "ui:direction": "row",
+                    "ui:gap": "25px",
+                    "ui:justify": "center",
+                    "ui:wrap": true,
+                    "ui:styles": {
+                      animation: "fadeInUp 1s ease-out 0.3s backwards",
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "button",
+                        "ui:label": "🚀 Get Started",
+                        "ui:action": "navigateToPage",
+                        "ui:actionParams": {
+                          url: "/hotelhub/signup",
+                        },
+                        "ui:styles": {
+                          padding: "20px 45px",
+                          fontSize: "1.2rem",
+                          fontWeight: "700",
+                          background: "rgba(255, 255, 255, 0.95)",
+                          color: "#0284c7",
+                          border: "2px solid rgba(255, 255, 255, 0.5)",
+                          borderRadius: "50px",
+                          cursor: "pointer",
+                          boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                          backdropFilter: "blur(10px)",
+                          transition: "all 0.3s ease",
+                          transform: "translateY(0)",
+                        },
+                        "ui:hoverTransform": "translateY(-5px) scale(1.05)",
+                        "ui:hoverShadow": "0 15px 40px rgba(255,255,255,0.4)",
+                      },
+                      {
+                        "ui:widget": "button",
+                        "ui:label": "📖 Learn More",
+                        "ui:action": "navigateToPage",
+                        "ui:actionParams": {
+                          url: "/hotelhub/login",
+                        },
+                        "ui:styles": {
+                          padding: "20px 45px",
+                          fontSize: "1.2rem",
+                          fontWeight: "700",
+                          background: "rgba(255, 255, 255, 0.15)",
+                          color: "white",
+                          border: "2px solid rgba(255, 255, 255, 0.5)",
+                          borderRadius: "50px",
+                          cursor: "pointer",
+                          backdropFilter: "blur(10px)",
+                          transition: "all 0.3s ease",
+                          transform: "translateY(0)",
+                        },
+                        "ui:hoverTransform": "translateY(-5px) scale(1.05)",
+                        "ui:hoverShadow": "0 15px 40px rgba(255,255,255,0.3)",
+                      },
+                    ],
+                  },
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "row",
+                    "ui:gap": "50px",
+                    "ui:styles": {
+                      marginTop: "40px",
+                      animation: "fadeInUp 1s ease-out 0.6s backwards",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
+                      background: "rgba(255, 255, 255, 0.08)",
+                      backdropFilter: "blur(15px)",
+                      borderRadius: "25px",
+                      padding: "40px 50px",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "container",
+                        "ui:direction": "column",
+                        "ui:gap": "10px",
+                        "ui:styles": {
+                          textAlign: "center",
+                          minWidth: "150px",
+                        },
+                        "ui:children": [
+                          {
+                            "ui:widget": "heading",
+                            "ui:text": "500+",
+                            "ui:level": "h2",
+                            "ui:styles": {
+                              fontSize: "3.5rem",
+                              fontWeight: "900",
+                              color: "white",
+                              margin: "0",
+                              textShadow: "0 0 20px rgba(255,255,255,0.5)",
+                            },
+                          },
+                          {
+                            "ui:widget": "text",
+                            "ui:content": "Hotels Using HotelHub",
+                            "ui:styles": {
+                              fontSize: "1.1rem",
+                              color: "rgba(255,255,255,0.95)",
+                              fontWeight: "500",
+                              textShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                            },
+                          },
+                        ],
+                      },
+                      {
+                        "ui:widget": "container",
+                        "ui:direction": "column",
+                        "ui:gap": "10px",
+                        "ui:styles": {
+                          textAlign: "center",
+                          minWidth: "150px",
+                        },
+                        "ui:children": [
+                          {
+                            "ui:widget": "heading",
+                            "ui:text": "50K+",
+                            "ui:level": "h2",
+                            "ui:styles": {
+                              fontSize: "3.5rem",
+                              fontWeight: "900",
+                              color: "white",
+                              margin: "0",
+                              textShadow: "0 0 20px rgba(255,255,255,0.5)",
+                            },
+                          },
+                          {
+                            "ui:widget": "text",
+                            "ui:content": "Rooms Managed",
+                            "ui:styles": {
+                              fontSize: "1.1rem",
+                              color: "rgba(255,255,255,0.95)",
+                              fontWeight: "500",
+                              textShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                            },
+                          },
+                        ],
+                      },
+                      {
+                        "ui:widget": "container",
+                        "ui:direction": "column",
+                        "ui:gap": "10px",
+                        "ui:styles": {
+                          textAlign: "center",
+                          minWidth: "150px",
+                        },
+                        "ui:children": [
+                          {
+                            "ui:widget": "heading",
+                            "ui:text": "99.9%",
+                            "ui:level": "h2",
+                            "ui:styles": {
+                              fontSize: "3.5rem",
+                              fontWeight: "900",
+                              color: "white",
+                              margin: "0",
+                              textShadow: "0 0 20px rgba(255,255,255,0.5)",
+                            },
+                          },
+                          {
+                            "ui:widget": "text",
+                            "ui:content": "Uptime Guarantee",
+                            "ui:styles": {
+                              fontSize: "1.1rem",
+                              color: "rgba(255,255,255,0.95)",
+                              fontWeight: "500",
+                              textShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                            },
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
-          {
+          featuresSection: {
             "ui:widget": "container",
             "ui:direction": "column",
-            "ui:gap": "50px",
-            "ui:id": "hero-content",
+            "ui:gap": "70px",
             "ui:styles": {
-              "position": "relative",
-              "zIndex": "10",
-              "display": "flex",
-              "flexDirection": "column",
-              "alignItems": "center",
-              "justifyContent": "center",
-              "minHeight": "100vh",
-              "padding": "120px 40px 80px",
-              "textAlign": "center"
+              padding: "100px 40px",
+              background: "transparent",
+              position: "relative",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "25px",
+                "ui:styles": {
+                  textAlign: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                  background: "rgba(255, 255, 255, 0.08)",
+                  backdropFilter: "blur(15px)",
+                  borderRadius: "25px",
+                  padding: "50px 40px",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "✨ Powerful Features",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "3.5rem",
+                      fontWeight: "900",
+                      color: "white",
+                      textShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                      marginBottom: "10px",
+                    },
+                  },
+                  {
+                    "ui:widget": "paragraph",
+                    "ui:text":
+                      "Everything you need to manage your hotel efficiently and professionally",
+                    "ui:styles": {
+                      fontSize: "1.4rem",
+                      color: "rgba(255, 255, 255, 0.9)",
+                      lineHeight: "1.6",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "30px",
+                "ui:styles": {
+                  maxWidth: "1400px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🛏️ Room Management",
+                    "ui:description":
+                      "Easily manage all your hotel rooms with our intuitive interface. Track availability, pricing, and room details in real-time.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "white",
+                      fontSize: "1.6rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(255, 255, 255, 0.85)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                      textShadow: "0 1px 5px rgba(0,0,0,0.1)",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)",
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "📅 Smart Reservations",
+                    "ui:description":
+                      "Track and manage reservations with real-time availability. Automated booking confirmations and calendar sync.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "white",
+                      fontSize: "1.6rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(255, 255, 255, 0.85)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                      textShadow: "0 1px 5px rgba(0,0,0,0.1)",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)",
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "👥 Guest Management",
+                    "ui:description":
+                      "Keep track of all your guests and their preferences. Build lasting relationships with personalized service.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "white",
+                      fontSize: "1.6rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(255, 255, 255, 0.85)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                      textShadow: "0 1px 5px rgba(0,0,0,0.1)",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)",
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "📊 Analytics Dashboard",
+                    "ui:description":
+                      "Get insights into your hotel performance with detailed reports and analytics. Make data-driven decisions.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "white",
+                      fontSize: "1.6rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(255, 255, 255, 0.85)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                      textShadow: "0 1px 5px rgba(0,0,0,0.1)",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)",
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "💳 Payment Processing",
+                    "ui:description":
+                      "Secure payment processing with multiple payment methods. Automated invoicing and receipt generation.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "white",
+                      fontSize: "1.6rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(255, 255, 255, 0.85)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                      textShadow: "0 1px 5px rgba(0,0,0,0.1)",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)",
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🔔 Smart Notifications",
+                    "ui:description":
+                      "Stay informed with real-time notifications for bookings, check-ins, and important updates across all channels.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "white",
+                      fontSize: "1.6rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(255, 255, 255, 0.85)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                      textShadow: "0 1px 5px rgba(0,0,0,0.1)",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)",
+                  },
+                ],
+              },
+            ],
+          },
+          ctaSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "35px",
+            "ui:styles": {
+              padding: "80px 40px 100px",
+              background: "transparent",
+              textAlign: "center",
+              position: "relative",
             },
             "ui:children": [
               {
@@ -2850,583 +3388,82 @@ handleLoginSuccess: `
                 "ui:direction": "column",
                 "ui:gap": "30px",
                 "ui:styles": {
-                  "background": "rgba(255, 255, 255, 0.1)",
-                  "backdropFilter": "blur(20px) saturate(180%)",
-                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
-                  "border": "1px solid rgba(255, 255, 255, 0.3)",
-                  "borderRadius": "30px",
-                  "padding": "60px 50px",
-                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-                  "maxWidth": "900px",
-                  "animation": "fadeInUp 1s ease-out"
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                  background: "rgba(14, 165, 233, 0.2)",
+                  backdropFilter: "blur(25px) saturate(180%)",
+                  borderRadius: "30px",
+                  padding: "60px 50px",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
                 },
                 "ui:children": [
                   {
                     "ui:widget": "heading",
-                    "ui:text": "Welcome to HotelHub",
-                    "ui:level": "h1",
+                    "ui:text": "Ready to Transform Your Hotel Management?",
+                    "ui:level": "h2",
                     "ui:styles": {
-                      "fontSize": "4.5rem",
-                      "fontWeight": "900",
-                      "color": "white",
-                      "textShadow": "0 4px 30px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)",
-                      "marginBottom": "0",
-                      "letterSpacing": "-2px",
-                      "lineHeight": "1.1"
-                    }
+                      fontSize: "3.2rem",
+                      fontWeight: "900",
+                      color: "white",
+                      marginBottom: "15px",
+                      textShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                      lineHeight: "1.2",
+                    },
                   },
                   {
                     "ui:widget": "paragraph",
-                    "ui:text": "Modern hotel management made simple",
+                    "ui:text":
+                      "Join hundreds of hotels already using HotelHub to streamline their operations",
                     "ui:styles": {
-                      "fontSize": "1.8rem",
-                      "color": "rgba(255, 255, 255, 0.95)",
-                      "lineHeight": "1.5",
-                      "marginBottom": "10px",
-                      "textShadow": "0 2px 15px rgba(0,0,0,0.4)",
-                      "fontWeight": "500"
-                    }
-                  },
-                  {
-                    "ui:widget": "paragraph",
-                    "ui:text": "Manage rooms, reservations, and guests all in one place",
-                    "ui:styles": {
-                      "fontSize": "1.3rem",
-                      "color": "rgba(255, 255, 255, 0.9)",
-                      "lineHeight": "1.6",
-                      "marginBottom": "20px",
-                      "textShadow": "0 2px 10px rgba(0,0,0,0.3)",
-                      "fontWeight": "400"
-                    }
-                  }
-                ]
-              },
-              {
-                "ui:widget": "flexLayout",
-                "ui:direction": "row",
-                "ui:gap": "25px",
-                "ui:justify": "center",
-                "ui:wrap": true,
-                "ui:styles": {
-                  "animation": "fadeInUp 1s ease-out 0.3s backwards"
-                },
-                "ui:children": [
-                  {
-                    "ui:widget": "button",
-                    "ui:label": "🚀 Get Started",
-                    "ui:action": "navigateToPage",
-                    "ui:actionParams": {
-                      "url": "/hotelhub/signup"
+                      fontSize: "1.4rem",
+                      color: "rgba(255,255,255,0.95)",
+                      lineHeight: "1.6",
+                      marginBottom: "20px",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
                     },
-                    "ui:styles": {
-                      "padding": "20px 45px",
-                      "fontSize": "1.2rem",
-                      "fontWeight": "700",
-                      "background": "rgba(255, 255, 255, 0.95)",
-                      "color": "#0284c7",
-                      "border": "2px solid rgba(255, 255, 255, 0.5)",
-                      "borderRadius": "50px",
-                      "cursor": "pointer",
-                      "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-                      "backdropFilter": "blur(10px)",
-                      "transition": "all 0.3s ease",
-                      "transform": "translateY(0)"
-                    },
-                    "ui:hoverTransform": "translateY(-5px) scale(1.05)",
-                    "ui:hoverShadow": "0 15px 40px rgba(255,255,255,0.4)"
                   },
                   {
                     "ui:widget": "button",
-                    "ui:label": "📖 Learn More",
+                    "ui:label": "🌟 Start Free Trial",
                     "ui:action": "navigateToPage",
                     "ui:actionParams": {
-                      "url": "/hotelhub/login"
+                      url: "/hotelhub/signup",
                     },
                     "ui:styles": {
-                      "padding": "20px 45px",
-                      "fontSize": "1.2rem",
-                      "fontWeight": "700",
-                      "background": "rgba(255, 255, 255, 0.15)",
-                      "color": "white",
-                      "border": "2px solid rgba(255, 255, 255, 0.5)",
-                      "borderRadius": "50px",
-                      "cursor": "pointer",
-                      "backdropFilter": "blur(10px)",
-                      "transition": "all 0.3s ease",
-                      "transform": "translateY(0)"
+                      padding: "20px 55px",
+                      fontSize: "1.3rem",
+                      fontWeight: "700",
+                      background: "rgba(255, 255, 255, 0.95)",
+                      color: "#0284c7",
+                      border: "2px solid rgba(255, 255, 255, 0.5)",
+                      borderRadius: "50px",
+                      cursor: "pointer",
+                      boxShadow: "0 10px 40px rgba(255,255,255,0.3)",
+                      backdropFilter: "blur(10px)",
+                      transition: "all 0.4s ease",
+                      margin: "0 auto",
                     },
-                    "ui:hoverTransform": "translateY(-5px) scale(1.05)",
-                    "ui:hoverShadow": "0 15px 40px rgba(255,255,255,0.3)"
-                  }
-                ]
-              },
-              {
-                "ui:widget": "container",
-                "ui:direction": "row",
-                "ui:gap": "50px",
-                "ui:styles": {
-                  "marginTop": "40px",
-                  "animation": "fadeInUp 1s ease-out 0.6s backwards",
-                  "display": "flex",
-                  "flexWrap": "wrap",
-                  "justifyContent": "center",
-                  "background": "rgba(255, 255, 255, 0.08)",
-                  "backdropFilter": "blur(15px)",
-                  "borderRadius": "25px",
-                  "padding": "40px 50px",
-                  "border": "1px solid rgba(255, 255, 255, 0.2)"
-                },
-                "ui:children": [
-                  {
-                    "ui:widget": "container",
-                    "ui:direction": "column",
-                    "ui:gap": "10px",
-                    "ui:styles": {
-                      "textAlign": "center",
-                      "minWidth": "150px"
-                    },
-                    "ui:children": [
-                      {
-                        "ui:widget": "heading",
-                        "ui:text": "500+",
-                        "ui:level": "h2",
-                        "ui:styles": {
-                          "fontSize": "3.5rem",
-                          "fontWeight": "900",
-                          "color": "white",
-                          "margin": "0",
-                          "textShadow": "0 0 20px rgba(255,255,255,0.5)"
-                        }
-                      },
-                      {
-                        "ui:widget": "text",
-                        "ui:content": "Hotels Using HotelHub",
-                        "ui:styles": {
-                          "fontSize": "1.1rem",
-                          "color": "rgba(255,255,255,0.95)",
-                          "fontWeight": "500",
-                          "textShadow": "0 2px 10px rgba(0,0,0,0.3)"
-                        }
-                      }
-                    ]
+                    "ui:hoverTransform": "translateY(-5px) scale(1.08)",
+                    "ui:hoverShadow": "0 20px 60px rgba(255,255,255,0.5)",
                   },
-                  {
-                    "ui:widget": "container",
-                    "ui:direction": "column",
-                    "ui:gap": "10px",
-                    "ui:styles": {
-                      "textAlign": "center",
-                      "minWidth": "150px"
-                    },
-                    "ui:children": [
-                      {
-                        "ui:widget": "heading",
-                        "ui:text": "50K+",
-                        "ui:level": "h2",
-                        "ui:styles": {
-                          "fontSize": "3.5rem",
-                          "fontWeight": "900",
-                          "color": "white",
-                          "margin": "0",
-                          "textShadow": "0 0 20px rgba(255,255,255,0.5)"
-                        }
-                      },
-                      {
-                        "ui:widget": "text",
-                        "ui:content": "Rooms Managed",
-                        "ui:styles": {
-                          "fontSize": "1.1rem",
-                          "color": "rgba(255,255,255,0.95)",
-                          "fontWeight": "500",
-                          "textShadow": "0 2px 10px rgba(0,0,0,0.3)"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "ui:widget": "container",
-                    "ui:direction": "column",
-                    "ui:gap": "10px",
-                    "ui:styles": {
-                      "textAlign": "center",
-                      "minWidth": "150px"
-                    },
-                    "ui:children": [
-                      {
-                        "ui:widget": "heading",
-                        "ui:text": "99.9%",
-                        "ui:level": "h2",
-                        "ui:styles": {
-                          "fontSize": "3.5rem",
-                          "fontWeight": "900",
-                          "color": "white",
-                          "margin": "0",
-                          "textShadow": "0 0 20px rgba(255,255,255,0.5)"
-                        }
-                      },
-                      {
-                        "ui:widget": "text",
-                        "ui:content": "Uptime Guarantee",
-                        "ui:styles": {
-                          "fontSize": "1.1rem",
-                          "color": "rgba(255,255,255,0.95)",
-                          "fontWeight": "500",
-                          "textShadow": "0 2px 10px rgba(0,0,0,0.3)"
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      "featuresSection": {
-        "ui:widget": "container",
-        "ui:direction": "column",
-        "ui:gap": "70px",
-        "ui:styles": {
-          "padding": "100px 40px",
-          "background": "transparent",
-          "position": "relative"
-        },
-        "ui:children": [
-          {
-            "ui:widget": "container",
-            "ui:direction": "column",
-            "ui:gap": "25px",
-            "ui:styles": {
-              "textAlign": "center",
-              "maxWidth": "900px",
-              "margin": "0 auto",
-              "background": "rgba(255, 255, 255, 0.08)",
-              "backdropFilter": "blur(15px)",
-              "borderRadius": "25px",
-              "padding": "50px 40px",
-              "border": "1px solid rgba(255, 255, 255, 0.2)"
-            },
-            "ui:children": [
-              {
-                "ui:widget": "heading",
-                "ui:text": "✨ Powerful Features",
-                "ui:level": "h2",
-                "ui:styles": {
-                  "fontSize": "3.5rem",
-                  "fontWeight": "900",
-                  "color": "white",
-                  "textShadow": "0 4px 20px rgba(0,0,0,0.3)",
-                  "marginBottom": "10px"
-                }
+                ],
               },
-              {
-                "ui:widget": "paragraph",
-                "ui:text": "Everything you need to manage your hotel efficiently and professionally",
-                "ui:styles": {
-                  "fontSize": "1.4rem",
-                  "color": "rgba(255, 255, 255, 0.9)",
-                  "lineHeight": "1.6",
-                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)"
-                }
-              }
-            ]
+            ],
           },
-          {
-            "ui:widget": "gridLayout",
-            "ui:columns": 3,
-            "ui:gap": "30px",
-            "ui:styles": {
-              "maxWidth": "1400px",
-              "margin": "0 auto"
-            },
-            "ui:children": [
-              {
-                "ui:widget": "card",
-                "ui:title": "🛏️ Room Management",
-                "ui:description": "Easily manage all your hotel rooms with our intuitive interface. Track availability, pricing, and room details in real-time.",
-                "ui:styles": {
-                  "padding": "40px",
-                  "textAlign": "center",
-                  "background": "rgba(255, 255, 255, 0.1)",
-                  "backdropFilter": "blur(20px) saturate(180%)",
-                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
-                  "borderRadius": "25px",
-                  "border": "1px solid rgba(255, 255, 255, 0.3)",
-                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                  "cursor": "pointer"
-                },
-                "ui:titleStyles": {
-                  "color": "white",
-                  "fontSize": "1.6rem",
-                  "fontWeight": "700",
-                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
-                  "marginBottom": "15px"
-                },
-                "ui:descriptionStyles": {
-                  "color": "rgba(255, 255, 255, 0.85)",
-                  "fontSize": "1.05rem",
-                  "lineHeight": "1.6",
-                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
-                },
-                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
-                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
-              },
-              {
-                "ui:widget": "card",
-                "ui:title": "📅 Smart Reservations",
-                "ui:description": "Track and manage reservations with real-time availability. Automated booking confirmations and calendar sync.",
-                "ui:styles": {
-                  "padding": "40px",
-                  "textAlign": "center",
-                  "background": "rgba(255, 255, 255, 0.1)",
-                  "backdropFilter": "blur(20px) saturate(180%)",
-                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
-                  "borderRadius": "25px",
-                  "border": "1px solid rgba(255, 255, 255, 0.3)",
-                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                  "cursor": "pointer"
-                },
-                "ui:titleStyles": {
-                  "color": "white",
-                  "fontSize": "1.6rem",
-                  "fontWeight": "700",
-                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
-                  "marginBottom": "15px"
-                },
-                "ui:descriptionStyles": {
-                  "color": "rgba(255, 255, 255, 0.85)",
-                  "fontSize": "1.05rem",
-                  "lineHeight": "1.6",
-                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
-                },
-                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
-                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
-              },
-              {
-                "ui:widget": "card",
-                "ui:title": "👥 Guest Management",
-                "ui:description": "Keep track of all your guests and their preferences. Build lasting relationships with personalized service.",
-                "ui:styles": {
-                  "padding": "40px",
-                  "textAlign": "center",
-                  "background": "rgba(255, 255, 255, 0.1)",
-                  "backdropFilter": "blur(20px) saturate(180%)",
-                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
-                  "borderRadius": "25px",
-                  "border": "1px solid rgba(255, 255, 255, 0.3)",
-                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                  "cursor": "pointer"
-                },
-                "ui:titleStyles": {
-                  "color": "white",
-                  "fontSize": "1.6rem",
-                  "fontWeight": "700",
-                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
-                  "marginBottom": "15px"
-                },
-                "ui:descriptionStyles": {
-                  "color": "rgba(255, 255, 255, 0.85)",
-                  "fontSize": "1.05rem",
-                  "lineHeight": "1.6",
-                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
-                },
-                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
-                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
-              },
-              {
-                "ui:widget": "card",
-                "ui:title": "📊 Analytics Dashboard",
-                "ui:description": "Get insights into your hotel performance with detailed reports and analytics. Make data-driven decisions.",
-                "ui:styles": {
-                  "padding": "40px",
-                  "textAlign": "center",
-                  "background": "rgba(255, 255, 255, 0.1)",
-                  "backdropFilter": "blur(20px) saturate(180%)",
-                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
-                  "borderRadius": "25px",
-                  "border": "1px solid rgba(255, 255, 255, 0.3)",
-                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                  "cursor": "pointer"
-                },
-                "ui:titleStyles": {
-                  "color": "white",
-                  "fontSize": "1.6rem",
-                  "fontWeight": "700",
-                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
-                  "marginBottom": "15px"
-                },
-                "ui:descriptionStyles": {
-                  "color": "rgba(255, 255, 255, 0.85)",
-                  "fontSize": "1.05rem",
-                  "lineHeight": "1.6",
-                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
-                },
-                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
-                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
-              },
-              {
-                "ui:widget": "card",
-                "ui:title": "💳 Payment Processing",
-                "ui:description": "Secure payment processing with multiple payment methods. Automated invoicing and receipt generation.",
-                "ui:styles": {
-                  "padding": "40px",
-                  "textAlign": "center",
-                  "background": "rgba(255, 255, 255, 0.1)",
-                  "backdropFilter": "blur(20px) saturate(180%)",
-                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
-                  "borderRadius": "25px",
-                  "border": "1px solid rgba(255, 255, 255, 0.3)",
-                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                  "cursor": "pointer"
-                },
-                "ui:titleStyles": {
-                  "color": "white",
-                  "fontSize": "1.6rem",
-                  "fontWeight": "700",
-                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
-                  "marginBottom": "15px"
-                },
-                "ui:descriptionStyles": {
-                  "color": "rgba(255, 255, 255, 0.85)",
-                  "fontSize": "1.05rem",
-                  "lineHeight": "1.6",
-                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
-                },
-                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
-                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
-              },
-              {
-                "ui:widget": "card",
-                "ui:title": "🔔 Smart Notifications",
-                "ui:description": "Stay informed with real-time notifications for bookings, check-ins, and important updates across all channels.",
-                "ui:styles": {
-                  "padding": "40px",
-                  "textAlign": "center",
-                  "background": "rgba(255, 255, 255, 0.1)",
-                  "backdropFilter": "blur(20px) saturate(180%)",
-                  "WebkitBackdropFilter": "blur(20px) saturate(180%)",
-                  "borderRadius": "25px",
-                  "border": "1px solid rgba(255, 255, 255, 0.3)",
-                  "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-                  "transition": "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                  "cursor": "pointer"
-                },
-                "ui:titleStyles": {
-                  "color": "white",
-                  "fontSize": "1.6rem",
-                  "fontWeight": "700",
-                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)",
-                  "marginBottom": "15px"
-                },
-                "ui:descriptionStyles": {
-                  "color": "rgba(255, 255, 255, 0.85)",
-                  "fontSize": "1.05rem",
-                  "lineHeight": "1.6",
-                  "textShadow": "0 1px 5px rgba(0,0,0,0.1)"
-                },
-                "ui:hoverTransform": "translateY(-15px) scale(1.02)",
-                "ui:hoverShadow": "0 20px 60px 0 rgba(14, 165, 233, 0.4)"
-              }
-            ]
-          }
-        ]
-      },
-      "ctaSection": {
-        "ui:widget": "container",
-        "ui:direction": "column",
-        "ui:gap": "35px",
-        "ui:styles": {
-          "padding": "80px 40px 100px",
-          "background": "transparent",
-          "textAlign": "center",
-          "position": "relative"
         },
-        "ui:children": [
+        styles: {
+          padding: "0",
+          background: "transparent",
+          minHeight: "100vh",
+        },
+        triggers: [
           {
-            "ui:widget": "container",
-            "ui:direction": "column",
-            "ui:gap": "30px",
-            "ui:styles": {
-              "maxWidth": "900px",
-              "margin": "0 auto",
-              "background": "rgba(14, 165, 233, 0.2)",
-              "backdropFilter": "blur(25px) saturate(180%)",
-              "borderRadius": "30px",
-              "padding": "60px 50px",
-              "border": "1px solid rgba(255, 255, 255, 0.3)",
-              "boxShadow": "0 8px 32px 0 rgba(31, 38, 135, 0.37)"
-            },
-            "ui:children": [
-              {
-                "ui:widget": "heading",
-                "ui:text": "Ready to Transform Your Hotel Management?",
-                "ui:level": "h2",
-                "ui:styles": {
-                  "fontSize": "3.2rem",
-                  "fontWeight": "900",
-                  "color": "white",
-                  "marginBottom": "15px",
-                  "textShadow": "0 4px 20px rgba(0,0,0,0.3)",
-                  "lineHeight": "1.2"
-                }
-              },
-              {
-                "ui:widget": "paragraph",
-                "ui:text": "Join hundreds of hotels already using HotelHub to streamline their operations",
-                "ui:styles": {
-                  "fontSize": "1.4rem",
-                  "color": "rgba(255,255,255,0.95)",
-                  "lineHeight": "1.6",
-                  "marginBottom": "20px",
-                  "textShadow": "0 2px 10px rgba(0,0,0,0.2)"
-                }
-              },
-              {
-                "ui:widget": "button",
-                "ui:label": "🌟 Start Free Trial",
-                "ui:action": "navigateToPage",
-                "ui:actionParams": {
-                  "url": "/hotelhub/signup"
-                },
-                "ui:styles": {
-                  "padding": "20px 55px",
-                  "fontSize": "1.3rem",
-                  "fontWeight": "700",
-                  "background": "rgba(255, 255, 255, 0.95)",
-                  "color": "#0284c7",
-                  "border": "2px solid rgba(255, 255, 255, 0.5)",
-                  "borderRadius": "50px",
-                  "cursor": "pointer",
-                  "boxShadow": "0 10px 40px rgba(255,255,255,0.3)",
-                  "backdropFilter": "blur(10px)",
-                  "transition": "all 0.4s ease",
-                  "margin": "0 auto"
-                },
-                "ui:hoverTransform": "translateY(-5px) scale(1.08)",
-                "ui:hoverShadow": "0 20px 60px rgba(255,255,255,0.5)"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "styles": {
-      "padding": "0",
-      "background": "transparent",
-      "minHeight": "100vh"
-    },
-    "triggers": [
-      {
-        "event": "load",
-        "action": "loadTheme"
-      }
-    ]
-  },
+            event: "load",
+            action: "loadTheme",
+          },
+        ],
+      },
       footer: {
         table: {},
         modal: {},
@@ -3443,6 +3480,2181 @@ handleLoginSuccess: `
         },
         styles: {
           background: "#1e293b",
+          padding: "32px",
+          textAlign: "center",
+        },
+        triggers: [],
+      },
+    },
+
+    resolvedAPIs: {},
+  },
+  {
+    title: "Chiyaz - Premium Tea & Coffee",
+    slug: "chiyaz",
+    projectUUID: "chiyaz-tea-coffee",
+    taskUUID: "chiyaz001",
+    status: "Active",
+    isTemplate: true,
+    templateCategory: "E-commerce",
+    organizationId: "696fd6f8a216cc192d63b84a",
+    createdBy: "000000000000000000000000",
+    accountValidation: true,
+    otpValidation: false,
+    isAnonymous: false,
+    requireAuth: false,
+    redirectIfNotAuth: "/chiyaz/login",
+
+    initialization: {
+      globalCSS: `
+/* ============================================ */
+/* CHIYAZ TEA & COFFEE - PREMIUM STYLING */
+/* ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* These styles get applied automatically */
+.chiyaz-review-card {
+  background: rgba(44, 24, 16, 0.85);
+  border: 1px solid rgba(212, 185, 150, 0.2);
+  color: #F5E9D9;
+}
+
+.chiyaz-rating-star {
+  color: #D2691E; /* Chiyaz gold/brown for stars */
+}
+
+.chiyaz-review-header {
+  font-family: 'Playfair Display', serif;
+}
+/* ============================================ */
+/* BASE STYLES - Tea & Coffee Theme */
+/* ============================================ */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%) !important;
+  background-attachment: fixed !important;
+  color: #2C1810 !important;
+  min-height: 100vh;
+  transition: background 0.6s ease, color 0.6s ease;
+  overflow-x: hidden;
+}
+
+/* ============================================ */
+/* DARK MODE - Coffee Shop Vibes */
+/* ============================================ */
+body.dark-mode {
+  background: linear-gradient(135deg, #1A120B 0%, #3E2723 70%, #1A120B 100%) !important;
+  background-attachment: fixed !important;
+  color: #F5E9D9 !important;
+}
+
+/* Glass card styling */
+.glass-card {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 0 8px 32px 0 rgba(139, 69, 19, 0.25) !important;
+  color: #2C1810 !important;
+}
+
+body.dark-mode .glass-card {
+  background: rgba(30, 18, 11, 0.7) !important;
+  border: 1px solid rgba(212, 185, 150, 0.2) !important;
+  color: #F5E9D9 !important;
+}
+
+/* Card text visibility */
+.glass-card h1,
+.glass-card h2,
+.glass-card h3,
+.glass-card p,
+.glass-card span {
+  color: #2C1810 !important;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5) !important;
+}
+
+body.dark-mode .glass-card h1,
+body.dark-mode .glass-card h2,
+body.dark-mode .glass-card h3,
+body.dark-mode .glass-card p,
+body.dark-mode .glass-card span {
+  color: #F5E9D9 !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Navbar styling */
+body nav,
+body header {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(139, 69, 19, 0.2) !important;
+  box-shadow: 0 8px 32px 0 rgba(139, 69, 19, 0.15) !important;
+}
+
+body.dark-mode nav,
+body.dark-mode header {
+  background: rgba(30, 18, 11, 0.9) !important;
+  border-bottom: 1px solid rgba(212, 185, 150, 0.2) !important;
+}
+
+body nav a,
+body header a,
+body nav button,
+body header button {
+  color: #5D4037 !important;
+  font-weight: 500 !important;
+}
+
+body.dark-mode nav a,
+body.dark-mode header a,
+body.dark-mode nav button,
+body.dark-mode header button {
+  color: #F5E9D9 !important;
+}
+
+/* Button styling */
+.primary-btn {
+  background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 25px !important;
+  padding: 12px 30px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.primary-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 10px 20px rgba(139, 69, 19, 0.3) !important;
+}
+
+/* Features cards */
+.feature-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(139, 69, 19, 0.2) !important;
+  border-radius: 20px !important;
+  padding: 30px !important;
+  transition: all 0.3s ease !important;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px) !important;
+  box-shadow: 0 20px 40px rgba(139, 69, 19, 0.2) !important;
+}
+
+/* Stats section styling */
+.stats-card {
+  background: rgba(44, 24, 16, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(212, 185, 150, 0.2) !important;
+  color: #F5E9D9 !important;
+  border-radius: 20px !important;
+  padding: 30px !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Feature cards dark background */
+.feature-content-card {
+  background: rgba(44, 24, 16, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(212, 185, 150, 0.2) !important;
+  color: #F5E9D9 !important;
+  border-radius: 20px !important;
+  padding: 40px !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(139, 69, 19, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+  border-radius: 10px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Form styling */
+.form-container {
+  background: rgba(255, 248, 240, 0.95) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(139, 69, 19, 0.2) !important;
+}
+
+body.dark-mode .form-container {
+  background: rgba(30, 18, 11, 0.95) !important;
+  border: 1px solid rgba(212, 185, 150, 0.2) !important;
+}
+
+/* Text colors for tea/coffee vibe */
+.tea-brown-text {
+  color: #5D4037 !important;
+}
+
+.coffee-gold-text {
+  color: #D2691E !important;
+}
+
+.cream-text {
+  color: #F5E9D9 !important;
+}
+
+.dark-brown-text {
+  color: #2C1810 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem !important;
+  }
+}
+`,
+
+      resources: [
+        "global.enduser.signup",
+        "global.enduser.login",
+        "global.enduser.logout",
+        "global.enduser.forgotPassword",
+        "global.enduser.resetPassword",
+        "global.enduser.verifyEmail",
+        "chiyaz.reviews.list",
+        "chiyaz.tea.list",
+        "chiyaz.coffee.list",
+      ],
+
+      actions: {
+        handleLogin: `
+console.log('🔐 Chiyaz login action triggered');
+const email = context.formData?.email;
+const password = context.formData?.password;
+
+if (!email || !password) {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Please enter email and password',
+    background: '#8B4513'
+  });
+  return;
+}
+
+try {
+  const response = await fetch('/api/enduser-auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ 
+      email, 
+      password,
+      websiteSlug: 'chiyaz'
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: data.error || '❌ Login failed',
+      background: '#8B4513'
+    });
+    return;
+  }
+
+  console.log('✅ Login successful:', data);
+  context.handlers.setData('user', data.user);
+
+  context.handlers.showNotification({
+    type: 'toast',
+    message: \`Welcome back, \${data.user.firstName || 'Tea Lover'}! 🍵\`,
+    background: '#2E7D32'
+  });
+
+  setTimeout(() => {
+    window.location.href = '/chiyaz/dashboard';
+  }, 1000);
+
+} catch (error) {
+  console.error('Login error:', error);
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Network error. Please try again.',
+    background: '#8B4513'
+  });
+}
+`,
+
+        handleSignup: `
+console.log('📝 Chiyaz signup handling');
+const { email, password, firstName, lastName, name } = context.formData || {};
+
+if (!email || !password) {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Email and password are required',
+    background: '#8B4513'
+  });
+  return;
+}
+
+try {
+  const response = await fetch('/api/enduser-auth/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      email: email.trim().toLowerCase(),
+      password,
+      name: \`\${firstName?.trim() || ''} \${lastName?.trim() || ''}\`.trim(),
+      organizationId: '696fd6f8a216cc192d63b84a',
+      websiteSlug: 'chiyaz'
+    })
+  });
+    
+  const data = await response.json();
+    
+  if (!response.ok) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: data.error || '❌ Signup failed',
+      background: '#8B4513',
+      duration: 4000
+    });
+    return;
+  }
+    
+  console.log('✅ Signup successful:', data);
+    
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '✅ Account created! Welcome to Chiyaz.',
+    background: '#2E7D32',
+    duration: 4000
+  });
+    
+  setTimeout(() => {
+    window.location.href = '/chiyaz/login';
+  }, 2000);
+    
+} catch (error) {
+  console.error('❌ Signup error:', error);
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Network error. Please try again.',
+    background: '#8B4513'
+  });
+}
+`,
+
+        toggleTheme: `
+const body = document.body;
+const isDark = body.classList.contains('dark-mode');
+
+if (isDark) {
+  body.classList.remove('dark-mode');
+  localStorage.setItem('chiyaz-theme', 'light');
+  console.log('☀️ Light mode activated');
+} else {
+  body.classList.add('dark-mode');
+  localStorage.setItem('chiyaz-theme', 'dark');
+  console.log('🌙 Dark mode activated');
+}
+`,
+
+        loadTheme: `
+const saved = localStorage.getItem('chiyaz-theme');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+if (saved === 'dark' || (!saved && prefersDark)) {
+  document.body.classList.add('dark-mode');
+  console.log('🌙 Dark mode loaded');
+}
+`,
+
+        navigateToPage: `
+const url = context.actionParams?.url;
+if (!url) {
+  console.error("❌ No URL provided");
+  return;
+}
+console.log("🧭 Navigating to:", url);
+window.location.href = url;
+`,
+
+        clearAuth: `
+console.log("🚪 Chiyaz logout...");
+  
+try {
+  const response = await fetch('/api/enduser-auth/logout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ websiteSlug: 'chiyaz' })
+  });
+    
+  const data = await response.json();
+    
+  if (response.ok) {
+    context.handlers.clearAuthData();
+    
+    context.handlers.showNotification({
+      type: "toast",
+      message: "✅ Logged out successfully",
+      background: "#2E7D32",
+      duration: 2000,
+    });
+    
+    setTimeout(() => {
+      window.location.href = data.redirectUrl || '/chiyaz';
+    }, 1000);
+  }
+} catch (error) {
+  console.error('Logout error:', error);
+  context.handlers.showNotification({
+    type: "toast",
+    message: "❌ Logout failed",
+    background: "#8B4513"
+  });
+}
+`,
+      },
+    },
+
+    pages: {
+      login: {
+        title: "Login - Chiyaz",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍵 Chiyaz",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  fontFamily: "'Playfair Display', serif",
+                  background:
+                    "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+                "ui:action": "navigateToPage",
+                "ui:actionParams": { url: "/chiyaz" },
+              },
+              themeToggle: {
+                "ui:widget": "toggle",
+                "ui:label": "",
+                "ui:size": "medium",
+                "ui:onChange": "toggleTheme",
+                "ui:styles": {
+                  marginLeft: "auto",
+                  marginRight: "20px",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/chiyaz" },
+                  },
+                  {
+                    label: "Sign Up",
+                    action: "navigateToPage",
+                    actionParams: { url: "/chiyaz/signup" },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(255, 255, 255, 0.95)",
+              borderBottom: "1px solid rgba(139, 69, 19, 0.2)",
+              padding: "18px 40px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              height: "70px",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              loginForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🍵 Welcome Back",
+                "ui:description": "Sign in to your Chiyaz account",
+                "ui:id": "loginForm",
+                "ui:styles": {
+                  maxWidth: "420px",
+                  margin: "120px auto 0",
+                  padding: "40px 36px",
+                  background: "rgba(255, 248, 240, 0.95)",
+                  backdropFilter: "blur(20px)",
+                  borderRadius: "20px",
+                  boxShadow: "0 15px 35px rgba(139, 69, 19, 0.2)",
+                  border: "1px solid rgba(139, 69, 19, 0.2)",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "tea.lover@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:labelStyles": {
+                      color: "#5D4037",
+                      fontWeight: "500",
+                    },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Enter your password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    "ui:labelStyles": {
+                      color: "#5D4037",
+                      fontWeight: "500",
+                    },
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Sign In",
+                    action: "handleLogin",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+                      color: "white",
+                      fontSize: "15px",
+                      fontWeight: "600",
+                      borderRadius: "25px",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                    },
+                    "ui:hoverTransform": "translateY(-2px)",
+                    "ui:hoverShadow": "0 10px 20px rgba(139, 69, 19, 0.3)",
+                  },
+                ],
+                "ui:titleStyles": {
+                  color: "#5D4037",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "28px",
+                  marginBottom: "10px",
+                },
+                "ui:descriptionStyles": {
+                  color: "#8B4513",
+                  fontSize: "16px",
+                  marginBottom: "30px",
+                },
+              },
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:direction": "column",
+                "ui:links": [
+                  {
+                    prefix: "Don't have an account?",
+                    label: "Sign Up",
+                    action: "navigateToPage",
+                    actionParams: { url: "/chiyaz/signup" },
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "420px",
+                  margin: "24px auto",
+                  padding: "16px",
+                  background: "rgba(139, 69, 19, 0.05)",
+                  borderRadius: "12px",
+                  color: "#5D4037",
+                },
+                "ui:linkStyles": {
+                  color: "#8B4513",
+                  fontWeight: "600",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 60px",
+              backgroundImage:
+                "linear-gradient(rgba(44, 24, 16, 0.7), rgba(44, 24, 16, 0.7)), url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundAttachment: "fixed",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content":
+                  "© 2024 Chiyaz Tea & Coffee. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#F5E9D9",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              background: "#2C1810",
+              padding: "24px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      signup: {
+        title: "Sign Up - Chiyaz",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍵 Chiyaz",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "800",
+                  fontFamily: "'Playfair Display', serif",
+                  background:
+                    "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+                "ui:action": "navigateToPage",
+                "ui:actionParams": { url: "/chiyaz" },
+              },
+              themeToggle: {
+                "ui:widget": "toggle",
+                "ui:label": "",
+                "ui:size": "medium",
+                "ui:onChange": "toggleTheme",
+                "ui:styles": {
+                  marginLeft: "auto",
+                  marginRight: "20px",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/chiyaz" },
+                  },
+                  {
+                    label: "Login",
+                    action: "navigateToPage",
+                    actionParams: { url: "/chiyaz/login" },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(255, 255, 255, 0.95)",
+              borderBottom: "1px solid rgba(139, 69, 19, 0.2)",
+              padding: "18px 40px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              height: "70px",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              signupForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "✨ Join Chiyaz",
+                "ui:description":
+                  "Create your account and discover premium tea & coffee",
+                "ui:id": "signupForm",
+                "ui:styles": {
+                  maxWidth: "420px",
+                  margin: "120px auto 0",
+                  padding: "40px 36px",
+                  background: "rgba(255, 248, 240, 0.95)",
+                  backdropFilter: "blur(20px)",
+                  borderRadius: "20px",
+                  boxShadow: "0 15px 35px rgba(139, 69, 19, 0.2)",
+                  border: "1px solid rgba(139, 69, 19, 0.2)",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Full Name",
+                    "ui:placeholder": "Alex Johnson",
+                    "ui:type": "text",
+                    "ui:name": "name",
+                    "ui:required": true,
+                    "ui:labelStyles": {
+                      color: "#5D4037",
+                      fontWeight: "500",
+                    },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "you@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:labelStyles": {
+                      color: "#5D4037",
+                      fontWeight: "500",
+                    },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Create a secure password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    "ui:labelStyles": {
+                      color: "#5D4037",
+                      fontWeight: "500",
+                    },
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Create Account",
+                    action: "handleSignup",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "14px 0",
+                      background:
+                        "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+                      color: "white",
+                      fontSize: "15px",
+                      fontWeight: "600",
+                      borderRadius: "25px",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                    },
+                    "ui:hoverTransform": "translateY(-2px)",
+                    "ui:hoverShadow": "0 10px 20px rgba(139, 69, 19, 0.3)",
+                  },
+                ],
+                "ui:titleStyles": {
+                  color: "#5D4037",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "28px",
+                  marginBottom: "10px",
+                },
+                "ui:descriptionStyles": {
+                  color: "#8B4513",
+                  fontSize: "16px",
+                  marginBottom: "30px",
+                },
+              },
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    prefix: "Already have an account?",
+                    label: "Login",
+                    action: "navigateToPage",
+                    actionParams: { url: "/chiyaz/login" },
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "420px",
+                  margin: "24px auto",
+                  padding: "16px",
+                  background: "rgba(139, 69, 19, 0.05)",
+                  borderRadius: "12px",
+                  color: "#5D4037",
+                },
+                "ui:linkStyles": {
+                  color: "#8B4513",
+                  fontWeight: "600",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 60px",
+              backgroundImage:
+                "linear-gradient(rgba(44, 24, 16, 0.7), rgba(44, 24, 16, 0.7)), url('https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2067&auto=format&fit=crop')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundAttachment: "fixed",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content":
+                  "© 2024 Chiyaz Tea & Coffee. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#F5E9D9",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              background: "#2C1810",
+              padding: "24px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      dashboard: {
+        title: "Dashboard - Chiyaz",
+        requireAuth: true,
+        redirectIfNotAuth: "/chiyaz/login",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "🍵 Chiyaz",
+                "ui:styles": {
+                  fontSize: "24px",
+                  fontWeight: "800",
+                  fontFamily: "'Playfair Display', serif",
+                  background:
+                    "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                },
+                "ui:action": "navigateToPage",
+                "ui:actionParams": { url: "/chiyaz/dashboard" },
+              },
+              themeToggle: {
+                "ui:widget": "toggle",
+                "ui:label": "",
+                "ui:size": "medium",
+                "ui:onChange": "toggleTheme",
+                "ui:styles": {
+                  marginLeft: "auto",
+                  marginRight: "20px",
+                },
+              },
+              userInfo: {
+                "ui:widget": "navLinks",
+                "ui:theme": "light",
+                "ui:links": [
+                  {
+                    label: "{{auth.user?.email || 'Tea Lover'}}",
+                    action: "",
+                    actionParams: {},
+                    styles: {
+                      fontWeight: "500",
+                      color: "inherit",
+                    },
+                  },
+                  {
+                    label: "Logout",
+                    action: "clearAuth",
+                    actionParams: {},
+                    styles: {
+                      color: "#8B4513",
+                      fontWeight: "500",
+                    },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(255, 255, 255, 0.95)",
+              borderBottom: "1px solid rgba(139, 69, 19, 0.2)",
+              padding: "16px 40px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backdropFilter: "blur(8px)",
+              height: "70px",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              menuHeading: {
+                "ui:widget": "heading",
+                "ui:text": "🍵 Menu",
+                "ui:level": "h3",
+                "ui:styles": {
+                  marginBottom: "24px",
+                  fontSize: "1.2rem",
+                  color: "inherit",
+                  padding: "0 12px",
+                  fontFamily: "'Playfair Display', serif",
+                },
+              },
+              menuContainer: {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "8px",
+                "ui:styles": {
+                  width: "100%",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🏠 Dashboard",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/chiyaz/dashboard" },
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 20px",
+                      background: "rgba(139, 69, 19, 0.1)",
+                      color: "#8B4513",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🛒 My Orders",
+                    "ui:action": "",
+                    "ui:actionParams": {},
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 20px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "❤️ Favorites",
+                    "ui:action": "",
+                    "ui:actionParams": {},
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 20px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "⚙️ Settings",
+                    "ui:action": "",
+                    "ui:actionParams": {},
+                    "ui:styles": {
+                      width: "100%",
+                      padding: "14px 20px",
+                      background: "transparent",
+                      color: "inherit",
+                      border: "none",
+                      borderRadius: "12px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      transition: "all 0.2s",
+                    },
+                  },
+                ],
+              },
+            },
+            styles: {
+              width: "280px",
+              background: "#FFF8F0",
+              padding: "90px 20px 30px",
+              minHeight: "calc(100vh - 70px)",
+              borderRight: "1px solid rgba(139, 69, 19, 0.1)",
+              position: "fixed",
+              top: "70px",
+              left: "0",
+            },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              welcomeCard: {
+                "ui:widget": "card",
+                "ui:title": "🍵 Welcome to Chiyaz",
+                "ui:description":
+                  "Hello {{auth.user?.name || auth.user?.email || 'Tea Lover'}}! Explore our premium tea & coffee collection.",
+                "ui:styles": {
+                  padding: "40px",
+                  textAlign: "left",
+                  background:
+                    "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+                  color: "white",
+                  border: "none",
+                  marginBottom: "30px",
+                  borderRadius: "20px",
+                  boxShadow: "0 10px 30px rgba(139, 69, 19, 0.3)",
+                },
+              },
+              statsGrid: {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "25px",
+                "ui:styles": {
+                  marginBottom: "40px",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "📦 Orders",
+                    "ui:description": "5 Active",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "rgba(139, 69, 19, 0.1)",
+                      border: "1px solid rgba(139, 69, 19, 0.2)",
+                      borderRadius: "16px",
+                      color: "#5D4037",
+                    },
+                    "ui:titleStyles": {
+                      color: "#8B4513",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "❤️ Favorites",
+                    "ui:description": "12 Items",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "rgba(210, 105, 30, 0.1)",
+                      border: "1px solid rgba(210, 105, 30, 0.2)",
+                      borderRadius: "16px",
+                      color: "#5D4037",
+                    },
+                    "ui:titleStyles": {
+                      color: "#D2691E",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "⭐ Rewards",
+                    "ui:description": "350 Points",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "rgba(46, 125, 50, 0.1)",
+                      border: "1px solid rgba(46, 125, 50, 0.2)",
+                      borderRadius: "16px",
+                      color: "#5D4037",
+                    },
+                    "ui:titleStyles": {
+                      color: "#2E7D32",
+                    },
+                  },
+                ],
+              },
+              recommendations: {
+                "ui:widget": "card",
+                "ui:title": "🔥 Recommended for You",
+                "ui:description":
+                  "• Premium Darjeeling Tea\\n• Ethiopian Yirgacheffe Coffee\\n• Japanese Matcha Powder\\n• Colombian Supreme Beans",
+                "ui:styles": {
+                  padding: "30px",
+                  background: "inherit",
+                  borderRadius: "16px",
+                  border: "1px solid rgba(139, 69, 19, 0.1)",
+                  marginBottom: "30px",
+                  color: "#5D4037",
+                },
+                "ui:titleStyles": {
+                  color: "#8B4513",
+                  fontFamily: "'Playfair Display', serif",
+                },
+              },
+            },
+            styles: {
+              marginLeft: "280px",
+              padding: "90px 40px 50px",
+              background: "inherit",
+              minHeight: "calc(100vh - 70px)",
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadTheme",
+              },
+            ],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content":
+                  "© 2024 Chiyaz Tea & Coffee. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "#8B4513",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              marginLeft: "280px",
+              background: "#2C1810",
+              padding: "30px",
+              textAlign: "center",
+            },
+            triggers: [],
+          },
+        },
+      },
+    },
+
+    components: {
+      navbar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "🍵 Chiyaz",
+            "ui:styles": {
+              fontSize: "28px",
+              fontWeight: "800",
+              fontFamily: "'Playfair Display', serif",
+              background: "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              cursor: "pointer",
+            },
+            "ui:action": "navigateToPage",
+            "ui:actionParams": { url: "/chiyaz" },
+          },
+          themeToggle: {
+            "ui:widget": "toggle",
+            "ui:label": "",
+            "ui:size": "medium",
+            "ui:onChange": "toggleTheme",
+            "ui:styles": {
+              marginLeft: "auto",
+              marginRight: "20px",
+            },
+          },
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "light",
+            "ui:links": [
+              {
+                label: "Login",
+                action: "navigateToPage",
+                actionParams: { url: "/chiyaz/login" },
+              },
+              {
+                label: "Sign Up",
+                action: "navigateToPage",
+                actionParams: { url: "/chiyaz/signup" },
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "rgba(255, 255, 255, 0.95)",
+          borderBottom: "1px solid rgba(139, 69, 19, 0.2)",
+          padding: "18px 40px",
+          position: "fixed",
+          width: "100%",
+          zIndex: "1000",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          backdropFilter: "blur(8px)",
+          height: "70px",
+        },
+        triggers: [
+          {
+            event: "load",
+            action: "loadTheme",
+          },
+        ],
+      },
+      sidebar: {
+        table: {},
+        modal: {},
+        uiSchema: {},
+        styles: { display: "none" },
+        triggers: [],
+      },
+      main: {
+        table: {},
+        modal: {
+          writeReview: {
+            title: "Write a Review",
+            uiSchema: {
+              reviewForm: {
+                "ui:widget": "reviewForm",
+                "ui:productId": "chiyaz-premium",
+                "ui:title": "Share Your Experience",
+                "ui:subtitle":
+                  "We'd love to hear about your Chiyaz tea or coffee experience",
+                "ui:submitAction": "api:chiyaz.reviews.submit",
+                "ui:styles": {
+                  maxWidth: "700px",
+                  margin: "0 auto",
+                  background: "rgba(44, 24, 16, 0.95)",
+                  backdropFilter: "blur(25px) saturate(180%)",
+                  borderRadius: "25px",
+                  border: "1px solid rgba(212, 185, 150, 0.3)",
+                  color: "#F5E9D9",
+                  padding: "40px",
+                },
+              },
+            },
+            styles: {
+              background: "rgba(0, 0, 0, 0.7)",
+              backdropFilter: "blur(10px)",
+            },
+          },
+        },
+        uiSchema: {
+          teaBubbles: {
+            "ui:widget": "backgroundEffect",
+            "ui:effect": "bubbles",
+            "ui:intensity": "medium", // Not too many - subtle
+            "ui:color": [
+              "#DEB887", // Burlywood - light tea
+              "#D2B48C", // Tan - milky tea
+              "#BC8F8F", // Rosy brown - chai
+              "#CD853F", // Peru - strong tea
+              "#DAA520", // Goldenrod - honey tea
+              "#F5DEB3", // Wheat - green tea
+            ],
+            "ui:speed": "slow", // Bubbles rise gently like steam
+            "ui:animationMode": "dark", // Only show in dark mode
+          },
+
+          // ☕ COFFEE STEAM - Darker brown wisps (optional - use OR tea bubbles)
+          coffeeSteam: {
+            "ui:widget": "backgroundEffect",
+            "ui:effect": "bubbles",
+            "ui:intensity": "low",
+            "ui:color": [
+              "#8B4513", // Saddle brown - dark coffee
+              "#A0522D", // Sienna - medium roast
+              "#D2691E", // Chocolate - coffee beans
+              "#8B7355", // Burlywood4 - latte
+            ],
+            "ui:speed": "slow",
+            "ui:animationMode": "dark",
+          },
+
+          // ⭐ SUBTLE STARS - Twinkling background (keep this)
+          subtleStars: {
+            "ui:widget": "backgroundEffect",
+            "ui:effect": "stars",
+            "ui:intensity": "medium",
+            "ui:color": "#F5E9D9", // Cream color - subtle
+            "ui:animationMode": "dark",
+          },
+          heroSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "0",
+            "ui:id": "hero-container",
+            "ui:styles": {
+              position: "relative",
+              width: "100%",
+              minHeight: "100vh",
+              overflow: "hidden",
+              padding: "0",
+              margin: "0",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:id": "hero-background",
+                "ui:styles": {
+                  position: "absolute",
+                  top: "0",
+                  left: "0",
+                  width: "100%",
+                  height: "100%",
+                  backgroundImage:
+                    "url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop')",
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat",
+                  zIndex: "0",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:styles": {
+                      position: "absolute",
+                      top: "0",
+                      left: "0",
+                      width: "100%",
+                      height: "100%",
+                      background: "rgba(44, 24, 16, 0.7)",
+                      backdropFilter: "blur(2px)",
+                      zIndex: "1",
+                    },
+                    "ui:children": [],
+                  },
+                ],
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "50px",
+                "ui:id": "hero-content",
+                "ui:styles": {
+                  position: "relative",
+                  zIndex: "10",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minHeight: "100vh",
+                  padding: "120px 40px 80px",
+                  textAlign: "center",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:gap": "30px",
+                    "ui:styles": {
+                      background: "rgba(255, 255, 255, 0.1)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      borderRadius: "30px",
+                      padding: "60px 50px",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      maxWidth: "900px",
+                      animation: "fadeInUp 1s ease-out",
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "Chiyaz Premium Tea & Coffee",
+                        "ui:level": "h1",
+                        "ui:styles": {
+                          fontSize: "4rem",
+                          fontWeight: "900",
+                          fontFamily: "'Playfair Display', serif",
+                          color: "white",
+                          textShadow: "0 4px 30px rgba(0,0,0,0.5)",
+                          marginBottom: "0",
+                          lineHeight: "1.1",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text":
+                          "Discover the world's finest tea leaves and coffee beans",
+                        "ui:styles": {
+                          fontSize: "1.8rem",
+                          color: "rgba(255, 255, 255, 0.95)",
+                          lineHeight: "1.5",
+                          marginBottom: "10px",
+                          fontFamily: "'Playfair Display', serif",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text":
+                          "Sourced from the best plantations, crafted for perfection",
+                        "ui:styles": {
+                          fontSize: "1.3rem",
+                          color: "rgba(255, 255, 255, 0.9)",
+                          lineHeight: "1.6",
+                          marginBottom: "20px",
+                        },
+                      },
+                    ],
+                  },
+                  {
+                    "ui:widget": "flexLayout",
+                    "ui:direction": "row",
+                    "ui:gap": "25px",
+                    "ui:justify": "center",
+                    "ui:wrap": true,
+                    "ui:styles": {
+                      animation: "fadeInUp 1s ease-out 0.3s backwards",
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "button",
+                        "ui:label": "🍵 Explore Collection",
+                        "ui:action": "navigateToPage",
+                        "ui:actionParams": {
+                          url: "/chiyaz/signup",
+                        },
+                        "ui:styles": {
+                          padding: "20px 45px",
+                          fontSize: "1.2rem",
+                          fontWeight: "700",
+                          background: "rgba(255, 255, 255, 0.95)",
+                          color: "#8B4513",
+                          border: "2px solid rgba(255, 255, 255, 0.5)",
+                          borderRadius: "50px",
+                          cursor: "pointer",
+                          boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                          backdropFilter: "blur(10px)",
+                          transition: "all 0.3s ease",
+                          transform: "translateY(0)",
+                        },
+                        "ui:hoverTransform": "translateY(-5px) scale(1.05)",
+                        "ui:hoverShadow": "0 15px 40px rgba(255,255,255,0.4)",
+                      },
+                      {
+                        "ui:widget": "button",
+                        "ui:label": "☕ Join Community",
+                        "ui:action": "navigateToPage",
+                        "ui:actionParams": {
+                          url: "/chiyaz/login",
+                        },
+                        "ui:styles": {
+                          padding: "20px 45px",
+                          fontSize: "1.2rem",
+                          fontWeight: "700",
+                          background: "rgba(255, 255, 255, 0.15)",
+                          color: "white",
+                          border: "2px solid rgba(255, 255, 255, 0.5)",
+                          borderRadius: "50px",
+                          cursor: "pointer",
+                          backdropFilter: "blur(10px)",
+                          transition: "all 0.3s ease",
+                          transform: "translateY(0)",
+                        },
+                        "ui:hoverTransform": "translateY(-5px) scale(1.05)",
+                        "ui:hoverShadow": "0 15px 40px rgba(255,255,255,0.3)",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+          statsSection: {
+            "ui:widget": "container",
+            "ui:direction": "row",
+            "ui:gap": "60px",
+            "ui:styles": {
+              marginTop: "40px",
+              animation: "fadeInUp 1s ease-out 0.6s backwards",
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
+              background: "rgba(44, 24, 16, 0.85)",
+              backdropFilter: "blur(15px) saturate(180%)",
+              borderRadius: "25px",
+              padding: "40px 50px",
+              border: "1px solid rgba(212, 185, 150, 0.2)",
+              maxWidth: "1000px",
+              margin: "0 auto 80px",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "10px",
+                "ui:styles": {
+                  textAlign: "center",
+                  minWidth: "180px",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "50+",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "3.5rem",
+                      fontWeight: "900",
+                      color: "#F5E9D9",
+                      margin: "0",
+                      textShadow: "0 0 20px rgba(255,255,255,0.2)",
+                    },
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content": "Tea Varieties",
+                    "ui:styles": {
+                      fontSize: "1.1rem",
+                      color: "rgba(245, 233, 217, 0.95)",
+                      fontWeight: "500",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "10px",
+                "ui:styles": {
+                  textAlign: "center",
+                  minWidth: "180px",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "30+",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "3.5rem",
+                      fontWeight: "900",
+                      color: "#F5E9D9",
+                      margin: "0",
+                      textShadow: "0 0 20px rgba(255,255,255,0.2)",
+                    },
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content": "Coffee Origins",
+                    "ui:styles": {
+                      fontSize: "1.1rem",
+                      color: "rgba(245, 233, 217, 0.95)",
+                      fontWeight: "500",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "10px",
+                "ui:styles": {
+                  textAlign: "center",
+                  minWidth: "180px",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "100%",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "3.5rem",
+                      fontWeight: "900",
+                      color: "#F5E9D9",
+                      margin: "0",
+                      textShadow: "0 0 20px rgba(255,255,255,0.2)",
+                    },
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content": "Organic Sourced",
+                    "ui:styles": {
+                      fontSize: "1.1rem",
+                      color: "rgba(245, 233, 217, 0.95)",
+                      fontWeight: "500",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+          featuresSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "70px",
+            "ui:styles": {
+              padding: "100px 40px",
+              background: "transparent",
+              position: "relative",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "25px",
+                "ui:styles": {
+                  textAlign: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                  background: "rgba(44, 24, 16, 0.85)",
+                  backdropFilter: "blur(15px) saturate(180%)",
+                  borderRadius: "25px",
+                  padding: "50px 40px",
+                  border: "1px solid rgba(212, 185, 150, 0.2)",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "✨ Premium Selection",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "3.5rem",
+                      fontWeight: "900",
+                      color: "#F5E9D9",
+                      textShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                      marginBottom: "10px",
+                      fontFamily: "'Playfair Display', serif",
+                    },
+                  },
+                  {
+                    "ui:widget": "paragraph",
+                    "ui:text":
+                      "Experience the finest tea and coffee from around the world",
+                    "ui:styles": {
+                      fontSize: "1.4rem",
+                      color: "rgba(245, 233, 217, 0.9)",
+                      lineHeight: "1.6",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 2,
+                "ui:gap": "30px",
+                "ui:styles": {
+                  maxWidth: "1200px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🍵 Premium Tea Collection",
+                    "ui:description":
+                      "From delicate Darjeeling to robust Assam, discover teas sourced from the finest estates across India, China, and Japan.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(44, 24, 16, 0.85)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(212, 185, 150, 0.2)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "#F5E9D9",
+                      fontSize: "1.8rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                      fontFamily: "'Playfair Display', serif",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(245, 233, 217, 0.9)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(139, 69, 19, 0.4)",
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "☕ Artisan Coffee Beans",
+                    "ui:description":
+                      "Single-origin beans from Ethiopia, Colombia, Brazil, and more. Roasted to perfection for the ultimate coffee experience.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(44, 24, 16, 0.85)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(212, 185, 150, 0.2)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "#F5E9D9",
+                      fontSize: "1.8rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                      fontFamily: "'Playfair Display', serif",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(245, 233, 217, 0.9)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(139, 69, 19, 0.4)",
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🌱 Organic & Sustainable",
+                    "ui:description":
+                      "All our products are ethically sourced, organic, and sustainable. Supporting farmers and protecting the environment.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(44, 24, 16, 0.85)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(212, 185, 150, 0.2)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "#F5E9D9",
+                      fontSize: "1.8rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                      fontFamily: "'Playfair Display', serif",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(245, 233, 217, 0.9)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(139, 69, 19, 0.4)",
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🎁 Subscription Boxes",
+                    "ui:description":
+                      "Curated monthly boxes with new tea and coffee discoveries. Perfect for exploring different flavors and origins.",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(44, 24, 16, 0.85)",
+                      backdropFilter: "blur(20px) saturate(180%)",
+                      WebkitBackdropFilter: "blur(20px) saturate(180%)",
+                      borderRadius: "25px",
+                      border: "1px solid rgba(212, 185, 150, 0.2)",
+                      boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                      transition:
+                        "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                      cursor: "pointer",
+                    },
+                    "ui:titleStyles": {
+                      color: "#F5E9D9",
+                      fontSize: "1.8rem",
+                      fontWeight: "700",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                      marginBottom: "15px",
+                      fontFamily: "'Playfair Display', serif",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "rgba(245, 233, 217, 0.9)",
+                      fontSize: "1.05rem",
+                      lineHeight: "1.6",
+                    },
+                    "ui:hoverTransform": "translateY(-15px) scale(1.02)",
+                    "ui:hoverShadow": "0 20px 60px 0 rgba(139, 69, 19, 0.4)",
+                  },
+                ],
+              },
+            ],
+          },
+          menuSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "80px",
+            "ui:styles": {
+              padding: "100px 40px",
+              background: "transparent",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "🍵 Our Premium Tea Collection",
+                "ui:level": "h2",
+                "ui:styles": {
+                  fontSize: "3.5rem",
+                  fontWeight: "900",
+                  color: "#F5E9D9",
+                  textAlign: "center",
+                  fontFamily: "'Playfair Display', serif",
+                  marginBottom: "60px",
+                },
+              },
+              {
+                "ui:widget": "projectGrid",
+                // ✅ FIXED: Remove "api." prefix - globalData already IS the api object
+                "ui:dataSource": "chiyaz.tea.list_filtered.data",
+                "ui:animated": true,
+              },
+              {
+                "ui:widget": "heading",
+                "ui:text": "☕ Our Premium Coffee Collection",
+                "ui:level": "h2",
+                "ui:styles": {
+                  fontSize: "3.5rem",
+                  fontWeight: "900",
+                  color: "#F5E9D9",
+                  textAlign: "center",
+                  fontFamily: "'Playfair Display', serif",
+                  marginTop: "80px",
+                  marginBottom: "60px",
+                },
+              },
+              {
+                "ui:widget": "projectGrid",
+                // ✅ FIXED: Remove "api." prefix
+                "ui:dataSource": "chiyaz.coffee.list_filtered.data",
+                "ui:animated": true,
+              },
+            ],
+          },
+          reviewsSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "70px",
+            "ui:id": "reviews-container",
+            "ui:styles": {
+              padding: "100px 40px",
+              background: "transparent",
+              position: "relative",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "25px",
+                "ui:styles": {
+                  textAlign: "center",
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                  background: "rgba(44, 24, 16, 0.85)",
+                  backdropFilter: "blur(15px) saturate(180%)",
+                  borderRadius: "25px",
+                  padding: "50px 40px",
+                  border: "1px solid rgba(212, 185, 150, 0.2)",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "⭐ Customer Reviews",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "3.5rem",
+                      fontWeight: "900",
+                      color: "#F5E9D9",
+                      textShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                      marginBottom: "10px",
+                      fontFamily: "'Playfair Display', serif",
+                    },
+                  },
+                  {
+                    "ui:widget": "paragraph",
+                    "ui:text":
+                      "See what tea and coffee lovers are saying about Chiyaz",
+                    "ui:styles": {
+                      fontSize: "1.4rem",
+                      color: "rgba(245, 233, 217, 0.9)",
+                      lineHeight: "1.6",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "customerReviews",
+                "ui:id": "chiyaz-reviews",
+                "ui:dataSource": "chiyaz.reviews",
+                "ui:title": "",
+                "ui:subtitle": "",
+                "ui:maxReviews": 6,
+                "ui:layout": "grid",
+                "ui:showRatingSummary": true,
+                "ui:showWriteReview": true,
+                "ui:writeReviewAction": "openModal:writeReview",
+                "ui:animated": true,
+                "ui:showLoadMore": true,
+                "ui:sortBy": "latest",
+                "ui:sectionBg": "transparent",
+                "ui:styles": {
+                  maxWidth: "1400px",
+                  margin: "0 auto",
+                },
+                "ui:cardStyles": {
+                  background: "rgba(44, 24, 16, 0.85)",
+                  backdropFilter: "blur(20px) saturate(180%)",
+                  border: "1px solid rgba(212, 185, 150, 0.2)",
+                  borderRadius: "20px",
+                  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.2)",
+                  color: "#F5E9D9",
+                },
+                "ui:ratingColor": "#D2691E",
+                "ui:avatarFallbackColor": "#8B4513",
+              },
+            ],
+          },
+          ctaSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "35px",
+            "ui:styles": {
+              padding: "80px 40px 100px",
+              background: "transparent",
+              textAlign: "center",
+              position: "relative",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "30px",
+                "ui:styles": {
+                  maxWidth: "900px",
+                  margin: "0 auto",
+                  background: "rgba(44, 24, 16, 0.85)",
+                  backdropFilter: "blur(25px) saturate(180%)",
+                  borderRadius: "30px",
+                  padding: "60px 50px",
+                  border: "1px solid rgba(212, 185, 150, 0.3)",
+                  boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "Ready to Elevate Your Tea & Coffee Experience?",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "3.2rem",
+                      fontWeight: "900",
+                      color: "#F5E9D9",
+                      marginBottom: "15px",
+                      textShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                      lineHeight: "1.2",
+                      fontFamily: "'Playfair Display', serif",
+                    },
+                  },
+                  {
+                    "ui:widget": "paragraph",
+                    "ui:text":
+                      "Join thousands of tea and coffee lovers enjoying our premium collection",
+                    "ui:styles": {
+                      fontSize: "1.4rem",
+                      color: "rgba(245, 233, 217, 0.95)",
+                      lineHeight: "1.6",
+                      marginBottom: "20px",
+                      textShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "🌟 Start Your Journey",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": {
+                      url: "/chiyaz/signup",
+                    },
+                    "ui:styles": {
+                      padding: "20px 55px",
+                      fontSize: "1.3rem",
+                      fontWeight: "700",
+                      background: "rgba(245, 233, 217, 0.95)",
+                      color: "#8B4513",
+                      border: "2px solid rgba(212, 185, 150, 0.5)",
+                      borderRadius: "50px",
+                      cursor: "pointer",
+                      boxShadow: "0 10px 40px rgba(245, 233, 217, 0.3)",
+                      backdropFilter: "blur(10px)",
+                      transition: "all 0.4s ease",
+                      margin: "0 auto",
+                    },
+                    "ui:hoverTransform": "translateY(-5px) scale(1.08)",
+                    "ui:hoverShadow": "0 20px 60px rgba(245, 233, 217, 0.5)",
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        styles: {
+          padding: "0",
+          background: "transparent",
+          minHeight: "100vh",
+        },
+        triggers: [
+          {
+            event: "load",
+            action: "loadTheme",
+          },
+          // ✅ FIXED: Use correct API keys and structure
+          {
+            event: "load",
+            source: "chiyaz.reviews.list", // Changed from "chiyaz.reviews"
+          },
+          {
+            event: "load",
+            source: "chiyaz.tea.list", // Changed from "chiyaz.tea"
+          },
+          {
+            event: "load",
+            source: "chiyaz.coffee.list", // Changed from "chiyaz.coffee"
+          },
+        ],
+      },
+      footer: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          footerText: {
+            "ui:widget": "text",
+            "ui:content": "© 2024 Chiyaz Tea & Coffee. All rights reserved.",
+            "ui:styles": {
+              textAlign: "center",
+              color: "#F5E9D9",
+              fontSize: "14px",
+            },
+          },
+        },
+        styles: {
+          background: "#2C1810",
           padding: "32px",
           textAlign: "center",
         },

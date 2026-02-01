@@ -279,7 +279,7 @@ async function seedGlobalEndUserAuth() {
   }
 }
 
-// Run if called directly
+// Run if called directl
 if (require.main === module) {
   seedGlobalEndUserAuth();
 }

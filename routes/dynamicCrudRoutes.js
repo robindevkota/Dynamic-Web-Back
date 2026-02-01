@@ -6,17 +6,18 @@ const DynamicCrudController = require("../controllers/dynamicCrudController");
 const { upload } = DynamicCrudController;
 
 const DEMO_ORG_ID = "000000000000000000000001";
+const CHIYAZ_ORG_ID = "696fd6f8a216cc192d63b84a"; // ✅ ADD THIS
 
-// ✅ Middleware to allow demo access without auth
+// ✅ UPDATED: Middleware to allow demo + Chiyaz access without auth
 const demoOrAuthMiddleware = (req, res, next) => {
   const { organizationId } = req.params;
 
-  // If it's demo org, skip auth
-  if (organizationId === DEMO_ORG_ID) {
+  // ✅ Allow both demo org AND Chiyaz org to bypass auth
+  if (organizationId === DEMO_ORG_ID || organizationId === CHIYAZ_ORG_ID) {
     req.user = {
       userId: "000000000000000000000000",
-      organizationId: DEMO_ORG_ID,
-      role: "DEMO_USER",
+      organizationId: organizationId, // ✅ Use the actual org ID
+      role: organizationId === DEMO_ORG_ID ? "DEMO_USER" : "PUBLIC_USER",
     };
     return next();
   }
@@ -25,15 +26,22 @@ const demoOrAuthMiddleware = (req, res, next) => {
   return authMiddleware(req, res, next);
 };
 
-// ✅ NEW: Middleware specifically for schema route (always allows demo access)
+// ✅ UPDATED: Schema middleware to support both demo and Chiyaz
 const schemaMiddleware = (req, res, next) => {
-  // For schema route, always use demo credentials
-  req.user = {
-    userId: "000000000000000000000000",
-    organizationId: DEMO_ORG_ID,
-    role: "DEMO_USER",
-  };
-  next();
+  const { organizationId } = req.params;
+  
+  // ✅ Allow schema access for demo and Chiyaz orgs
+  if (organizationId === DEMO_ORG_ID || organizationId === CHIYAZ_ORG_ID) {
+    req.user = {
+      userId: "000000000000000000000000",
+      organizationId: organizationId,
+      role: organizationId === DEMO_ORG_ID ? "DEMO_USER" : "PUBLIC_USER",
+    };
+    return next();
+  }
+  
+  // Otherwise require auth
+  return authMiddleware(req, res, next);
 };
 
 // ============================================
@@ -53,16 +61,16 @@ router.delete(
 );
 
 // ============================================
-// ✅ SCHEMA ROUTE - Uses special middleware
+// ✅ SCHEMA ROUTE - Updated to use organizationId
 // ============================================
 router.get(
-  "/entities/:entityName/schema",
-  schemaMiddleware,  // ✅ Use the new middleware
+  "/:organizationId/:entityName/schema", // ✅ CHANGED: Added organizationId param
+  schemaMiddleware,
   DynamicCrudController.getEntity,
 );
 
 // ============================================
-// DYNAMIC CRUD - allows demo access
+// DYNAMIC CRUD - allows demo + Chiyaz access
 // ============================================
 router.get(
   "/:organizationId/:entityName",
