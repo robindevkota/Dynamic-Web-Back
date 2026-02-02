@@ -309,6 +309,33 @@ const configureAPIs = async () => {
 
   const menuAPIConfigs = [
     // ✅ MAIN API
+
+   {
+      key: "chiyaz.menu.schema",
+      name: "Get Menu Schema",
+      description: "Fetches the schema definition for the menu entity",
+      url: `http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu/schema`,
+      method: "GET",
+      headers: {},
+      
+      successNotification: { type: "none" },
+      errorNotification: { 
+        type: "toast", 
+        message: "Failed to load menu schema", 
+        background: "#8B4513" 
+      },
+      
+      storeResponse: true,
+      storeKey: "schema.menu", // ✅ This will store at api.schema.menu
+      
+      onSuccess: [],
+      onError: ["console:Failed to fetch menu schema"],
+      
+      tags: ["chiyaz", "menu", "schema"],
+      projectUUID: "chiyaz-tea-coffee",
+      organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
+      isActive: true,
+    },
     {
       key: "chiyaz.menu.api",
       name: "Get All Menu Items",

@@ -64,9 +64,8 @@ router.delete(
 // ✅ SCHEMA ROUTE - Updated to use organizationId
 // ============================================
 router.get(
-  "/:organizationId/:entityName/schema", // ✅ CHANGED: Added organizationId param
-  schemaMiddleware,
-  DynamicCrudController.getEntity,
+  "/:organizationId/:entityName/schema",
+  DynamicCrudController.getEntity
 );
 
 // ============================================

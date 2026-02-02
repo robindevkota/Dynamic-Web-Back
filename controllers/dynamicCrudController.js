@@ -1071,10 +1071,12 @@ class DynamicCrudController {
   }
   // GET SINGLE ENTITY SCHEMA
 // In DynamicCrudController
+// Controller
 static async getEntity(req, res) {
   try {
-    const { entityName } = req.params;
-    const { organizationId } = req.user; // ✅ Get from req.user, not params
+    const { entityName, organizationId } = req.params; // ✅ From URL params!
+
+    console.log(`📋 Fetching schema for: ${entityName} (Org: ${organizationId})`);
 
     const entity = await DynamicEntity.findOne({
       entityName,
@@ -1082,12 +1084,21 @@ static async getEntity(req, res) {
     });
 
     if (!entity) {
-      return res.status(404).json({ error: "Entity not found" });
+      return res.status(404).json({ 
+        error: "Entity not found",
+        entityName,
+        organizationId 
+      });
     }
+
+    const schemaObject = Object.fromEntries(entity.schema);
+
+    console.log(`✅ Schema found:`, Object.keys(schemaObject));
 
     res.json({
       success: true,
-      schema: Object.fromEntries(entity.schema),
+      entityName: entity.entityName,
+      schema: schemaObject,
       operations: entity.operations
     });
   } catch (error) {
