@@ -14,5 +14,6 @@ router.post('/login', endUserAuthController.login);
 router.post('/logout', endUserAuthController.logout);
 router.post('/forgot-password', endUserAuthController.forgotPassword);
 router.post('/reset-password', endUserAuthController.resetPassword);
+router.get('/check-session', endUserAuthController.checkSession);
 
 module.exports = router;

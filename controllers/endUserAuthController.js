@@ -5,7 +5,68 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/User");
 const { sendVerificationEmail } = require("../utils/emailService");
-
+exports.checkSession = async (req, res) => {
+  try {
+    const websiteSlug = 
+      req.query.websiteSlug || 
+      req.headers['x-website-slug'] || 
+      req.body.websiteSlug;
+    
+    console.log('🔍 checkSession called');
+    console.log('🔍 websiteSlug:', websiteSlug);
+    console.log('🔍 All cookies:', req.cookies); // ✅ Log ALL cookies
+    console.log('🔍 Raw cookie header:', req.headers.cookie); // ✅ Log raw header
+    
+    if (!websiteSlug) {
+      console.log('❌ No websiteSlug provided');
+      return res.json({ authenticated: false });
+    }
+    
+    const cookieName = `${websiteSlug}_auth_token`;
+    const token = req.cookies[cookieName];
+    
+    console.log(`🍪 Looking for cookie: ${cookieName}`);
+    console.log(`🍪 Cookie value: ${token ? 'EXISTS' : 'NOT FOUND'}`);
+    
+    if (!token) {
+      console.log('❌ No auth token found in request');
+      return res.json({ authenticated: false });
+    }
+    
+    // Rest of your verification code...
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select('-password');
+    
+    if (!user || user.status !== 'ACTIVE') {
+      console.log('❌ User not found or not active');
+      return res.json({ authenticated: false });
+    }
+    
+    console.log(`✅ Session valid for ${user.email}`);
+    
+    res.json({
+      authenticated: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ Session check error:', error.message);
+    
+    if (error.name === 'JsonWebTokenError') {
+      console.log('❌ Invalid JWT token');
+    } else if (error.name === 'TokenExpiredError') {
+      console.log('❌ JWT token expired');
+    }
+    
+    res.json({ authenticated: false });
+  }
+};
 // ═══════════════════════════════════════════════════════
 // END USER SIGNUP (For client websites - hotel guests, shoppers, etc.)
 // ═══════════════════════════════════════════════════════
@@ -257,6 +318,7 @@ exports.login = async (req, res) => {
       sameSite: isProduction ? "strict" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
+      domain:undefined
     });
 
     console.log("✅ End user login successful:", user.email);
@@ -397,5 +459,13 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ error: "Failed to reset password" });
   }
 };
+
+// backend/controllers/endUserAuthController.js
+// ✅ ADD THIS NEW ENDPOINT
+
+// ═══════════════════════════════════════════════════════
+// CHECK SESSION (for auto-login)
+// ═══════════════════════════════════════════════════════
+
 
 module.exports = exports;

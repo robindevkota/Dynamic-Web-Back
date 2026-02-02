@@ -2642,7 +2642,6 @@ try {
             triggers: [
               {
                 event: "load",
-                action: "api",
                 source: "rooms.api",
                 params: {
                   page: 1,
@@ -3988,7 +3987,60 @@ textarea::placeholder {
       ],
 
       actions: {
-
+checkExistingAuth: `
+  console.log('🔍 Checking for existing authentication...');
+  
+  try {
+    // ✅ FIX: Add websiteSlug as query parameter too
+    const response = await fetch('/api/enduser-auth/check-session?websiteSlug=chiyaz', {
+      method: 'GET',
+      credentials: 'include', // ✅ Send cookies
+      headers: {
+        'Content-Type': 'application/json',
+        'x-website-slug': 'chiyaz', // ✅ Lowercase to match backend expectation
+      }
+    });
+    
+    console.log('📡 Session check response status:', response.status);
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('📦 Session data:', data);
+      
+      if (data.authenticated) {
+        console.log('✅ User already authenticated:', data.user.email);
+        
+        // Store user data
+        context.handlers.setData('user', data.user);
+        
+        // Show notification
+        context.handlers.showNotification({
+          type: 'toast',
+          message: \`Welcome back, \${data.user.firstName || data.user.email || 'Tea Lover'}! 🍵\`,
+          background: '#2E7D32',
+          duration: 2000
+        });
+        
+        // Redirect to dashboard
+        setTimeout(() => {
+          window.location.href = '/chiyaz/dashboard';
+        }, 1000);
+        
+        return; // Stop here
+      } else {
+        console.log('ℹ️ No active session');
+      }
+    } else {
+      console.log('⚠️ Session check failed with status:', response.status);
+    }
+    
+    console.log('ℹ️ Showing login form');
+    
+  } catch (error) {
+    console.error('❌ Session check failed:', error);
+    // If check fails, just show login form (fail gracefully)
+  }
+`,
         api: `
     console.log("🔵 API action triggered");
     const apiKey = context.actionParams?.apiKey || context.actionConfig?.apiKey;
@@ -4429,236 +4481,240 @@ try {
     },
 
     pages: {
-      login: {
-        title: "Login - Chiyaz",
-        components: {
-          navbar: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              logo: {
-                "ui:widget": "text",
-                "ui:content": "🍵 Chiyaz",
-                "ui:styles": {
-                  fontSize: "28px",
-                  fontWeight: "800",
-                  fontFamily: "'Playfair Display', serif",
-                  background:
-                    "linear-gradient(135deg, #F5E9D9 0%, #D2691E 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  cursor: "pointer",
-                },
-                "ui:action": "navigateToPage",
-                "ui:actionParams": { url: "/chiyaz" },
-              },
-              themeToggle: {
-                "ui:widget": "toggle",
-                "ui:label": "",
-                "ui:size": "medium",
-                "ui:onChange": "toggleTheme",
-                "ui:styles": {
-                  marginLeft: "auto",
-                  marginRight: "20px",
-                },
-              },
-              links: {
-                "ui:widget": "navLinks",
-                "ui:theme": "light",
-                "ui:links": [
-                  {
-                    label: "Home",
-                    action: "navigateToPage",
-                    actionParams: { url: "/chiyaz" },
-                    styles: {
-                      color: "#F5E9D9",
-                      fontWeight: "600",
-                    },
-                  },
-                  {
-                    label: "Sign Up",
-                    action: "navigateToPage",
-                    actionParams: { url: "/chiyaz/signup" },
-                    styles: {
-                      color: "#F5E9D9",
-                      fontWeight: "600",
-                    },
-                  },
-                ],
-              },
-            },
-            styles: {
-              background: "rgba(44, 24, 16, 0.95)",
-              backdropFilter: "blur(20px) saturate(180%)",
-              borderBottom: "2px solid rgba(212, 185, 150, 0.3)",
-              padding: "18px 40px",
-              position: "fixed",
-              width: "100%",
-              zIndex: "1000",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              height: "70px",
-            },
-            triggers: [
-              {
-                event: "load",
-                action: "loadTheme",
-              },
-            ],
+     // ✅ ENHANCED LOGIN PAGE WITH AUTO-LOGIN CHECK
+// Add this to your Chiyaz template in demo.js
+
+login: {
+  title: "Login - Chiyaz",
+  components: {
+    navbar: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        logo: {
+          "ui:widget": "text",
+          "ui:content": "🍵 Chiyaz",
+          "ui:styles": {
+            fontSize: "28px",
+            fontWeight: "800",
+            fontFamily: "'Playfair Display', serif",
+            background: "linear-gradient(135deg, #F5E9D9 0%, #D2691E 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            cursor: "pointer",
           },
-          sidebar: {
-            table: {},
-            modal: {},
-            uiSchema: {},
-            styles: { display: "none" },
-            triggers: [],
+          "ui:action": "navigateToPage",
+          "ui:actionParams": { url: "/chiyaz" },
+        },
+        themeToggle: {
+          "ui:widget": "toggle",
+          "ui:label": "",
+          "ui:size": "medium",
+          "ui:onChange": "toggleTheme",
+          "ui:styles": {
+            marginLeft: "auto",
+            marginRight: "20px",
           },
-          main: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              loginForm: {
-                "ui:widget": "formContainer",
-                "ui:title": "🍵 Welcome Back",
-                "ui:description": "Sign in to your Chiyaz account",
-                "ui:id": "loginForm",
-                "ui:styles": {
-                  maxWidth: "420px",
-                  margin: "120px auto 0",
-                  padding: "40px 36px",
-                  background: "rgba(44, 24, 16, 0.95)",
-                  backdropFilter: "blur(20px)",
-                  borderRadius: "20px",
-                  boxShadow: "0 15px 35px rgba(139, 69, 19, 0.4)",
-                  border: "2px solid rgba(212, 185, 150, 0.3)",
-                  color: "#F5E9D9",
-                },
-                "ui:fields": [
-                  {
-                    "ui:widget": "inputField",
-                    "ui:label": "Email Address",
-                    "ui:placeholder": "tea.lover@example.com",
-                    "ui:type": "email",
-                    "ui:name": "email",
-                    "ui:required": true,
-                    "ui:labelStyles": {
-                      color: "#F5E9D9",
-                      fontWeight: "500",
-                    },
-                  },
-                  {
-                    "ui:widget": "inputField",
-                    "ui:label": "Password",
-                    "ui:placeholder": "Enter your password",
-                    "ui:type": "password",
-                    "ui:name": "password",
-                    "ui:required": true,
-                    "ui:labelStyles": {
-                      color: "#F5E9D9",
-                      fontWeight: "500",
-                    },
-                  },
-                ],
-                "ui:actions": [
-                  {
-                    label: "Sign In",
-                    action: "handleLogin",
-                    variant: "primary",
-                    styles: {
-                      width: "100%",
-                      padding: "14px 0",
-                      background:
-                        "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
-                      color: "#F5E9D9",
-                      fontSize: "15px",
-                      fontWeight: "600",
-                      borderRadius: "25px",
-                      border: "none",
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                    },
-                    "ui:hoverTransform": "translateY(-2px)",
-                    "ui:hoverShadow": "0 10px 20px rgba(139, 69, 19, 0.5)",
-                  },
-                ],
-                "ui:titleStyles": {
-                  color: "#F5E9D9",
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: "28px",
-                  marginBottom: "10px",
-                },
-                "ui:descriptionStyles": {
-                  color: "rgba(245, 233, 217, 0.9)",
-                  fontSize: "16px",
-                  marginBottom: "30px",
-                },
-              },
-              authLinks: {
-                "ui:widget": "authLinks",
-                "ui:alignment": "center",
-                "ui:direction": "column",
-                "ui:links": [
-                  {
-                    prefix: "Don't have an account?",
-                    label: "Sign Up",
-                    action: "navigateToPage",
-                    actionParams: { url: "/chiyaz/signup" },
-                  },
-                ],
-                "ui:styles": {
-                  maxWidth: "420px",
-                  margin: "24px auto",
-                  padding: "16px",
-                  background: "rgba(139, 69, 19, 0.15)",
-                  backdropFilter: "blur(10px)",
-                  borderRadius: "12px",
-                  color: "#F5E9D9",
-                  border: "1px solid rgba(212, 185, 150, 0.2)",
-                },
-                "ui:linkStyles": {
-                  color: "#D2691E",
-                  fontWeight: "600",
-                },
+        },
+        links: {
+          "ui:widget": "navLinks",
+          "ui:theme": "light",
+          "ui:links": [
+            {
+              label: "Home",
+              action: "navigateToPage",
+              actionParams: { url: "/chiyaz" },
+              styles: {
+                color: "#F5E9D9",
+                fontWeight: "600",
               },
             },
-            styles: {
-              padding: "100px 40px 60px",
-              backgroundImage:
-                "linear-gradient(rgba(44, 24, 16, 0.9), rgba(44, 24, 16, 0.9)), url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundAttachment: "fixed",
-              minHeight: "100vh",
+            {
+              label: "Sign Up",
+              action: "navigateToPage",
+              actionParams: { url: "/chiyaz/signup" },
+              styles: {
+                color: "#F5E9D9",
+                fontWeight: "600",
+              },
             },
-            triggers: [],
+          ],
+        },
+      },
+      styles: {
+        background: "rgba(44, 24, 16, 0.95)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        borderBottom: "2px solid rgba(212, 185, 150, 0.3)",
+        padding: "18px 40px",
+        position: "fixed",
+        width: "100%",
+        zIndex: "1000",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        height: "70px",
+      },
+      triggers: [
+        {
+          event: "load",
+          action: "loadTheme",
+        },
+      ],
+    },
+    sidebar: {
+      table: {},
+      modal: {},
+      uiSchema: {},
+      styles: { display: "none" },
+      triggers: [],
+    },
+    main: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        loginForm: {
+          "ui:widget": "formContainer",
+          "ui:title": "🍵 Welcome Back",
+          "ui:description": "Sign in to your Chiyaz account",
+          "ui:id": "loginForm",
+          "ui:styles": {
+            maxWidth: "420px",
+            margin: "120px auto 0",
+            padding: "40px 36px",
+            background: "rgba(44, 24, 16, 0.95)",
+            backdropFilter: "blur(20px)",
+            borderRadius: "20px",
+            boxShadow: "0 15px 35px rgba(139, 69, 19, 0.4)",
+            border: "2px solid rgba(212, 185, 150, 0.3)",
+            color: "#F5E9D9",
           },
-          footer: {
-            table: {},
-            modal: {},
-            uiSchema: {
-              footerText: {
-                "ui:widget": "text",
-                "ui:content":
-                  "© 2024 Chiyaz Tea & Coffee. All rights reserved.",
-                "ui:styles": {
-                  textAlign: "center",
-                  color: "#F5E9D9",
-                  fontSize: "14px",
-                },
+          "ui:fields": [
+            {
+              "ui:widget": "inputField",
+              "ui:label": "Email Address",
+              "ui:placeholder": "tea.lover@example.com",
+              "ui:type": "email",
+              "ui:name": "email",
+              "ui:required": true,
+              "ui:labelStyles": {
+                color: "#F5E9D9",
+                fontWeight: "500",
               },
             },
-            styles: {
-              background: "#2C1810",
-              padding: "24px",
-              textAlign: "center",
+            {
+              "ui:widget": "inputField",
+              "ui:label": "Password",
+              "ui:placeholder": "Enter your password",
+              "ui:type": "password",
+              "ui:name": "password",
+              "ui:required": true,
+              "ui:labelStyles": {
+                color: "#F5E9D9",
+                fontWeight: "500",
+              },
             },
-            triggers: [],
+          ],
+          "ui:actions": [
+            {
+              label: "Sign In",
+              action: "handleLogin",
+              variant: "primary",
+              styles: {
+                width: "100%",
+                padding: "14px 0",
+                background: "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+                color: "#F5E9D9",
+                fontSize: "15px",
+                fontWeight: "600",
+                borderRadius: "25px",
+                border: "none",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              },
+              "ui:hoverTransform": "translateY(-2px)",
+              "ui:hoverShadow": "0 10px 20px rgba(139, 69, 19, 0.5)",
+            },
+          ],
+          "ui:titleStyles": {
+            color: "#F5E9D9",
+            fontFamily: "'Playfair Display', serif",
+            fontSize: "28px",
+            marginBottom: "10px",
+          },
+          "ui:descriptionStyles": {
+            color: "rgba(245, 233, 217, 0.9)",
+            fontSize: "16px",
+            marginBottom: "30px",
+          },
+        },
+        authLinks: {
+          "ui:widget": "authLinks",
+          "ui:alignment": "center",
+          "ui:direction": "column",
+          "ui:links": [
+            {
+              prefix: "Don't have an account?",
+              label: "Sign Up",
+              action: "navigateToPage",
+              actionParams: { url: "/chiyaz/signup" },
+            },
+          ],
+          "ui:styles": {
+            maxWidth: "420px",
+            margin: "24px auto",
+            padding: "16px",
+            background: "rgba(139, 69, 19, 0.15)",
+            backdropFilter: "blur(10px)",
+            borderRadius: "12px",
+            color: "#F5E9D9",
+            border: "1px solid rgba(212, 185, 150, 0.2)",
+          },
+          "ui:linkStyles": {
+            color: "#D2691E",
+            fontWeight: "600",
           },
         },
       },
-      // ADD THIS TO YOUR CHIYAZ TEMPLATE IN demo.js
-      // This is the MENU PAGE configuration - add it to the pages object
+      styles: {
+        padding: "100px 40px 60px",
+        backgroundImage: "linear-gradient(rgba(44, 24, 16, 0.9), rgba(44, 24, 16, 0.9)), url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+        minHeight: "100vh",
+      },
+      triggers: [
+        // ✅ ADD THIS: Check for existing auth on page load
+        {
+          event: "load",
+          action: "checkExistingAuth",
+        },
+      ],
+    },
+    footer: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        footerText: {
+          "ui:widget": "text",
+          "ui:content": "© 2024 Chiyaz Tea & Coffee. All rights reserved.",
+          "ui:styles": {
+            textAlign: "center",
+            color: "#F5E9D9",
+            fontSize: "14px",
+          },
+        },
+      },
+      styles: {
+        background: "#2C1810",
+        padding: "24px",
+        textAlign: "center",
+      },
+      triggers: [],
+    },
+  },
+},
+     
 
       menu: {
         title: "Menu Management - Chiyaz",
@@ -5294,7 +5350,6 @@ try {
             triggers: [
               {
                 event: "load",
-                action: "api",
                 source: "chiyaz.menu.api",
                 params: {
                   page: 1,
@@ -6888,7 +6943,6 @@ try {
           },
           {
             event: "load",
-            action: "api",
             source: "chiyaz.menu.api", // ✅ Load menu data on page load
           },
           {
