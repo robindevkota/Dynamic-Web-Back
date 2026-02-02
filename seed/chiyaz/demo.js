@@ -3976,8 +3976,8 @@ textarea::placeholder {
         "global.enduser.resetPassword",
         "global.enduser.verifyEmail",
         "chiyaz.reviews.list",
-        // "chiyaz.tea.list",
-        // "chiyaz.coffee.list",
+        "chiyaz.tea.list",
+        "chiyaz.coffee.list",
         "chiyaz.reviews.submit",
 
         "chiyaz.menu.api",
@@ -3988,53 +3988,6 @@ textarea::placeholder {
       ],
 
       actions: {
-
-        api: `
-    console.log("🔵 API action triggered");
-    const apiKey = context.actionParams?.apiKey || context.actionConfig?.apiKey;
-    const payload = context.payload || context.modalFormData || context.formData || {};
-    
-    if (!apiKey) {
-      console.error("❌ No API key provided");
-      return;
-    }
-    
-    console.log("📡 Calling API:", apiKey, "with payload:", payload);
-    await context.handlers.handleApiCall(apiKey, payload, context.actionConfig);
-  `,
-
-  // ✅ ADD THIS - Reload menu data action
-  reloadMenuData: `
-    console.log("🔄 Reloading menu data");
-    await context.handlers.handleApiCall('chiyaz.menu.api', {});
-    console.log("✅ Menu data reloaded");
-  `,
-        openModal: `
-    const modalName = context.actionParams?.modal || context.actionParams?.modalName;
-    if (!modalName) {
-      console.error("❌ No modal name provided");
-      return;
-    }
-    
-    console.log("🎭 Opening modal:", modalName);
-    
-    // Clear modal data
-    context.handlers.setModalFormData({});
-    context.handlers.setFieldErrors({});
-    
-    // Open the modal
-    context.handlers.setActiveModal(modalName);
-    
-    console.log("✅ Modal opened");
-  `,
-
-        closeModal: `
-    console.log("❌ Closing modal");
-    context.handlers.setModalFormData({});
-    context.handlers.setFieldErrors({});
-    context.handlers.setActiveModal(null);
-    console.log("✅ Modal closed");
-  `,
         openEditMenuModal: `
   console.log("🔄 Opening edit menu modal");
   const itemData = context.actionConfig?.row || context.payload;
@@ -4970,21 +4923,15 @@ try {
                   {
                     name: "category",
                     label: "Category",
-                    type: "select", // ✅ Dropdown instead of text
+                    type: "text",
                     placeholder: "Select category",
                     required: true,
-                    options: [
-                      { value: "Tea", label: "Tea" },
-                      { value: "Coffee", label: "Coffee" },
-                      { value: "Specialty", label: "Specialty" },
-                      { value: "Blend", label: "Blend" },
-                    ],
                   },
                   {
                     name: "type",
                     label: "Type",
                     type: "text",
-                    placeholder: "Black Tea / Arabica Coffee",
+                    placeholder: "Select type",
                     required: true,
                   },
                   {
@@ -5009,23 +4956,10 @@ try {
                     required: false,
                   },
                   {
-                    name: "imageUrl",
-                    label: "Image URL",
-                    type: "text",
-                    placeholder: "https://...",
-                    required: false,
-                  },
-                  {
                     name: "inStock",
                     label: "In Stock",
-                    type: "checkbox",
-                    required: false,
-                  },
-                  {
-                    name: "tastingNotes",
-                    label: "Tasting Notes (comma-separated)",
                     type: "text",
-                    placeholder: "Floral, Sweet, Delicate",
+                    placeholder: "true",
                     required: false,
                   },
                 ],
@@ -5703,8 +5637,8 @@ try {
                   {
                     "ui:widget": "button",
                     "ui:label": "Menu",
-                    "ui:action": "navigateToPage",
-                    "ui:actionParams": { url: "/chiyaz/menu" },
+                      "ui:action": "navigateToPage",
+                   "ui:actionParams": { url: "/chiyaz/menu" },
                     "ui:styles": {
                       width: "100%",
                       padding: "14px 20px",
@@ -6605,110 +6539,92 @@ try {
               },
             ],
           },
-         menuSection: {
-  "ui:widget": "container",
-  "ui:direction": "column",
-  "ui:gap": "80px",
-  "ui:styles": {
-    padding: "100px 40px",
-    background: "transparent",
-  },
-  "ui:children": [
-    {
-      "ui:widget": "heading",
-      "ui:text": "🍵 Our Premium Tea Collection",
-      "ui:level": "h2",
-      "ui:styles": {
-        fontSize: "3.5rem",
-        fontWeight: "900",
-        color: "white",
-        textAlign: "center",
-        fontFamily: "'Playfair Display', serif",
-        marginBottom: "60px",
-        textShadow: "0 4px 20px rgba(0,0,0,0.5)",
-      },
-    },
-    {
-      "ui:widget": "projectGrid",
-      "ui:dataSource": "chiyaz.menu.api", // ✅ FIX: Point to actual data location
-      "ui:filterBy": { category: "Tea" }, // ✅ ADD: Filter for Tea only
-      "ui:animated": true,
-       "ui:fieldMap": {  // ✅ ADD: Map your menu fields to grid fields
-        "name": "productName",      // grid expects "name", you have "productName"
-        "title": "productName",     // also map to title
-        "image": "imageUrl",        // grid expects "image", you have "imageUrl"
-        "description": "description",
-        "price": "price",
-        "category": "category"
-      },
-      "ui:cardStyles": {
-        background: "rgba(44, 24, 16, 0.85)",
-        border: "1px solid rgba(212, 185, 150, 0.2)",
-        borderRadius: "20px",
-        color: "#F5E9D9",
-        padding: "25px",
-      },
-      "ui:titleStyles": {
-        color: "#F5E9D9",
-        fontFamily: "'Playfair Display', serif",
-      },
-      "ui:descriptionStyles": {
-        color: "rgba(245, 233, 217, 0.9)",
-      },
-      "ui:priceStyles": {
-        color: "#D2691E",
-        fontWeight: "700",
-      },
-    },
-    {
-      "ui:widget": "heading",
-      "ui:text": "☕ Our Premium Coffee Collection",
-      "ui:level": "h2",
-      "ui:styles": {
-        fontSize: "3.5rem",
-        fontWeight: "900",
-        color: "white",
-        textAlign: "center",
-        fontFamily: "'Playfair Display', serif",
-        marginTop: "80px",
-        marginBottom: "60px",
-        textShadow: "0 4px 20px rgba(0,0,0,0.5)",
-      },
-    },
-    {
-      "ui:widget": "projectGrid",
-      "ui:dataSource": "chiyaz.menu.api", // ✅ FIX: Point to actual data location
-      "ui:filterBy": { category: "Coffee" }, // ✅ ADD: Filter for Coffee only
-      "ui:animated": true,
-       "ui:fieldMap": {  // ✅ ADD: Map your menu fields to grid fields
-        "name": "productName",      // grid expects "name", you have "productName"
-        "title": "productName",     // also map to title
-        "image": "imageUrl",        // grid expects "image", you have "imageUrl"
-        "description": "description",
-        "price": "price",
-        "category": "category"
-      },
-      "ui:cardStyles": {
-        background: "rgba(44, 24, 16, 0.85)",
-        border: "1px solid rgba(212, 185, 150, 0.2)",
-        borderRadius: "20px",
-        color: "#F5E9D9",
-        padding: "25px",
-      },
-      "ui:titleStyles": {
-        color: "#F5E9D9",
-        fontFamily: "'Playfair Display', serif",
-      },
-      "ui:descriptionStyles": {
-        color: "rgba(245, 233, 217, 0.9)",
-      },
-      "ui:priceStyles": {
-        color: "#D2691E",
-        fontWeight: "700",
-      },
-    },
-  ],
-},
+          menuSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "80px",
+            "ui:styles": {
+              padding: "100px 40px",
+              background: "transparent",
+              backgroundColor: "transparent",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "🍵 Our Premium Tea Collection",
+                "ui:level": "h2",
+                "ui:styles": {
+                  fontSize: "3.5rem",
+                  fontWeight: "900",
+                  color: "white",
+                  textAlign: "center",
+                  fontFamily: "'Playfair Display', serif",
+                  marginBottom: "60px",
+                  textShadow: "0 4px 20px rgba(0,0,0,0.5)",
+                },
+              },
+              {
+                "ui:widget": "projectGrid",
+                "ui:dataSource": "chiyaz.tea.list_filtered.data",
+                "ui:animated": true,
+                "ui:cardStyles": {
+                  border: "1px solid rgba(212, 185, 150, 0.2)",
+                  borderRadius: "20px",
+                  color: "#F5E9D9",
+                  padding: "25px",
+                },
+                "ui:titleStyles": {
+                  color: "#F5E9D9",
+                  fontFamily: "'Playfair Display', serif",
+                },
+                "ui:descriptionStyles": {
+                  color: "rgba(245, 233, 217, 0.9)",
+                },
+                "ui:priceStyles": {
+                  color: "#D2691E",
+                  fontWeight: "700",
+                },
+              },
+              {
+                "ui:widget": "heading",
+                "ui:text": "☕ Our Premium Coffee Collection",
+                "ui:level": "h2",
+                "ui:styles": {
+                  fontSize: "3.5rem",
+                  fontWeight: "900",
+                  color: "white",
+                  textAlign: "center",
+                  fontFamily: "'Playfair Display', serif",
+                  marginTop: "80px",
+                  marginBottom: "60px",
+                  textShadow: "0 4px 20px rgba(0,0,0,0.5)",
+                },
+              },
+              {
+                "ui:widget": "projectGrid",
+                "ui:dataSource": "chiyaz.coffee.list_filtered.data",
+                "ui:animated": true,
+                "ui:cardStyles": {
+                  background: "rgba(44, 24, 16, 0.85)",
+                  border: "1px solid rgba(212, 185, 150, 0.2)",
+                  borderRadius: "20px",
+                  color: "#F5E9D9",
+                  padding: "25px",
+                },
+                "ui:titleStyles": {
+                  color: "#F5E9D9",
+                  fontFamily: "'Playfair Display', serif",
+                },
+                "ui:descriptionStyles": {
+                  color: "rgba(245, 233, 217, 0.9)",
+                },
+                "ui:priceStyles": {
+                  color: "#D2691E",
+                  fontWeight: "700",
+                },
+              },
+            ],
+          },
           reviewsSection: {
             "ui:widget": "container",
             "ui:direction": "column",
@@ -6888,12 +6804,15 @@ try {
           },
           {
             event: "load",
-            action: "api",
-            source: "chiyaz.menu.api", // ✅ Load menu data on page load
+            source: "chiyaz.reviews.list",
           },
           {
             event: "load",
-            source: "chiyaz.reviews.list",
+            source: "chiyaz.tea.list",
+          },
+          {
+            event: "load",
+            source: "chiyaz.coffee.list",
           },
         ],
       },
