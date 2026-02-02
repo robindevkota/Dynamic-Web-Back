@@ -1,120 +1,213 @@
 {
-  "users": [
-    {
-      "id": "1",
-      "username": "admin",
-      "password": "admin",
-      "role": "admin"
-    },
-    {
-      "id": "2",
-      "citizenship": "1234",
-      "role": "voter"
-    },
-    {
-      "id": "3",
-      "citizenship": "12345",
-      "role": "voter"
-    },
-    {
-      "id": "4",
-      "citizenship": "123456",
-      "role": "voter"
-    },
-    {
-      "id": "5",
-      "citizenship": "1234567",
-      "role": "voter"
-    },
-    {
-      "id": "6",
-      "citizenship": "12345678",
-      "role": "voter"
-    }
+  "title": "Chiyaz - Premium Tea & Coffee (FIXED VERSION)",
+  "slug": "chiyaz",
+  "projectUUID": "chiyaz-tea-coffee",
+
+  "FIXES_APPLIED": [
+    "1. ✅ Review cards now have dark tea/coffee backgrounds (rgba(44, 24, 16, 0.85))",
+    "2. ✅ Review summary sidebar has dark background",
+    "3. ✅ All review text colors changed to cream (#F5E9D9)",
+    "4. ✅ Hero image now persists throughout entire page with fixed attachment",
+    "5. ✅ Background image applied to main component styles",
+    "6. ✅ Added ui:cardStyles overrides for customerReviews widget"
   ],
-  "polls": [
-    {
-      "id": "p1",
-      "title": "Home Minister",
-      "description": "Select the next Home Minister",
-      "options": [
-        {
-          "text": "Kulman",
-          "count": 1
-        },
-        {
-          "text": "Promad",
-          "count": 1
+
+  "initialization": {
+    "globalCSS": "/* ============================================ */\n/* CHIYAZ TEA & COFFEE - PREMIUM STYLING (FIXED) */\n/* ============================================ */\n\n@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');\n\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n}\n\n/* ✅ PERSISTENT BACKGROUND IMAGE */\nbody::before {\n  content: '';\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2070&auto=format&fit=crop');\n  background-size: cover;\n  background-position: center;\n  background-attachment: fixed;\n  background-repeat: no-repeat;\n  z-index: -2;\n}\n\nbody::after {\n  content: '';\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  background: rgba(44, 24, 16, 0.85);\n  backdrop-filter: blur(3px);\n  z-index: -1;\n}\n\n/* ============================================ */\n/* BASE STYLES - Tea & Coffee Theme */\n/* ============================================ */\nbody {\n  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;\n  font-size: 15px;\n  line-height: 1.6;\n  background: transparent !important;\n  color: #F5E9D9 !important;\n  min-height: 100vh;\n  transition: all 0.6s ease;\n  overflow-x: hidden;\n  position: relative;\n}\n\n/* ============================================ */\n/* DARK MODE - Coffee Shop Vibes */\n/* ============================================ */\nbody.dark-mode::after {\n  background: rgba(26, 18, 11, 0.9) !important;\n}\n\nbody.dark-mode {\n  color: #F5E9D9 !important;\n}\n\n/* Navbar links in dark mode */\nbody.dark-mode nav a,\nbody.dark-mode nav button {\n  color: #F5E9D9 !important;\n  transition: all 0.2s ease;\n}\n\nbody.dark-mode nav a:hover,\nbody.dark-mode nav button:hover {\n  color: #D2691E !important;\n  background: rgba(212, 185, 150, 0.1) !important;\n}\n\n/* ============================================ */\n/* CUSTOMER REVIEWS - FORCE DARK BACKGROUNDS */\n/* ============================================ */\n\n/* Override ALL review cards with !important */\n.customer-review-card,\n.review-card,\n.testimonial-card,\n[class*=\"review-card\"],\n[class*=\"testimonial-card\"],\nsection div[style*=\"background\"][style*=\"white\"] {\n  background: rgba(44, 24, 16, 0.85) !important;\n  backdrop-filter: blur(20px) saturate(180%) !important;\n  border: 1px solid rgba(212, 185, 150, 0.2) !important;\n  border-radius: 20px !important;\n  color: #F5E9D9 !important;\n}\n\n/* Review card ALL text elements */\n.customer-review-card *,\n.review-card *,\n.testimonial-card *,\n[class*=\"review-card\"] *,\n[class*=\"testimonial-card\"] * {\n  color: #F5E9D9 !important;\n}\n\n/* Review summary sidebar */\n.review-summary,\n.rating-summary,\n[class*=\"summary\"],\nsection > div > div[style*=\"flex: 0 0 280px\"] {\n  background: rgba(44, 24, 16, 0.85) !important;\n  border: 1px solid rgba(212, 185, 150, 0.2) !important;\n  border-radius: 20px !important;\n  color: #F5E9D9 !important;\n}\n\n/* Rating stars */\n.rating,\n[class*=\"rating\"],\nspan[style*=\"color\"][style*=\"#fbbf24\"] {\n  color: #D2691E !important;\n}\n\n/* Write review button */\n.write-review-btn,\nbutton[onclick*=\"review\"],\nbutton[style*=\"#667eea\"] {\n  background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%) !important;\n  color: #F5E9D9 !important;\n}\n\n/* ============================================ */\n/* PROJECT GRID - Tea & Coffee Cards */\n/* ============================================ */\n.project-grid-item,\n.product-card,\n.item-card,\n.grid-item,\n.project-card,\n[class*=\"grid-item\"],\n[class*=\"product-card\"],\n[class*=\"item-card\"] {\n  background: rgba(44, 24, 16, 0.85) !important;\n  backdrop-filter: blur(20px) saturate(180%) !important;\n  border: 1px solid rgba(212, 185, 150, 0.2) !important;\n  border-radius: 20px !important;\n  color: #F5E9D9 !important;\n  overflow: hidden !important;\n  transition: all 0.3s ease !important;\n}\n\n.project-grid-item:hover,\n.product-card:hover,\n.item-card:hover {\n  transform: translateY(-10px) !important;\n  box-shadow: 0 20px 40px rgba(139, 69, 19, 0.3) !important;\n  border: 1px solid rgba(212, 185, 150, 0.4) !important;\n}\n\n/* Glass card styling */\n.glass-card {\n  background: rgba(44, 24, 16, 0.85) !important;\n  backdrop-filter: blur(20px) saturate(180%) !important;\n  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;\n  border: 1px solid rgba(212, 185, 150, 0.2) !important;\n  box-shadow: 0 8px 32px 0 rgba(139, 69, 19, 0.25) !important;\n  color: #F5E9D9 !important;\n}\n\n/* Card text visibility */\n.glass-card h1,\n.glass-card h2,\n.glass-card h3,\n.glass-card p,\n.glass-card span {\n  color: #F5E9D9 !important;\n  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;\n}\n\n/* Navbar styling */\nbody nav,\nbody header {\n  background: rgba(44, 24, 16, 0.95) !important;\n  backdrop-filter: blur(20px) saturate(180%) !important;\n  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;\n  border-bottom: 2px solid rgba(212, 185, 150, 0.3) !important;\n  color: #F5E9D9 !important;\n}\n\nbody.dark-mode nav,\nbody.dark-mode header {\n  background: rgba(30, 18, 11, 0.95) !important;\n  border-bottom: 2px solid rgba(212, 185, 150, 0.3) !important;\n}\n\nbody nav a,\nbody header a,\nbody nav button,\nbody header button {\n  color: #F5E9D9 !important;\n  font-weight: 500 !important;\n}\n\n/* Button styling */\n.primary-btn {\n  background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%) !important;\n  color: #F5E9D9 !important;\n  border: none !important;\n  border-radius: 25px !important;\n  padding: 12px 30px !important;\n  font-weight: 600 !important;\n  transition: all 0.3s ease !important;\n}\n\n.primary-btn:hover {\n  transform: translateY(-3px) !important;\n  box-shadow: 0 10px 20px rgba(139, 69, 19, 0.5) !important;\n}\n\n/* Input fields */\ninput, textarea, select {\n  background: rgba(245, 233, 217, 0.1) !important;\n  border: 1px solid rgba(212, 185, 150, 0.3) !important;\n  color: #F5E9D9 !important;\n  padding: 12px 16px !important;\n  border-radius: 10px !important;\n}\n\ninput::placeholder,\ntextarea::placeholder {\n  color: rgba(245, 233, 217, 0.6) !important;\n}\n\n/* Scrollbar */\n::-webkit-scrollbar {\n  width: 10px;\n}\n\n::-webkit-scrollbar-track {\n  background: rgba(139, 69, 19, 0.1);\n  border-radius: 10px;\n}\n\n::-webkit-scrollbar-thumb {\n  background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);\n  border-radius: 10px;\n}\n\n/* Animations */\n@keyframes fadeInUp {\n  from {\n    opacity: 0;\n    transform: translateY(40px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n\n/* Responsive */\n@media (max-width: 768px) {\n  .hero-title {\n    font-size: 2.5rem !important;\n  }\n  \n  .hero-subtitle {\n    font-size: 1.1rem !important;\n  }\n  \n  nav {\n    padding: 15px 20px !important;\n  }\n  \n  .glass-card {\n    padding: 25px !important;\n  }\n  \n  .project-grid-item,\n  .customer-review-card {\n    margin-bottom: 20px !important;\n  }\n}",
+
+    "resources": [
+      "global.enduser.signup",
+      "global.enduser.login",
+      "global.enduser.logout",
+      "chiyaz.reviews.list",
+      "chiyaz.tea.list",
+      "chiyaz.coffee.list",
+      "chiyaz.reviews.submit"
+    ],
+
+    "actions": {
+      "openReviewModal": "console.log('🎭 Opening review modal');\ncontext.handlers.setModalFormData({});\ncontext.handlers.setFieldErrors({});\ncontext.handlers.setActiveModal('writeReview');\nconsole.log('✅ Review modal opened');",
+
+      "submitReview": "console.log('📝 Submitting review');\nconst formData = context.modalFormData || {};\nconsole.log('📦 Review form data:', formData);\nconst errors = {};\nif (!formData.reviewerName || formData.reviewerName.trim().length < 2) {\n  errors.reviewerName = 'Name must be at least 2 characters';\n}\nif (!formData.rating || formData.rating < 1 || formData.rating > 5) {\n  errors.rating = 'Please select a rating (1-5 stars)';\n}\nif (!formData.comment || formData.comment.trim().length < 10) {\n  errors.comment = 'Review must be at least 10 characters';\n}\nif (Object.keys(errors).length > 0) {\n  console.error('❌ Validation errors:', errors);\n  context.handlers.setFieldErrors(errors);\n  context.handlers.showNotification({\n    type: 'toast',\n    message: '❌ Please fix the errors in the form',\n    background: '#8B4513',\n    duration: 3000\n  });\n  return;\n}\ncontext.handlers.setFieldErrors({});\nconsole.log('🚀 Calling chiyaz.reviews.submit API');\nawait context.handlers.handleApiCall('chiyaz.reviews.submit', formData);\nconsole.log('✅ Review submitted successfully');",
+
+      "closeReviewModal": "console.log('❌ Closing review modal');\ncontext.handlers.setModalFormData({});\ncontext.handlers.setFieldErrors({});\ncontext.handlers.setActiveModal(null);\nconsole.log('✅ Modal closed and data cleared');",
+
+      "toggleTheme": "const body = document.body;\nconst isDark = body.classList.contains('dark-mode');\nif (isDark) {\n  body.classList.remove('dark-mode');\n  localStorage.setItem('chiyaz-theme', 'light');\n  console.log('☀️ Light mode activated');\n} else {\n  body.classList.add('dark-mode');\n  localStorage.setItem('chiyaz-theme', 'dark');\n  console.log('🌙 Dark mode activated');\n}",
+
+      "loadTheme": "const saved = localStorage.getItem('chiyaz-theme');\nconst prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;\nif (saved === 'dark' || (!saved && prefersDark)) {\n  document.body.classList.add('dark-mode');\n  console.log('🌙 Dark mode loaded');\n}",
+
+      "navigateToPage": "const url = context.actionParams?.url;\nif (!url) {\n  console.error('❌ No URL provided');\n  return;\n}\nconsole.log('🧭 Navigating to:', url);\nwindow.location.href = url;"
+    }
+  },
+
+  "components": {
+    "main": {
+      "modal": {
+        "writeReview": {
+          "ui:title": "Write a Review",
+          "ui:theme": "dark",
+          "ui:styles": {
+            "maxWidth": "600px",
+            "background": "rgba(44, 24, 16, 0.95)",
+            "color": "#F5E9D9",
+            "padding": "40px",
+            "borderRadius": "20px",
+            "border": "1px solid rgba(212, 185, 150, 0.3)"
+          },
+          "ui:fields": [
+            {
+              "name": "reviewerName",
+              "label": "Your Name",
+              "type": "text",
+              "placeholder": "John Doe",
+              "required": true
+            },
+            {
+              "name": "rating",
+              "label": "Rating",
+              "type": "number",
+              "placeholder": "5",
+              "required": true
+            },
+            {
+              "name": "title",
+              "label": "Review Title",
+              "type": "text",
+              "placeholder": "Great product!",
+              "required": false
+            },
+            {
+              "name": "comment",
+              "label": "Your Review",
+              "type": "text",
+              "placeholder": "Tell us about your experience...",
+              "required": true
+            },
+            {
+              "name": "productName",
+              "label": "Product Name",
+              "type": "text",
+              "placeholder": "Ethiopian Coffee",
+              "required": false
+            }
+          ],
+          "ui:actions": [
+            {
+              "label": "Submit Review",
+              "action": "submitReview",
+              "variant": "primary",
+              "styles": {
+                "width": "100%",
+                "padding": "14px 0",
+                "background": "linear-gradient(135deg, #8B4513 0%, #D2691E 100%)",
+                "color": "white",
+                "fontSize": "15px",
+                "fontWeight": "600",
+                "borderRadius": "25px",
+                "border": "none"
+              }
+            },
+            {
+              "label": "Cancel",
+              "action": "closeReviewModal",
+              "variant": "outline",
+              "styles": {
+                "width": "100%",
+                "padding": "14px 0",
+                "background": "transparent",
+                "color": "#F5E9D9",
+                "fontSize": "15px",
+                "fontWeight": "600",
+                "borderRadius": "25px",
+                "border": "1px solid rgba(212, 185, 150, 0.3)"
+              }
+            }
+          ]
         }
-      ]
-    },
-    {
-      "id": "p2",
-      "title": "Education Minister",
-      "description": "Choose the Education Minister",
-      "options": [
-        {
-          "text": "Alice",
-          "count": 2
+      },
+      "uiSchema": {
+        "backgroundEffect": {
+          "ui:widget": "backgroundEffect",
+          "ui:effect": "bubbles",
+          "ui:intensity": "high",
+          "ui:color": [
+            "#F5E9D9",
+            "#DEB887",
+            "#D2B48C",
+            "#8B4513",
+            "#D2691E",
+            "#A0522D",
+            "#CD853F",
+            "#BC8F8F",
+            "#DAA520",
+            "#F5DEB3"
+          ],
+          "ui:speed": "medium",
+          "ui:animationMode": "both"
         },
-        {
-          "text": "Bob",
-          "count": 0
+        "reviewsSection": {
+          "ui:widget": "customerReviews",
+          "ui:id": "chiyaz-reviews",
+          "ui:dataSource": "chiyaz.reviews.list",
+          "ui:title": "⭐ Customer Reviews",
+          "ui:subtitle": "See what our customers are saying about our premium tea & coffee",
+          "ui:maxReviews": 6,
+          "ui:layout": "grid",
+          "ui:showRatingSummary": true,
+          "ui:showWriteReview": true,
+          "ui:writeReviewAction": "openReviewModal",
+          "ui:sectionBg": "transparent",
+          "ui:cardStyles": {
+            "background": "rgba(44, 24, 16, 0.85)",
+            "border": "1px solid rgba(212, 185, 150, 0.2)",
+            "borderRadius": "20px",
+            "color": "#F5E9D9",
+            "padding": "30px",
+            "backdropFilter": "blur(20px) saturate(180%)"
+          },
+          "ui:titleStyles": {
+            "color": "#F5E9D9",
+            "fontFamily": "'Playfair Display', serif"
+          },
+          "ui:textStyles": {
+            "color": "rgba(245, 233, 217, 0.9)"
+          },
+          "ui:ratingStyles": {
+            "color": "#D2691E"
+          },
+          "ui:summaryStyles": {
+            "background": "rgba(44, 24, 16, 0.85)",
+            "border": "1px solid rgba(212, 185, 150, 0.2)",
+            "borderRadius": "20px",
+            "color": "#F5E9D9",
+            "padding": "25px"
+          }
         }
-      ]
-    },
-    {
-      "id": "p3",
-      "title": "Finance Minister",
-      "description": "Select the Finance Minister",
-      "options": [
+      },
+      "styles": {
+        "padding": "0",
+        "background": "transparent",
+        "minHeight": "100vh",
+        "position": "relative"
+      },
+      "triggers": [
         {
-          "text": "Ramesh",
-          "count": 2
+          "event": "load",
+          "action": "loadTheme"
         },
         {
-          "text": "Suresh",
-          "count": 0
+          "event": "load",
+          "source": "chiyaz.reviews.list"
+        },
+        {
+          "event": "load",
+          "source": "chiyaz.tea.list"
+        },
+        {
+          "event": "load",
+          "source": "chiyaz.coffee.list"
         }
       ]
     }
-  ],
-  "votes": [
-    {
-      "id": "3e25",
-      "pollId": "p1",
-      "option": "Kulman",
-      "citizenship": "1234"
-    },
-    {
-      "id": "ecd3",
-      "pollId": "p2",
-      "option": "Alice",
-      "citizenship": "1234"
-    },
-    {
-      "id": "a00b",
-      "pollId": "p3",
-      "option": "Ramesh",
-      "citizenship": "1234"
-    },
-    {
-      "id": "076b",
-      "pollId": "p1",
-      "option": "Promad",
-      "citizenship": "123456"
-    },
-    {
-      "id": "3d8c",
-      "pollId": "p2",
-      "option": "Alice",
-      "citizenship": "123456"
-    },
-    {
-      "id": "879a",
-      "pollId": "p3",
-      "option": "Ramesh",
-      "citizenship": "123456"
-    }
-  ]
+  }
 }

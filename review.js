@@ -162,7 +162,6 @@ const seedReviewData = async (reviewSlug) => {
   const collectionName = `dyn_${reviewSlug.replace(/[^a-zA-Z0-9_]/g, "_")}`;
   
   console.log("📦 Collection name:", collectionName);
-  console.log("   (generated from slug:", reviewSlug + ")");
 
   const ReviewModel = mongoose.connection.collection(collectionName);
 
@@ -188,18 +187,6 @@ const seedReviewData = async (reviewSlug) => {
     const count = await ReviewModel.countDocuments();
     console.log(`📊 Verified count in DB: ${count} documents`);
     
-    if (result.length > 0) {
-      console.log(`   First review: ${result[0].reviewerName} - ${result[0].rating}⭐`);
-    }
-    
-    console.log("📊 Average Rating:", {
-      total: reviewsWithMetadata.length,
-      avgRating: (
-        reviewsWithMetadata.reduce((sum, r) => sum + r.rating, 0) /
-        reviewsWithMetadata.length
-      ).toFixed(1),
-    });
-    
   } catch (err) {
     console.error("❌ Insert failed:", err.message);
     throw err;
@@ -207,130 +194,107 @@ const seedReviewData = async (reviewSlug) => {
 };
 
 // ===================================
-// STEP 3: CONFIGURE APIS (Hotel Pattern)
+// STEP 3: CONFIGURE APIS (UPDATED & FIXED)
 // ===================================
 const configureAPIs = async () => {
   console.log("\n🔧 === STEP 3: CONFIGURING API RESOURCES ===");
 
+  const CRUD_PATH = `/api/crud/${CHIYAZ_ORG_ID}/review`;
+
   const reviewAPIConfigs = [
-    // ✅ LIST REVIEWS
+    // ✅ LIST REVIEWS (Public read)
     {
       key: "chiyaz.reviews.list",
       name: "Get Chiyaz Reviews",
-      description: "Fetches customer reviews for Chiyaz tea & coffee",
-      url: `http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/review`,
+      description: "Fetches all customer reviews (public)",
+      type: "crud",
+      url: CRUD_PATH,
       method: "GET",
-      headers: {},
-      
-      successNotification: {
-        type: "none",
-      },
-      
+      authRequired: false, // Public
+      storeResponse: true,
+      storeKey: "chiyaz.reviews.list",
+      successNotification: { type: "none" },
       errorNotification: {
         type: "toast",
         message: "Failed to load reviews",
         background: "#8B4513",
-        duration: 3000,
       },
-      
-      storeResponse: true,
-      storeKey: "chiyaz.reviews.list",
-      
-      onSuccess: [],
-      onError: ["console:Failed to fetch reviews"],
-      
-      tags: ["chiyaz", "reviews", "customer-feedback"],
-      projectUUID: "chiyaz-tea-coffee",
       organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
+      projectUUID: "chiyaz-tea-coffee",
       isActive: true,
     },
 
-    // ✅ SUBMIT REVIEW (Following hotel pattern with transformPayload)
+    // ✅ SUBMIT REVIEW (Public create + auto avatar + refresh list on success)
     {
       key: "chiyaz.reviews.submit",
       name: "Submit Chiyaz Review",
-      description: "Submit a new customer review",
-      url: `http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/review`,
+      description: "Submit a new public customer review",
+      type: "crud",
+      url: CRUD_PATH,
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      
+      authRequired: false, // Public submission
+      headers: { "Content-Type": "application/json" },
       transformPayload: `
         (payload) => {
           console.log("📝 Transforming review payload:", payload);
           
-          // Auto-generate avatar if not provided
+          // Auto-generate random avatar if none provided
           const avatarIndex = Math.floor(Math.random() * 70) + 1;
           const reviewerAvatar = payload.reviewerAvatar || \`https://i.pravatar.cc/150?img=\${avatarIndex}\`;
           
           return {
-            reviewerName: payload.reviewerName || "Anonymous",
-            reviewerAvatar: reviewerAvatar,
+            reviewerName: payload.reviewerName?.trim() || "Anonymous",
+            reviewerAvatar,
             rating: parseInt(payload.rating) || 5,
-            title: payload.title || "",
-            comment: payload.comment || "",
-            productName: payload.productName || "",
+            title: payload.title?.trim() || "",
+            comment: payload.comment?.trim() || "",
+            productName: payload.productName?.trim() || "",
             verifiedPurchase: payload.verifiedPurchase || false,
             helpfulCount: 0,
             date: new Date().toISOString()
           };
         }
       `,
-      
-      successNotification: {
-        type: "toast",
-        message: "✅ Thank you for your review!",
-        background: "#2E7D32",
-        duration: 3000,
-      },
-      
-      errorNotification: {
-        type: "toast",
-        message: "❌ Failed to submit review",
-        background: "#8B4513",
-        duration: 3000,
-      },
-      
       storeResponse: true,
       storeKey: "chiyaz.reviews.submitted",
-      
+      successNotification: {
+        type: "toast",
+        message: "✅ Thank you! Your review has been submitted.",
+        background: "#2E7D32",
+        duration: 5000,
+      },
+      errorNotification: {
+        type: "toast",
+        message: "❌ Failed to submit review. Please try again.",
+        background: "#D32F2F",
+        duration: 5000,
+      },
       onSuccess: [
         {
-          action: "closeModal",
+          action: "closeReviewModal",  // This matches the registered action in initialization.actions
           actionParams: {},
         },
-        {
+        { 
           action: "api",
-          actionParams: {
-            apiKey: "chiyaz.reviews.list",
-            payload: {},
-          },
+          actionParams: { apiKey: "chiyaz.reviews.list" }
         },
       ],
-      
-      onError: ["console:Failed to submit review"],
-      
-      tags: ["chiyaz", "reviews", "submit"],
-      projectUUID: "chiyaz-tea-coffee",
       organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
+      projectUUID: "chiyaz-tea-coffee",
       isActive: true,
     },
   ];
 
   for (const config of reviewAPIConfigs) {
-    await APIConfig.findOneAndUpdate(
+    const updated = await APIConfig.findOneAndUpdate(
       { key: config.key },
-      {
-        ...config,
-        isActive: true,
-      },
+      config,
       { upsert: true, new: true }
     );
-    console.log(`✅ ${config.key} configured → stores at ${config.storeKey}`);
+    console.log(`✅ ${config.key} → configured & active`);
   }
 
-  console.log(`\n✅ Configured ${reviewAPIConfigs.length} API resources`);
+  console.log(`\n✅ All ${reviewAPIConfigs.length} API resources ready`);
 };
 
 // ===================================
@@ -342,36 +306,26 @@ const main = async () => {
 
     await mongoose.connect(
       "mongodb+srv://admin:sjITV8nazkocOrCX@cluster0.sunkcl4.mongodb.net/",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
+      { useNewUrlParser: true, useUnifiedTopology: true }
     );
 
-    console.log("✅ Connected to MongoDB successfully!");
-    console.log("=".repeat(60));
+    console.log("✅ Connected!");
 
-    // Run all steps WITH SLUG PASSING
-    const reviewResult = await createReviewsEntity();
-    await seedReviewData(reviewResult.slug);
+    const { slug } = await createReviewsEntity();
+    await seedReviewData(slug);
     await configureAPIs();
 
     console.log("\n" + "=".repeat(60));
-    console.log("🎉 CHIYAZ REVIEWS SETUP COMPLETED!");
+    console.log("🎉 CHIYAZ REVIEWS FULLY SETUP & FIXED!");
     console.log("=".repeat(60));
-    console.log("\n🔗 Test your API:");
-    console.log(`   GET http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/review`);
-    console.log("\n💡 Expected response:");
-    console.log("   { success: true, data: [... 6 reviews ...] }");
-    console.log("\n🎨 In frontend config, use:");
-    console.log(`   "ui:dataSource": "chiyaz.reviews.list"`);
-    console.log("\n🌐 Reviews will appear on:");
-    console.log("   http://localhost:3000/chiyaz");
-    console.log("\n📝 Actions in demo.js initialization.actions:");
-    console.log("   - openReviewModal");
-    console.log("   - submitReview (calls api: chiyaz.reviews.submit)");
-    console.log("   - closeReviewModal");
-    console.log("=".repeat(60) + "\n");
+    console.log("\n🔗 Test endpoints (relative URLs now work everywhere):");
+    console.log(`   GET /api/crud/${CHIYAZ_ORG_ID}/review`);
+    console.log(`   POST /api/crud/${CHIYAZ_ORG_ID}/review`);
+    console.log("\n👉 Next steps:");
+    console.log("   1. Hard refresh http://localhost:3000/chiyaz (Ctrl+Shift+R)");
+    console.log("   2. Submit a review with ≥10 char comment");
+    console.log("   3. It should now work perfectly!");
+    console.log("=".repeat(60));
 
     mongoose.disconnect();
   } catch (err) {
@@ -382,5 +336,4 @@ const main = async () => {
   }
 };
 
-// Run it!
 main();

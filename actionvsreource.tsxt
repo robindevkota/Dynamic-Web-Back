@@ -1,0 +1,31 @@
+initialization: {
+  actions: {
+    // Optional wrapper (adds confirmation)
+    deleteRoom: `
+      if (!confirm('Delete?')) return;
+      await context.handlers.handleApiCall('rooms.delete', context.row);
+    `,
+    
+    // Required (complex logic)
+    handleLogin: `/* multi-step workflow */`,
+    toggleTheme: `/* UI-only */`
+  }
+}
+```
+
+---
+
+## **Decision Tree**
+```
+Is this an API call?
+│
+├─ YES → Is it simple CRUD?
+│   │
+│   ├─ YES → Use RESOURCE
+│   │         (90% of cases)
+│   │
+│   └─ NO → Use ACTION
+│         (complex workflow)
+│
+└─ NO → Use ACTION
+      (UI/browser operations)
