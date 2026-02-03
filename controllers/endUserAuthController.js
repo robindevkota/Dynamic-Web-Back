@@ -1,49 +1,68 @@
 // backend/controllers/endUserAuthController.js
+// FIXED VERSION - End users bypass payment, go directly to ACTIVE
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const User = require("../models/User");
-const { sendVerificationEmail } = require("../utils/emailService");
+const PageConfig = require("../models/PageConfig");
+const { sendEndUserVerificationEmail } = require("../utils/emailService");
+
+// Optional simple in-memory cache (clears on server restart)
+const orgCache = new Map();
+
+// ═══════════════════════════════════════════════════════════════
+// HELPER: Get organizationId from websiteSlug
+// ═══════════════════════════════════════════════════════════════
+const getOrgIdFromWebsiteSlug = async (websiteSlug) => {
+  if (!websiteSlug) return null;
+
+  if (orgCache.has(websiteSlug)) {
+    return orgCache.get(websiteSlug);
+  }
+
+  try {
+    const page = await PageConfig.findOne({ slug: websiteSlug })
+      .select("organizationId")
+      .lean();
+
+    const orgId = page?.organizationId?.toString() || null;
+    if (orgId) orgCache.set(websiteSlug, orgId);
+    else console.warn(`No org for slug: ${websiteSlug}`);
+    return orgId;
+  } catch (err) {
+    console.error("Org lookup error:", err);
+    return null;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// CHECK SESSION - End user authentication status
+// ═══════════════════════════════════════════════════════════════
 exports.checkSession = async (req, res) => {
   try {
-    const websiteSlug = 
-      req.query.websiteSlug || 
-      req.headers['x-website-slug'] || 
-      req.body.websiteSlug;
-    
-    console.log('🔍 checkSession called');
-    console.log('🔍 websiteSlug:', websiteSlug);
-    console.log('🔍 All cookies:', req.cookies); // ✅ Log ALL cookies
-    console.log('🔍 Raw cookie header:', req.headers.cookie); // ✅ Log raw header
-    
-    if (!websiteSlug) {
-      console.log('❌ No websiteSlug provided');
-      return res.json({ authenticated: false });
-    }
-    
+    const websiteSlug = req.query.websiteSlug || req.headers['x-website-slug'] || req.body.websiteSlug;
+    if (!websiteSlug) return res.json({ authenticated: false });
+
     const cookieName = `${websiteSlug}_auth_token`;
     const token = req.cookies[cookieName];
-    
-    console.log(`🍪 Looking for cookie: ${cookieName}`);
-    console.log(`🍪 Cookie value: ${token ? 'EXISTS' : 'NOT FOUND'}`);
-    
-    if (!token) {
-      console.log('❌ No auth token found in request');
-      return res.json({ authenticated: false });
-    }
-    
-    // Rest of your verification code...
+    if (!token) return res.json({ authenticated: false });
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId).select('-password');
-    
-    if (!user || user.status !== 'ACTIVE') {
-      console.log('❌ User not found or not active');
+
+    if (!user || user.status !== 'ACTIVE') return res.json({ authenticated: false });
+
+    // Allow END_USER and END_USER_ADMIN on website portal
+    if (!["END_USER", "END_USER_ADMIN"].includes(user.role)) {
       return res.json({ authenticated: false });
     }
-    
-    console.log(`✅ Session valid for ${user.email}`);
-    
+
+    const expectedOrgId = await getOrgIdFromWebsiteSlug(websiteSlug);
+    if (!expectedOrgId || user.organizationId.toString() !== expectedOrgId) {
+      return res.json({ authenticated: false });
+    }
+
     res.json({
       authenticated: true,
       user: {
@@ -54,168 +73,138 @@ exports.checkSession = async (req, res) => {
         role: user.role
       }
     });
-    
   } catch (error) {
-    console.error('❌ Session check error:', error.message);
-    
-    if (error.name === 'JsonWebTokenError') {
-      console.log('❌ Invalid JWT token');
-    } else if (error.name === 'TokenExpiredError') {
-      console.log('❌ JWT token expired');
-    }
-    
     res.json({ authenticated: false });
   }
 };
-// ═══════════════════════════════════════════════════════
-// END USER SIGNUP (For client websites - hotel guests, shoppers, etc.)
-// ═══════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// SIGNUP - End users (website visitors)
+// ✅ Creates END_USER role, status PENDING_VERIFICATION
+// ═══════════════════════════════════════════════════════════════
 exports.signup = async (req, res) => {
   try {
     const {
       email,
       password,
-      firstName,
-      lastName,
-      name, // ✅ Support single "name" field
-      fullName, // ✅ Support "fullName" field
-      organizationId,
+      firstName = "",
+      lastName = "",
+      name = "",
+      fullName = "",
       websiteSlug,
     } = req.body;
 
-    console.log("📝 End User Signup Request:", {
-      email,
-      firstName,
-      lastName,
-      name,
-      fullName,
-      organizationId,
-      hasPassword: !!password,
-    });
-
-    // ✅ FLEXIBLE VALIDATION - Only require email and password
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
-    }
-
-    if (!organizationId) {
-      return res.status(400).json({
-        error:
-          "Organization context required. This endpoint is for end users only.",
+    if (!email || !password || !websiteSlug) {
+      return res.status(400).json({ 
+        error: "Email, password, and websiteSlug are required" 
       });
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
+    // Get org from slug only
+    const orgId = await getOrgIdFromWebsiteSlug(websiteSlug);
+    if (!orgId) {
+      return res.status(400).json({ error: "Invalid website" });
+    }
+
+    // Check if email already exists
+    if (await User.findOne({ email: email.toLowerCase() })) {
       return res.status(409).json({ error: "Email already registered" });
     }
 
-    // ✅ FLEXIBLE NAME HANDLING - Support multiple formats
+    // ═══════════════════════════════════════════════════════════
+    // SUPER FLEXIBLE NAME PARSING
+    // Handles ALL cases: fullName, name, firstName only, etc.
+    // ═══════════════════════════════════════════════════════════
     let finalFirstName = "";
     let finalLastName = "";
 
-    if (firstName && lastName) {
-      // Format 1: firstName + lastName
+    // 1. Prefer fullName if provided
+    if (fullName.trim()) {
+      const parts = fullName.trim().split(/\s+/);
+      finalFirstName = parts[0] || "";
+      finalLastName = parts.slice(1).join(" ") || "";
+    }
+    // 2. Fallback to name (single field)
+    else if (name.trim()) {
+      const parts = name.trim().split(/\s+/);
+      finalFirstName = parts[0] || "";
+      finalLastName = parts.slice(1).join(" ") || "";
+    }
+    // 3. Use firstName + lastName if both present
+    else if (firstName.trim() || lastName.trim()) {
       finalFirstName = firstName.trim();
       finalLastName = lastName.trim();
-    } else if (fullName) {
-      // Format 2: fullName (split into first/last)
-      const nameParts = fullName.trim().split(" ");
-      finalFirstName = nameParts[0] || "";
-      finalLastName = nameParts.slice(1).join(" ") || "";
-    } else if (name) {
-      // Format 3: name (split into first/last)
-      const nameParts = name.trim().split(" ");
-      finalFirstName = nameParts[0] || "";
-      finalLastName = nameParts.slice(1).join(" ") || "";
-    } else if (firstName) {
-      // Format 4: firstName only
-      finalFirstName = firstName.trim();
     }
 
-    console.log("👤 Processed name:", {
-      firstName: finalFirstName,
-      lastName: finalLastName,
-    });
+    // If still empty, use email prefix as fallback first name
+    if (!finalFirstName && !finalLastName) {
+      finalFirstName = email.split("@")[0] || "User";
+    }
 
-    // Hash password
+    console.log("Processed name →", { finalFirstName, finalLastName });
+
     const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Generate verification token
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-    // ✅ Create END USER (not CLIENT_ADMIN)
+    // ✅ Create END_USER (status: PENDING_VERIFICATION → will become ACTIVE after verify)
     const user = await User.create({
       email: email.toLowerCase(),
       password: hashedPassword,
       firstName: finalFirstName,
       lastName: finalLastName,
-      role: "END_USER",
-      organizationId,
+      role: "END_USER", // ✅ END_USER role (not CLIENT_ADMIN)
+      organizationId: orgId,
       websiteSlug,
       emailVerified: false,
       emailVerificationToken: verificationToken,
       emailVerificationExpires: verificationExpires,
-      status: "PENDING_VERIFICATION",
+      status: "PENDING_VERIFICATION", // ✅ Will become ACTIVE after verify (NO payment)
     });
 
-    console.log(`✅ End user created: ${user.email} (org: ${organizationId})`);
+    console.log(`✅ END_USER created: ${user.email} | Name: ${finalFirstName} ${finalLastName}`);
+    console.log(`   → Status: PENDING_VERIFICATION (will become ACTIVE after verify)`);
 
-    // Send verification email
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
     const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
-    await sendVerificationEmail({
+    await sendEndUserVerificationEmail({
       to: user.email,
       name: finalFirstName || "User",
       verificationUrl,
+      appName: "Chiyaz"
     });
 
     res.status(201).json({
       success: true,
-      message:
-        "Account created! Please check your email to verify your account.",
-      email: user.email,
+      message: "Account created! Check your email to verify.",
       nextStep: "EMAIL_VERIFICATION",
     });
   } catch (err) {
-    console.error("❌ End user signup error:", err);
-
+    console.error("Signup error:", err);
     let status = 500;
-    let clientError = "Signup failed";
+    let errorMsg = "Signup failed";
 
-    if (err.name === "MongoServerError" && err.code === 11000) {
+    if (err.code === 11000) {
       status = 409;
-      clientError = "Email already registered";
+      errorMsg = "Email already registered";
     } else if (err.name === "ValidationError") {
       status = 400;
-      const firstError = Object.values(err.errors || {})[0];
-      clientError = `Validation failed: ${firstError?.message || err.message}`;
-
-      // ✅ MORE DETAILED ERROR LOGGING
-      console.error("Validation Details:", {
-        errors: err.errors,
-        message: err.message,
-        name: err.name,
-      });
+      errorMsg = Object.values(err.errors)[0]?.message || "Invalid data";
     }
 
-    res.status(status).json({ error: clientError });
+    res.status(status).json({ error: errorMsg });
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// END USER EMAIL VERIFICATION (unchanged)
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// VERIFY EMAIL - End users (website visitors)
+// ✅ FIX: Sets status to ACTIVE immediately (NO payment required)
+// ═══════════════════════════════════════════════════════════════
 exports.verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
-
-    if (!token) {
-      return res.status(400).json({ error: "Verification token required" });
-    }
+    if (!token) return res.status(400).json({ error: "Verification token required" });
 
     const user = await User.findOne({
       emailVerificationToken: token,
@@ -223,105 +212,170 @@ exports.verifyEmail = async (req, res) => {
     });
 
     if (!user) {
+      return res.status(400).json({ error: "Invalid or expired token" });
+    }
+
+    // ✅ CHECK: This should ONLY verify end users (END_USER, END_USER_ADMIN)
+    if (!["END_USER", "END_USER_ADMIN"].includes(user.role)) {
       return res.status(400).json({
-        error: "Invalid or expired verification token",
+        error: "Invalid user type for end user verification",
+        hint: "Platform users should use /api/auth/verify-email"
       });
     }
 
-    // ✅ Mark as ACTIVE immediately (no payment step!)
+    // ✅ Activate immediately – NO payment step for end users
     user.emailVerified = true;
     user.emailVerificationToken = undefined;
     user.emailVerificationExpires = undefined;
-    user.status = "ACTIVE";
+    user.status = "ACTIVE"; // ✅ ACTIVE (not PENDING_PAYMENT)
     await user.save();
 
-    console.log("✅ End user email verified:", user.email);
+    console.log(`✅ END_USER verified & activated: ${user.email}`);
+    console.log(`   → Status set to ACTIVE (no payment required)`);
 
     res.json({
       success: true,
-      message: "Email verified successfully! You can now login.",
+      message: "Email verified! You can now log in.",
       nextStep: "LOGIN",
     });
   } catch (err) {
-    console.error("Email verification error:", err);
+    console.error("Verification error:", err);
     res.status(500).json({ error: "Verification failed" });
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// END USER LOGIN (unchanged)
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// RESEND VERIFICATION - End users
+// ═══════════════════════════════════════════════════════════════
+exports.resendVerification = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    // Find user - must be END_USER or END_USER_ADMIN
+    const user = await User.findOne({ 
+      email: email.toLowerCase(),
+      role: { $in: ["END_USER", "END_USER_ADMIN"] }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if already verified
+    if (user.emailVerified) {
+      return res.status(400).json({ 
+        error: "Email already verified",
+        nextStep: user.status === "ACTIVE" ? "LOGIN" : "CONTACT_SUPPORT"
+      });
+    }
+
+    // Generate new verification token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+    user.emailVerificationToken = verificationToken;
+    user.emailVerificationExpires = verificationExpires;
+    await user.save();
+
+    // Send email
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+
+    console.log('🔗 NEW End-User Verification URL:', verificationUrl);
+
+    await sendEndUserVerificationEmail({
+      to: user.email,
+      name: user.firstName || 'User',
+      verificationUrl,
+      appName: user.websiteSlug || 'Our Platform'
+    });
+
+    console.log('✅ End-user verification email resent to:', user.email);
+
+    res.json({
+      success: true,
+      message: "Verification email sent! Please check your inbox.",
+      debugToken: process.env.NODE_ENV !== 'production' ? verificationToken : undefined
+    });
+
+  } catch (err) {
+    console.error("Resend verification error:", err);
+    res.status(500).json({ error: "Failed to resend verification email" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// LOGIN - End users (website visitors)
+// ✅ Only allows ACTIVE END_USERs (no payment check)
+// ═══════════════════════════════════════════════════════════════
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const websiteSlug = req.body.websiteSlug || req.headers["x-website-slug"];
 
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password required" });
-    }
+    if (!websiteSlug) return res.status(400).json({ error: "websiteSlug required" });
 
-    const user = await User.findOne({
-      email: email.toLowerCase(),
-    }).select("+password");
+    const expectedOrgId = await getOrgIdFromWebsiteSlug(websiteSlug);
+    if (!expectedOrgId) return res.status(400).json({ error: "Invalid website" });
 
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
+    const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
+    if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
-    // ✅ SIMPLIFIED STATUS CHECK (no payment, no organization billing)
+    // ✅ Status check for END_USER
     if (user.status === "PENDING_VERIFICATION") {
-      return res.status(403).json({
-        error: "Please verify your email first",
-        nextStep: "EMAIL_VERIFICATION",
+      return res.status(403).json({ 
+        error: "Please verify your email first", 
+        nextStep: "EMAIL_VERIFICATION" 
       });
     }
 
-    if (user.status === "SUSPENDED") {
-      return res.status(403).json({
-        error: "Account suspended. Please contact support.",
-      });
+    if (user.status !== "ACTIVE") {
+      return res.status(403).json({ error: "Account not active" });
     }
 
-    // Verify password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    if (!await bcrypt.compare(password, user.password)) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // Generate JWT
-    const websiteSlug =
-      req.body.websiteSlug || req.headers["x-website-slug"] || "default";
+    // ✅ Allow END_USER and END_USER_ADMIN (block platform roles)
+    if (!["END_USER", "END_USER_ADMIN"].includes(user.role)) {
+      return res.status(403).json({ error: "This account cannot log in here" });
+    }
+
+    // ✅ Org check
+    if (user.organizationId.toString() !== expectedOrgId) {
+      return res.status(403).json({ error: "Account does not belong to this website" });
+    }
+
     const token = jwt.sign(
       {
         userId: user._id,
         email: user.email,
         role: user.role,
-        organizationId: user.organizationId,
-        websiteSlug: websiteSlug, // ✅ Store slug in token
+        organizationId: user.organizationId.toString(),
+        websiteSlug,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" },
+      { expiresIn: "7d" }
     );
 
-    // Update last login
     user.lastLogin = new Date();
     await user.save();
 
-    // ✅ Set HTTP-only cookie with DYNAMIC NAME based on websiteSlug
-    const isProduction = process.env.NODE_ENV === "production";
-    const cookieName = `${websiteSlug}_auth_token`; // ✅ Dynamic name!
-
-    console.log(`✅ Setting cookie: ${cookieName} for user: ${user.email}`);
-
+    const cookieName = `${websiteSlug}_auth_token`;
     res.cookie(cookieName, token, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "strict" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
-      domain:undefined
     });
 
-    console.log("✅ End user login successful:", user.email);
+    console.log('✅ END_USER login successful:', user.email);
 
     res.json({
       success: true,
@@ -339,13 +393,11 @@ exports.login = async (req, res) => {
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// END USER LOGOUT (unchanged)
-// ═══════════════════════════════════════════════════════
-// endUserAuthController.js - logout
+// ═══════════════════════════════════════════════════════════════
+// LOGOUT - End users
+// ═══════════════════════════════════════════════════════════════
 exports.logout = async (req, res) => {
   try {
-    // ✅ Get websiteSlug from request body or headers
     const websiteSlug = req.body.websiteSlug || req.headers['x-website-slug'];
     
     if (!websiteSlug) {
@@ -354,7 +406,6 @@ exports.logout = async (req, res) => {
       });
     }
 
-    // ✅ Clear ONLY this website's cookie
     const cookieName = `${websiteSlug}_auth_token`;
     
     console.log(`🚪 Logging out from ${websiteSlug}, clearing cookie: ${cookieName}`);
@@ -369,7 +420,7 @@ exports.logout = async (req, res) => {
     res.status(200).json({ 
       success: true,
       message: "Logged out successfully",
-      redirectUrl: `/${websiteSlug}`  // ✅ Redirect to website home
+      redirectUrl: `/${websiteSlug}`
     });
   } catch (err) {
     console.error("Logout error:", err);
@@ -377,9 +428,9 @@ exports.logout = async (req, res) => {
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// FORGOT PASSWORD (unchanged)
-// ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// PASSWORD RESET FLOW - End users
+// ═══════════════════════════════════════════════════════════════
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
@@ -388,9 +439,13 @@ exports.forgotPassword = async (req, res) => {
       return res.status(400).json({ error: "Email is required" });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ 
+      email: email.toLowerCase(),
+      role: { $in: ["END_USER", "END_USER_ADMIN"] }
+    });
 
     if (!user) {
+      // Don't reveal if user exists
       return res.json({
         success: true,
         message: "If that email exists, a reset link has been sent.",
@@ -409,6 +464,8 @@ exports.forgotPassword = async (req, res) => {
 
     console.log("🔑 Password reset URL:", resetUrl);
 
+    // TODO: Send email with resetUrl
+
     res.json({
       success: true,
       message: "If that email exists, a reset link has been sent.",
@@ -419,9 +476,6 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// RESET PASSWORD (unchanged)
-// ═══════════════════════════════════════════════════════
 exports.resetPassword = async (req, res) => {
   try {
     const { token, password } = req.body;
@@ -433,6 +487,7 @@ exports.resetPassword = async (req, res) => {
     const user = await User.findOne({
       passwordResetToken: token,
       passwordResetExpires: { $gt: Date.now() },
+      role: { $in: ["END_USER", "END_USER_ADMIN"] }
     });
 
     if (!user) {
@@ -459,13 +514,5 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ error: "Failed to reset password" });
   }
 };
-
-// backend/controllers/endUserAuthController.js
-// ✅ ADD THIS NEW ENDPOINT
-
-// ═══════════════════════════════════════════════════════
-// CHECK SESSION (for auto-login)
-// ═══════════════════════════════════════════════════════
-
 
 module.exports = exports;

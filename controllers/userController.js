@@ -6,14 +6,16 @@ const crypto = require("crypto");
 const { sendDeveloperInvitation } = require("../utils/emailService");
 
 // ✅ Get all users (SUPER_ADMIN only)
+// SUPER_ADMIN: sees only platform roles (no END_USER)
 exports.getAllUsers = async (req, res) => {
   try {
-    // Check if user is SUPER_ADMIN (set by auth middleware)
     if (req.user.role !== 'SUPER_ADMIN') {
       return res.status(403).json({ error: "Forbidden: Super admin only" });
     }
 
-    const users = await User.find()
+    const users = await User.find({
+      role: { $in: ['SUPER_ADMIN', 'CLIENT_ADMIN', 'DEVELOPER', 'END_USER_ADMIN'] }
+    })
       .populate('organizationId', 'name')
       .select('-password')
       .sort({ createdAt: -1 });
@@ -26,37 +28,37 @@ exports.getAllUsers = async (req, res) => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        organizationId: user.organizationId?._id,
         organizationName: user.organizationId?.name,
         status: user.status,
-        emailVerified: user.emailVerified,
-        lastLogin: user.lastLogin,
         createdAt: user.createdAt
       }))
     });
-
   } catch (err) {
-    console.error("Error fetching all users:", err);
-    res.status(500).json({ error: "Failed to fetch users" });
+    res.status(500).json({ error: err.message });
   }
 };
 
-// ✅ Get users in my organization (CLIENT_ADMIN only)
+// Org-level user list – different view per role
 exports.getMyOrganizationUsers = async (req, res) => {
   try {
-    // Get organizationId from authenticated user (set by auth middleware)
     const { organizationId, role } = req.user;
 
-    if (role === 'DEVELOPER') {
-      return res.status(403).json({ error: "Forbidden: Admins only" });
+    let query = { organizationId };
+
+    if (role === 'CLIENT_ADMIN') {
+      // Sees only DEVELOPER + END_USER_ADMIN (NOT customers)
+      query.role = { $in: ['DEVELOPER', 'END_USER_ADMIN'] };
+    } else if (role === 'END_USER_ADMIN') {
+      // Sees only END_USER (customers)
+      query.role = 'END_USER';
+    } else if (role === 'DEVELOPER') {
+      // Developers see no user list (or only other devs if you want)
+      return res.status(403).json({ error: "No access to user list" });
+    } else {
+      return res.status(403).json({ error: "Forbidden" });
     }
 
-    if (!organizationId) {
-      return res.status(400).json({ error: "No organization found" });
-    }
-
-    // Find all users in this organization
-    const users = await User.find({ organizationId })
+    const users = await User.find(query)
       .select('-password')
       .sort({ createdAt: -1 });
 
@@ -69,17 +71,17 @@ exports.getMyOrganizationUsers = async (req, res) => {
         lastName: user.lastName,
         role: user.role,
         status: user.status,
-        assignedProjects: user.assignedProjects,
         lastLogin: user.lastLogin,
         createdAt: user.createdAt
       }))
     });
-
   } catch (err) {
-    console.error("Error fetching organization users:", err);
-    res.status(500).json({ error: "Failed to fetch users" });
+    res.status(500).json({ error: err.message });
   }
 };
+
+// ✅ Get users in my organization (CLIENT_ADMIN only)
+
 
 // ✅ Invite Developer (CLIENT_ADMIN only)
 exports.inviteDeveloper = async (req, res) => {

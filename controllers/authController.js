@@ -1,4 +1,5 @@
 // backend/controllers/authController.js
+// FIXED VERSION - Role-based verification + payment flow
 
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -7,11 +8,9 @@ const User = require("../models/User");
 const Organization = require("../models/Organization");
 const { sendVerificationEmail } = require("../utils/emailService");
 
-// ✅ STEP 1: SIGNUP (Creates user + org, sends verification email)
-// backend/controllers/authController.js (signup only - replace your current one)
-
-// In authController.js - Replace your signup function
-
+// ═══════════════════════════════════════════════════════════════
+// SIGNUP - Platform users (CLIENT_ADMIN only)
+// ═══════════════════════════════════════════════════════════════
 exports.signup = async (req, res) => {
   try {
     const { email, password, firstName, lastName, organizationName, pricingPlan } = req.body;
@@ -65,18 +64,18 @@ exports.signup = async (req, res) => {
       }
     });
 
-    // 2. Create the user
+    // 2. Create the CLIENT_ADMIN user
     const user = await User.create({
       email: email.toLowerCase(),
       password: hashedPassword,
       firstName: firstName?.trim() || "",
       lastName: lastName?.trim() || "",
-      role: "CLIENT_ADMIN",
+      role: "CLIENT_ADMIN", // ✅ PLATFORM USER
       organizationId: organization._id,
       emailVerified: false,
       emailVerificationToken: verificationToken,
       emailVerificationExpires: verificationExpires,
-      status: "PENDING_VERIFICATION"
+      status: "PENDING_VERIFICATION" // ✅ Will become PENDING_PAYMENT after verify
     });
 
     // 3. Link owner back to organization
@@ -85,7 +84,6 @@ exports.signup = async (req, res) => {
 
     console.log(`✅ Organization created with owner: ${user._id}`);
 
-    // ⚠️ IMPORTANT: Construct the verification URL correctly
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
@@ -108,15 +106,7 @@ exports.signup = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("═══════════════════════════════════════════════════════════");
-    console.error("Signup crashed with payload:", JSON.stringify(req.body, null, 2));
-    console.error("Error name:", err.name);
-    console.error("Error message:", err.message);
-    console.error("Full error object:", err);
-    if (err.stack) {
-      console.error("Stack trace:\n", err.stack.split('\n').slice(0, 10).join('\n'));
-    }
-    console.error("═══════════════════════════════════════════════════════════");
+    console.error("Signup error:", err);
 
     let status = 500;
     let clientError = "Signup failed - internal error";
@@ -140,10 +130,10 @@ exports.signup = async (req, res) => {
   }
 };
 
-
-// ✅ STEP 2: VERIFY EMAIL
-// Replace verifyEmail in authController.js
-
+// ═══════════════════════════════════════════════════════════════
+// VERIFY EMAIL - Platform users (CLIENT_ADMIN only)
+// ✅ FIX: Sets status to PENDING_PAYMENT (NOT ACTIVE)
+// ═══════════════════════════════════════════════════════════════
 exports.verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
@@ -161,13 +151,13 @@ exports.verifyEmail = async (req, res) => {
     // If not found with valid token, check if user already verified this token
     if (!user) {
       // Check if a user exists who might have already used this token
-      // We'll search by the fact that they're verified but in PENDING_PAYMENT status
       user = await User.findOne({
         emailVerified: true,
-        status: "PENDING_PAYMENT"
+        status: "PENDING_PAYMENT",
+        role: "CLIENT_ADMIN" // ✅ Only look for platform users
       }).populate('organizationId').sort({ updatedAt: -1 }).limit(1);
 
-      // If we found a recently verified user, allow them to continue
+      // If we found a recently verified user, allow them to continue to payment
       if (user) {
         console.log('⚠️  Token already used, but allowing user to proceed to payment');
         
@@ -191,19 +181,28 @@ exports.verifyEmail = async (req, res) => {
       });
     }
 
-    // Mark email as verified
+    // ✅ CHECK: This should ONLY verify platform users (CLIENT_ADMIN)
+    if (user.role !== "CLIENT_ADMIN") {
+      return res.status(400).json({
+        error: "Invalid user type for platform verification",
+        hint: "End users should use /api/enduser-auth/verify-email"
+      });
+    }
+
+    // ✅ Mark email as verified
     user.emailVerified = true;
     user.emailVerificationToken = undefined;
     user.emailVerificationExpires = undefined;
-    user.status = "PENDING_PAYMENT";
+    user.status = "PENDING_PAYMENT"; // ✅ NOT ACTIVE - needs payment first
     await user.save();
 
-    console.log('✅ Email verified for:', user.email);
+    console.log('✅ Email verified for CLIENT_ADMIN:', user.email);
+    console.log('   → Status set to PENDING_PAYMENT (requires payment)');
 
     // Return payment info
     res.json({
       success: true,
-      message: "Email verified successfully!",
+      message: "Email verified successfully! Please complete payment to activate your account.",
       nextStep: "PAYMENT",
       organization: {
         id: user.organizationId._id,
@@ -219,8 +218,9 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
-// Add this to authController.js
-
+// ═══════════════════════════════════════════════════════════════
+// RESEND VERIFICATION
+// ═══════════════════════════════════════════════════════════════
 exports.resendVerification = async (req, res) => {
   try {
     const { email } = req.body;
@@ -230,7 +230,10 @@ exports.resendVerification = async (req, res) => {
     }
 
     // Find user
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ 
+      email: email.toLowerCase(),
+      role: "CLIENT_ADMIN" // ✅ Only platform users
+    });
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -277,17 +280,13 @@ exports.resendVerification = async (req, res) => {
   }
 };
 
-
-// Add this route to authRoutes.js
-// router.post("/resend-verification", resendVerification);
-
-// ✅ STEP 3: HANDLE PAYMENT SUCCESS (Called by Stripe webhook)
-// Add this function to handle actual Stripe payment
-// backend/controllers/authController.js
+// ═══════════════════════════════════════════════════════════════
+// HANDLE PAYMENT SUCCESS - Platform users only
+// ✅ FIX: Add role check to prevent end users from accessing
+// ═══════════════════════════════════════════════════════════════
 exports.handlePaymentSuccess = async (req, res) => {
   try {
-    // For webhook: expect metadata from session
-    const { organizationId } = req.body;  // from metadata in real webhook
+    const { organizationId } = req.body;
 
     if (!organizationId) {
       return res.status(400).json({ error: "Missing organizationId" });
@@ -300,20 +299,37 @@ exports.handlePaymentSuccess = async (req, res) => {
 
     const user = await User.findOne({ 
       organizationId: organization._id, 
-      role: "CLIENT_ADMIN" 
+      role: "CLIENT_ADMIN" // ✅ Only CLIENT_ADMIN can complete payment
     });
 
-    if (!user) return res.status(404).json({ error: "Owner user not found" });
+    if (!user) {
+      return res.status(404).json({ error: "Owner user not found" });
+    }
 
-    // In real webhook you get customer & subscription from event.data.object
-    // For CLI trigger test: use fake values or skip customer creation
+    // ✅ CHECK: User must be in PENDING_PAYMENT status
+    if (user.status !== "PENDING_PAYMENT") {
+      return res.status(400).json({
+        error: "User is not pending payment",
+        currentStatus: user.status,
+        hint: user.status === "ACTIVE" ? "Account already active" : "Invalid status for payment"
+      });
+    }
+
+    // ✅ CHECK: Prevent END_USERs from accessing payment flow
+    if (user.role === "END_USER" || user.role === "END_USER_ADMIN") {
+      return res.status(403).json({
+        error: "End users cannot access platform payment flow",
+        hint: "This endpoint is only for CLIENT_ADMIN users"
+      });
+    }
+
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-    // Fake/simulated values from trigger (in real life → from event)
-    const customerId = 'cus_test_' + Date.now();  // or from session.customer
-    const subscriptionId = 'sub_test_' + Date.now();  // or from session.subscription
+    // Simulated payment (in production, get from Stripe webhook)
+    const customerId = 'cus_test_' + Date.now();
+    const subscriptionId = 'sub_test_' + Date.now();
 
-    // Update DB
+    // ✅ Update organization billing
     organization.billing.status = "ACTIVE";
     organization.billing.stripeCustomerId = customerId;
     organization.billing.stripeSubscriptionId = subscriptionId;
@@ -322,10 +338,13 @@ exports.handlePaymentSuccess = async (req, res) => {
     organization.status = "ACTIVE";
     await organization.save();
 
+    // ✅ Activate CLIENT_ADMIN user
     user.status = "ACTIVE";
     await user.save();
 
-    console.log('✅ Account activated via mock payment');
+    console.log('✅ Platform account activated via payment');
+    console.log(`   User: ${user.email} (${user.role})`);
+    console.log(`   Organization: ${organization.name}`);
 
     res.json({
       success: true,
@@ -339,8 +358,10 @@ exports.handlePaymentSuccess = async (req, res) => {
   }
 };
 
-
-// ✅ STEP 4: LOGIN (Only allowed if status is ACTIVE)
+// ═══════════════════════════════════════════════════════════════
+// LOGIN - All platform users (CLIENT_ADMIN, DEVELOPER, SUPER_ADMIN)
+// ✅ FIX: Proper status checks for different roles
+// ═══════════════════════════════════════════════════════════════
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -358,21 +379,43 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // ✅ Check user status
-    if (user.status === "PENDING_VERIFICATION") {
+    // ✅ CHECK: Only allow platform roles (block END_USER from this endpoint)
+    const platformRoles = ['SUPER_ADMIN', 'CLIENT_ADMIN', 'DEVELOPER'];
+    if (!platformRoles.includes(user.role)) {
       return res.status(403).json({ 
-        error: "Please verify your email first",
-        nextStep: "EMAIL_VERIFICATION"
+        error: "This login is for platform users only",
+        hint: "End users should log in via their website"
       });
     }
 
-    if (user.status === "PENDING_PAYMENT") {
-      return res.status(403).json({ 
-        error: "Please complete payment to activate your account",
-        nextStep: "PAYMENT",
-        organizationId: user.organizationId._id
-      });
+    // ✅ Status checks - different for each role
+    if (user.role === "CLIENT_ADMIN") {
+      // CLIENT_ADMIN must verify email first
+      if (user.status === "PENDING_VERIFICATION") {
+        return res.status(403).json({ 
+          error: "Please verify your email first",
+          nextStep: "EMAIL_VERIFICATION"
+        });
+      }
+
+      // CLIENT_ADMIN must complete payment
+      if (user.status === "PENDING_PAYMENT") {
+        return res.status(403).json({ 
+          error: "Please complete payment to activate your account",
+          nextStep: "PAYMENT",
+          organizationId: user.organizationId._id
+        });
+      }
+    } else if (user.role === "DEVELOPER") {
+      // DEVELOPER must accept invitation
+      if (user.status === "PENDING_VERIFICATION") {
+        return res.status(403).json({
+          error: "Please accept your invitation first",
+          nextStep: "ACCEPT_INVITATION"
+        });
+      }
     }
+    // SUPER_ADMIN has no restrictions
 
     if (user.status === "SUSPENDED") {
       return res.status(403).json({ error: "Account suspended. Please contact support." });
@@ -384,7 +427,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // ✅ Check organization billing status
+    // ✅ Check organization billing status (except SUPER_ADMIN)
     if (user.role !== 'SUPER_ADMIN' && user.organizationId) {
       if (user.organizationId.billing.status === "CANCELED") {
         return res.status(403).json({ error: "Subscription canceled. Please renew." });
@@ -420,7 +463,7 @@ exports.login = async (req, res) => {
       path: "/",
     });
 
-    console.log('✅ Login successful:', user.email);
+    console.log('✅ Login successful:', user.email, `(${user.role})`);
 
     res.json({
       success: true,
@@ -441,14 +484,16 @@ exports.login = async (req, res) => {
   }
 };
 
+// ═══════════════════════════════════════════════════════════════
+// LOGOUT
+// ═══════════════════════════════════════════════════════════════
 exports.logout = async (req, res) => {
   try {
-    // Clear the JWT cookie (match the name used in login)
     res.clearCookie("auth_token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
-      path: "/", // Important: must match the path used when setting the cookie
+      path: "/",
     });
 
     res.status(200).json({ message: "Logged out successfully" });

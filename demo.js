@@ -4354,63 +4354,100 @@ try {
   });
 }`,
 
-        handleSignup: `console.log('📝 Chiyaz signup handling');
-const { email, password, firstName, lastName, name } = context.formData || {};
+handleSignup: `console.log('📝 Chiyaz signup action triggered');
 
+// ✅ Get ALL form data from context
+const formData = context.formData || {};
+console.log('📦 Full formData from DataStore:', formData);
+
+// ✅ Extract fields with proper fallbacks
+const email = formData.email?.trim();
+const password = formData.password;
+const name = formData.name?.trim();
+const firstName = formData.firstName?.trim();
+const lastName = formData.lastName?.trim();
+const fullName = formData.fullName?.trim();
+
+console.log('📋 Extracted fields:', { email, password, name, firstName, lastName, fullName });
+
+// Validation
 if (!email || !password) {
+  console.error('❌ Validation failed: Missing email or password');
   context.handlers.showNotification({
     type: 'toast',
     message: '❌ Email and password are required',
-    background: '#8B4513'
+    background: '#8B4513',
+    duration: 3000
   });
   return;
 }
 
+// ✅ Build payload with ALL possible name variations
+const payload = {
+  email: email.toLowerCase(),
+  password: password,
+  websiteSlug: 'chiyaz'
+};
+
+// Add all name fields that exist (backend handles the parsing)
+if (fullName) payload.fullName = fullName;
+if (name) payload.name = name;
+if (firstName) payload.firstName = firstName;
+if (lastName) payload.lastName = lastName;
+
+console.log('🚀 Sending signup payload:', payload);
+
 try {
   const response = await fetch('/api/enduser-auth/signup', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json'
+    },
     credentials: 'include',
-    body: JSON.stringify({
-      email: email.trim().toLowerCase(),
-      password,
-      name: \`\${firstName?.trim() || ''} \${lastName?.trim() || ''}\`.trim(),
-      organizationId: '696fd6f8a216cc192d63b84a',
-      websiteSlug: 'chiyaz'
-    })
+    body: JSON.stringify(payload)
   });
     
   const data = await response.json();
+  console.log('📡 Signup API response:', { status: response.status, data });
     
   if (!response.ok) {
+    console.error('❌ Signup failed:', data);
     context.handlers.showNotification({
       type: 'toast',
-      message: data.error || '❌ Signup failed',
+      message: data.error || '❌ Signup failed. Please try again.',
       background: '#8B4513',
       duration: 4000
     });
     return;
   }
     
-  console.log('✅ Signup successful:', data);
+  console.log('✅ Signup successful!');
     
+  // Show success notification
   context.handlers.showNotification({
     type: 'toast',
-    message: '✅ Account created! Welcome to Chiyaz.',
+    message: '✅ Account created! Please check your email to verify your account.',
     background: '#2E7D32',
-    duration: 4000
+    duration: 5000
   });
     
+  // Clear the form
+  context.handlers.setFormData({});
+  console.log('🧹 Form data cleared');
+  
+  // Redirect to login after 2 seconds
   setTimeout(() => {
+    console.log('🔄 Redirecting to login page...');
     window.location.href = '/chiyaz/login';
   }, 2000);
     
 } catch (error) {
-  console.error('❌ Signup error:', error);
+  console.error('❌ Network error during signup:', error);
   context.handlers.showNotification({
     type: 'toast',
-    message: '❌ Network error. Please try again.',
-    background: '#8B4513'
+    message: '❌ Network error. Please check your connection and try again.',
+    background: '#8B4513',
+    duration: 4000
   });
 }`,
 
