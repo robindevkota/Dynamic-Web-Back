@@ -22,7 +22,7 @@ const seedSuperAdmin = async () => {
       email: SUPER_ADMIN_EMAIL,
       password: hashedPassword,
       role: "SUPER_ADMIN",
-      isEmailVerified: true,
+      emailVerified: true,
       organizationId: null,
     });
 

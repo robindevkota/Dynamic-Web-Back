@@ -1,0 +1,24 @@
+Platform Tier (SaaS Backend – Private Access)
+
+SUPER_ADMIN (seeded)
+   └── oversees / creates
+         └── CLIENT_ADMIN (signup or manual)
+               ├── invites → DEVELOPER (builds sites)
+               └── seeds/invites → END_USER_ADMIN (manages customers)
+
+Access Summary:
+- SUPER_ADMIN     → full platform (no end-user data)
+- CLIENT_ADMIN    → org metadata, invites devs & end-user-admin (no end-user data)
+- DEVELOPER       → builds PageConfig + Dynamic Entities (own org only)
+- END_USER_ADMIN  → full view/manage END_USERS (own org only)
+
+Website Tier (Public-Facing – Per Organization)
+
+Websites (PageConfig + Dynamic Data)
+   └── public visitors → END_USERS (signup/login via EndUserAuthController)
+                           └── managed exclusively by END_USER_ADMIN
+
+Forbidden Access (Blocked):
+SUPER_ADMIN    → END_USERS
+CLIENT_ADMIN   → END_USERS
+DEVELOPER      → END_USERS
