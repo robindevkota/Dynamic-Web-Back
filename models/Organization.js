@@ -1,72 +1,161 @@
-// backend/models/Organization.js
+// backend/models/Organization.js - ENHANCED with Status
 
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const organizationSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  slug: { type: String, required: true, unique: true },
-  
-  // Owner reference
-  ownerId: { 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: "User",
-    required: false,
-    index: true 
+const OrganizationSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true
   },
   
-  pricingPlan: { 
-    type: String, 
-    enum: ["starter", "professional", "enterprise"], 
-    required: true 
+  // ✅ NEW: Organization-level status
+  status: {
+    type: String,
+    enum: ['ACTIVE', 'INACTIVE', 'SUSPENDED', 'TRIAL'],
+    default: 'ACTIVE',
+    index: true
   },
   
-  // Plan limits
-  maxUsers: { type: Number, required: true },
-  maxProjects: { type: Number, required: true },
+  // ✅ NEW: Track why organization was deactivated
+  deactivationReason: {
+    type: String,
+    enum: ['PAYMENT_FAILED', 'TRIAL_EXPIRED', 'MANUAL', 'POLICY_VIOLATION'],
+    default: null
+  },
   
-  // Current usage
-  currentUsers: { type: Number, default: 1 }, // Owner counts as 1
-  currentProjects: { type: Number, default: 0 },
+  // ✅ NEW: When and by whom was it deactivated
+  deactivatedAt: {
+    type: Date,
+    default: null
+  },
+  deactivatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
   
-  // ✅ ADD BILLING FIELDS
-  billing: {
-    status: {
-      type: String,
-      enum: ["TRIAL", "ACTIVE", "PAST_DUE", "CANCELED"],
-      default: "TRIAL"
-    },
-    stripeCustomerId: { type: String },
-    stripeSubscriptionId: { type: String },
-    
-    // Trial period (14 days)
-    trialStartDate: { type: Date },
-    trialEndDate: { type: Date },
-    
-    // Subscription
-    subscriptionStartDate: { type: Date },
-    currentPeriodEnd: { type: Date },
-    cancelAtPeriodEnd: { type: Boolean, default: false },
-    
-    // Payment history
-    lastPaymentDate: { type: Date },
-    lastPaymentAmount: { type: Number },
-    nextPaymentDate: { type: Date }
+  // Subscription & Billing
+  pricingPlan: {
+    type: String,
+    enum: ['FREE', 'STARTER', 'PRO', 'ENTERPRISE'],
+    default: 'FREE'
+  },
+  subscriptionStatus: {
+    type: String,
+    enum: ['ACTIVE', 'PAST_DUE', 'CANCELED', 'TRIAL'],
+    default: 'TRIAL'
+  },
+  subscriptionEndsAt: {
+    type: Date
+  },
+  trialEndsAt: {
+    type: Date
+  },
+  
+  // Limits
+  maxProjects: {
+    type: Number,
+    default: 5
+  },
+  maxUsers: {
+    type: Number,
+    default: 10
+  },
+  maxStorage: {
+    type: Number,
+    default: 1024 // MB
+  },
+  
+  // Current Usage
+  currentProjects: {
+    type: Number,
+    default: 0
+  },
+  currentUsers: {
+    type: Number,
+    default: 0
+  },
+  currentStorage: {
+    type: Number,
+    default: 0
+  },
+  
+  // Contact Information
+  contactEmail: {
+    type: String
+  },
+  supportEmail: {
+    type: String
+  },
+  billingEmail: {
+    type: String
+  },
+  
+  // Address (optional)
+  address: {
+    street: String,
+    city: String,
+    state: String,
+    country: String,
+    zipCode: String
   },
   
   // Settings
   settings: {
-    whiteLabel: { type: Boolean, default: false },
-    customDomain: { type: String },
-    logoUrl: { type: String }
-  },
-  
-  // Status
-  status: {
-    type: String,
-    enum: ["PENDING_PAYMENT", "ACTIVE", "SUSPENDED", "DELETED"],
-    default: "PENDING_PAYMENT"
+    allowPublicSignup: {
+      type: Boolean,
+      default: false
+    },
+    customDomain: {
+      type: String,
+      default: null
+    },
+    logoUrl: {
+      type: String,
+      default: null
+    },
+    brandColor: {
+      type: String,
+      default: '#1890ff'
+    }
   }
   
-}, { timestamps: true });
+}, {
+  timestamps: true
+});
 
-module.exports = mongoose.model("Organization", organizationSchema);
+// ✅ Indexes for efficient queries
+OrganizationSchema.index({ slug: 1 }, { unique: true });
+OrganizationSchema.index({ status: 1 });
+OrganizationSchema.index({ pricingPlan: 1 });
+OrganizationSchema.index({ subscriptionStatus: 1 });
+
+// ✅ Virtual: Is organization accessible?
+OrganizationSchema.virtual('isAccessible').get(function() {
+  return this.status === 'ACTIVE' || this.status === 'TRIAL';
+});
+
+// ✅ Method: Check if organization has capacity for new project
+OrganizationSchema.methods.canAddProject = function() {
+  return this.currentProjects < this.maxProjects;
+};
+
+// ✅ Method: Check if organization has capacity for new user
+OrganizationSchema.methods.canAddUser = function() {
+  return this.currentUsers < this.maxUsers;
+};
+
+// ✅ Method: Check if trial has expired
+OrganizationSchema.methods.isTrialExpired = function() {
+  if (!this.trialEndsAt) return false;
+  return new Date() > this.trialEndsAt;
+};
+
+module.exports = mongoose.model('Organization', OrganizationSchema);

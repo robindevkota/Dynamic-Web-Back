@@ -247,6 +247,8 @@ exports.verifyEmail = async (req, res) => {
 // ═══════════════════════════════════════════════════════════════
 // RESEND VERIFICATION - End users
 // ═══════════════════════════════════════════════════════════════
+// Add this to endUserAuthController.js
+
 exports.resendVerification = async (req, res) => {
   try {
     const { email } = req.body;
@@ -274,6 +276,7 @@ exports.resendVerification = async (req, res) => {
     }
 
     // Generate new verification token
+    const crypto = require("crypto");
     const verificationToken = crypto.randomBytes(32).toString('hex');
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
@@ -287,6 +290,7 @@ exports.resendVerification = async (req, res) => {
 
     console.log('🔗 NEW End-User Verification URL:', verificationUrl);
 
+    const { sendEndUserVerificationEmail } = require('../utils/emailService');
     await sendEndUserVerificationEmail({
       to: user.email,
       name: user.firstName || 'User',
@@ -299,6 +303,7 @@ exports.resendVerification = async (req, res) => {
     res.json({
       success: true,
       message: "Verification email sent! Please check your inbox.",
+      // Only include debug token in development
       debugToken: process.env.NODE_ENV !== 'production' ? verificationToken : undefined
     });
 

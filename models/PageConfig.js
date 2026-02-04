@@ -1,3 +1,5 @@
+// backend/models/PageConfig.js - COMPLETE WITH PROJECT STATUS
+
 const mongoose = require('mongoose');
 
 const ComponentSchema = new mongoose.Schema({
@@ -26,12 +28,51 @@ const PageConfigSchema = new mongoose.Schema({
   slug: { type: String, required: true, unique: true },
   projectUUID: { type: String, default: "" },
   taskUUID: { type: String, default: "" },
-  status: { type: String, enum: ['Active', 'Draft', 'Deleted'], default: 'Draft' },
+  
+  // ✅ EXISTING: Publication status (Draft/Published/Deleted)
+  status: { 
+    type: String, 
+    enum: ['Active', 'Draft', 'Deleted'], 
+    default: 'Draft' 
+  },
+  
+  // ✅ NEW: Project-level status (ACTIVE/INACTIVE for access control)
+  projectStatus: {
+    type: String,
+    enum: ['ACTIVE', 'INACTIVE', 'ARCHIVED', 'MAINTENANCE'],
+    default: 'ACTIVE',
+    index: true
+  },
+  
+  // ✅ NEW: Track why project was deactivated
+  projectDeactivationReason: {
+    type: String,
+    enum: ['MANUAL', 'CLIENT_NONPAYMENT', 'MAINTENANCE', 'ARCHIVED', 'POLICY_VIOLATION'],
+    default: null
+  },
+  
+  // ✅ NEW: When and by whom was project deactivated
+  projectDeactivatedAt: {
+    type: Date,
+    default: null
+  },
+  projectDeactivatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  
+  // ✅ NEW: Maintenance mode message
+  maintenanceMessage: {
+    type: String,
+    default: null
+  },
+  
   accountValidation: { type: Boolean, default: false },
   otpValidation: { type: Boolean, default: false },
   isAnonymous: { type: Boolean, default: true },
   
-  // ✅ NEW: Ownership & Permissions
+  // ✅ Ownership & Permissions
   organizationId: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: "Organization",
@@ -77,8 +118,16 @@ const PageConfigSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-// Index for efficient queries
+// ✅ Indexes for efficient queries
+PageConfigSchema.index({ slug: 1 }, { unique: true });
 PageConfigSchema.index({ organizationId: 1, status: 1 });
 PageConfigSchema.index({ isTemplate: 1, status: 1 });
+PageConfigSchema.index({ projectStatus: 1 }); // ✅ NEW
+PageConfigSchema.index({ organizationId: 1, projectStatus: 1 }); // ✅ NEW
+
+// ✅ Virtual: Is project accessible?
+PageConfigSchema.virtual('isAccessible').get(function() {
+  return this.projectStatus === 'ACTIVE';
+});
 
 module.exports = mongoose.model('PageConfig', PageConfigSchema);

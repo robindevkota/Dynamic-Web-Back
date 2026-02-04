@@ -1,9 +1,32 @@
-// routes/pageConfigRoutes.js
+// backend/routes/pageConfigRoutes.js - FINAL CORRECTED VERSION
+
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 
-// ⚠️ Check if projectPermissions middleware exists
+// ✅ Import optional auth middleware
+let optionalAuth;
+try {
+  const optionalAuthMiddleware = require('../middleware/optionalAuth');
+  optionalAuth = optionalAuthMiddleware.optionalAuth;
+  console.log('✅ Optional auth middleware loaded');
+} catch (err) {
+  console.warn('⚠️ Optional auth middleware not found, using passthrough');
+  optionalAuth = (req, res, next) => { req.user = null; next(); };
+}
+
+// ✅ Import organization access middleware
+let checkOrganizationAccess;
+try {
+  const orgMiddleware = require('../middleware/checkOrganizationAccess');
+  checkOrganizationAccess = orgMiddleware.checkOrganizationAccess;
+  console.log('✅ Organization access middleware loaded');
+} catch (err) {
+  console.warn('⚠️ Organization access middleware not found, using passthrough');
+  checkOrganizationAccess = (req, res, next) => next();
+}
+
+// ✅ Import project permissions middleware
 let canCreateProject, canEditProject, canDeleteProject;
 try {
   const permissions = require('../middleware/projectPermissions');
@@ -13,7 +36,6 @@ try {
   console.log('✅ Project permissions middleware loaded');
 } catch (err) {
   console.warn('⚠️ Project permissions middleware not found, using passthrough');
-  // Fallback: no-op middleware
   canCreateProject = canEditProject = canDeleteProject = (req, res, next) => next();
 }
 
@@ -23,26 +45,38 @@ const {
   createPage,
   updatePage,
   deletePage,
-  cloneTemplate
+  cloneTemplate,
+  toggleProjectStatus
 } = require('../controllers/pageConfigController');
 
-// ✅ Table data - list all pages (auth required)
-router.get('/', authMiddleware, getAllPages);
+// ═══════════════════════════════════════════════════════════
+// PUBLIC ROUTES (must come FIRST before protected routes)
+// ═══════════════════════════════════════════════════════════
 
-// ✅✅✅ PUBLIC: Get single page by slug (NO AUTH for rendering public pages like /auth, /signup)
-// This allows DynamicRenderer to load public pages without being logged in
-router.get('/:slug', getPageBySlug);
+// ✅ Get single page by slug (PUBLIC - optional auth for admin features)
+// Uses optionalAuth instead of authMiddleware to allow public access
+router.get('/:slug', optionalAuth, getPageBySlug);
 
-// ✅ Create new page (auth + permission check)
-router.post('/', authMiddleware, canCreateProject, createPage);
+// ═══════════════════════════════════════════════════════════
+// PROTECTED ROUTES (require authentication)
+// ═══════════════════════════════════════════════════════════
 
-// ✅ Clone template (auth + permission check)
-router.post('/clone/:slug', authMiddleware, canCreateProject, cloneTemplate);
+// ✅ List all pages (admin table - requires auth)
+router.get('/', authMiddleware, checkOrganizationAccess, getAllPages);
 
-// ✅ Update page (auth + permission check)
-router.put('/:slug', authMiddleware, canEditProject, updatePage);
+// ✅ Create new page (requires auth)
+router.post('/', authMiddleware, checkOrganizationAccess, canCreateProject, createPage);
 
-// ✅ Delete page (auth + permission check)
-router.delete('/:slug', authMiddleware, canDeleteProject, deletePage);
+// ✅ Clone template (requires auth)
+router.post('/clone/:slug', authMiddleware, checkOrganizationAccess, canCreateProject, cloneTemplate);
+
+// ✅ Toggle project status (requires auth)
+router.patch('/:slug/status', authMiddleware, checkOrganizationAccess, toggleProjectStatus);
+
+// ✅ Update page (requires auth)
+router.put('/:slug', authMiddleware, checkOrganizationAccess, canEditProject, updatePage);
+
+// ✅ Delete page (requires auth)
+router.delete('/:slug', authMiddleware, checkOrganizationAccess, canDeleteProject, deletePage);
 
 module.exports = router;

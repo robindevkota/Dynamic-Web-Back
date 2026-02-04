@@ -427,13 +427,28 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // ✅ Check organization billing status (except SUPER_ADMIN)
+    // ✅ FIXED: Check organization status (except SUPER_ADMIN)
     if (user.role !== 'SUPER_ADMIN' && user.organizationId) {
-      if (user.organizationId.billing.status === "CANCELED") {
-        return res.status(403).json({ error: "Subscription canceled. Please renew." });
+      // Check organization-level status
+      if (user.organizationId.status === "INACTIVE") {
+        return res.status(403).json({ 
+          error: "Your organization is currently inactive. Please contact support." 
+        });
       }
-      if (user.organizationId.billing.status === "PAST_DUE") {
-        return res.status(403).json({ error: "Payment overdue. Please update payment method." });
+      if (user.organizationId.status === "SUSPENDED") {
+        return res.status(403).json({ 
+          error: "Your organization has been suspended. Please contact support." 
+        });
+      }
+      
+      // Optional: Check billing status if it exists
+      if (user.organizationId.billing) {
+        if (user.organizationId.billing.status === "CANCELED") {
+          return res.status(403).json({ error: "Subscription canceled. Please renew." });
+        }
+        if (user.organizationId.billing.status === "PAST_DUE") {
+          return res.status(403).json({ error: "Payment overdue. Please update payment method." });
+        }
       }
     }
 
