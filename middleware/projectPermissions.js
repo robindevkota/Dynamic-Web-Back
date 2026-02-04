@@ -27,8 +27,8 @@ exports.canCreateProject = async (req, res, next) => {
       return next();
     }
 
-    // CLIENT_ADMIN: Check project limits
-    if (role === 'CLIENT_ADMIN') {
+    // CLIENT_ADMIN and DEVELOPER: Check project limits
+    if (role === 'CLIENT_ADMIN' || role === 'DEVELOPER') {
       if (!organizationId) {
         return res.status(400).json({ error: "No organization found" });
       }
@@ -51,14 +51,14 @@ exports.canCreateProject = async (req, res, next) => {
         });
       }
 
-      console.log('✅ CLIENT_ADMIN - permission granted');
+      console.log(`✅ ${role} - permission granted`);
       return next();
     }
 
-    // DEVELOPER cannot create projects
-    console.log('❌ DEVELOPER cannot create projects');
+    // Unknown role - deny
+    console.log('❌ Unknown role cannot create projects');
     return res.status(403).json({ 
-      error: "Only admins can create projects" 
+      error: "Insufficient permissions to create projects" 
     });
 
   } catch (err) {
@@ -109,7 +109,7 @@ exports.canEditProject = async (req, res, next) => {
       });
     }
 
-    // CLIENT_ADMIN can only edit their own org's projects
+    // CLIENT_ADMIN can edit their own org's projects
     if (role === 'CLIENT_ADMIN') {
       if (!project.organizationId || project.organizationId.toString() !== organizationId) {
         console.log('❌ Not your organization');
@@ -121,10 +121,22 @@ exports.canEditProject = async (req, res, next) => {
       return next();
     }
 
-    // DEVELOPER cannot edit
-    console.log('❌ DEVELOPER cannot edit');
+    // DEVELOPER can edit their own org's projects (limited)
+    if (role === 'DEVELOPER') {
+      if (!project.organizationId || project.organizationId.toString() !== organizationId) {
+        console.log('❌ Not your organization');
+        return res.status(403).json({ 
+          error: "You can only edit projects from your organization" 
+        });
+      }
+      console.log('✅ DEVELOPER - permission granted (limited edit)');
+      return next();
+    }
+
+    // Unknown role - deny
+    console.log('❌ Unknown role cannot edit');
     return res.status(403).json({ 
-      error: "Developers cannot edit projects" 
+      error: "Insufficient permissions to edit projects" 
     });
 
   } catch (err) {
@@ -136,7 +148,7 @@ exports.canEditProject = async (req, res, next) => {
 // ✅ Check if user can delete project
 exports.canDeleteProject = async (req, res, next) => {
   try {
-    console.log('🔒 canDeleteProject - checking permissions...');
+    console.log('🔍 canDeleteProject - checking permissions...');
 
     if (!req.user) {
       console.error('❌ req.user is undefined in canDeleteProject');
@@ -192,10 +204,10 @@ exports.canDeleteProject = async (req, res, next) => {
       return next();
     }
 
-    // Unknown role
+    // Unknown role - deny
     console.log('❌ Unknown role:', role);
     return res.status(403).json({ 
-      error: "Invalid role" 
+      error: "Insufficient permissions to delete projects" 
     });
 
   } catch (err) {

@@ -10,12 +10,1919 @@ mongoose.connect(
 );
 
 const websites = [
-  // Add this to your demo.js websites array
 
-  // Add this to your demo.js websites array
+{
+  title: "FitZen - Premium Fitness & Wellness",
+  slug: "fitzen",
+  projectUUID: "fitzen-wellness",
+  taskUUID: "fitzen001",
+  status: "Active",
+  isTemplate: true,
+   templateCategory: "E-commerce",
+    organizationId: "6981d54da9b6db6a9fd3cb5f",
+  createdBy: "000000000000000000000000",
+  accountValidation: true,
+  otpValidation: false,
+  isAnonymous: false,
+  requireAuth: false,
+  redirectIfNotAuth: "/fitzen/login",
 
-  // Add this to your demo.js websites array
+  initialization: {
+    globalCSS: `/* ============================================ */
+/* FITZEN - PREMIUM FITNESS & WELLNESS PLATFORM */
+/* Modern, Sophisticated UI with Advanced Animations */
+/* ============================================ */
 
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ============================================ */
+/* RESET & BASE */
+/* ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background: #0A0E27 !important;
+  color: #E8EAED !important;
+  min-height: 100vh;
+  transition: background 0.6s ease, color 0.6s ease;
+  overflow-x: hidden;
+}
+
+/* ============================================ */
+/* GLASSMORPHISM EFFECTS */
+/* ============================================ */
+.glass-card,
+.feature-card,
+.stats-card,
+.workout-card,
+.class-card {
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  border-radius: 24px !important;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.glass-card:hover,
+.feature-card:hover,
+.workout-card:hover,
+.class-card:hover {
+  transform: translateY(-12px) scale(1.02) !important;
+  box-shadow: 
+    0 20px 60px 0 rgba(124, 58, 237, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(124, 58, 237, 0.3) !important;
+}
+
+/* ============================================ */
+/* GRADIENT ACCENTS */
+/* ============================================ */
+.gradient-primary {
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%) !important;
+}
+
+.gradient-secondary {
+  background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%) !important;
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, #10B981 0%, #34D399 100%) !important;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================ */
+/* NAVBAR STYLING */
+/* ============================================ */
+nav,
+header {
+  background: rgba(10, 14, 39, 0.8) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.2) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+nav a,
+nav button,
+header a,
+header button {
+  color: #E8EAED !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+nav a:hover,
+nav button:hover {
+  color: #EC4899 !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ============================================ */
+/* BUTTON STYLES */
+/* ============================================ */
+.btn-primary {
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 16px !important;
+  padding: 14px 32px !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.btn-primary:hover {
+  transform: translateY(-4px) scale(1.05) !important;
+  box-shadow: 0 20px 50px rgba(124, 58, 237, 0.5) !important;
+}
+
+.btn-primary:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover:before {
+  left: 100%;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: white !important;
+  border: 2px solid rgba(124, 58, 237, 0.5) !important;
+  border-radius: 16px !important;
+  padding: 14px 32px !important;
+  font-weight: 600 !important;
+  backdrop-filter: blur(10px) !important;
+  transition: all 0.3s ease !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(124, 58, 237, 0.2) !important;
+  border-color: #7C3AED !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ============================================ */
+/* STATS CARDS */
+/* ============================================ */
+.stats-card {
+  padding: 32px !important;
+  text-align: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.stats-card:before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, transparent 70%);
+  animation: pulse 3s ease-in-out infinite;
+}
+
+.stats-value {
+  font-size: 3.5rem !important;
+  font-weight: 900 !important;
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px !important;
+  text-shadow: 0 0 30px rgba(124, 58, 237, 0.5) !important;
+}
+
+.stats-label {
+  font-size: 1.1rem !important;
+  color: rgba(232, 234, 237, 0.8) !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+/* ============================================ */
+/* WORKOUT CARDS */
+/* ============================================ */
+.workout-card {
+  position: relative !important;
+  overflow: hidden !important;
+  cursor: pointer !important;
+}
+
+.workout-card img {
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.workout-card:hover img {
+  transform: scale(1.15) rotate(2deg) !important;
+}
+
+.workout-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  background: rgba(236, 72, 153, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+}
+
+/* ============================================ */
+/* PROGRESS BARS */
+/* ============================================ */
+.progress-container {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #7C3AED 0%, #EC4899 100%);
+  border-radius: 20px;
+  transition: width 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================ */
+/* FORM INPUTS */
+/* ============================================ */
+input,
+textarea,
+select {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E8EAED !important;
+  padding: 14px 20px !important;
+  border-radius: 12px !important;
+  font-size: 15px !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  border-color: #7C3AED !important;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.2) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(232, 234, 237, 0.5) !important;
+}
+
+/* ============================================ */
+/* SCROLLBAR */
+/* ============================================ */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(10, 14, 39, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  border-radius: 10px;
+  border: 2px solid rgba(10, 14, 39, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #9333EA 0%, #F472B6 100%);
+}
+
+/* ============================================ */
+/* ANIMATIONS */
+/* ============================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(124, 58, 237, 0.8);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.animate-fadeInScale {
+  animation: fadeInScale 0.6s ease-out;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* ============================================ */
+/* RESPONSIVE DESIGN */
+/* ============================================ */
+@media (max-width: 768px) {
+  .stats-value {
+    font-size: 2.5rem !important;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem !important;
+  }
+  
+  nav {
+    padding: 15px 20px !important;
+  }
+  
+  .glass-card,
+  .feature-card {
+    padding: 24px !important;
+  }
+}
+
+/* ============================================ */
+/* UTILITY CLASSES */
+/* ============================================ */
+.text-gradient-primary {
+  background: linear-gradient(135deg, #7C3AED 0%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-secondary {
+  background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.backdrop-blur {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.shadow-glow {
+  box-shadow: 0 10px 40px rgba(124, 58, 237, 0.4);
+}
+
+.shadow-glow-hover:hover {
+  box-shadow: 0 20px 60px rgba(124, 58, 237, 0.6);
+}`,
+
+    resources: [
+      "global.enduser.signup",
+      "global.enduser.login",
+      "global.enduser.logout",
+      "fitzen.workouts.list",
+      "fitzen.classes.list",
+      "fitzen.stats.get",
+      "fitzen.workout.log",
+    ],
+
+    actions: {
+      navigateToPage: `
+  const url = context.actionParams?.url;
+  if (!url) {
+    console.error("❌ No URL provided");
+    return;
+  }
+  console.log("🧭 Navigating to:", url);
+  window.location.href = url;
+`,
+
+      handleLogin: `
+  console.log("🔐 FitZen login action triggered");
+  const email = context.formData?.email;
+  const password = context.formData?.password;
+  
+  if (!email || !password) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '❌ Please enter email and password',
+      background: '#7C3AED',
+      duration: 3000
+    });
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/enduser-auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ 
+        email, 
+        password,
+        websiteSlug: 'fitzen'
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      context.handlers.showNotification({
+        type: 'toast',
+        message: data.error || '❌ Login failed',
+        background: '#7C3AED',
+        duration: 3000
+      });
+      return;
+    }
+    
+    console.log('✅ Login successful:', data);
+    context.handlers.setData('user', data.user);
+    
+    context.handlers.showNotification({
+      type: 'toast',
+      message: \`✨ Welcome back, \${data.user.firstName || 'Champion'}!\`,
+      background: '#10B981',
+      duration: 2500
+    });
+    
+    setTimeout(() => {
+      window.location.href = '/fitzen/dashboard';
+    }, 1000);
+    
+  } catch (error) {
+    console.error('Login error:', error);
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '❌ Network error. Please try again.',
+      background: '#EF4444',
+      duration: 3000
+    });
+  }
+`,
+
+      handleSignup: `
+  console.log("📝 FitZen signup action triggered");
+  const formData = context.formData || {};
+  
+  const email = formData.email?.trim();
+  const password = formData.password;
+  const name = formData.name?.trim();
+  const fitnessGoal = formData.fitnessGoal || 'general';
+  
+  if (!email || !password || !name) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '❌ Please fill all required fields',
+      background: '#EF4444',
+      duration: 3000
+    });
+    return;
+  }
+  
+  const payload = {
+    email: email.toLowerCase(),
+    password: password,
+    name: name,
+    fitnessGoal: fitnessGoal,
+    websiteSlug: 'fitzen'
+  };
+  
+  try {
+    const response = await fetch('/api/enduser-auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      context.handlers.showNotification({
+        type: 'toast',
+        message: data.error || '❌ Signup failed',
+        background: '#EF4444',
+        duration: 4000
+      });
+      return;
+    }
+    
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '✅ Account created! Welcome to FitZen! 🎉',
+      background: '#10B981',
+      duration: 3000
+    });
+    
+    context.handlers.setFormData({});
+    
+    setTimeout(() => {
+      window.location.href = '/fitzen/login';
+    }, 2000);
+    
+  } catch (error) {
+    console.error('Signup error:', error);
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '❌ Network error. Please try again.',
+      background: '#EF4444',
+      duration: 3000
+    });
+  }
+`,
+
+      clearAuth: `
+  console.log("🚪 FitZen logout...");
+  
+  try {
+    const response = await fetch('/api/enduser-auth/logout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ websiteSlug: 'fitzen' })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      context.handlers.clearAuthData();
+      
+      context.handlers.showNotification({
+        type: "toast",
+        message: "✅ Logged out successfully. See you soon! 👋",
+        background: "#10B981",
+        duration: 2000,
+      });
+      
+      setTimeout(() => {
+        window.location.href = data.redirectUrl || '/fitzen';
+      }, 1000);
+    }
+  } catch (error) {
+    console.error('Logout error:', error);
+    context.handlers.showNotification({
+      type: "toast",
+      message: "❌ Logout failed",
+      background: "#EF4444",
+      duration: 3000
+    });
+  }
+`,
+
+      openModal: `
+  const modalName = context.actionParams?.modal || context.actionParams?.modalName;
+  if (!modalName) {
+    console.error("❌ No modal name provided");
+    return;
+  }
+  
+  console.log("🎭 Opening modal:", modalName);
+  context.handlers.setModalFormData({});
+  context.handlers.setFieldErrors({});
+  context.handlers.setActiveModal(modalName);
+`,
+
+      closeModal: `
+  console.log("❌ Closing modal");
+  context.handlers.setModalFormData({});
+  context.handlers.setFieldErrors({});
+  context.handlers.setActiveModal(null);
+`,
+
+      logWorkout: `
+  console.log("📝 Logging workout");
+  const formData = context.modalFormData || {};
+  
+  if (!formData.workoutType || !formData.duration) {
+    context.handlers.showNotification({
+      type: "toast",
+      message: "❌ Please fill all fields",
+      background: "#EF4444",
+      duration: 3000
+    });
+    return;
+  }
+  
+  // Simulated API call
+  console.log("🚀 Workout logged:", formData);
+  
+  context.handlers.showNotification({
+    type: "toast",
+    message: "✅ Workout logged successfully! 💪",
+    background: "#10B981",
+    duration: 2500
+  });
+  
+  context.handlers.setActiveModal(null);
+  context.handlers.setModalFormData({});
+`,
+    },
+  },
+
+  pages: {
+    login: {
+      title: "Login - FitZen",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "💪 FitZen",
+              "ui:styles": {
+                fontSize: "32px",
+                fontWeight: "900",
+                fontFamily: "'Poppins', sans-serif",
+                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                cursor: "pointer",
+                letterSpacing: "-1px"
+              }
+            },
+            links: {
+              "ui:widget": "navLinks",
+              "ui:theme": "dark",
+              "ui:links": [
+                {
+                  label: "Home",
+                  action: "navigateToPage",
+                  actionParams: { url: "/fitzen" },
+                  styles: { color: "#E8EAED", fontWeight: "600" }
+                },
+                {
+                  label: "Sign Up",
+                  action: "navigateToPage",
+                  actionParams: { url: "/fitzen/signup" },
+                  styles: { 
+                    color: "white",
+                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                    padding: "10px 24px",
+                    borderRadius: "12px",
+                    fontWeight: "600"
+                  }
+                }
+              ]
+            }
+          },
+          styles: {
+            background: "rgba(10, 14, 39, 0.8)",
+            backdropFilter: "blur(20px)",
+            borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+            padding: "20px 50px",
+            position: "fixed",
+            width: "100%",
+            zIndex: "1000",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "80px"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+        main: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            loginForm: {
+              "ui:widget": "formContainer",
+              "ui:title": "🔐 Welcome Back",
+              "ui:description": "Sign in to continue your fitness journey",
+              "ui:id": "loginForm",
+              "ui:styles": {
+                maxWidth: "480px",
+                margin: "140px auto 0",
+                padding: "48px 40px",
+                background: "rgba(255, 255, 255, 0.05)",
+                backdropFilter: "blur(30px)",
+                borderRadius: "24px",
+                boxShadow: "0 20px 60px rgba(124, 58, 237, 0.3)",
+                border: "1px solid rgba(255, 255, 255, 0.1)"
+              },
+              "ui:fields": [
+                {
+                  "ui:widget": "inputField",
+                  "ui:label": "Email Address",
+                  "ui:placeholder": "your.email@example.com",
+                  "ui:type": "email",
+                  "ui:name": "email",
+                  "ui:required": true,
+                  "ui:labelStyles": {
+                    color: "#E8EAED",
+                    fontWeight: "600",
+                    marginBottom: "8px"
+                  }
+                },
+                {
+                  "ui:widget": "inputField",
+                  "ui:label": "Password",
+                  "ui:placeholder": "••••••••",
+                  "ui:type": "password",
+                  "ui:name": "password",
+                  "ui:required": true,
+                  "ui:labelStyles": {
+                    color: "#E8EAED",
+                    fontWeight: "600",
+                    marginBottom: "8px"
+                  }
+                }
+              ],
+              "ui:actions": [
+                {
+                  label: "Sign In →",
+                  action: "handleLogin",
+                  variant: "primary",
+                  styles: {
+                    width: "100%",
+                    padding: "16px 0",
+                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                    color: "white",
+                    fontSize: "16px",
+                    fontWeight: "700",
+                    borderRadius: "16px",
+                    border: "none",
+                    cursor: "pointer",
+                    marginTop: "8px"
+                  }
+                }
+              ],
+              "ui:titleStyles": {
+                color: "#E8EAED",
+                fontFamily: "'Poppins', sans-serif",
+                fontSize: "32px",
+                fontWeight: "800",
+                marginBottom: "12px",
+                textAlign: "center"
+              },
+              "ui:descriptionStyles": {
+                color: "rgba(232, 234, 237, 0.8)",
+                fontSize: "16px",
+                marginBottom: "36px",
+                textAlign: "center"
+              }
+            },
+            authLinks: {
+              "ui:widget": "authLinks",
+              "ui:alignment": "center",
+              "ui:direction": "column",
+              "ui:links": [
+                {
+                  prefix: "Don't have an account?",
+                  label: "Sign Up",
+                  action: "navigateToPage",
+                  actionParams: { url: "/fitzen/signup" }
+                }
+              ],
+              "ui:styles": {
+                maxWidth: "480px",
+                margin: "24px auto",
+                padding: "20px",
+                background: "rgba(124, 58, 237, 0.1)",
+                backdropFilter: "blur(10px)",
+                borderRadius: "16px",
+                border: "1px solid rgba(124, 58, 237, 0.2)"
+              },
+              "ui:linkStyles": {
+                color: "#EC4899",
+                fontWeight: "700"
+              }
+            }
+          },
+          styles: {
+            padding: "100px 40px 80px",
+            background: "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.15), transparent 50%), radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.15), transparent 50%), #0A0E27",
+            minHeight: "100vh"
+          },
+          triggers: []
+        },
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 FitZen. Empowering your fitness journey. 💪",
+              "ui:styles": {
+                textAlign: "center",
+                color: "rgba(232, 234, 237, 0.6)",
+                fontSize: "14px"
+              }
+            }
+          },
+          styles: {
+            background: "rgba(10, 14, 39, 0.8)",
+            padding: "32px",
+            textAlign: "center",
+            borderTop: "1px solid rgba(124, 58, 237, 0.2)"
+          },
+          triggers: []
+        }
+      }
+    },
+
+    signup: {
+      title: "Sign Up - FitZen",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "💪 FitZen",
+              "ui:styles": {
+                fontSize: "32px",
+                fontWeight: "900",
+                fontFamily: "'Poppins', sans-serif",
+                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                cursor: "pointer",
+                letterSpacing: "-1px"
+              }
+            },
+            links: {
+              "ui:widget": "navLinks",
+              "ui:theme": "dark",
+              "ui:links": [
+                {
+                  label: "Home",
+                  action: "navigateToPage",
+                  actionParams: { url: "/fitzen" }
+                },
+                {
+                  label: "Login",
+                  action: "navigateToPage",
+                  actionParams: { url: "/fitzen/login" }
+                }
+              ]
+            }
+          },
+          styles: {
+            background: "rgba(10, 14, 39, 0.8)",
+            backdropFilter: "blur(20px)",
+            borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+            padding: "20px 50px",
+            position: "fixed",
+            width: "100%",
+            zIndex: "1000",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "80px"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+        main: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            signupForm: {
+              "ui:widget": "formContainer",
+              "ui:title": "✨ Start Your Journey",
+              "ui:description": "Create your account and transform your fitness",
+              "ui:id": "signupForm",
+              "ui:styles": {
+                maxWidth: "480px",
+                margin: "140px auto 0",
+                padding: "48px 40px",
+                background: "rgba(255, 255, 255, 0.05)",
+                backdropFilter: "blur(30px)",
+                borderRadius: "24px",
+                boxShadow: "0 20px 60px rgba(124, 58, 237, 0.3)",
+                border: "1px solid rgba(255, 255, 255, 0.1)"
+              },
+              "ui:fields": [
+                {
+                  "ui:widget": "inputField",
+                  "ui:label": "Full Name",
+                  "ui:placeholder": "John Doe",
+                  "ui:type": "text",
+                  "ui:name": "name",
+                  "ui:required": true,
+                  "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" }
+                },
+                {
+                  "ui:widget": "inputField",
+                  "ui:label": "Email Address",
+                  "ui:placeholder": "you@example.com",
+                  "ui:type": "email",
+                  "ui:name": "email",
+                  "ui:required": true,
+                  "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" }
+                },
+                {
+                  "ui:widget": "inputField",
+                  "ui:label": "Password",
+                  "ui:placeholder": "Create strong password",
+                  "ui:type": "password",
+                  "ui:name": "password",
+                  "ui:required": true,
+                  "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" }
+                },
+                {
+                  "ui:widget": "selectField",
+                  "ui:label": "Fitness Goal",
+                  "ui:name": "fitnessGoal",
+                  "ui:placeholder": "Select your goal",
+                  "ui:options": [
+                    { value: "weight_loss", label: "Weight Loss" },
+                    { value: "muscle_gain", label: "Muscle Gain" },
+                    { value: "endurance", label: "Build Endurance" },
+                    { value: "flexibility", label: "Flexibility" },
+                    { value: "general", label: "General Fitness" }
+                  ],
+                  "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" }
+                }
+              ],
+              "ui:actions": [
+                {
+                  label: "Create Account →",
+                  action: "handleSignup",
+                  variant: "primary",
+                  styles: {
+                    width: "100%",
+                    padding: "16px 0",
+                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                    color: "white",
+                    fontSize: "16px",
+                    fontWeight: "700",
+                    borderRadius: "16px",
+                    border: "none"
+                  }
+                }
+              ]
+            },
+            authLinks: {
+              "ui:widget": "authLinks",
+              "ui:alignment": "center",
+              "ui:links": [
+                {
+                  prefix: "Already have an account?",
+                  label: "Login",
+                  action: "navigateToPage",
+                  actionParams: { url: "/fitzen/login" }
+                }
+              ],
+              "ui:styles": {
+                maxWidth: "480px",
+                margin: "24px auto"
+              }
+            }
+          },
+          styles: {
+            padding: "100px 40px 80px",
+            background: "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.15), transparent 50%), #0A0E27",
+            minHeight: "100vh"
+          },
+          triggers: []
+        },
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 FitZen. All rights reserved.",
+              "ui:styles": {
+                textAlign: "center",
+                color: "rgba(232, 234, 237, 0.6)"
+              }
+            }
+          },
+          styles: {
+            background: "rgba(10, 14, 39, 0.8)",
+            padding: "32px",
+            borderTop: "1px solid rgba(124, 58, 237, 0.2)"
+          },
+          triggers: []
+        }
+      }
+    },
+
+    dashboard: {
+      title: "Dashboard - FitZen",
+      requireAuth: true,
+      redirectIfNotAuth: "/fitzen/login",
+      components: {
+        navbar: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            logo: {
+              "ui:widget": "text",
+              "ui:content": "💪 FitZen",
+              "ui:styles": {
+                fontSize: "28px",
+                fontWeight: "900",
+                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent"
+              }
+            },
+            userInfo: {
+              "ui:widget": "navLinks",
+              "ui:theme": "dark",
+              "ui:links": [
+                {
+                  label: "{{auth.user?.email || 'User'}}",
+                  action: "",
+                  styles: { color: "#E8EAED" }
+                },
+                {
+                  label: "Logout",
+                  action: "clearAuth",
+                  styles: { color: "#EC4899", fontWeight: "700" }
+                }
+              ]
+            }
+          },
+          styles: {
+            background: "rgba(10, 14, 39, 0.95)",
+            backdropFilter: "blur(20px)",
+            borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+            padding: "18px 50px",
+            position: "fixed",
+            width: "100%",
+            zIndex: "1000",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "75px"
+          },
+          triggers: []
+        },
+        sidebar: {
+          table: {},
+          modal: {},
+          uiSchema: {},
+          styles: { display: "none" },
+          triggers: []
+        },
+        main: {
+          table: {},
+          modal: {
+            logWorkout: {
+              "ui:title": "Log Workout",
+              "ui:theme": "dark",
+              "ui:styles": {
+                maxWidth: "500px",
+                background: "rgba(10, 14, 39, 0.95)",
+                padding: "40px"
+              },
+              "ui:fields": [
+                {
+                  name: "workoutType",
+                  label: "Workout Type",
+                  type: "text",
+                  placeholder: "e.g., Running, Weightlifting",
+                  required: true
+                },
+                {
+                  name: "duration",
+                  label: "Duration (minutes)",
+                  type: "number",
+                  placeholder: "30",
+                  required: true
+                },
+                {
+                  name: "caloriesBurned",
+                  label: "Calories Burned",
+                  type: "number",
+                  placeholder: "250",
+                  required: false
+                }
+              ],
+              "ui:actions": [
+                {
+                  label: "Log Workout",
+                  action: "logWorkout",
+                  variant: "primary"
+                },
+                {
+                  label: "Cancel",
+                  action: "closeModal",
+                  variant: "outline"
+                }
+              ]
+            }
+          },
+          uiSchema: {
+            welcomeCard: {
+              "ui:widget": "card",
+              "ui:title": "💪 Welcome Back, Champion!",
+              "ui:description": "Let's crush today's goals together",
+              "ui:styles": {
+                padding: "48px",
+                marginTop: "100px",
+                marginBottom: "40px",
+                background: "linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%)",
+                backdropFilter: "blur(30px)",
+                border: "1px solid rgba(124, 58, 237, 0.3)",
+                borderRadius: "24px",
+                textAlign: "center"
+              }
+            },
+            
+            statsGrid: {
+              "ui:widget": "gridLayout",
+              "ui:columns": 4,
+              "ui:gap": "24px",
+              "ui:styles": { marginBottom: "40px" },
+              "ui:children": [
+                {
+                  "ui:widget": "card",
+                  "ui:title": "🔥 245",
+                  "ui:description": "Calories Burned Today",
+                  "ui:styles": {
+                    padding: "32px 24px",
+                    textAlign: "center",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "20px"
+                  },
+                  "ui:titleStyles": {
+                    fontSize: "2.5rem",
+                    fontWeight: "900",
+                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "💪 12",
+                  "ui:description": "Workouts This Week",
+                  "ui:styles": {
+                    padding: "32px 24px",
+                    textAlign: "center",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "20px"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "⏱️ 45m",
+                  "ui:description": "Average Duration",
+                  "ui:styles": {
+                    padding: "32px 24px",
+                    textAlign: "center",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "20px"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "🏆 28",
+                  "ui:description": "Day Streak",
+                  "ui:styles": {
+                    padding: "32px 24px",
+                    textAlign: "center",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "20px"
+                  }
+                }
+              ]
+            },
+
+            quickActions: {
+              "ui:widget": "flexLayout",
+              "ui:direction": "row",
+              "ui:gap": "16px",
+              "ui:styles": { marginBottom: "50px", justifyContent: "center" },
+              "ui:children": [
+                {
+                  "ui:widget": "button",
+                  "ui:label": "📝 Log Workout",
+                  "ui:action": "openModal",
+                  "ui:actionParams": { modal: "logWorkout" },
+                  "ui:styles": {
+                    padding: "16px 32px",
+                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                    color: "white",
+                    borderRadius: "16px",
+                    fontSize: "16px",
+                    fontWeight: "700"
+                  }
+                },
+                {
+                  "ui:widget": "button",
+                  "ui:label": "📊 View Progress",
+                  "ui:action": "navigateToPage",
+                  "ui:actionParams": { url: "/fitzen/progress" },
+                  "ui:styles": {
+                    padding: "16px 32px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    color: "white",
+                    border: "2px solid rgba(124, 58, 237, 0.5)",
+                    borderRadius: "16px",
+                    fontSize: "16px",
+                    fontWeight: "700"
+                  }
+                }
+              ]
+            }
+          },
+          styles: {
+            padding: "90px 40px 50px",
+            background: "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.1), transparent 70%), #0A0E27",
+            minHeight: "100vh"
+          },
+          triggers: []
+        },
+        footer: {
+          table: {},
+          modal: {},
+          uiSchema: {
+            footerText: {
+              "ui:widget": "text",
+              "ui:content": "© 2024 FitZen. All rights reserved.",
+              "ui:styles": {
+                textAlign: "center",
+                color: "rgba(232, 234, 237, 0.6)"
+              }
+            }
+          },
+          styles: {
+            background: "rgba(10, 14, 39, 0.8)",
+            padding: "32px",
+            borderTop: "1px solid rgba(124, 58, 237, 0.2)"
+          },
+          triggers: []
+        }
+      }
+    }
+  },
+
+  // HOME PAGE (Landing)
+  components: {
+    navbar: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        logo: {
+          "ui:widget": "text",
+          "ui:content": "💪 FitZen",
+          "ui:styles": {
+            fontSize: "32px",
+            fontWeight: "900",
+            fontFamily: "'Poppins', sans-serif",
+            background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            cursor: "pointer",
+            letterSpacing: "-1px"
+          }
+        },
+        links: {
+          "ui:widget": "navLinks",
+          "ui:theme": "dark",
+          "ui:links": [
+            {
+              label: "Home",
+              action: "navigateToPage",
+              actionParams: { url: "/fitzen" },
+              styles: { color: "#E8EAED", fontWeight: "600" }
+            },
+            {
+              label: "Features",
+              action: "navigateToPage",
+              actionParams: { url: "/fitzen#features" },
+              styles: { color: "#E8EAED", fontWeight: "600" }
+            },
+            {
+              label: "Login",
+              action: "navigateToPage",
+              actionParams: { url: "/fitzen/login" },
+              styles: { color: "#E8EAED", fontWeight: "600" }
+            },
+            {
+              label: "Get Started",
+              action: "navigateToPage",
+              actionParams: { url: "/fitzen/signup" },
+              styles: {
+                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                color: "white",
+                padding: "12px 28px",
+                borderRadius: "14px",
+                fontWeight: "700",
+                border: "none"
+              }
+            }
+          ]
+        }
+      },
+      styles: {
+        background: "rgba(10, 14, 39, 0.8)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+        padding: "20px 50px",
+        position: "fixed",
+        width: "100%",
+        zIndex: "1000",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        height: "80px",
+        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)"
+      },
+      triggers: []
+    },
+    
+    sidebar: {
+      table: {},
+      modal: {},
+      uiSchema: {},
+      styles: { display: "none" },
+      triggers: []
+    },
+    
+    main: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        heroSection: {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "40px",
+          "ui:styles": {
+            padding: "180px 40px 100px",
+            textAlign: "center",
+            background: "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.2), transparent 70%), radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.15), transparent 70%)",
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "Transform Your Body",
+              "ui:level": "h1",
+              "ui:styles": {
+                fontSize: "5rem",
+                fontWeight: "900",
+                fontFamily: "'Poppins', sans-serif",
+                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                marginBottom: "24px",
+                lineHeight: "1.1",
+                letterSpacing: "-2px"
+              }
+            },
+            {
+              "ui:widget": "paragraph",
+              "ui:text": "Join thousands of people achieving their fitness goals with our AI-powered training platform",
+              "ui:styles": {
+                fontSize: "1.5rem",
+                color: "rgba(232, 234, 237, 0.8)",
+                maxWidth: "800px",
+                lineHeight: "1.6",
+                marginBottom: "24px"
+              }
+            },
+            {
+              "ui:widget": "flexLayout",
+              "ui:direction": "row",
+              "ui:gap": "20px",
+              "ui:justify": "center",
+              "ui:children": [
+                {
+                  "ui:widget": "button",
+                  "ui:label": "Start Free Trial →",
+                  "ui:action": "navigateToPage",
+                  "ui:actionParams": { url: "/fitzen/signup" },
+                  "ui:styles": {
+                    padding: "20px 48px",
+                    fontSize: "1.2rem",
+                    fontWeight: "800",
+                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "16px",
+                    cursor: "pointer",
+                    boxShadow: "0 10px 40px rgba(124, 58, 237, 0.4)"
+                  }
+                },
+                {
+                  "ui:widget": "button",
+                  "ui:label": "Watch Demo",
+                  "ui:action": "navigateToPage",
+                  "ui:actionParams": { url: "#demo" },
+                  "ui:styles": {
+                    padding: "20px 48px",
+                    fontSize: "1.2rem",
+                    fontWeight: "800",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    color: "white",
+                    border: "2px solid rgba(124, 58, 237, 0.5)",
+                    borderRadius: "16px",
+                    cursor: "pointer",
+                    backdropFilter: "blur(10px)"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+
+        statsSection: {
+          "ui:widget": "container",
+          "ui:direction": "row",
+          "ui:gap": "60px",
+          "ui:styles": {
+            padding: "80px 40px",
+            background: "rgba(255, 255, 255, 0.02)",
+            backdropFilter: "blur(10px)",
+            borderTop: "1px solid rgba(124, 58, 237, 0.1)",
+            borderBottom: "1px solid rgba(124, 58, 237, 0.1)",
+            display: "flex",
+            justifyContent: "center",
+            flexWrap: "wrap"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "container",
+              "ui:direction": "column",
+              "ui:gap": "12px",
+              "ui:styles": { textAlign: "center", minWidth: "200px" },
+              "ui:children": [
+                {
+                  "ui:widget": "heading",
+                  "ui:text": "50K+",
+                  "ui:level": "h2",
+                  "ui:styles": {
+                    fontSize: "4rem",
+                    fontWeight: "900",
+                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent"
+                  }
+                },
+                {
+                  "ui:widget": "text",
+                  "ui:content": "Active Users",
+                  "ui:styles": {
+                    fontSize: "1.2rem",
+                    color: "rgba(232, 234, 237, 0.7)",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px"
+                  }
+                }
+              ]
+            },
+            {
+              "ui:widget": "container",
+              "ui:direction": "column",
+              "ui:gap": "12px",
+              "ui:styles": { textAlign: "center", minWidth: "200px" },
+              "ui:children": [
+                {
+                  "ui:widget": "heading",
+                  "ui:text": "200+",
+                  "ui:level": "h2",
+                  "ui:styles": {
+                    fontSize: "4rem",
+                    fontWeight: "900",
+                    background: "linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent"
+                  }
+                },
+                {
+                  "ui:widget": "text",
+                  "ui:content": "Workout Programs",
+                  "ui:styles": {
+                    fontSize: "1.2rem",
+                    color: "rgba(232, 234, 237, 0.7)",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px"
+                  }
+                }
+              ]
+            },
+            {
+              "ui:widget": "container",
+              "ui:direction": "column",
+              "ui:gap": "12px",
+              "ui:styles": { textAlign: "center", minWidth: "200px" },
+              "ui:children": [
+                {
+                  "ui:widget": "heading",
+                  "ui:text": "98%",
+                  "ui:level": "h2",
+                  "ui:styles": {
+                    fontSize: "4rem",
+                    fontWeight: "900",
+                    background: "linear-gradient(135deg, #10B981 0%, #34D399 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent"
+                  }
+                },
+                {
+                  "ui:widget": "text",
+                  "ui:content": "Success Rate",
+                  "ui:styles": {
+                    fontSize: "1.2rem",
+                    color: "rgba(232, 234, 237, 0.7)",
+                    fontWeight: "600",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+
+        featuresSection: {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "80px",
+          "ui:styles": {
+            padding: "120px 40px",
+            background: "transparent"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "container",
+              "ui:direction": "column",
+              "ui:gap": "20px",
+              "ui:styles": { textAlign: "center", maxWidth: "800px", margin: "0 auto" },
+              "ui:children": [
+                {
+                  "ui:widget": "heading",
+                  "ui:text": "Everything You Need",
+                  "ui:level": "h2",
+                  "ui:styles": {
+                    fontSize: "3.5rem",
+                    fontWeight: "900",
+                    color: "#E8EAED",
+                    fontFamily: "'Poppins', sans-serif"
+                  }
+                },
+                {
+                  "ui:widget": "paragraph",
+                  "ui:text": "Powerful features to help you achieve your fitness goals faster",
+                  "ui:styles": {
+                    fontSize: "1.3rem",
+                    color: "rgba(232, 234, 237, 0.7)",
+                    lineHeight: "1.6"
+                  }
+                }
+              ]
+            },
+            {
+              "ui:widget": "gridLayout",
+              "ui:columns": 3,
+              "ui:gap": "32px",
+              "ui:children": [
+                {
+                  "ui:widget": "card",
+                  "ui:title": "🏋️ Personalized Plans",
+                  "ui:description": "AI-powered workout plans tailored to your fitness level and goals",
+                  "ui:styles": {
+                    padding: "40px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "24px",
+                    textAlign: "center"
+                  },
+                  "ui:titleStyles": {
+                    fontSize: "1.8rem",
+                    marginBottom: "16px",
+                    color: "#E8EAED"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "📊 Progress Tracking",
+                  "ui:description": "Track your workouts, calories, and progress with detailed analytics",
+                  "ui:styles": {
+                    padding: "40px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "24px",
+                    textAlign: "center"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "👥 Community",
+                  "ui:description": "Connect with like-minded people and stay motivated together",
+                  "ui:styles": {
+                    padding: "40px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "24px",
+                    textAlign: "center"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "🎯 Goal Setting",
+                  "ui:description": "Set SMART goals and get guided step-by-step to achieve them",
+                  "ui:styles": {
+                    padding: "40px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "24px",
+                    textAlign: "center"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "🍎 Nutrition Plans",
+                  "ui:description": "Personalized meal plans and nutrition guidance from experts",
+                  "ui:styles": {
+                    padding: "40px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "24px",
+                    textAlign: "center"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "⚡ Live Classes",
+                  "ui:description": "Join live workout sessions with certified trainers daily",
+                  "ui:styles": {
+                    padding: "40px",
+                    background: "rgba(255, 255, 255, 0.05)",
+                    backdropFilter: "blur(30px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    borderRadius: "24px",
+                    textAlign: "center"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+
+        ctaSection: {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "32px",
+          "ui:styles": {
+            padding: "120px 40px",
+            textAlign: "center",
+            background: "linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%)",
+            backdropFilter: "blur(20px)",
+            borderRadius: "32px",
+            margin: "80px 40px",
+            border: "1px solid rgba(124, 58, 237, 0.2)"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "Ready to Transform?",
+              "ui:level": "h2",
+              "ui:styles": {
+                fontSize: "3.5rem",
+                fontWeight: "900",
+                color: "#E8EAED",
+                marginBottom: "16px",
+                fontFamily: "'Poppins', sans-serif"
+              }
+            },
+            {
+              "ui:widget": "paragraph",
+              "ui:text": "Join FitZen today and start your journey to a healthier, stronger you",
+              "ui:styles": {
+                fontSize: "1.3rem",
+                color: "rgba(232, 234, 237, 0.8)",
+                marginBottom: "24px"
+              }
+            },
+            {
+              "ui:widget": "button",
+              "ui:label": "Get Started Free →",
+              "ui:action": "navigateToPage",
+              "ui:actionParams": { url: "/fitzen/signup" },
+              "ui:styles": {
+                padding: "20px 50px",
+                fontSize: "1.2rem",
+                fontWeight: "800",
+                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                color: "white",
+                border: "none",
+                borderRadius: "16px",
+                cursor: "pointer",
+                boxShadow: "0 15px 50px rgba(124, 58, 237, 0.5)",
+                margin: "0 auto"
+              }
+            }
+          ]
+        }
+      },
+      styles: {
+        padding: "0",
+        background: "#0A0E27",
+        minHeight: "100vh"
+      },
+      triggers: []
+    },
+    
+    footer: {
+      table: {},
+      modal: {},
+      uiSchema: {
+        footerHeading: {
+          "ui:widget": "heading",
+          "ui:text": "💪 FitZen",
+          "ui:level": "h3",
+          "ui:styles": {
+            textAlign: "center",
+            fontSize: "2rem",
+            fontWeight: "900",
+            background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            marginBottom: "16px"
+          }
+        },
+        footerDesc: {
+          "ui:widget": "paragraph",
+          "ui:text": "Empowering your fitness journey with AI-powered training and community support",
+          "ui:styles": {
+            textAlign: "center",
+            color: "rgba(232, 234, 237, 0.6)",
+            maxWidth: "600px",
+            margin: "0 auto 32px"
+          }
+        },
+        socialIcons: {
+          "ui:widget": "socialIcons",
+          "ui:size": "large",
+          "ui:variant": "colored",
+          "ui:icons": [
+            { platform: "facebook", url: "https://facebook.com/fitzen" },
+            { platform: "twitter", url: "https://twitter.com/fitzen" },
+            { platform: "instagram", url: "https://instagram.com/fitzen" },
+            { platform: "youtube", url: "https://youtube.com/fitzen" }
+          ]
+        },
+        divider: {
+          "ui:widget": "divider",
+          "ui:spacing": "large",
+          "ui:color": "rgba(124, 58, 237, 0.2)"
+        },
+        footerText: {
+          "ui:widget": "text",
+          "ui:content": "© 2024 FitZen. Transforming lives through fitness. All rights reserved.",
+          "ui:styles": {
+            textAlign: "center",
+            color: "rgba(232, 234, 237, 0.5)",
+            fontSize: "14px"
+          }
+        }
+      },
+      styles: {
+        background: "rgba(10, 14, 39, 0.8)",
+        backdropFilter: "blur(20px)",
+        padding: "60px 40px 40px",
+        borderTop: "1px solid rgba(124, 58, 237, 0.2)"
+      },
+      triggers: []
+    }
+  },
+
+  resolvedAPIs: {}
+},
   {
     title: "HotelHub - Reservation Management",
     slug: "hotelhub",

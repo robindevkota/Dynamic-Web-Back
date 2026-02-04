@@ -176,7 +176,7 @@ function getDynamicModel(entity) {
     },
     organizationId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: false, // ✅ Changed to false for global entities
       index: true,
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -311,33 +311,59 @@ function mapFieldType(fieldDef) {
 }
 
 // ───────────────────────────────────────────────
-//  Controller Class (ENHANCED)
+//  Controller Class (ENHANCED WITH GLOBAL SUPPORT)
 // ───────────────────────────────────────────────
 class DynamicCrudController {
-  // ✅ LIST ENTITIES (unchanged)
+  // ✅ LIST ENTITIES (UPDATED with global support)
   static async listEntities(req, res) {
     try {
-      const { organizationId } = req.user;
-      const query = { organizationId };
+      const { role, organizationId } = req.user; // ✅ Get role
+      
+      let query = {};
+      
+      // ✅ Role-based filtering (same pattern as PageConfig)
+      if (role === 'SUPER_ADMIN') {
+        // No filter - SUPER_ADMIN sees all entities
+        console.log('🔓 SUPER_ADMIN - showing all entities');
+      } 
+      else if (role === 'CLIENT_ADMIN' || role === 'DEVELOPER') {
+        // Can see: global entities + their org's entities
+        console.log(`🔒 ${role} - filtering to global + org ${organizationId}`);
+        query = {
+          $or: [
+            { isGlobal: true },                  // ✅ Global entities
+            { organizationId: organizationId }   // ✅ Their org's entities
+          ]
+        };
+      }
+
+      console.log('📋 Entity query:', JSON.stringify(query, null, 2));
 
       const entities = await DynamicEntity.find(query)
         .select(
-          "entityName slug schema operations projectUUID projectId createdAt updatedAt params",
+          "entityName slug schema operations projectUUID projectId createdAt updatedAt params isGlobal organizationId",
         )
         .lean();
 
       const entitiesWithSchema = entities.map((entity) => ({
         ...entity,
         schema: entity.schema || {},
-        scope:
-          entity.projectUUID || entity.projectId ? "project" : "organization",
+        scope: entity.isGlobal ? "global" : 
+               (entity.projectUUID || entity.projectId ? "project" : "organization"),
+        // ✅ Add permission flags
+        canEdit: role === 'SUPER_ADMIN' || 
+                 (!entity.isGlobal && entity.organizationId?.toString() === organizationId),
+        canDelete: role === 'SUPER_ADMIN' || 
+                   (!entity.isGlobal && entity.organizationId?.toString() === organizationId),
       }));
+
+      console.log(`✅ Returning ${entitiesWithSchema.length} entities for ${role}`);
 
       res.json({
         success: true,
         count: entitiesWithSchema.length,
         entities: entitiesWithSchema,
-        context: { organizationId },
+        context: { organizationId, role },
       });
     } catch (error) {
       console.error("❌ listEntities failed:", error);
@@ -345,12 +371,21 @@ class DynamicCrudController {
     }
   }
 
-  // ✅ DEFINE ENTITY (Enhanced with params support)
+  // ✅ DEFINE ENTITY (Enhanced with global support + params support)
   static async defineEntity(req, res) {
     try {
       const { entityName, schema, operations, projectUUID, projectId, params } =
         req.body;
-      const { organizationId, userId } = req.user;
+      const { organizationId, userId, role } = req.user; // ✅ Add role
+
+      // ✅ Check if trying to create global entity
+      const isGlobal = req.body.isGlobal === true;
+      
+      if (isGlobal && role !== 'SUPER_ADMIN') {
+        return res.status(403).json({
+          error: "Only SUPER_ADMIN can create global entities",
+        });
+      }
 
       const finalProjectId = projectId || req.user.projectId || null;
       const finalProjectUUID = projectUUID || req.user.projectUUID || null;
@@ -365,8 +400,11 @@ class DynamicCrudController {
         });
       }
 
+      // ✅ Generate slug (global entities use 'global-' prefix)
       let slug;
-      if (finalProjectUUID) {
+      if (isGlobal) {
+        slug = `global-${entityName}`;
+      } else if (finalProjectUUID) {
         slug = `${organizationId}-${finalProjectUUID}-${entityName}`;
       } else if (finalProjectId) {
         slug = `${organizationId}-${finalProjectId}-${entityName}`;
@@ -382,9 +420,9 @@ class DynamicCrudController {
         });
       }
 
-      // ✅ Create entity with params support
+      // ✅ Create entity with global support
       const entity = await DynamicEntity.create({
-        organizationId,
+        organizationId: isGlobal ? null : organizationId, // Global entities have no org
         projectId: finalProjectId,
         projectUUID: finalProjectUUID,
         entityName,
@@ -398,6 +436,7 @@ class DynamicCrudController {
           "list",
         ],
         params: params || [],
+        isGlobal: isGlobal, // ✅ NEW FIELD
         createdBy: userId,
       });
 
@@ -408,21 +447,21 @@ class DynamicCrudController {
         {
           key: apiKey,
           name: `Dynamic CRUD: ${entityName}`,
-          description: `Auto-generated CRUD API for ${entityName}`,
+          description: `Auto-generated CRUD API for ${entityName}${isGlobal ? ' (Global)' : ''}`,
           type: "dynamic",
-          baseUrl: `/api/crud/${organizationId}/${entityName}`,
+          baseUrl: `/api/crud/${organizationId || 'global'}/${entityName}`,
           methods: entity.operations.map((op) => op.toUpperCase()),
           isActive: true,
-          projectUUID: finalProjectUUID,
-          organizationId,
+          projectUUID: isGlobal ? 'global' : finalProjectUUID,
+          organizationId: isGlobal ? null : organizationId,
           authRequired: true,
           createdBy: userId,
-          tags: ["dynamic", "crud", entityName],
+          tags: ["dynamic", "crud", entityName].concat(isGlobal ? ["global"] : []),
         },
         { upsert: true, new: true },
       );
 
-      console.log(`✅ Entity created: ${entityName} | slug: ${slug}`);
+      console.log(`✅ Entity created: ${entityName} | slug: ${slug} | global: ${isGlobal}`);
 
       res.status(201).json({
         success: true,
@@ -430,7 +469,7 @@ class DynamicCrudController {
           ...entity.toObject(),
           schema: Object.fromEntries(entity.schema),
         },
-        apiEndpoint: `/api/crud/${organizationId}/${entityName}`,
+        apiEndpoint: `/api/crud/${organizationId || 'global'}/${entityName}`,
         apiConfigKey: apiKey,
       });
     } catch (error) {
@@ -439,23 +478,50 @@ class DynamicCrudController {
     }
   }
 
-  // ✅ CRUD HANDLER (Enhanced with file array support + type conversion)
+  // ✅ CRUD HANDLER (Enhanced with permission checks + file array support + type conversion)
   static createCrudHandler(operation) {
     return async (req, res) => {
       try {
         const { organizationId, entityName } = req.params;
-        const { userId } = req.user;
+        const { userId, role, organizationId: userOrgId } = req.user;
 
-        // ✅ Get entity definition
-        const entity = await DynamicEntity.findOne({
+        // ✅ Get entity definition (support both global and org-specific lookups)
+        let entity = await DynamicEntity.findOne({
           organizationId,
           entityName,
         }).lean();
+
+        // If not found and org is 'global', try to find global entity
+        if (!entity && organizationId === 'global') {
+          entity = await DynamicEntity.findOne({
+            entityName,
+            isGlobal: true,
+          }).lean();
+        }
 
         if (!entity) {
           return res
             .status(404)
             .json({ error: `Entity "${entityName}" not found` });
+        }
+
+        // ✅ Permission check for non-global entities
+        if (!entity.isGlobal && role !== 'SUPER_ADMIN') {
+          // Must belong to user's org
+          if (entity.organizationId?.toString() !== userOrgId) {
+            return res.status(403).json({
+              error: "You don't have permission to access this entity",
+            });
+          }
+        }
+
+        // ✅ Read-only check for global entities (non-admins can only read/list)
+        if (entity.isGlobal && operation !== 'list' && operation !== 'read') {
+          if (role !== 'SUPER_ADMIN') {
+            return res.status(403).json({
+              error: "Global entities are read-only for non-admin users",
+            });
+          }
         }
 
         // Convert schema
@@ -482,7 +548,7 @@ class DynamicCrudController {
         switch (operation) {
           // ── LIST ───────────────────────────────────────
           case "list": {
-            const query = { organizationId };
+            const query = entity.isGlobal ? {} : { organizationId: entity.organizationId };
             if (projectId) query.projectId = projectId;
             if (projectUUID) query.projectUUID = projectUUID;
 
@@ -652,7 +718,7 @@ class DynamicCrudController {
               ...recordData,
               projectId: projectId || null,
               projectUUID: projectUUID || null,
-              organizationId,
+              organizationId: entity.isGlobal ? null : entity.organizationId,
               createdBy: userId,
             });
 
@@ -677,7 +743,8 @@ class DynamicCrudController {
               return res.status(400).json({ error: "Invalid record ID" });
             }
 
-            const query = { _id: recordId, organizationId };
+            const query = { _id: recordId };
+            if (!entity.isGlobal) query.organizationId = entity.organizationId;
             if (projectId) query.projectId = projectId;
             if (projectUUID) query.projectUUID = projectUUID;
 
@@ -751,7 +818,8 @@ class DynamicCrudController {
               });
             }
 
-            const query = { _id: recordId, organizationId };
+            const query = { _id: recordId };
+            if (!entity.isGlobal) query.organizationId = entity.organizationId;
             if (projectId) query.projectId = projectId;
             if (projectUUID) query.projectUUID = projectUUID;
 
@@ -781,7 +849,8 @@ class DynamicCrudController {
               return res.status(400).json({ error: "Invalid record ID" });
             }
 
-            const query = { _id: recordId, organizationId };
+            const query = { _id: recordId };
+            if (!entity.isGlobal) query.organizationId = entity.organizationId;
             if (projectId) query.projectId = projectId;
             if (projectUUID) query.projectUUID = projectUUID;
 
@@ -928,24 +997,38 @@ class DynamicCrudController {
     return { valid: Object.keys(errors).length === 0, errors };
   }
 
-  // ✅ UPDATE ENTITY
+  // ✅ UPDATE ENTITY (Enhanced with permission check)
   static async updateEntity(req, res) {
     try {
       const { entityId } = req.params;
       const { entityName, schema, operations } = req.body;
-      const { organizationId, userId } = req.user;
+      const { organizationId, userId, role } = req.user;
 
       if (!mongoose.isValidObjectId(entityId)) {
         return res.status(400).json({ error: "Invalid entity ID" });
       }
 
-      const entity = await DynamicEntity.findOne({
-        _id: entityId,
-        organizationId,
-      });
+      const entity = await DynamicEntity.findById(entityId);
 
       if (!entity) {
         return res.status(404).json({ error: "Entity not found" });
+      }
+
+      // ✅ Permission check
+      if (role !== 'SUPER_ADMIN') {
+        // Cannot edit global entities
+        if (entity.isGlobal) {
+          return res.status(403).json({
+            error: "Only SUPER_ADMIN can update global entities",
+          });
+        }
+        
+        // Can only edit own org's entities
+        if (entity.organizationId?.toString() !== organizationId) {
+          return res.status(403).json({
+            error: "You can only update entities from your organization",
+          });
+        }
       }
 
       if (entityName && entityName !== entity.entityName) {
@@ -957,9 +1040,11 @@ class DynamicCrudController {
 
         const projectIdentifier =
           entity.projectUUID || entity.projectId?.toString() || "";
-        const newSlug = projectIdentifier
-          ? `${organizationId}-${projectIdentifier}-${entityName}`
-          : `${organizationId}-${entityName}`;
+        const newSlug = entity.isGlobal 
+          ? `global-${entityName}`
+          : (projectIdentifier
+            ? `${organizationId}-${projectIdentifier}-${entityName}`
+            : `${organizationId}-${entityName}`);
 
         const existing = await DynamicEntity.findOne({
           slug: newSlug,
@@ -997,7 +1082,7 @@ class DynamicCrudController {
         { key: apiKey },
         {
           name: `Dynamic CRUD: ${entity.entityName}`,
-          baseUrl: `/api/crud/${organizationId}/${entity.entityName}`,
+          baseUrl: `/api/crud/${entity.organizationId || 'global'}/${entity.entityName}`,
           methods: entity.operations.map((op) => op.toUpperCase()),
           updatedBy: userId,
         },
@@ -1019,23 +1104,37 @@ class DynamicCrudController {
     }
   }
 
-  // ✅ DELETE ENTITY
+  // ✅ DELETE ENTITY (Enhanced with permission check)
   static async deleteEntity(req, res) {
     try {
       const { entityId } = req.params;
-      const { organizationId } = req.user;
+      const { organizationId, role } = req.user;
 
       if (!mongoose.isValidObjectId(entityId)) {
         return res.status(400).json({ error: "Invalid entity ID" });
       }
 
-      const entity = await DynamicEntity.findOne({
-        _id: entityId,
-        organizationId,
-      });
+      const entity = await DynamicEntity.findById(entityId);
 
       if (!entity) {
         return res.status(404).json({ error: "Entity not found" });
+      }
+
+      // ✅ Permission check
+      if (role !== 'SUPER_ADMIN') {
+        // Cannot delete global entities
+        if (entity.isGlobal) {
+          return res.status(403).json({
+            error: "Only SUPER_ADMIN can delete global entities",
+          });
+        }
+        
+        // Can only delete own org's entities
+        if (entity.organizationId?.toString() !== organizationId) {
+          return res.status(403).json({
+            error: "You can only delete entities from your organization",
+          });
+        }
       }
 
       const Model = getDynamicModel(entity);
@@ -1043,7 +1142,7 @@ class DynamicCrudController {
 
       if (recordCount > 0) {
         return res.status(400).json({
-          error: `Cannot delete entity. It has ${recordCount} existing records. Delete all records first.`,
+          error: `Cannot delete entity "${entity.entityName}". It has ${recordCount} existing records. Delete all records first.`,
           recordCount,
         });
       }
@@ -1069,43 +1168,61 @@ class DynamicCrudController {
       res.status(500).json({ error: error.message });
     }
   }
-  // GET SINGLE ENTITY SCHEMA
-// In DynamicCrudController
-// Controller
-static async getEntity(req, res) {
-  try {
-    const { entityName, organizationId } = req.params; // ✅ From URL params!
 
-    console.log(`📋 Fetching schema for: ${entityName} (Org: ${organizationId})`);
+  // ✅ GET SINGLE ENTITY SCHEMA (Enhanced with permission check)
+  static async getEntity(req, res) {
+    try {
+      const { entityName, organizationId } = req.params;
+      const { role, organizationId: userOrgId } = req.user;
 
-    const entity = await DynamicEntity.findOne({
-      entityName,
-      organizationId
-    });
+      console.log(`📋 Fetching schema for: ${entityName} (Org: ${organizationId})`);
 
-    if (!entity) {
-      return res.status(404).json({ 
-        error: "Entity not found",
+      let entity = await DynamicEntity.findOne({
         entityName,
-        organizationId 
+        organizationId
       });
+
+      // If not found and org is 'global', try to find global entity
+      if (!entity && organizationId === 'global') {
+        entity = await DynamicEntity.findOne({
+          entityName,
+          isGlobal: true,
+        });
+      }
+
+      if (!entity) {
+        return res.status(404).json({ 
+          error: "Entity not found",
+          entityName,
+          organizationId 
+        });
+      }
+
+      // ✅ Permission check
+      if (!entity.isGlobal && role !== 'SUPER_ADMIN') {
+        if (entity.organizationId?.toString() !== userOrgId) {
+          return res.status(403).json({
+            error: "You don't have permission to access this entity",
+          });
+        }
+      }
+
+      const schemaObject = Object.fromEntries(entity.schema);
+
+      console.log(`✅ Schema found:`, Object.keys(schemaObject));
+
+      res.json({
+        success: true,
+        entityName: entity.entityName,
+        schema: schemaObject,
+        operations: entity.operations,
+        isGlobal: entity.isGlobal || false,
+      });
+    } catch (error) {
+      console.error("❌ getEntity failed:", error);
+      res.status(500).json({ error: error.message });
     }
-
-    const schemaObject = Object.fromEntries(entity.schema);
-
-    console.log(`✅ Schema found:`, Object.keys(schemaObject));
-
-    res.json({
-      success: true,
-      entityName: entity.entityName,
-      schema: schemaObject,
-      operations: entity.operations
-    });
-  } catch (error) {
-    console.error("❌ getEntity failed:", error);
-    res.status(500).json({ error: error.message });
   }
-}
 }
 
 // ───────────────────────────────────────────────
