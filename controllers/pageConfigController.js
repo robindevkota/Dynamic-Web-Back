@@ -1,4 +1,4 @@
-// controllers/pageConfigController.js
+// controllers/pageConfigController.js - FIXED TRIGGERS
 const mongoose = require('mongoose');
 const PageConfig = require('../models/PageConfig');
 const Organization = require('../models/Organization');
@@ -91,20 +91,20 @@ exports.getAllPages = async (req, res) => {
     }
 
     const pages = await PageConfig.find(query)
-      .select('title slug projectUUID taskUUID status isTemplate templateCategory organizationId createdAt accountValidation otpValidation isAnonymous')
+      .select('title slug projectUUID taskUUID status projectStatus projectDeactivationReason isTemplate templateCategory organizationId createdAt accountValidation otpValidation isAnonymous')
       .populate('organizationId', 'name')
       .sort({ isTemplate: -1, createdAt: -1 }); // Templates first
 
     // ✅ Add permission flags to each page
     const pagesWithPermissions = pages.map(page => ({
       ...page.toObject(),
-      // ✅ Can edit: SUPER_ADMIN can edit all, CLIENT_ADMIN/DEVELOPER can edit their own (non-template)
       canEdit: role === 'SUPER_ADMIN' || 
                (!page.isTemplate && page.organizationId?._id.toString() === organizationId),
-      
-      // ✅ Can delete: SUPER_ADMIN can delete all, CLIENT_ADMIN/DEVELOPER can delete their own (non-template)
       canDelete: role === 'SUPER_ADMIN' || 
-                 (!page.isTemplate && page.organizationId?._id.toString() === organizationId)
+                 (!page.isTemplate && page.organizationId?._id.toString() === organizationId),
+      // ✅ NEW: Can toggle project status
+      canToggleStatus: role === 'SUPER_ADMIN' || 
+                       (role === 'CLIENT_ADMIN' && !page.isTemplate && page.organizationId?._id.toString() === organizationId)
     }));
 
     console.log(`✅ Loaded ${pagesWithPermissions.length} pages for ${role}`);
@@ -116,23 +116,47 @@ exports.getAllPages = async (req, res) => {
   }
 };
 
-// ✅ GET single page config by slug (for renderer)
-// PUBLIC route - no auth required for rendering pages
+// ✅ GET single page config by slug (for renderer) - FIXED TRIGGERS
 exports.getPageBySlug = async (req, res) => {
   try {
     const APIConfig = require('../models/APIConfig');
     
-    // ✅ req.user is optional for this route (public pages like /auth don't need auth)
     const { role, organizationId } = req.user || {};
     
     const page = await PageConfig.findOne({ 
       slug: req.params.slug,
       status: { $ne: 'Deleted' } 
-    }).populate('organizationId', 'name');
+    }).populate('organizationId', 'name status');
     
     if (!page) return res.status(404).json({ message: 'Page not found' });
 
-    // Check permissions (only if user is authenticated)
+    // ✅ CHECK ORGANIZATION STATUS
+    if (page.organizationId && page.organizationId.status !== 'ACTIVE') {
+      return res.status(503).json({
+        error: 'SERVICE_UNAVAILABLE',
+        message: 'This service is temporarily unavailable. Please contact support.',
+        organizationStatus: page.organizationId.status
+      });
+    }
+
+    // ✅ CHECK PROJECT STATUS
+    if (page.projectStatus !== 'ACTIVE') {
+      if (!req.user || (role !== 'SUPER_ADMIN' && role !== 'CLIENT_ADMIN')) {
+        if (page.projectStatus === 'MAINTENANCE' && page.maintenanceMessage) {
+          return res.status(503).json({
+            error: 'MAINTENANCE',
+            message: page.maintenanceMessage
+          });
+        }
+        
+        return res.status(503).json({
+          error: 'PROJECT_INACTIVE',
+          message: 'This project is currently inactive.',
+          projectStatus: page.projectStatus
+        });
+      }
+    }
+
     const canEdit = req.user && (
       role === 'SUPER_ADMIN' || 
       (!page.isTemplate && page.organizationId?._id.toString() === organizationId)
@@ -141,6 +165,7 @@ exports.getPageBySlug = async (req, res) => {
     console.log(`📤 Sending page config for: ${page.slug}`);
     console.log(`   Authenticated: ${!!req.user}`);
     console.log(`   Can edit: ${canEdit}`);
+    console.log(`   Project Status: ${page.projectStatus}`);
     
     // Convert Mongoose Map to plain object
     const pageObject = page.toObject();
@@ -153,8 +178,14 @@ exports.getPageBySlug = async (req, res) => {
     console.log(`   - Sub-pages available:`, Object.keys(pageObject.pages || {}));
     console.log(`   - Actions available:`, pageObject.initialization?.actions ? Object.keys(pageObject.initialization.actions) : 'NO ACTIONS');
     
-    // ✅ RESOLVE COMPONENT REFERENCES
+    // ✅ CRITICAL FIX: Log triggers BEFORE resolving
+    console.log(`   - Main triggers:`, pageObject.components?.main?.triggers || 'NO TRIGGERS');
+    
+    // ✅ RESOLVE COMPONENT REFERENCES (preserves triggers)
     const resolvedPageObject = resolveComponentReferences(pageObject);
+    
+    // ✅ CRITICAL FIX: Log triggers AFTER resolving
+    console.log(`   - Main triggers (after resolve):`, resolvedPageObject.components?.main?.triggers || 'NO TRIGGERS');
     
     // RESOLVE API REFERENCES
     if (resolvedPageObject.initialization?.resources && Array.isArray(resolvedPageObject.initialization.resources)) {
@@ -192,22 +223,34 @@ exports.getPageBySlug = async (req, res) => {
           };
         });
         
-        // Return page with resolved APIs and resolved component references
-        return res.json({
+        // ✅ CRITICAL FIX: PRESERVE TRIGGERS when returning
+        const response = {
           ...resolvedPageObject,
           resolvedAPIs: apisMap,
           canEdit: canEdit || false,
-          canDelete: canEdit && !page.isTemplate || false
-        });
+          canDelete: canEdit && !page.isTemplate || false,
+          projectStatus: page.projectStatus
+        };
+        
+        // ✅ VERIFY triggers are still in response
+        console.log(`📦 Triggers in response:`, response.components?.main?.triggers || 'NO TRIGGERS IN RESPONSE');
+        
+        return res.json(response);
       }
     }
     
     // If old format (full objects) or no resources, return as-is
-    res.json({
+    const response = {
       ...resolvedPageObject,
       canEdit: canEdit || false,
-      canDelete: canEdit && !page.isTemplate || false
-    });
+      canDelete: canEdit && !page.isTemplate || false,
+      projectStatus: page.projectStatus
+    };
+    
+    // ✅ VERIFY triggers are still in response
+    console.log(`📦 Triggers in response (no resolve):`, response.components?.main?.triggers || 'NO TRIGGERS IN RESPONSE');
+    
+    res.json(response);
     
   } catch (err) {
     console.error('❌ Error fetching page:', err);
@@ -218,7 +261,6 @@ exports.getPageBySlug = async (req, res) => {
 // ✅ CREATE new page config
 exports.createPage = async (req, res) => {
   try {
-    // ✅ Check if user is authenticated
     if (!req.user) {
       return res.status(401).json({ error: "Authentication required" });
     }
@@ -238,7 +280,7 @@ exports.createPage = async (req, res) => {
           modal: components[compName].modal || {},
           uiSchema: components[compName].uiSchema || {},
           styles: components[compName].styles || {},
-          triggers: components[compName].triggers || []
+          triggers: components[compName].triggers || [] // ✅ PRESERVE TRIGGERS
         };
       }
     });
@@ -251,7 +293,7 @@ exports.createPage = async (req, res) => {
       actions: initialization.actions || {}
     };
     
-    // ✅ Process pages (preserve references)
+    // ✅ Process pages (preserve references AND triggers)
     const pages = req.body.pages || {};
     const processedPages = {};
     
@@ -275,7 +317,7 @@ exports.createPage = async (req, res) => {
               modal: comp.modal || {},
               uiSchema: comp.uiSchema || {},
               styles: comp.styles || {},
-              triggers: comp.triggers || []
+              triggers: comp.triggers || [] // ✅ PRESERVE TRIGGERS
             };
           }
         }
@@ -311,6 +353,7 @@ exports.createPage = async (req, res) => {
     console.log(`   - Is Template: ${page.isTemplate}`);
     console.log(`   - Actions:`, Object.keys(page.initialization.actions || {}));
     console.log(`   - Sub-pages:`, Object.keys(page.pages || {}));
+    console.log(`   - Main triggers:`, page.components?.main?.triggers || 'NO TRIGGERS');
     
     res.status(201).json(page);
   } catch (err) {
@@ -325,7 +368,6 @@ exports.createPage = async (req, res) => {
 // ✅ UPDATE page config
 exports.updatePage = async (req, res) => {
   try {
-    // ✅ Check if user is authenticated
     if (!req.user) {
       return res.status(401).json({ error: "Authentication required" });
     }
@@ -345,7 +387,7 @@ exports.updatePage = async (req, res) => {
           modal: components[compName].modal || {},
           uiSchema: components[compName].uiSchema || {},
           styles: components[compName].styles || {},
-          triggers: components[compName].triggers || []
+          triggers: components[compName].triggers || [] // ✅ PRESERVE TRIGGERS
         };
       }
     });
@@ -358,7 +400,7 @@ exports.updatePage = async (req, res) => {
       actions: initialization.actions || {}
     };
 
-    // ✅ Process pages (preserve references)
+    // ✅ Process pages (preserve references AND triggers)
     const pages = req.body.pages || {};
     const processedPages = {};
     
@@ -382,7 +424,7 @@ exports.updatePage = async (req, res) => {
               modal: comp.modal || {},
               uiSchema: comp.uiSchema || {},
               styles: comp.styles || {},
-              triggers: comp.triggers || []
+              triggers: comp.triggers || [] // ✅ PRESERVE TRIGGERS
             };
           }
         }
@@ -419,6 +461,7 @@ exports.updatePage = async (req, res) => {
     console.log(`✅ Updated page: ${page.slug} (v${page.version})`);
     console.log(`   - Actions:`, Object.keys(page.initialization.actions || {}));
     console.log(`   - Sub-pages:`, Object.keys(page.pages || {}));
+    console.log(`   - Main triggers:`, page.components?.main?.triggers || 'NO TRIGGERS');
     
     res.json(page);
 
@@ -448,26 +491,14 @@ exports.deletePage = async (req, res) => {
       console.log(`📊 Decremented project count for org: ${page.organizationId}`);
     }
     
-    console.log(`🗑️  Deleted page: ${page.slug}`);
+    console.log(`🗑️ Deleted page: ${page.slug}`);
     res.json({ message: 'Page deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// backend/controllers/pageConfigController.js - Add this method
-
-/**
- * ✅ NEW: Toggle Project Status (CLIENT_ADMIN only)
- * Allows CLIENT_ADMIN to activate/deactivate specific projects
- */
-// backend/controllers/pageConfigController.js
-// ✅ ADD THIS METHOD to your existing pageConfigController.js
-
-/**
- * Toggle Project Status (CLIENT_ADMIN or SUPER_ADMIN)
- * Allows toggling between ACTIVE/INACTIVE/MAINTENANCE/ARCHIVED
- */
+// ✅ Toggle Project Status
 exports.toggleProjectStatus = async (req, res) => {
   try {
     const { slug } = req.params;
@@ -497,10 +528,8 @@ exports.toggleProjectStatus = async (req, res) => {
     
     // ✅ Permission check
     if (role === 'SUPER_ADMIN') {
-      // SUPER_ADMIN can toggle any project
       console.log('✅ SUPER_ADMIN - permission granted');
     } else if (role === 'CLIENT_ADMIN') {
-      // CLIENT_ADMIN can only toggle their own org's projects
       if (!project.organizationId || project.organizationId.toString() !== organizationId) {
         console.log(`❌ Permission denied: Project not in user's organization`);
         return res.status(403).json({ 
@@ -508,7 +537,6 @@ exports.toggleProjectStatus = async (req, res) => {
         });
       }
       
-      // Cannot toggle templates
       if (project.isTemplate) {
         console.log(`❌ Permission denied: Cannot modify template`);
         return res.status(403).json({ 
@@ -518,7 +546,6 @@ exports.toggleProjectStatus = async (req, res) => {
       
       console.log('✅ CLIENT_ADMIN - permission granted');
     } else {
-      // DEVELOPER cannot toggle project status
       console.log(`❌ Permission denied: Role ${role} cannot toggle status`);
       return res.status(403).json({ 
         error: "Only administrators can manage project status" 
@@ -572,145 +599,9 @@ exports.toggleProjectStatus = async (req, res) => {
   }
 };
 
-// ✅ UPDATED: getAllPages - Include projectStatus in response
-exports.getAllPages = async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ error: "Authentication required" });
-    }
-
-    const { role, organizationId } = req.user;
-
-    let query = { status: { $ne: 'Deleted' } };
-
-    // SUPER_ADMIN sees everything
-    if (role === 'SUPER_ADMIN') {
-      // No filter needed - sees all
-    }
-    // CLIENT_ADMIN sees: templates + their org's projects
-    else if (role === 'CLIENT_ADMIN') {
-      query = {
-        ...query,
-        $or: [
-          { isTemplate: true },
-          { organizationId: organizationId }
-        ]
-      };
-    }
-    // DEVELOPER sees: templates + their org's projects (read-only)
-    else if (role === 'DEVELOPER') {
-      query = {
-        ...query,
-        $or: [
-          { isTemplate: true },
-          { organizationId: organizationId }
-        ]
-      };
-    }
-
-    const pages = await PageConfig.find(query)
-      .select('title slug projectUUID taskUUID status projectStatus projectDeactivationReason isTemplate templateCategory organizationId createdAt accountValidation otpValidation isAnonymous')
-      .populate('organizationId', 'name')
-      .sort({ isTemplate: -1, createdAt: -1 });
-
-    // ✅ Add permission flags to each page
-    const pagesWithPermissions = pages.map(page => ({
-      ...page.toObject(),
-      canEdit: role === 'SUPER_ADMIN' || 
-               (!page.isTemplate && page.organizationId?._id.toString() === organizationId),
-      canDelete: role === 'SUPER_ADMIN' || 
-                 (!page.isTemplate && page.organizationId?._id.toString() === organizationId),
-      // ✅ NEW: Can toggle project status
-      canToggleStatus: role === 'SUPER_ADMIN' || 
-                       (role === 'CLIENT_ADMIN' && !page.isTemplate && page.organizationId?._id.toString() === organizationId)
-    }));
-
-    console.log(`✅ Loaded ${pagesWithPermissions.length} pages for ${role}`);
-    res.json(pagesWithPermissions);
-
-  } catch (err) {
-    console.error('❌ Error fetching pages:', err);
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// ✅ UPDATED: getPageBySlug - Check both org status and project status
-exports.getPageBySlug = async (req, res) => {
-  try {
-    const APIConfig = require('../models/APIConfig');
-    const Organization = require('../models/Organization');
-    
-    const { role, organizationId } = req.user || {};
-    
-    const page = await PageConfig.findOne({ 
-      slug: req.params.slug,
-      status: { $ne: 'Deleted' } 
-    })
-    .populate('organizationId', 'name status');
-    
-    if (!page) return res.status(404).json({ message: 'Page not found' });
-
-    // ✅ CHECK ORGANIZATION STATUS (if page belongs to an org)
-    if (page.organizationId && page.organizationId.status !== 'ACTIVE') {
-      return res.status(503).json({
-        error: 'SERVICE_UNAVAILABLE',
-        message: 'This service is temporarily unavailable. Please contact support.',
-        organizationStatus: page.organizationId.status
-      });
-    }
-
-    // ✅ CHECK PROJECT STATUS
-    if (page.projectStatus !== 'ACTIVE') {
-      // Allow admin access even if project is inactive
-      if (!req.user || (role !== 'SUPER_ADMIN' && role !== 'CLIENT_ADMIN')) {
-        if (page.projectStatus === 'MAINTENANCE' && page.maintenanceMessage) {
-          return res.status(503).json({
-            error: 'MAINTENANCE',
-            message: page.maintenanceMessage
-          });
-        }
-        
-        return res.status(503).json({
-          error: 'PROJECT_INACTIVE',
-          message: 'This project is currently inactive.',
-          projectStatus: page.projectStatus
-        });
-      }
-    }
-
-    // Check permissions (only if user is authenticated)
-    const canEdit = req.user && (
-      role === 'SUPER_ADMIN' || 
-      (!page.isTemplate && page.organizationId?._id.toString() === organizationId)
-    );
-    
-    console.log(`📤 Sending page config for: ${page.slug}`);
-    console.log(`   Authenticated: ${!!req.user}`);
-    console.log(`   Can edit: ${canEdit}`);
-    console.log(`   Project Status: ${page.projectStatus}`);
-    
-    const pageObject = page.toObject();
-    
-    if (pageObject.pages && pageObject.pages instanceof Map) {
-      pageObject.pages = Object.fromEntries(pageObject.pages);
-    }
-    
-    res.json({
-      ...pageObject,
-      canEdit,
-      projectStatus: page.projectStatus
-    });
-
-  } catch (err) {
-    console.error('❌ Error:', err);
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// ✅ NEW: Clone template to create new project
+// ✅ Clone Template
 exports.cloneTemplate = async (req, res) => {
   try {
-    // ✅ Check if user is authenticated
     if (!req.user) {
       return res.status(401).json({ error: "Authentication required" });
     }
@@ -740,7 +631,7 @@ exports.cloneTemplate = async (req, res) => {
       return res.status(400).json({ error: "Slug already exists" });
     }
 
-    // Check project limits (already done in middleware, but double-check)
+    // Check project limits
     if (role === 'CLIENT_ADMIN') {
       const organization = await Organization.findById(organizationId);
       

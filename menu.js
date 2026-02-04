@@ -1,29 +1,54 @@
+// universal-menu-seed.js - WORKS FOR ANY ORGANIZATION
 const mongoose = require("mongoose");
 const DynamicEntity = require("./models/DynamicEntity");
 const APIConfig = require("./models/APIConfig");
+const PageConfig = require("./models/PageConfig");
 
-const CHIYAZ_ORG_ID = "696fd6f8a216cc192d63b84a";
-const DEMO_USER_ID = "000000000000000000000000";
+// ✅ CONFIGURABLE: Change these based on which website you're setting up
+const WEBSITE_SLUG = "chiyaz"; // Change to your website slug
+const PROJECT_UUID = "chiyaz-tea-coffee"; // Change to your project UUID
 
 // ===================================
-// STEP 1: CREATE MENU ENTITY (Single entity with category field)
+// GET ORGANIZATION ID FROM WEBSITE SLUG
 // ===================================
-const createMenuEntity = async () => {
-  console.log("\n🍵 === STEP 1: CREATING CHIYAZ MENU ENTITY ===");
+async function getOrgFromWebsite(slug) {
+  console.log(`🔍 Looking up organization for website: ${slug}`);
+  
+  const page = await PageConfig.findOne({ slug }).select('organizationId title');
+  
+  if (!page) {
+    throw new Error(`❌ Website "${slug}" not found in PageConfig`);
+  }
+  
+  if (!page.organizationId) {
+    throw new Error(`❌ Website "${slug}" has no organizationId`);
+  }
+  
+  console.log(`✅ Found: ${page.title} → Org: ${page.organizationId}`);
+  return page.organizationId.toString();
+}
 
-  const menuEntitySlug = `${CHIYAZ_ORG_ID}-chiyaz-tea-coffee-menu`;
+// ===================================
+// STEP 1: CREATE MENU ENTITY
+// ===================================
+const createMenuEntity = async (orgId, userId) => {
+  console.log("\n🍵 === STEP 1: CREATING MENU ENTITY ===");
+  console.log(`   Organization: ${orgId}`);
+  console.log(`   Project: ${PROJECT_UUID}`);
+
+  const menuEntitySlug = `${orgId}-menu`;
 
   const existingEntity = await DynamicEntity.findOne({ slug: menuEntitySlug });
   if (existingEntity) {
-    console.log("⚠️ Menu entity already exists, deleting old one...");
+    console.log("⚠️  Menu entity already exists, deleting old one...");
     await DynamicEntity.deleteOne({ slug: menuEntitySlug });
   }
 
   const menuEntity = await DynamicEntity.create({
-    organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
-    projectUUID: "chiyaz-tea-coffee",
+    organizationId: new mongoose.Types.ObjectId(orgId),
+    projectUUID: PROJECT_UUID,
     entityName: "menu",
-    isPublic: true,
+    isGlobal: false,
     slug: menuEntitySlug,
     schema: {
       productName: { 
@@ -69,7 +94,6 @@ const createMenuEntity = async () => {
         type: "boolean", 
         required: false 
       },
-      // Tea-specific fields
       brewingTemp: { 
         type: "string", 
         required: false 
@@ -78,7 +102,6 @@ const createMenuEntity = async () => {
         type: "string", 
         required: false 
       },
-      // Coffee-specific fields
       roastLevel: { 
         type: "string", 
         required: false 
@@ -87,7 +110,6 @@ const createMenuEntity = async () => {
         type: "string", 
         required: false 
       },
-      // Common fields
       tastingNotes: { 
         type: "array",
         items: { type: "string" },
@@ -99,30 +121,30 @@ const createMenuEntity = async () => {
       }
     },
     operations: ["create", "read", "update", "delete", "list"],
-    isTemplate: false,
-    createdBy: new mongoose.Types.ObjectId(DEMO_USER_ID),
+    createdBy: new mongoose.Types.ObjectId(userId),
   });
 
   console.log("✅ Menu entity created:", menuEntity.entityName);
+  console.log("   Slug:", menuEntity.slug);
   return { entity: menuEntity, slug: menuEntitySlug };
 };
 
 // ===================================
-// STEP 2: SEED MENU DATA (Both Tea & Coffee)
+// STEP 2: SEED MENU DATA
 // ===================================
-const seedMenuData = async (menuSlug) => {
+const seedMenuData = async (menuSlug, orgId, userId) => {
   console.log("\n🍵☕ === STEP 2: SEEDING MENU DATA ===");
 
   const dummyMenuItems = [
-    // === TEA ITEMS ===
+    // TEA ITEMS
     {
       productName: "Premium Darjeeling First Flush",
       category: "Tea",
       type: "Black Tea",
       price: 24.99,
       origin: "Darjeeling, India",
-      description: "Delicate and floral with a light golden color. Harvested in spring from the finest estates in Darjeeling.",
-      imageUrl: "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?q=80&w=2070&auto=format&fit=crop",
+      description: "Delicate and floral with a light golden color.",
+      imageUrl: "https://images.unsplash.com/photo-1564890369478-c89ca6d9cde9?q=80&w=2070",
       inStock: true,
       featured: true,
       brewingTemp: "85-90°C",
@@ -136,8 +158,8 @@ const seedMenuData = async (menuSlug) => {
       type: "Green Tea",
       price: 34.99,
       origin: "Uji, Japan",
-      description: "Vibrant green powder from Uji, Japan. Smooth, slightly sweet with umami richness.",
-      imageUrl: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?q=80&w=2071&auto=format&fit=crop",
+      description: "Vibrant green powder with umami richness.",
+      imageUrl: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?q=80&w=2071",
       inStock: true,
       featured: true,
       brewingTemp: "70-80°C",
@@ -151,8 +173,8 @@ const seedMenuData = async (menuSlug) => {
       type: "Green Tea",
       price: 29.99,
       origin: "Hangzhou, China",
-      description: "One of China's most famous green teas. Pan-fired for a distinctive flat shape.",
-      imageUrl: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=2070&auto=format&fit=crop",
+      description: "One of China's most famous green teas.",
+      imageUrl: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?q=80&w=2070",
       inStock: true,
       featured: true,
       brewingTemp: "75-80°C",
@@ -166,8 +188,8 @@ const seedMenuData = async (menuSlug) => {
       type: "White Tea",
       price: 39.99,
       origin: "Fujian, China",
-      description: "The finest white tea made only from unopened buds. Delicate, naturally sweet.",
-      imageUrl: "https://images.unsplash.com/photo-1597318112605-6f03c196f0ca?q=80&w=2070&auto=format&fit=crop",
+      description: "The finest white tea made only from unopened buds.",
+      imageUrl: "https://images.unsplash.com/photo-1597318112605-6f03c196f0ca?q=80&w=2070",
       inStock: true,
       featured: false,
       brewingTemp: "70-75°C",
@@ -181,8 +203,8 @@ const seedMenuData = async (menuSlug) => {
       type: "Black Tea",
       price: 18.99,
       origin: "Assam, India",
-      description: "Robust, malty, and full-bodied. Perfect morning tea that stands up beautifully to milk.",
-      imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fcf?q=80&w=2070&auto=format&fit=crop",
+      description: "Robust, malty, and full-bodied.",
+      imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fcf?q=80&w=2070",
       inStock: true,
       featured: false,
       brewingTemp: "95-100°C",
@@ -190,16 +212,15 @@ const seedMenuData = async (menuSlug) => {
       tastingNotes: ["Malty", "Bold", "Full-bodied"],
       weight: "200g"
     },
-
-    // === COFFEE ITEMS ===
+    // COFFEE ITEMS
     {
       productName: "Ethiopian Yirgacheffe",
       category: "Coffee",
       type: "Arabica Coffee",
       price: 22.99,
       origin: "Yirgacheffe, Ethiopia",
-      description: "Bright, floral, and fruity. Notes of blueberry, jasmine, and citrus.",
-      imageUrl: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=2061&auto=format&fit=crop",
+      description: "Bright, floral, and fruity.",
+      imageUrl: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=2061",
       inStock: true,
       featured: true,
       roastLevel: "Light",
@@ -213,8 +234,8 @@ const seedMenuData = async (menuSlug) => {
       type: "Arabica Coffee",
       price: 19.99,
       origin: "Huila, Colombia",
-      description: "Smooth and well-balanced. Medium body with sweet caramel and nutty notes.",
-      imageUrl: "https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=2074&auto=format&fit=crop",
+      description: "Smooth and well-balanced.",
+      imageUrl: "https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=2074",
       inStock: true,
       featured: true,
       roastLevel: "Medium",
@@ -228,8 +249,8 @@ const seedMenuData = async (menuSlug) => {
       type: "Arabica Coffee",
       price: 17.99,
       origin: "Minas Gerais, Brazil",
-      description: "Rich, smooth, and chocolatey. Low acidity with full body.",
-      imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=2070&auto=format&fit=crop",
+      description: "Rich, smooth, and chocolatey.",
+      imageUrl: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=2070",
       inStock: true,
       featured: true,
       roastLevel: "Medium-Dark",
@@ -243,8 +264,8 @@ const seedMenuData = async (menuSlug) => {
       type: "Arabica Coffee",
       price: 21.99,
       origin: "Antigua, Guatemala",
-      description: "Complex and spicy. Full-bodied with chocolate, spice, and smoky undertones.",
-      imageUrl: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071&auto=format&fit=crop",
+      description: "Complex and spicy.",
+      imageUrl: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?q=80&w=2071",
       inStock: true,
       featured: false,
       roastLevel: "Medium-Dark",
@@ -258,8 +279,8 @@ const seedMenuData = async (menuSlug) => {
       type: "Arabica Coffee",
       price: 20.99,
       origin: "Sumatra, Indonesia",
-      description: "Earthy and full-bodied. Heavy body with low acidity.",
-      imageUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2067&auto=format&fit=crop",
+      description: "Earthy and full-bodied.",
+      imageUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2067",
       inStock: true,
       featured: false,
       roastLevel: "Dark",
@@ -273,114 +294,106 @@ const seedMenuData = async (menuSlug) => {
   console.log(`→ Using collection: ${collectionName}`);
 
   const MenuModel = mongoose.connection.collection(collectionName);
-
   await MenuModel.deleteMany({});
-  console.log(`🗑️ Cleared existing menu items`);
+  console.log(`🗑️  Cleared existing menu items`);
 
   const menuItemsWithMetadata = dummyMenuItems.map(item => ({
     ...item,
-    organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
-    projectUUID: "chiyaz-tea-coffee",
-    createdBy: new mongoose.Types.ObjectId(DEMO_USER_ID),
+    organizationId: new mongoose.Types.ObjectId(orgId),
+    projectUUID: PROJECT_UUID,
+    createdBy: new mongoose.Types.ObjectId(userId),
     createdAt: new Date(),
     updatedAt: new Date(),
   }));
 
-  try {
-    const result = await MenuModel.insertMany(menuItemsWithMetadata);
-    console.log(`✅ Inserted ${result.length} menu items`);
-    
-    const teaCount = menuItemsWithMetadata.filter(i => i.category === "Tea").length;
-    const coffeeCount = menuItemsWithMetadata.filter(i => i.category === "Coffee").length;
-    
-    console.log(`   📊 Tea items: ${teaCount}`);
-    console.log(`   📊 Coffee items: ${coffeeCount}`);
-    console.log(`   Verified count: ${await MenuModel.countDocuments()}`);
-  } catch (err) {
-    console.error("❌ Menu insert failed:", err.message);
-  }
+  const result = await MenuModel.insertMany(menuItemsWithMetadata);
+  console.log(`✅ Inserted ${result.length} menu items`);
+  
+  const teaCount = menuItemsWithMetadata.filter(i => i.category === "Tea").length;
+  const coffeeCount = menuItemsWithMetadata.filter(i => i.category === "Coffee").length;
+  
+  console.log(`   📊 Tea items: ${teaCount}`);
+  console.log(`   📊 Coffee items: ${coffeeCount}`);
 };
 
 // ===================================
 // STEP 3: CONFIGURE APIS
 // ===================================
-const configureAPIs = async () => {
+const configureAPIs = async (orgId, userId) => {
   console.log("\n🔧 === STEP 3: CONFIGURING API RESOURCES ===");
 
   const menuAPIConfigs = [
-    // ✅ MAIN API
-
-   {
-      key: "chiyaz.menu.schema",
+    {
+      key: `${WEBSITE_SLUG}.menu.schema`,
       name: "Get Menu Schema",
       description: "Fetches the schema definition for the menu entity",
-      url: `http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu/schema`,
+      url: `/api/crud/${orgId}/menu/schema`,
       method: "GET",
       headers: {},
-      
       successNotification: { type: "none" },
       errorNotification: { 
         type: "toast", 
         message: "Failed to load menu schema", 
         background: "#8B4513" 
       },
-      
       storeResponse: true,
-      storeKey: "schema.menu", // ✅ This will store at api.schema.menu
-      
+      storeKey: "schema.menu",
       onSuccess: [],
       onError: ["console:Failed to fetch menu schema"],
-      
-      tags: ["chiyaz", "menu", "schema"],
-      projectUUID: "chiyaz-tea-coffee",
-      organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
+      tags: [WEBSITE_SLUG, "menu", "schema"],
+      projectUUID: PROJECT_UUID,
+      organizationId: new mongoose.Types.ObjectId(orgId),
       isActive: true,
     },
     {
-      key: "chiyaz.menu.api",
+      key: `${WEBSITE_SLUG}.menu.api`,
       name: "Get All Menu Items",
       description: "Fetches all menu items",
-      url: `http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu`,
+      url: `/api/crud/${orgId}/menu`,
       method: "GET",
       headers: {},
-      transformResponse: `
-        (response) => {
-          console.log('🍵 Menu API raw response:', response);
-          let items = [];
-          if (response && response.success && Array.isArray(response.data)) {
-            items = response.data;
-          } else if (Array.isArray(response)) {
-            items = response;
-          }
-          console.log('→ Menu items loaded:', items.length);
-          return items;
-        }
-      `,
       successNotification: { type: "none" },
       errorNotification: { 
         type: "toast", 
         message: "Failed to load menu", 
-        background: "#8B4513", 
-        duration: 3000 
+        background: "#8B4513" 
       },
       storeResponse: true,
-      storeKey: "chiyaz.menu.api",
+      storeKey: `${WEBSITE_SLUG}.menu.api`,
       onSuccess: [],
       onError: ["console:Failed to fetch menu"],
-      tags: ["chiyaz", "menu"],
-      projectUUID: "chiyaz-tea-coffee",
-      organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
+      tags: [WEBSITE_SLUG, "menu"],
+      projectUUID: PROJECT_UUID,
+      organizationId: new mongoose.Types.ObjectId(orgId),
       isActive: true,
     },
-
-    // ... LIST API (unchanged)
-
-    // ✅ CREATE API (fixed onSuccess)
     {
-      key: "chiyaz.menu.create",
+      key: `${WEBSITE_SLUG}.menu.list`,
+      name: "List Menu Items with Filters",
+      description: "Fetches menu items with pagination and filters",
+      url: `/api/crud/${orgId}/menu`,
+      method: "GET",
+      headers: {},
+      successNotification: { type: "none" },
+      errorNotification: {
+        type: "toast",
+        message: "Failed to load menu items",
+        background: "#8B4513"
+      },
+      storeResponse: true,
+      storeKey: `${WEBSITE_SLUG}.menu.api`,
+      onSuccess: [],
+      onError: ["console:Failed to list menu items"],
+      tags: [WEBSITE_SLUG, "menu", "list"],
+      projectUUID: PROJECT_UUID,
+      organizationId: new mongoose.Types.ObjectId(orgId),
+      isActive: true,
+    },
+    {
+      key: `${WEBSITE_SLUG}.menu.create`,
       name: "Create Menu Item",
       description: "Creates a new menu item",
-      url: `http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu`,
+      url: `/api/crud/${orgId}/menu`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       transformPayload: `
@@ -407,119 +420,86 @@ const configureAPIs = async () => {
       successNotification: {
         type: "toast",
         message: "✅ Menu item created!",
-        background: "#2E7D32",
-        duration: 3000
+        background: "#2E7D32"
       },
       errorNotification: {
         type: "toast",
         message: "❌ Failed to create item",
-        background: "#8B4513",
-        duration: 3000
+        background: "#8B4513"
       },
       closeModalOnSuccess: true,
       storeResponse: true,
-      storeKey: "chiyaz.menu.created",
-     onSuccess: [
-    "closeModal",
-    { 
-      action: "reloadMenuData",  // ✅ Use the new reload action
-      actionParams: {} 
-    }
-  ],
+      storeKey: `${WEBSITE_SLUG}.menu.created`,
+      onSuccess: ["closeModal", { action: "reloadMenuData", actionParams: {} }],
       onError: ["console:Failed to create menu item"],
-      tags: ["chiyaz", "menu", "create"],
-      projectUUID: "chiyaz-tea-coffee",
-      organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
+      tags: [WEBSITE_SLUG, "menu", "create"],
+      projectUUID: PROJECT_UUID,
+      organizationId: new mongoose.Types.ObjectId(orgId),
       isActive: true,
     },
-
-    // ✅ UPDATE API (fixed onSuccess)
     {
-      key: "chiyaz.menu.update",
+      key: `${WEBSITE_SLUG}.menu.update`,
       name: "Update Menu Item",
       description: "Updates an existing menu item",
-      url: `http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu`,
+      url: `/api/crud/${orgId}/menu`,
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       transformPayload: `
         (payload) => {
           const itemId = payload._id || payload.id;
-          if (!itemId) {
-            throw new Error("Menu item ID is required");
-          }
-          console.log("🔄 Updating menu item:", itemId);
-          return \`http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu/\${itemId}\`;
+          if (!itemId) throw new Error("Menu item ID is required");
+          return \`/api/crud/${orgId}/menu/\${itemId}\`;
         }
       `,
       successNotification: {
         type: "toast",
         message: "✅ Menu item updated!",
-        background: "#2E7D32",
-        duration: 3000
+        background: "#2E7D32"
       },
       errorNotification: {
         type: "toast",
         message: "❌ Failed to update item",
-        background: "#8B4513",
-        duration: 3000
+        background: "#8B4513"
       },
       storeResponse: true,
-      storeKey: "chiyaz.menu.updated",
-      onSuccess: [
-    "closeModal",
-    { 
-      action: "reloadMenuData",  // ✅ Use the new reload action
-      actionParams: {} 
-    }
-  ],
+      storeKey: `${WEBSITE_SLUG}.menu.updated`,
+      onSuccess: ["closeModal", { action: "reloadMenuData", actionParams: {} }],
       onError: ["console:Failed to update menu item"],
-      tags: ["chiyaz", "menu", "update"],
-      projectUUID: "chiyaz-tea-coffee",
-      organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
+      tags: [WEBSITE_SLUG, "menu", "update"],
+      projectUUID: PROJECT_UUID,
+      organizationId: new mongoose.Types.ObjectId(orgId),
       isActive: true,
     },
-
-    // ✅ DELETE API (fixed onSuccess)
     {
-      key: "chiyaz.menu.delete",
+      key: `${WEBSITE_SLUG}.menu.delete`,
       name: "Delete Menu Item",
       description: "Deletes a menu item",
-      url: `http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu`,
+      url: `/api/crud/${orgId}/menu`,
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       transformPayload: `
         (payload) => {
           const itemId = payload._id || payload.id;
-          if (!itemId) {
-            throw new Error("Menu item ID is required");
-          }
-          console.log("🗑️ Deleting menu item:", itemId);
-          return \`http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu/\${itemId}\`;
+          if (!itemId) throw new Error("Menu item ID is required");
+          return \`/api/crud/${orgId}/menu/\${itemId}\`;
         }
       `,
       successNotification: {
         type: "toast",
         message: "✅ Menu item deleted!",
-        background: "#2E7D32",
-        duration: 3000
+        background: "#2E7D32"
       },
       errorNotification: {
         type: "toast",
         message: "❌ Failed to delete item",
-        background: "#8B4513",
-        duration: 3000
+        background: "#8B4513"
       },
       storeResponse: false,
-      onSuccess: [
-    { 
-      action: "reloadMenuData",  // ✅ Use the new reload action
-      actionParams: {} 
-    }
-  ],
+      onSuccess: [{ action: "reloadMenuData", actionParams: {} }],
       onError: ["console:Failed to delete menu item"],
-      tags: ["chiyaz", "menu", "delete"],
-      projectUUID: "chiyaz-tea-coffee",
-      organizationId: new mongoose.Types.ObjectId(CHIYAZ_ORG_ID),
+      tags: [WEBSITE_SLUG, "menu", "delete"],
+      projectUUID: PROJECT_UUID,
+      organizationId: new mongoose.Types.ObjectId(orgId),
       isActive: true,
     },
   ];
@@ -541,24 +521,31 @@ const main = async () => {
   try {
     console.log("🔌 Connecting to MongoDB...");
     await mongoose.connect(
-      "mongodb+srv://admin:sjITV8nazkocOrCX@cluster0.sunkcl4.mongodb.net/",
-      { useNewUrlParser: true, useUnifiedTopology: true }
+      "mongodb+srv://admin:sjITV8nazkocOrCX@cluster0.sunkcl4.mongodb.net/"
     );
     console.log("✅ Connected!");
 
-    const menuResult = await createMenuEntity();
-    await seedMenuData(menuResult.slug);
-    await configureAPIs();
+    // Get org ID dynamically from website slug
+    const orgId = await getOrgFromWebsite(WEBSITE_SLUG);
+    const userId = "000000000000000000000000"; // System user for seeding
+
+    const menuResult = await createMenuEntity(orgId, userId);
+    await seedMenuData(menuResult.slug, orgId, userId);
+    await configureAPIs(orgId, userId);
 
     console.log("\n" + "=".repeat(60));
-    console.log("🎉 CHIYAZ MENU SETUP COMPLETED!");
+    console.log("🎉 MENU SETUP COMPLETED!");
     console.log("=".repeat(60));
-    console.log("Next steps:");
-    console.log(`1. Visit: http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu`);
-    console.log("   → Should show all menu items");
-    console.log(`2. Visit: http://localhost:5000/api/crud/${CHIYAZ_ORG_ID}/menu?category=Tea`);
-    console.log("   → Should show only tea items");
-    console.log("3. Clear browser cache + visit http://localhost:3000/chiyaz");
+    console.log(`✅ Website: ${WEBSITE_SLUG}`);
+    console.log(`✅ Organization: ${orgId}`);
+    console.log(`✅ Menu entity created`);
+    console.log(`✅ 10 items seeded`);
+    console.log(`✅ 6 APIs configured`);
+    console.log("\n📝 Remember to:");
+    console.log("1. Replace dynamicCrudRoutes.js with DYNAMIC version");
+    console.log("2. Restart backend server");
+    console.log("3. Clear browser cache");
+    console.log("4. Test at: http://localhost:3000/" + WEBSITE_SLUG);
     console.log("=".repeat(60));
 
   } catch (err) {
