@@ -10,7 +10,1508 @@ mongoose.connect(
 );
 
 const websites = [
+{
+  "title": "SmartWidget Showcase - Animations & Icons",
+  "slug": "smartwidget-demo",
+  "projectUUID": "smartwidget-showcase-001",
+  "taskUUID": "showcase001",
+  "status": "Active",
+  "isTemplate": false,
+  templateCategory: "E-commerce", // Category (E-commerce, Portfolio, Dashboard, Landing Page, Blog, Other)
+    organizationId: null,
+  "createdBy": "000000000000000000000000",
+  "accountValidation": false,
+  "otpValidation": false,
+  "isAnonymous": true,
+  "requireAuth": false,
 
+  "initialization": {
+    "globalCSS": `/* SmartWidget Showcase Styles */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  color: #1e293b;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Section backgrounds */
+.glass-section {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 60px 40px;
+  margin: 40px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dark-section {
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 60px 40px;
+  margin: 40px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  color: #f8fafc;
+}
+
+/* Code blocks */
+.code-block {
+  background: #1e293b;
+  color: #64ffda;
+  padding: 20px;
+  border-radius: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  overflow-x: auto;
+  margin: 20px 0;
+  border: 2px solid #334155;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(102, 126, 234, 0.8),
+                0 0 60px rgba(102, 126, 234, 0.6);
+  }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Interactive cards */
+.showcase-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.showcase-card:hover {
+  transform: translateY(-10px) scale(1.02);
+}
+
+/* Grid layouts */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  margin: 30px 0;
+}
+
+.animation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin: 30px 0;
+}`,
+
+    "resources": [
+      "demo.products.list",
+      "demo.stats.dashboard",
+      "demo.users.list"
+    ],
+
+    "actions": {
+      "scrollToSection": `
+        const sectionId = context.actionParams?.sectionId;
+        if (sectionId) {
+          const element = document.getElementById(sectionId);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+      `,
+      
+      "showDemo": `
+        const demoType = context.actionParams?.type || 'default';
+        context.handlers.showNotification({
+          type: 'toast',
+          message: \`🎨 \${demoType} demo activated!\`,
+          background: '#667eea',
+          duration: 2000
+        });
+      `
+    }
+  },
+
+  "components": {
+    "navbar": {
+      "uiSchema": {
+        "logo": {
+          "ui:widget": "text",
+          "ui:content": "🎨 SmartWidget Demo",
+          "ui:icon": {
+            "type": "fontawesome",
+            "value": "fas fa-palette"
+          },
+          "ui:iconPosition": "left",
+          "ui:iconGap": "12px",
+          "ui:animation": "fadeInDown",
+          "ui:styles": {
+            "fontSize": "24px",
+            "fontWeight": "800",
+            "color": "white",
+            "cursor": "pointer"
+          }
+        },
+        
+        "navLinks": {
+          "ui:widget": "container",
+          "ui:direction": "row",
+          "ui:gap": "20px",
+          "ui:styles": {
+            "marginLeft": "auto"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "button",
+              "ui:label": "Icons",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-icons",
+                "color": "white"
+              },
+              "ui:iconPosition": "left",
+              "ui:action": "scrollToSection",
+              "ui:actionParams": { "sectionId": "icons-section" },
+              "ui:animateOnHover": "lift",
+              "ui:styles": {
+                "background": "rgba(255,255,255,0.1)",
+                "color": "white",
+                "border": "2px solid rgba(255,255,255,0.3)",
+                "padding": "10px 20px",
+                "borderRadius": "12px",
+                "fontWeight": "600",
+                "backdropFilter": "blur(10px)"
+              }
+            },
+            {
+              "ui:widget": "button",
+              "ui:label": "Animations",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-magic",
+                "color": "white"
+              },
+              "ui:iconPosition": "left",
+              "ui:action": "scrollToSection",
+              "ui:actionParams": { "sectionId": "animations-section" },
+              "ui:animateOnHover": "lift",
+              "ui:styles": {
+                "background": "rgba(255,255,255,0.1)",
+                "color": "white",
+                "border": "2px solid rgba(255,255,255,0.3)",
+                "padding": "10px 20px",
+                "borderRadius": "12px",
+                "fontWeight": "600",
+                "backdropFilter": "blur(10px)"
+              }
+            },
+            {
+              "ui:widget": "button",
+              "ui:label": "Data Binding",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-database",
+                "color": "white"
+              },
+              "ui:iconPosition": "left",
+              "ui:action": "scrollToSection",
+              "ui:actionParams": { "sectionId": "data-section" },
+              "ui:animateOnHover": "lift",
+              "ui:styles": {
+                "background": "rgba(255,255,255,0.1)",
+                "color": "white",
+                "border": "2px solid rgba(255,255,255,0.3)",
+                "padding": "10px 20px",
+                "borderRadius": "12px",
+                "fontWeight": "600",
+                "backdropFilter": "blur(10px)"
+              }
+            }
+          ]
+        }
+      },
+      "styles": {
+        "background": "rgba(30, 41, 59, 0.95)",
+        "backdropFilter": "blur(20px)",
+        "borderBottom": "2px solid rgba(255,255,255,0.1)",
+        "padding": "20px 40px",
+        "position": "fixed",
+        "width": "100%",
+        "zIndex": "1000",
+        "display": "flex",
+        "alignItems": "center",
+        "boxShadow": "0 8px 32px rgba(0,0,0,0.1)"
+      }
+    },
+
+    "main": {
+      "uiSchema": {
+        "heroSection": {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "40px",
+          "ui:styles": {
+            "padding": "140px 40px 80px",
+            "textAlign": "center",
+            "maxWidth": "1200px",
+            "margin": "0 auto"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "SmartWidget Showcase",
+              "ui:level": "h1",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-star",
+                "color": "#fbbf24"
+              },
+              "ui:iconPosition": "top",
+              "ui:iconGap": "20px",
+              "ui:animation": "fadeInUp",
+              "ui:styles": {
+                "fontSize": "4rem",
+                "fontWeight": "900",
+                "color": "white",
+                "textShadow": "0 4px 20px rgba(0,0,0,0.5)",
+                "fontFamily": "'Poppins', sans-serif",
+                "marginBottom": "20px"
+              }
+            },
+            
+            {
+              "ui:widget": "paragraph",
+              "ui:text": "Explore the power of icons, animations, and dynamic data binding",
+              "ui:animation": "fadeInUp",
+              "ui:styles": {
+                "fontSize": "1.5rem",
+                "color": "rgba(255,255,255,0.9)",
+                "maxWidth": "800px",
+                "margin": "0 auto 40px"
+              }
+            },
+            
+            {
+              "ui:widget": "container",
+              "ui:direction": "row",
+              "ui:gap": "20px",
+              "ui:justify": "center",
+              "ui:styles": {
+                "flexWrap": "wrap"
+              },
+              "ui:children": [
+                {
+                  "ui:widget": "button",
+                  "ui:label": "Explore Icons",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-rocket"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:action": "scrollToSection",
+                  "ui:actionParams": { "sectionId": "icons-section" },
+                  "ui:animation": "scaleIn",
+                  "ui:animateOnHover": "float",
+                  "ui:styles": {
+                    "padding": "16px 32px",
+                    "fontSize": "1.1rem",
+                    "fontWeight": "700",
+                    "background": "white",
+                    "color": "#667eea",
+                    "border": "none",
+                    "borderRadius": "16px",
+                    "boxShadow": "0 8px 24px rgba(0,0,0,0.15)"
+                  }
+                },
+                {
+                  "ui:widget": "button",
+                  "ui:label": "See Animations",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-bolt"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:action": "scrollToSection",
+                  "ui:actionParams": { "sectionId": "animations-section" },
+                  "ui:animation": "scaleIn",
+                  "ui:animateOnHover": "float",
+                  "ui:styles": {
+                    "padding": "16px 32px",
+                    "fontSize": "1.1rem",
+                    "fontWeight": "700",
+                    "background": "rgba(255,255,255,0.2)",
+                    "color": "white",
+                    "border": "2px solid white",
+                    "borderRadius": "16px",
+                    "backdropFilter": "blur(10px)"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+
+        "iconsSection": {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "50px",
+          "ui:id": "icons-section",
+          "ui:styles": {
+            "padding": "80px 40px",
+            "maxWidth": "1400px",
+            "margin": "0 auto",
+            "background": "rgba(255,255,255,0.95)",
+            "backdropFilter": "blur(20px)",
+            "borderRadius": "24px",
+            "boxShadow": "0 8px 32px rgba(0,0,0,0.1)"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "Icon Showcase",
+              "ui:level": "h2",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-icons",
+                "color": "#667eea"
+              },
+              "ui:iconPosition": "left",
+              "ui:animation": "fadeInLeft",
+              "ui:styles": {
+                "fontSize": "2.5rem",
+                "fontWeight": "800",
+                "color": "#1e293b",
+                "textAlign": "center"
+              }
+            },
+            
+            {
+              "ui:widget": "paragraph",
+              "ui:text": "Icons can be positioned left, right, top, or bottom with customizable gaps and colors",
+              "ui:animation": "fadeInUp",
+              "ui:styles": {
+                "fontSize": "1.1rem",
+                "color": "#64748b",
+                "textAlign": "center",
+                "maxWidth": "700px",
+                "margin": "0 auto"
+              }
+            },
+
+            {
+              "ui:widget": "gridLayout",
+              "ui:columns": 4,
+              "ui:gap": "24px",
+              "ui:children": [
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Heart Left",
+                  "ui:description": "Icon on the left side",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-heart",
+                    "color": "#ef4444"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:animation": "fadeInUp",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "padding": "30px",
+                    "textAlign": "center",
+                    "background": "white",
+                    "borderRadius": "16px",
+                    "border": "2px solid #e2e8f0",
+                    "transition": "all 0.3s"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Star Right",
+                  "ui:description": "Icon on the right side",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-star",
+                    "color": "#fbbf24"
+                  },
+                  "ui:iconPosition": "right",
+                  "ui:animation": "fadeInUp",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "padding": "30px",
+                    "textAlign": "center",
+                    "background": "white",
+                    "borderRadius": "16px",
+                    "border": "2px solid #e2e8f0",
+                    "transition": "all 0.3s"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Crown Top",
+                  "ui:description": "Icon on top",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-crown",
+                    "color": "#f59e0b"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "fadeInUp",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "padding": "30px",
+                    "textAlign": "center",
+                    "background": "white",
+                    "borderRadius": "16px",
+                    "border": "2px solid #e2e8f0",
+                    "transition": "all 0.3s"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Trophy Bottom",
+                  "ui:description": "Icon on bottom",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-trophy",
+                    "color": "#8b5cf6"
+                  },
+                  "ui:iconPosition": "bottom",
+                  "ui:animation": "fadeInUp",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "padding": "30px",
+                    "textAlign": "center",
+                    "background": "white",
+                    "borderRadius": "16px",
+                    "border": "2px solid #e2e8f0",
+                    "transition": "all 0.3s"
+                  }
+                }
+              ]
+            },
+
+            {
+              "ui:widget": "divider",
+              "ui:variant": "solid",
+              "ui:color": "#e2e8f0",
+              "ui:spacing": "large"
+            },
+
+            {
+              "ui:widget": "heading",
+              "ui:text": "Input Icons (Prefix & Suffix)",
+              "ui:level": "h3",
+              "ui:animation": "fadeInLeft",
+              "ui:styles": {
+                "fontSize": "2rem",
+                "fontWeight": "700",
+                "color": "#1e293b",
+                "marginTop": "20px"
+              }
+            },
+
+            {
+              "ui:widget": "container",
+              "ui:direction": "column",
+              "ui:gap": "20px",
+              "ui:styles": {
+                "maxWidth": "600px",
+                "margin": "0 auto",
+                "width": "100%"
+              },
+              "ui:children": [
+                {
+                  "ui:widget": "inputField",
+                  "ui:label": "Email with Prefix Icon",
+                  "ui:placeholder": "your.email@example.com",
+                  "ui:name": "email",
+                  "ui:prefixIcon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-envelope",
+                    "color": "#667eea"
+                  },
+                  "ui:animation": "fadeInLeft"
+                },
+                {
+                  "ui:widget": "inputField",
+                  "ui:label": "Search with Suffix Icon",
+                  "ui:placeholder": "Search anything...",
+                  "ui:name": "search",
+                  "ui:suffixIcon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-search",
+                    "color": "#10b981"
+                  },
+                  "ui:animation": "fadeInRight"
+                },
+                {
+                  "ui:widget": "inputField",
+                  "ui:label": "Price with Both Icons",
+                  "ui:placeholder": "0.00",
+                  "ui:name": "price",
+                  "ui:prefixIcon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-dollar-sign",
+                    "color": "#059669"
+                  },
+                  "ui:suffixIcon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-check-circle",
+                    "color": "#10b981"
+                  },
+                  "ui:animation": "fadeInUp"
+                }
+              ]
+            }
+          ]
+        },
+
+        "animationsSection": {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "50px",
+          "ui:id": "animations-section",
+          "ui:styles": {
+            "padding": "80px 40px",
+            "maxWidth": "1400px",
+            "margin": "40px auto",
+            "background": "rgba(30, 41, 59, 0.95)",
+            "backdropFilter": "blur(20px)",
+            "borderRadius": "24px",
+            "boxShadow": "0 8px 32px rgba(0,0,0,0.3)",
+            "color": "white"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "Animation Showcase",
+              "ui:level": "h2",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-magic",
+                "color": "#a78bfa"
+              },
+              "ui:iconPosition": "left",
+              "ui:animation": "rotateIn",
+              "ui:styles": {
+                "fontSize": "2.5rem",
+                "fontWeight": "800",
+                "color": "white",
+                "textAlign": "center"
+              }
+            },
+
+            {
+              "ui:widget": "paragraph",
+              "ui:text": "SmartWidget supports entry animations and hover animations powered by Framer Motion",
+              "ui:animation": "fadeInUp",
+              "ui:styles": {
+                "fontSize": "1.1rem",
+                "color": "rgba(255,255,255,0.9)",
+                "textAlign": "center",
+                "maxWidth": "700px",
+                "margin": "0 auto"
+              }
+            },
+
+            {
+              "ui:widget": "heading",
+              "ui:text": "Entry Animations",
+              "ui:level": "h3",
+              "ui:animation": "slideInLeft",
+              "ui:styles": {
+                "fontSize": "1.8rem",
+                "fontWeight": "700",
+                "color": "white",
+                "marginTop": "20px"
+              }
+            },
+
+            {
+              "ui:widget": "gridLayout",
+              "ui:columns": 3,
+              "ui:gap": "24px",
+              "ui:children": [
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Fade In",
+                  "ui:description": "Smooth fade in effect",
+                  "ui:animation": "fadeIn",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(255,255,255,0.1)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid rgba(255,255,255,0.2)",
+                    "color": "white"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Slide In Up",
+                  "ui:description": "Slides from bottom",
+                  "ui:animation": "slideInUp",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(255,255,255,0.1)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid rgba(255,255,255,0.2)",
+                    "color": "white"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Scale In",
+                  "ui:description": "Scales from small",
+                  "ui:animation": "scaleIn",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(255,255,255,0.1)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid rgba(255,255,255,0.2)",
+                    "color": "white"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Fade In Left",
+                  "ui:description": "Fades from left side",
+                  "ui:animation": "fadeInLeft",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(255,255,255,0.1)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid rgba(255,255,255,0.2)",
+                    "color": "white"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Fade In Right",
+                  "ui:description": "Fades from right side",
+                  "ui:animation": "fadeInRight",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(255,255,255,0.1)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid rgba(255,255,255,0.2)",
+                    "color": "white"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Rotate In",
+                  "ui:description": "Rotates while fading",
+                  "ui:animation": "rotateIn",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(255,255,255,0.1)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid rgba(255,255,255,0.2)",
+                    "color": "white"
+                  }
+                }
+              ]
+            },
+
+            {
+              "ui:widget": "divider",
+              "ui:variant": "dashed",
+              "ui:color": "rgba(255,255,255,0.3)",
+              "ui:spacing": "large"
+            },
+
+            {
+              "ui:widget": "heading",
+              "ui:text": "Hover Animations",
+              "ui:level": "h3",
+              "ui:animation": "slideInRight",
+              "ui:styles": {
+                "fontSize": "1.8rem",
+                "fontWeight": "700",
+                "color": "white",
+                "marginTop": "20px"
+              }
+            },
+
+            {
+              "ui:widget": "gridLayout",
+              "ui:columns": 4,
+              "ui:gap": "24px",
+              "ui:children": [
+                {
+                  "ui:widget": "button",
+                  "ui:label": "Lift",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-arrow-up"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:animateOnHover": "lift",
+                  "ui:animation": "fadeInUp",
+                  "ui:styles": {
+                    "padding": "20px 30px",
+                    "background": "rgba(167, 139, 250, 0.2)",
+                    "color": "white",
+                    "border": "2px solid #a78bfa",
+                    "borderRadius": "12px",
+                    "fontWeight": "600",
+                    "width": "100%"
+                  }
+                },
+                {
+                  "ui:widget": "button",
+                  "ui:label": "Grow",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-expand"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:animateOnHover": "grow",
+                  "ui:animation": "fadeInUp",
+                  "ui:styles": {
+                    "padding": "20px 30px",
+                    "background": "rgba(34, 197, 94, 0.2)",
+                    "color": "white",
+                    "border": "2px solid #22c55e",
+                    "borderRadius": "12px",
+                    "fontWeight": "600",
+                    "width": "100%"
+                  }
+                },
+                {
+                  "ui:widget": "button",
+                  "ui:label": "Tilt",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-undo"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:animateOnHover": "tilt",
+                  "ui:animation": "fadeInUp",
+                  "ui:styles": {
+                    "padding": "20px 30px",
+                    "background": "rgba(59, 130, 246, 0.2)",
+                    "color": "white",
+                    "border": "2px solid #3b82f6",
+                    "borderRadius": "12px",
+                    "fontWeight": "600",
+                    "width": "100%"
+                  }
+                },
+                {
+                  "ui:widget": "button",
+                  "ui:label": "Float",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-cloud"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:animateOnHover": "float",
+                  "ui:animation": "fadeInUp",
+                  "ui:styles": {
+                    "padding": "20px 30px",
+                    "background": "rgba(251, 191, 36, 0.2)",
+                    "color": "white",
+                    "border": "2px solid #fbbf24",
+                    "borderRadius": "12px",
+                    "fontWeight": "600",
+                    "width": "100%"
+                  }
+                }
+              ]
+            },
+
+            {
+              "ui:widget": "divider",
+              "ui:variant": "solid",
+              "ui:color": "rgba(255,255,255,0.2)",
+              "ui:spacing": "large"
+            },
+
+            {
+              "ui:widget": "heading",
+              "ui:text": "Continuous Animations",
+              "ui:level": "h3",
+              "ui:animation": "fadeInLeft",
+              "ui:styles": {
+                "fontSize": "1.8rem",
+                "fontWeight": "700",
+                "color": "white",
+                "marginTop": "20px"
+              }
+            },
+
+            {
+              "ui:widget": "flexLayout",
+              "ui:direction": "row",
+              "ui:gap": "30px",
+              "ui:justify": "center",
+              "ui:wrap": true,
+              "ui:children": [
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Pulse",
+                  "ui:description": "Continuous pulse animation",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-heart",
+                    "color": "#ef4444"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "pulse",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(239, 68, 68, 0.2)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid #ef4444",
+                    "color": "white",
+                    "minWidth": "200px"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Bounce",
+                  "ui:description": "Bouncing animation",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-basketball-ball",
+                    "color": "#f59e0b"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "bounce",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(245, 158, 11, 0.2)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid #f59e0b",
+                    "color": "white",
+                    "minWidth": "200px"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Float",
+                  "ui:description": "Floating up and down",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-feather",
+                    "color": "#8b5cf6"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "float",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "rgba(139, 92, 246, 0.2)",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid #8b5cf6",
+                    "color": "white",
+                    "minWidth": "200px"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+
+        "dataBindingSection": {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "50px",
+          "ui:id": "data-section",
+          "ui:styles": {
+            "padding": "80px 40px",
+            "maxWidth": "1400px",
+            "margin": "40px auto",
+            "background": "rgba(255,255,255,0.95)",
+            "backdropFilter": "blur(20px)",
+            "borderRadius": "24px",
+            "boxShadow": "0 8px 32px rgba(0,0,0,0.1)"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "Dynamic Data Binding",
+              "ui:level": "h2",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-database",
+                "color": "#667eea"
+              },
+              "ui:iconPosition": "left",
+              "ui:animation": "fadeInDown",
+              "ui:styles": {
+                "fontSize": "2.5rem",
+                "fontWeight": "800",
+                "color": "#1e293b",
+                "textAlign": "center"
+              }
+            },
+
+            {
+              "ui:widget": "paragraph",
+              "ui:text": "SmartWidget automatically resolves templates and binds data from DataStore",
+              "ui:animation": "fadeInUp",
+              "ui:styles": {
+                "fontSize": "1.1rem",
+                "color": "#64748b",
+                "textAlign": "center",
+                "maxWidth": "700px",
+                "margin": "0 auto"
+              }
+            },
+
+            {
+              "ui:widget": "heading",
+              "ui:text": "Template Examples",
+              "ui:level": "h3",
+              "ui:animation": "fadeInLeft",
+              "ui:styles": {
+                "fontSize": "1.8rem",
+                "fontWeight": "700",
+                "color": "#1e293b",
+                "marginTop": "20px"
+              }
+            },
+
+            {
+              "ui:widget": "gridLayout",
+              "ui:columns": 2,
+              "ui:gap": "24px",
+              "ui:children": [
+                {
+                  "ui:widget": "card",
+                  "ui:title": "User Email",
+                  "ui:description": "{{auth.user.email || 'guest@example.com'}}",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-envelope",
+                    "color": "#3b82f6"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "fadeInUp",
+                  "ui:animateOnHover": "lift",
+                  "ui:styles": {
+                    "padding": "30px",
+                    "background": "white",
+                    "borderRadius": "16px",
+                    "border": "2px solid #e2e8f0"
+                  },
+                  "ui:titleStyles": {
+                    "color": "#1e293b",
+                    "fontSize": "1.3rem",
+                    "fontWeight": "700"
+                  },
+                  "ui:descriptionStyles": {
+                    "color": "#3b82f6",
+                    "fontSize": "1.1rem",
+                    "fontFamily": "monospace"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Auth Status",
+                  "ui:description": "{{auth.isAuthenticated ? 'Logged In' : 'Guest'}}",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-user-shield",
+                    "color": "#10b981"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "fadeInUp",
+                  "ui:animateOnHover": "lift",
+                  "ui:styles": {
+                    "padding": "30px",
+                    "background": "white",
+                    "borderRadius": "16px",
+                    "border": "2px solid #e2e8f0"
+                  },
+                  "ui:titleStyles": {
+                    "color": "#1e293b",
+                    "fontSize": "1.3rem",
+                    "fontWeight": "700"
+                  },
+                  "ui:descriptionStyles": {
+                    "color": "#10b981",
+                    "fontSize": "1.1rem",
+                    "fontFamily": "monospace"
+                  }
+                }
+              ]
+            },
+
+            {
+              "ui:widget": "divider",
+              "ui:variant": "solid",
+              "ui:color": "#e2e8f0",
+              "ui:spacing": "large"
+            },
+
+            {
+              "ui:widget": "heading",
+              "ui:text": "Stats Dashboard (Mock Data)",
+              "ui:level": "h3",
+              "ui:animation": "slideInRight",
+              "ui:styles": {
+                "fontSize": "1.8rem",
+                "fontWeight": "700",
+                "color": "#1e293b",
+                "marginTop": "20px"
+              }
+            },
+
+            {
+              "ui:widget": "gridLayout",
+              "ui:columns": 4,
+              "ui:gap": "24px",
+              "ui:children": [
+                {
+                  "ui:widget": "statsCounter",
+                  "ui:value": "12,543",
+                  "ui:label": "Total Users",
+                  "ui:color": "#3b82f6",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-users",
+                    "color": "#3b82f6"
+                  },
+                  "ui:animation": "scaleIn",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "background": "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))",
+                    "borderRadius": "16px",
+                    "border": "2px solid #dbeafe",
+                    "padding": "30px"
+                  }
+                },
+                {
+                  "ui:widget": "statsCounter",
+                  "ui:value": "8,492",
+                  "ui:label": "Active Projects",
+                  "ui:color": "#10b981",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-project-diagram",
+                    "color": "#10b981"
+                  },
+                  "ui:animation": "scaleIn",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "background": "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))",
+                    "borderRadius": "16px",
+                    "border": "2px solid #d1fae5",
+                    "padding": "30px"
+                  }
+                },
+                {
+                  "ui:widget": "statsCounter",
+                  "ui:value": "95.4%",
+                  "ui:label": "Success Rate",
+                  "ui:color": "#8b5cf6",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-chart-line",
+                    "color": "#8b5cf6"
+                  },
+                  "ui:animation": "scaleIn",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "background": "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05))",
+                    "borderRadius": "16px",
+                    "border": "2px solid #ede9fe",
+                    "padding": "30px"
+                  }
+                },
+                {
+                  "ui:widget": "statsCounter",
+                  "ui:value": "$2.4M",
+                  "ui:label": "Revenue",
+                  "ui:color": "#f59e0b",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-dollar-sign",
+                    "color": "#f59e0b"
+                  },
+                  "ui:animation": "scaleIn",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "background": "linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05))",
+                    "borderRadius": "16px",
+                    "border": "2px solid #fef3c7",
+                    "padding": "30px"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+
+        "combinedFeaturesSection": {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "50px",
+          "ui:styles": {
+            "padding": "80px 40px",
+            "maxWidth": "1400px",
+            "margin": "40px auto",
+            "background": "rgba(30, 41, 59, 0.95)",
+            "backdropFilter": "blur(20px)",
+            "borderRadius": "24px",
+            "boxShadow": "0 8px 32px rgba(0,0,0,0.3)",
+            "color": "white"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "Combined Features",
+              "ui:level": "h2",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-layer-group",
+                "color": "#a78bfa"
+              },
+              "ui:iconPosition": "left",
+              "ui:animation": "fadeInDown",
+              "ui:styles": {
+                "fontSize": "2.5rem",
+                "fontWeight": "800",
+                "color": "white",
+                "textAlign": "center"
+              }
+            },
+
+            {
+              "ui:widget": "paragraph",
+              "ui:text": "Icons + Animations + Data Binding working together seamlessly",
+              "ui:animation": "fadeInUp",
+              "ui:styles": {
+                "fontSize": "1.1rem",
+                "color": "rgba(255,255,255,0.9)",
+                "textAlign": "center",
+                "maxWidth": "700px",
+                "margin": "0 auto"
+              }
+            },
+
+            {
+              "ui:widget": "gridLayout",
+              "ui:columns": 3,
+              "ui:gap": "24px",
+              "ui:children": [
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Premium User",
+                  "ui:description": "Animated card with icon and dynamic status",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-crown",
+                    "color": "#fbbf24"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "fadeInUp",
+                  "ui:animateOnHover": "float",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1))",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid #fbbf24",
+                    "color": "white"
+                  },
+                  "ui:titleStyles": {
+                    "color": "#fbbf24",
+                    "fontSize": "1.5rem",
+                    "fontWeight": "800"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Verified Badge",
+                  "ui:description": "Trust indicator with smooth animations",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-shield-check",
+                    "color": "#10b981"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "scaleIn",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1))",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid #10b981",
+                    "color": "white"
+                  },
+                  "ui:titleStyles": {
+                    "color": "#10b981",
+                    "fontSize": "1.5rem",
+                    "fontWeight": "800"
+                  }
+                },
+                {
+                  "ui:widget": "card",
+                  "ui:title": "Lightning Fast",
+                  "ui:description": "Performance optimized components",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-bolt",
+                    "color": "#f59e0b"
+                  },
+                  "ui:iconPosition": "top",
+                  "ui:animation": "rotateIn",
+                  "ui:animateOnHover": "tilt",
+                  "ui:styles": {
+                    "padding": "40px",
+                    "textAlign": "center",
+                    "background": "linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1))",
+                    "backdropFilter": "blur(10px)",
+                    "borderRadius": "16px",
+                    "border": "2px solid #f59e0b",
+                    "color": "white"
+                  },
+                  "ui:titleStyles": {
+                    "color": "#f59e0b",
+                    "fontSize": "1.5rem",
+                    "fontWeight": "800"
+                  }
+                }
+              ]
+            },
+
+            {
+              "ui:widget": "divider",
+              "ui:variant": "dashed",
+              "ui:color": "rgba(255,255,255,0.3)",
+              "ui:spacing": "large"
+            },
+
+            {
+              "ui:widget": "container",
+              "ui:direction": "row",
+              "ui:gap": "30px",
+              "ui:justify": "center",
+              "ui:wrap": true,
+              "ui:children": [
+                {
+                  "ui:widget": "button",
+                  "ui:label": "Start Building",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-rocket",
+                    "color": "white"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:action": "showDemo",
+                  "ui:actionParams": { "type": "Build" },
+                  "ui:animation": "fadeInLeft",
+                  "ui:animateOnHover": "float",
+                  "ui:styles": {
+                    "padding": "18px 40px",
+                    "fontSize": "1.2rem",
+                    "fontWeight": "700",
+                    "background": "white",
+                    "color": "#667eea",
+                    "border": "none",
+                    "borderRadius": "16px",
+                    "boxShadow": "0 8px 24px rgba(255,255,255,0.2)"
+                  }
+                },
+                {
+                  "ui:widget": "button",
+                  "ui:label": "View Documentation",
+                  "ui:icon": {
+                    "type": "fontawesome",
+                    "value": "fas fa-book",
+                    "color": "white"
+                  },
+                  "ui:iconPosition": "left",
+                  "ui:action": "showDemo",
+                  "ui:actionParams": { "type": "Docs" },
+                  "ui:animation": "fadeInRight",
+                  "ui:animateOnHover": "grow",
+                  "ui:styles": {
+                    "padding": "18px 40px",
+                    "fontSize": "1.2rem",
+                    "fontWeight": "700",
+                    "background": "rgba(255,255,255,0.1)",
+                    "color": "white",
+                    "border": "2px solid white",
+                    "borderRadius": "16px",
+                    "backdropFilter": "blur(10px)"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+
+        "footerCTA": {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "30px",
+          "ui:styles": {
+            "padding": "80px 40px",
+            "textAlign": "center",
+            "maxWidth": "900px",
+            "margin": "40px auto"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "heading",
+              "ui:text": "Ready to Build Amazing UIs?",
+              "ui:level": "h2",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-sparkles",
+                "color": "#fbbf24"
+              },
+              "ui:iconPosition": "top",
+              "ui:iconGap": "20px",
+              "ui:animation": "pulse",
+              "ui:styles": {
+                "fontSize": "3rem",
+                "fontWeight": "900",
+                "color": "white",
+                "fontFamily": "'Poppins', sans-serif"
+              }
+            },
+            {
+              "ui:widget": "paragraph",
+              "ui:text": "SmartWidget makes it easy to create beautiful, animated, and data-driven interfaces",
+              "ui:animation": "fadeInUp",
+              "ui:styles": {
+                "fontSize": "1.3rem",
+                "color": "rgba(255,255,255,0.9)",
+                "marginBottom": "20px"
+              }
+            },
+            {
+              "ui:widget": "button",
+              "ui:label": "Get Started Now",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-arrow-right",
+                "color": "#667eea"
+              },
+              "ui:iconPosition": "right",
+              "ui:action": "showDemo",
+              "ui:actionParams": { "type": "Get Started" },
+              "ui:animation": "scaleUp",
+              "ui:animateOnHover": "float",
+              "ui:styles": {
+                "padding": "20px 50px",
+                "fontSize": "1.3rem",
+                "fontWeight": "700",
+                "background": "white",
+                "color": "#667eea",
+                "border": "none",
+                "borderRadius": "50px",
+                "boxShadow": "0 10px 40px rgba(255,255,255,0.3)"
+              }
+            }
+          ]
+        }
+      },
+      "styles": {
+        "padding": "0",
+        "margin": "0"
+      }
+    },
+
+    "footer": {
+      "uiSchema": {
+        "footerContent": {
+          "ui:widget": "container",
+          "ui:direction": "column",
+          "ui:gap": "20px",
+          "ui:styles": {
+            "textAlign": "center"
+          },
+          "ui:children": [
+            {
+              "ui:widget": "text",
+              "ui:content": "© 2024 SmartWidget Showcase",
+              "ui:icon": {
+                "type": "fontawesome",
+                "value": "fas fa-code",
+                "color": "rgba(255,255,255,0.7)"
+              },
+              "ui:iconPosition": "left",
+              "ui:styles": {
+                "color": "rgba(255,255,255,0.9)",
+                "fontSize": "1rem"
+              }
+            },
+            {
+              "ui:widget": "text",
+              "ui:content": "Built with SmartWidget & Framer Motion",
+              "ui:styles": {
+                "color": "rgba(255,255,255,0.7)",
+                "fontSize": "0.9rem"
+              }
+            }
+          ]
+        }
+      },
+      "styles": {
+        "background": "rgba(30, 41, 59, 0.95)",
+        "backdropFilter": "blur(20px)",
+        "padding": "40px",
+        "borderTop": "2px solid rgba(255,255,255,0.1)"
+      }
+    }
+  },
+
+  "resolvedAPIs": {}
+},
 {
   title: "FitZen - Premium Fitness & Wellness",
   slug: "fitzen",
