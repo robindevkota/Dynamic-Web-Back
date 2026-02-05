@@ -18129,7 +18129,7 @@ try {
               // ========== LOGIN FORM ==========
               {
                 "ui:widget": "conditionalContent",
-                "ui:condition": "{{!authMode || authMode === 'login'}}",
+                 "ui:condition": "{{api.authMode === 'login'}}",
                 "ui:content": {
                   "ui:widget": "container",
                   "ui:direction": "column",
@@ -18191,6 +18191,7 @@ try {
                             marginBottom: "20px",
                             width: "100%",
                             boxSizing: "border-box",
+                              textAlign: "left"
                           },
                           "ui:labelStyles": {
                             // Added labelStyles
@@ -18221,6 +18222,7 @@ try {
                             marginBottom: "30px", // Increased margin
                             width: "100%",
                             boxSizing: "border-box",
+                              "textAlign": "left"
                           },
                           "ui:labelStyles": {
                             // Added labelStyles
@@ -18294,7 +18296,7 @@ try {
               // ========== SIGNUP FORM ==========
               {
                 "ui:widget": "conditionalContent",
-                "ui:condition": "{{authMode === 'signup'}}",
+               "ui:condition": "{{api.authMode === 'login'}}",
                 "ui:content": {
                   "ui:widget": "container",
                   "ui:direction": "column",
@@ -18590,7 +18592,7 @@ try {
               // ========== FORGOT PASSWORD FORM ==========
               {
                 "ui:widget": "conditionalContent",
-                "ui:condition": "{{authMode === 'forgot'}}",
+                 "ui:condition": "{{api.authMode === 'login'}}",
                 "ui:content": {
                   "ui:widget": "container",
                   "ui:direction": "column",
