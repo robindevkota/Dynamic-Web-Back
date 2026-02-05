@@ -11,16 +11,12 @@ module.exports = (req, res, next) => {
     // Get token from cookie
     const token = req.cookies.auth_token;
 
-    if (!token) {
-      console.log('❌ No auth_token cookie found');
-      return res.status(401).json({ 
-        error: "Authentication required",
-        debug: {
-          cookiesReceived: Object.keys(req.cookies || {}),
-          cookieHeader: req.headers.cookie ? 'present' : 'missing'
-        }
-      });
-    }
+   if (!token) {
+  console.log('❌ No auth_token cookie found');
+  return res.status(401).json({ 
+    error: "Authentication required"
+  });
+}
 
     console.log('✅ Token found in cookie');
 

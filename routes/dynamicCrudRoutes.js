@@ -1,165 +1,268 @@
-// routes/dynamicCrudRoutes.js - FULLY DYNAMIC VERSION
+// routes/dynamicCrudRoutes.js - FIXED VERSION
+// Properly separates platform-tier and website-tier authentication
+
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware"); // Platform tier
+const { endUserAdminAuth, optionalEndUserAuth, getOrgIdFromSlug } = require("../middleware/websiteTierAuth"); // Website tier
 const DynamicCrudController = require("../controllers/dynamicCrudController");
-const PageConfig = require("../models/PageConfig");
+const DynamicEntity = require("../models/DynamicEntity");
 const { upload } = DynamicCrudController;
 
-// ✅ Cache for website slug → organizationId mapping
-const orgCache = new Map();
-
-// ✅ DYNAMIC: Get organizationId from website slug
-async function getOrgIdFromSlug(websiteSlug) {
-  if (!websiteSlug) return null;
+/**
+ * CRITICAL MIDDLEWARE: Dynamic authentication based on entity configuration
+ * 
+ * Flow:
+ * 1. Check if websiteSlug is provided (website-tier access)
+ * 2. Look up the entity to check if it's marked as public
+ * 3. Route to appropriate auth:
+ *    - Public entity + websiteSlug → Allow unauthenticated
+ *    - Protected entity + websiteSlug → Require END_USER_ADMIN auth
+ *    - No websiteSlug → Require platform auth (DEVELOPER/CLIENT_ADMIN/SUPER_ADMIN)
+ */
+async function dynamicEntityAuth(req, res, next) {
+  const { organizationId, entityName } = req.params;
   
-  // Check cache first
-  if (orgCache.has(websiteSlug)) {
-    return orgCache.get(websiteSlug);
+  // Get website slug from various sources
+  let websiteSlug = req.headers['x-website-slug'] || 
+                    req.query.websiteSlug || 
+                    req.body?.websiteSlug;
+  
+  // ✅ AUTO-DETECT: If no websiteSlug but has website cookie, find the slug
+  if (!websiteSlug && !req.cookies?.auth_token) {
+    // Check if any website-specific cookie exists
+    const cookieNames = Object.keys(req.cookies || {});
+    const websiteCookie = cookieNames.find(name => 
+      name.endsWith('_auth_token') && name !== 'auth_token'
+    );
+    
+    if (websiteCookie) {
+      // Extract slug from cookie name (e.g., "chiyaz_auth_token" → "chiyaz")
+      websiteSlug = websiteCookie.replace('_auth_token', '');
+      console.log(`   ✅ Auto-detected websiteSlug from cookie: ${websiteSlug}`);
+    } else {
+      // Try to find website from organizationId
+      const PageConfig = require('../models/PageConfig');
+      const page = await PageConfig.findOne({ 
+        organizationId,
+        status: { $ne: 'Deleted' }
+      }).select('slug').lean();
+      
+      if (page) {
+        websiteSlug = page.slug;
+        console.log(`   ✅ Auto-detected websiteSlug from org: ${websiteSlug}`);
+      }
+    }
   }
   
+  console.log(`\n🔍 Dynamic Entity Auth Check:`);
+  console.log(`   Entity: ${entityName}`);
+  console.log(`   OrgID: ${organizationId}`);
+  console.log(`   Website: ${websiteSlug || 'NONE (platform access)'}`);
+
   try {
-    // Find page config by slug
-    const page = await PageConfig.findOne({ slug: websiteSlug })
-      .select('organizationId')
-      .lean();
-    
-    const orgId = page?.organizationId?.toString() || null;
-    
-    if (orgId) {
-      orgCache.set(websiteSlug, orgId);
-      console.log(`✅ Cached: ${websiteSlug} → ${orgId}`);
-    } else {
-      console.warn(`⚠️ No org found for slug: ${websiteSlug}`);
+    // ═══════════════════════════════════════════════════════════
+    // CASE 1: Platform-tier access (no websiteSlug after detection)
+    // ═══════════════════════════════════════════════════════════
+    if (!websiteSlug) {
+      console.log(`   → Platform-tier access (requires DEVELOPER/CLIENT_ADMIN/SUPER_ADMIN)`);
+      
+      // ✅ Check if platform cookie exists
+      const platformToken = req.cookies?.auth_token;
+      
+      if (!platformToken) {
+        console.log('   ❌ No platform auth_token - rejecting request');
+        return res.status(401).json({ 
+          error: "Authentication required",
+          hint: "Please log in to the platform",
+          tier: "platform"
+        });
+      }
+      
+      return authMiddleware(req, res, next);
     }
+
+    // ═══════════════════════════════════════════════════════════
+    // CASE 2: Website-tier access (websiteSlug detected/provided)
+    // ═══════════════════════════════════════════════════════════
     
-    return orgId;
+    // Verify org matches website
+    const expectedOrgId = await getOrgIdFromSlug(websiteSlug);
+    
+    if (!expectedOrgId) {
+      return res.status(400).json({ 
+        error: "Invalid website slug" 
+      });
+    }
+
+    if (expectedOrgId !== organizationId) {
+      console.log(`   ❌ Org mismatch: expected ${expectedOrgId}, got ${organizationId}`);
+      return res.status(403).json({ 
+        error: "Organization mismatch" 
+      });
+    }
+
+    // Look up entity to check access level
+    let entity = await DynamicEntity.findOne({
+      organizationId,
+      entityName,
+    }).lean();
+
+    // Try global entity if not found
+    if (!entity && organizationId === 'global') {
+      entity = await DynamicEntity.findOne({
+        entityName,
+        isGlobal: true,
+      }).lean();
+    }
+
+    if (!entity) {
+      return res.status(404).json({ 
+        error: `Entity "${entityName}" not found` 
+      });
+    }
+
+    // ✅ Check if entity is public
+    const isPublicEntity = entity.isPublic === true || entity.publicAccess === true;
+
+    if (isPublicEntity) {
+      // PUBLIC ENTITY: Allow unauthenticated access
+      console.log(`   ✅ Public entity - allowing unauthenticated access`);
+      
+      // Create a public user object for logging purposes
+      req.user = {
+        userId: "public",
+        organizationId: organizationId,
+        role: "PUBLIC_USER",
+        websiteSlug: websiteSlug,
+        isPublicAccess: true
+      };
+      
+      return next();
+    } else {
+      // PROTECTED ENTITY: Require END_USER_ADMIN authentication
+      console.log(`   🔒 Protected entity - requiring END_USER_ADMIN auth`);
+      return endUserAdminAuth(req, res, next);
+    }
+
   } catch (err) {
-    console.error('❌ Org lookup error:', err);
-    return null;
+    console.error("❌ Dynamic auth error:", err);
+    return res.status(500).json({ 
+      error: "Authentication check failed",
+      message: err.message 
+    });
   }
 }
 
-// ✅ DYNAMIC: Middleware to allow public access based on website slug
-const dynamicPublicOrAuthMiddleware = async (req, res, next) => {
+/**
+ * Schema endpoint - needs special handling
+ * - Platform tier: Requires platform auth
+ * - Website tier: Uses optional auth (allows public access)
+ */
+async function dynamicSchemaAuth(req, res, next) {
   const { organizationId } = req.params;
   
-  // Get website slug from various sources
   const websiteSlug = req.headers['x-website-slug'] || 
                      req.query.websiteSlug || 
                      req.body?.websiteSlug;
   
-  console.log(`🔍 Dynamic middleware - OrgID: ${organizationId}, Slug: ${websiteSlug}`);
-  
-  // If website slug is provided, resolve org and allow public access
-  if (websiteSlug) {
-    const expectedOrgId = await getOrgIdFromSlug(websiteSlug);
+  if (!websiteSlug) {
+    // Platform access
+    const platformToken = req.cookies?.auth_token; // ✅ ADD THIS CHECK
     
-    if (expectedOrgId && expectedOrgId === organizationId) {
-      console.log(`✅ Public access granted for ${websiteSlug} (${organizationId})`);
-      
-      req.user = {
-        userId: "000000000000000000000000",
-        organizationId: organizationId,
-        role: "PUBLIC_USER",
-        websiteSlug: websiteSlug
-      };
-      
-      return next();
-    } else {
-      console.log(`❌ Org mismatch: expected ${expectedOrgId}, got ${organizationId}`);
+    if (!platformToken) {
+      return res.status(401).json({ 
+        error: "Authentication required",
+        hint: "Please log in to access schema",
+        tier: "platform"
+      });
     }
+    
+    return authMiddleware(req, res, next);
   }
-  
-  // Otherwise require authentication
-  return authMiddleware(req, res, next);
-};
 
-// ✅ DYNAMIC: Schema middleware
-const dynamicSchemaMiddleware = async (req, res, next) => {
-  const { organizationId } = req.params;
-  
-  const websiteSlug = req.headers['x-website-slug'] || 
-                     req.query.websiteSlug || 
-                     req.body?.websiteSlug;
-  
-  if (websiteSlug) {
+  // Website access - verify org matches
+  try {
     const expectedOrgId = await getOrgIdFromSlug(websiteSlug);
     
-    if (expectedOrgId && expectedOrgId === organizationId) {
-      req.user = {
-        userId: "000000000000000000000000",
-        organizationId: organizationId,
-        role: "PUBLIC_USER",
-        websiteSlug: websiteSlug
-      };
-      
-      return next();
+    if (!expectedOrgId || expectedOrgId !== organizationId) {
+      return res.status(403).json({ error: "Organization mismatch" });
     }
+
+    // Allow public access to schemas
+    req.user = {
+      userId: "public",
+      organizationId: organizationId,
+      role: "PUBLIC_USER",
+      websiteSlug: websiteSlug,
+      isPublicAccess: true
+    };
+    
+    next();
+  } catch (err) {
+    console.error("❌ Schema auth error:", err);
+    return res.status(500).json({ error: "Authentication check failed" });
   }
-  
-  // Otherwise require authentication
-  return authMiddleware(req, res, next);
-};
+}
 
 // ============================================
-// ENTITY MANAGEMENT (always requires auth)
+// ENTITY MANAGEMENT (platform-tier only)
+// Requires DEVELOPER, CLIENT_ADMIN, or SUPER_ADMIN
 // ============================================
 router.get("/entities", authMiddleware, DynamicCrudController.listEntities);
 router.post("/entity", authMiddleware, DynamicCrudController.defineEntity);
-router.put(
-  "/entity/:entityId",
-  authMiddleware,
-  DynamicCrudController.updateEntity,
-);
-router.delete(
-  "/entity/:entityId",
-  authMiddleware,
-  DynamicCrudController.deleteEntity,
-);
+router.put("/entity/:entityId", authMiddleware, DynamicCrudController.updateEntity);
+router.delete("/entity/:entityId", authMiddleware, DynamicCrudController.deleteEntity);
 
 // ============================================
-// ✅ SCHEMA ROUTE - Dynamic public access
+// SCHEMA ROUTE - Website-tier public access
 // ============================================
 router.get(
   "/:organizationId/:entityName/schema",
-  dynamicSchemaMiddleware,
+  dynamicSchemaAuth,
   DynamicCrudController.getEntity
 );
 
 // ============================================
-// DYNAMIC CRUD - Public access based on website slug
+// DYNAMIC CRUD ROUTES - Smart authentication
+// Uses dynamicEntityAuth to determine access level
 // ============================================
+
+// LIST
 router.get(
   "/:organizationId/:entityName",
-  dynamicPublicOrAuthMiddleware,
-  DynamicCrudController.createCrudHandler("list"),
+  dynamicEntityAuth,
+  DynamicCrudController.createCrudHandler("list")
 );
 
+// CREATE
 router.post(
   "/:organizationId/:entityName",
-  dynamicPublicOrAuthMiddleware,
+  dynamicEntityAuth,
   upload.any(),
-  DynamicCrudController.createCrudHandler("create"),
+  DynamicCrudController.createCrudHandler("create")
 );
 
+// READ ONE
 router.get(
   "/:organizationId/:entityName/:recordId",
-  dynamicPublicOrAuthMiddleware,
-  DynamicCrudController.createCrudHandler("read"),
+  dynamicEntityAuth,
+  DynamicCrudController.createCrudHandler("read")
 );
 
+// UPDATE
 router.put(
   "/:organizationId/:entityName/:recordId",
-  dynamicPublicOrAuthMiddleware,
+  dynamicEntityAuth,
   upload.any(),
-  DynamicCrudController.createCrudHandler("update"),
+  DynamicCrudController.createCrudHandler("update")
 );
 
+// DELETE
 router.delete(
   "/:organizationId/:entityName/:recordId",
-  dynamicPublicOrAuthMiddleware,
-  DynamicCrudController.createCrudHandler("delete"),
+  dynamicEntityAuth,
+  DynamicCrudController.createCrudHandler("delete")
 );
 
 module.exports = router;

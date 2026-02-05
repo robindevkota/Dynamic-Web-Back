@@ -194,3 +194,31 @@ Effects:
   - Other projects still work
     ↓
 CLIENT_ADMIN decides, not SUPER_ADMIN
+
+
+
+
+
+Request to /api/crud/{orgId}/{entityName}
+    │
+    ├─ Has websiteSlug header/param?
+    │   │
+    │   ├─ YES → Website-tier access
+    │   │   │
+    │   │   ├─ Verify org matches website
+    │   │   │
+    │   │   ├─ Look up entity
+    │   │   │
+    │   │   ├─ Entity is public?
+    │   │   │   │
+    │   │   │   ├─ YES → Allow unauthenticated
+    │   │   │   │         Set req.user = "PUBLIC_USER"
+    │   │   │   │
+    │   │   │   └─ NO  → Require END_USER_ADMIN auth
+    │   │   │             Check {websiteSlug}_auth_token
+    │   │   │
+    │   │   └─ Continue to handler
+    │   │
+    │   └─ NO  → Platform-tier access
+    │            Require auth_token
+    │            Check DEVELOPER/CLIENT_ADMIN/SUPER_ADMIN role
