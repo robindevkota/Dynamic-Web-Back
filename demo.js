@@ -10,23 +10,23 @@ mongoose.connect(
 );
 
 const websites = [
-{
-  "title": "SmartWidget Showcase - Animations & Icons",
-  "slug": "smartwidget-demo",
-  "projectUUID": "smartwidget-showcase-001",
-  "taskUUID": "showcase001",
-  "status": "Active",
-  "isTemplate": false,
-  templateCategory: "E-commerce", // Category (E-commerce, Portfolio, Dashboard, Landing Page, Blog, Other)
+  {
+    title: "SmartWidget Showcase - Animations & Icons",
+    slug: "smartwidget-demo",
+    projectUUID: "smartwidget-showcase-001",
+    taskUUID: "showcase001",
+    status: "Active",
+    isTemplate: false,
+    templateCategory: "E-commerce", // Category (E-commerce, Portfolio, Dashboard, Landing Page, Blog, Other)
     organizationId: null,
-  "createdBy": "000000000000000000000000",
-  "accountValidation": false,
-  "otpValidation": false,
-  "isAnonymous": true,
-  "requireAuth": false,
+    createdBy: "000000000000000000000000",
+    accountValidation: false,
+    otpValidation: false,
+    isAnonymous: true,
+    requireAuth: false,
 
-  "initialization": {
-    "globalCSS": `/* SmartWidget Showcase Styles */
+    initialization: {
+      globalCSS: `/* SmartWidget Showcase Styles */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@600;700;800&display=swap');
 
@@ -130,14 +130,14 @@ html {
   margin: 30px 0;
 }`,
 
-    "resources": [
-      "demo.products.list",
-      "demo.stats.dashboard",
-      "demo.users.list"
-    ],
+      resources: [
+        "demo.products.list",
+        "demo.stats.dashboard",
+        "demo.users.list",
+      ],
 
-    "actions": {
-      "scrollToSection": `
+      actions: {
+        scrollToSection: `
         const sectionId = context.actionParams?.sectionId;
         if (sectionId) {
           const element = document.getElementById(sectionId);
@@ -146,8 +146,8 @@ html {
           }
         }
       `,
-      
-      "showDemo": `
+
+        showDemo: `
         const demoType = context.actionParams?.type || 'default';
         context.handlers.showNotification({
           type: 'toast',
@@ -155,1381 +155,1397 @@ html {
           background: '#667eea',
           duration: 2000
         });
-      `
-    }
-  },
-
-  "components": {
-    "navbar": {
-      "uiSchema": {
-        "logo": {
-          "ui:widget": "text",
-          "ui:content": "🎨 SmartWidget Demo",
-          "ui:icon": {
-            "type": "fontawesome",
-            "value": "fas fa-palette"
-          },
-          "ui:iconPosition": "left",
-          "ui:iconGap": "12px",
-          "ui:animation": "fadeInDown",
-          "ui:styles": {
-            "fontSize": "24px",
-            "fontWeight": "800",
-            "color": "white",
-            "cursor": "pointer"
-          }
-        },
-        
-        "navLinks": {
-          "ui:widget": "container",
-          "ui:direction": "row",
-          "ui:gap": "20px",
-          "ui:styles": {
-            "marginLeft": "auto"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "button",
-              "ui:label": "Icons",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-icons",
-                "color": "white"
-              },
-              "ui:iconPosition": "left",
-              "ui:action": "scrollToSection",
-              "ui:actionParams": { "sectionId": "icons-section" },
-              "ui:animateOnHover": "lift",
-              "ui:styles": {
-                "background": "rgba(255,255,255,0.1)",
-                "color": "white",
-                "border": "2px solid rgba(255,255,255,0.3)",
-                "padding": "10px 20px",
-                "borderRadius": "12px",
-                "fontWeight": "600",
-                "backdropFilter": "blur(10px)"
-              }
-            },
-            {
-              "ui:widget": "button",
-              "ui:label": "Animations",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-magic",
-                "color": "white"
-              },
-              "ui:iconPosition": "left",
-              "ui:action": "scrollToSection",
-              "ui:actionParams": { "sectionId": "animations-section" },
-              "ui:animateOnHover": "lift",
-              "ui:styles": {
-                "background": "rgba(255,255,255,0.1)",
-                "color": "white",
-                "border": "2px solid rgba(255,255,255,0.3)",
-                "padding": "10px 20px",
-                "borderRadius": "12px",
-                "fontWeight": "600",
-                "backdropFilter": "blur(10px)"
-              }
-            },
-            {
-              "ui:widget": "button",
-              "ui:label": "Data Binding",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-database",
-                "color": "white"
-              },
-              "ui:iconPosition": "left",
-              "ui:action": "scrollToSection",
-              "ui:actionParams": { "sectionId": "data-section" },
-              "ui:animateOnHover": "lift",
-              "ui:styles": {
-                "background": "rgba(255,255,255,0.1)",
-                "color": "white",
-                "border": "2px solid rgba(255,255,255,0.3)",
-                "padding": "10px 20px",
-                "borderRadius": "12px",
-                "fontWeight": "600",
-                "backdropFilter": "blur(10px)"
-              }
-            }
-          ]
-        }
+      `,
       },
-      "styles": {
-        "background": "rgba(30, 41, 59, 0.95)",
-        "backdropFilter": "blur(20px)",
-        "borderBottom": "2px solid rgba(255,255,255,0.1)",
-        "padding": "20px 40px",
-        "position": "fixed",
-        "width": "100%",
-        "zIndex": "1000",
-        "display": "flex",
-        "alignItems": "center",
-        "boxShadow": "0 8px 32px rgba(0,0,0,0.1)"
-      }
     },
 
-    "main": {
-      "uiSchema": {
-        "heroSection": {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "40px",
-          "ui:styles": {
-            "padding": "140px 40px 80px",
-            "textAlign": "center",
-            "maxWidth": "1200px",
-            "margin": "0 auto"
+    components: {
+      navbar: {
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "🎨 SmartWidget Demo",
+            "ui:icon": {
+              type: "fontawesome",
+              value: "fas fa-palette",
+            },
+            "ui:iconPosition": "left",
+            "ui:iconGap": "12px",
+            "ui:animation": "fadeInDown",
+            "ui:styles": {
+              fontSize: "24px",
+              fontWeight: "800",
+              color: "white",
+              cursor: "pointer",
+            },
           },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "SmartWidget Showcase",
-              "ui:level": "h1",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-star",
-                "color": "#fbbf24"
-              },
-              "ui:iconPosition": "top",
-              "ui:iconGap": "20px",
-              "ui:animation": "fadeInUp",
-              "ui:styles": {
-                "fontSize": "4rem",
-                "fontWeight": "900",
-                "color": "white",
-                "textShadow": "0 4px 20px rgba(0,0,0,0.5)",
-                "fontFamily": "'Poppins', sans-serif",
-                "marginBottom": "20px"
-              }
+
+          navLinks: {
+            "ui:widget": "container",
+            "ui:direction": "row",
+            "ui:gap": "20px",
+            "ui:styles": {
+              marginLeft: "auto",
             },
-            
-            {
-              "ui:widget": "paragraph",
-              "ui:text": "Explore the power of icons, animations, and dynamic data binding",
-              "ui:animation": "fadeInUp",
-              "ui:styles": {
-                "fontSize": "1.5rem",
-                "color": "rgba(255,255,255,0.9)",
-                "maxWidth": "800px",
-                "margin": "0 auto 40px"
-              }
-            },
-            
-            {
-              "ui:widget": "container",
-              "ui:direction": "row",
-              "ui:gap": "20px",
-              "ui:justify": "center",
-              "ui:styles": {
-                "flexWrap": "wrap"
-              },
-              "ui:children": [
-                {
-                  "ui:widget": "button",
-                  "ui:label": "Explore Icons",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-rocket"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:action": "scrollToSection",
-                  "ui:actionParams": { "sectionId": "icons-section" },
-                  "ui:animation": "scaleIn",
-                  "ui:animateOnHover": "float",
-                  "ui:styles": {
-                    "padding": "16px 32px",
-                    "fontSize": "1.1rem",
-                    "fontWeight": "700",
-                    "background": "white",
-                    "color": "#667eea",
-                    "border": "none",
-                    "borderRadius": "16px",
-                    "boxShadow": "0 8px 24px rgba(0,0,0,0.15)"
-                  }
+            "ui:children": [
+              {
+                "ui:widget": "button",
+                "ui:label": "Icons",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-icons",
+                  color: "white",
                 },
-                {
-                  "ui:widget": "button",
-                  "ui:label": "See Animations",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-bolt"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:action": "scrollToSection",
-                  "ui:actionParams": { "sectionId": "animations-section" },
-                  "ui:animation": "scaleIn",
-                  "ui:animateOnHover": "float",
-                  "ui:styles": {
-                    "padding": "16px 32px",
-                    "fontSize": "1.1rem",
-                    "fontWeight": "700",
-                    "background": "rgba(255,255,255,0.2)",
-                    "color": "white",
-                    "border": "2px solid white",
-                    "borderRadius": "16px",
-                    "backdropFilter": "blur(10px)"
-                  }
-                }
-              ]
-            }
-          ]
+                "ui:iconPosition": "left",
+                "ui:action": "scrollToSection",
+                "ui:actionParams": { sectionId: "icons-section" },
+                "ui:animateOnHover": "lift",
+                "ui:styles": {
+                  background: "rgba(255,255,255,0.1)",
+                  color: "white",
+                  border: "2px solid rgba(255,255,255,0.3)",
+                  padding: "10px 20px",
+                  borderRadius: "12px",
+                  fontWeight: "600",
+                  backdropFilter: "blur(10px)",
+                },
+              },
+              {
+                "ui:widget": "button",
+                "ui:label": "Animations",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-magic",
+                  color: "white",
+                },
+                "ui:iconPosition": "left",
+                "ui:action": "scrollToSection",
+                "ui:actionParams": { sectionId: "animations-section" },
+                "ui:animateOnHover": "lift",
+                "ui:styles": {
+                  background: "rgba(255,255,255,0.1)",
+                  color: "white",
+                  border: "2px solid rgba(255,255,255,0.3)",
+                  padding: "10px 20px",
+                  borderRadius: "12px",
+                  fontWeight: "600",
+                  backdropFilter: "blur(10px)",
+                },
+              },
+              {
+                "ui:widget": "button",
+                "ui:label": "Data Binding",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-database",
+                  color: "white",
+                },
+                "ui:iconPosition": "left",
+                "ui:action": "scrollToSection",
+                "ui:actionParams": { sectionId: "data-section" },
+                "ui:animateOnHover": "lift",
+                "ui:styles": {
+                  background: "rgba(255,255,255,0.1)",
+                  color: "white",
+                  border: "2px solid rgba(255,255,255,0.3)",
+                  padding: "10px 20px",
+                  borderRadius: "12px",
+                  fontWeight: "600",
+                  backdropFilter: "blur(10px)",
+                },
+              },
+            ],
+          },
         },
-
-        "iconsSection": {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "50px",
-          "ui:id": "icons-section",
-          "ui:styles": {
-            "padding": "80px 40px",
-            "maxWidth": "1400px",
-            "margin": "0 auto",
-            "background": "rgba(255,255,255,0.95)",
-            "backdropFilter": "blur(20px)",
-            "borderRadius": "24px",
-            "boxShadow": "0 8px 32px rgba(0,0,0,0.1)"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "Icon Showcase",
-              "ui:level": "h2",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-icons",
-                "color": "#667eea"
-              },
-              "ui:iconPosition": "left",
-              "ui:animation": "fadeInLeft",
-              "ui:styles": {
-                "fontSize": "2.5rem",
-                "fontWeight": "800",
-                "color": "#1e293b",
-                "textAlign": "center"
-              }
-            },
-            
-            {
-              "ui:widget": "paragraph",
-              "ui:text": "Icons can be positioned left, right, top, or bottom with customizable gaps and colors",
-              "ui:animation": "fadeInUp",
-              "ui:styles": {
-                "fontSize": "1.1rem",
-                "color": "#64748b",
-                "textAlign": "center",
-                "maxWidth": "700px",
-                "margin": "0 auto"
-              }
-            },
-
-            {
-              "ui:widget": "gridLayout",
-              "ui:columns": 4,
-              "ui:gap": "24px",
-              "ui:children": [
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Heart Left",
-                  "ui:description": "Icon on the left side",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-heart",
-                    "color": "#ef4444"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:animation": "fadeInUp",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "padding": "30px",
-                    "textAlign": "center",
-                    "background": "white",
-                    "borderRadius": "16px",
-                    "border": "2px solid #e2e8f0",
-                    "transition": "all 0.3s"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Star Right",
-                  "ui:description": "Icon on the right side",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-star",
-                    "color": "#fbbf24"
-                  },
-                  "ui:iconPosition": "right",
-                  "ui:animation": "fadeInUp",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "padding": "30px",
-                    "textAlign": "center",
-                    "background": "white",
-                    "borderRadius": "16px",
-                    "border": "2px solid #e2e8f0",
-                    "transition": "all 0.3s"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Crown Top",
-                  "ui:description": "Icon on top",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-crown",
-                    "color": "#f59e0b"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "fadeInUp",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "padding": "30px",
-                    "textAlign": "center",
-                    "background": "white",
-                    "borderRadius": "16px",
-                    "border": "2px solid #e2e8f0",
-                    "transition": "all 0.3s"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Trophy Bottom",
-                  "ui:description": "Icon on bottom",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-trophy",
-                    "color": "#8b5cf6"
-                  },
-                  "ui:iconPosition": "bottom",
-                  "ui:animation": "fadeInUp",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "padding": "30px",
-                    "textAlign": "center",
-                    "background": "white",
-                    "borderRadius": "16px",
-                    "border": "2px solid #e2e8f0",
-                    "transition": "all 0.3s"
-                  }
-                }
-              ]
-            },
-
-            {
-              "ui:widget": "divider",
-              "ui:variant": "solid",
-              "ui:color": "#e2e8f0",
-              "ui:spacing": "large"
-            },
-
-            {
-              "ui:widget": "heading",
-              "ui:text": "Input Icons (Prefix & Suffix)",
-              "ui:level": "h3",
-              "ui:animation": "fadeInLeft",
-              "ui:styles": {
-                "fontSize": "2rem",
-                "fontWeight": "700",
-                "color": "#1e293b",
-                "marginTop": "20px"
-              }
-            },
-
-            {
-              "ui:widget": "container",
-              "ui:direction": "column",
-              "ui:gap": "20px",
-              "ui:styles": {
-                "maxWidth": "600px",
-                "margin": "0 auto",
-                "width": "100%"
-              },
-              "ui:children": [
-                {
-                  "ui:widget": "inputField",
-                  "ui:label": "Email with Prefix Icon",
-                  "ui:placeholder": "your.email@example.com",
-                  "ui:name": "email",
-                  "ui:prefixIcon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-envelope",
-                    "color": "#667eea"
-                  },
-                  "ui:animation": "fadeInLeft"
-                },
-                {
-                  "ui:widget": "inputField",
-                  "ui:label": "Search with Suffix Icon",
-                  "ui:placeholder": "Search anything...",
-                  "ui:name": "search",
-                  "ui:suffixIcon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-search",
-                    "color": "#10b981"
-                  },
-                  "ui:animation": "fadeInRight"
-                },
-                {
-                  "ui:widget": "inputField",
-                  "ui:label": "Price with Both Icons",
-                  "ui:placeholder": "0.00",
-                  "ui:name": "price",
-                  "ui:prefixIcon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-dollar-sign",
-                    "color": "#059669"
-                  },
-                  "ui:suffixIcon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-check-circle",
-                    "color": "#10b981"
-                  },
-                  "ui:animation": "fadeInUp"
-                }
-              ]
-            }
-          ]
+        styles: {
+          background: "rgba(30, 41, 59, 0.95)",
+          backdropFilter: "blur(20px)",
+          borderBottom: "2px solid rgba(255,255,255,0.1)",
+          padding: "20px 40px",
+          position: "fixed",
+          width: "100%",
+          zIndex: "1000",
+          display: "flex",
+          alignItems: "center",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
         },
-
-        "animationsSection": {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "50px",
-          "ui:id": "animations-section",
-          "ui:styles": {
-            "padding": "80px 40px",
-            "maxWidth": "1400px",
-            "margin": "40px auto",
-            "background": "rgba(30, 41, 59, 0.95)",
-            "backdropFilter": "blur(20px)",
-            "borderRadius": "24px",
-            "boxShadow": "0 8px 32px rgba(0,0,0,0.3)",
-            "color": "white"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "Animation Showcase",
-              "ui:level": "h2",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-magic",
-                "color": "#a78bfa"
-              },
-              "ui:iconPosition": "left",
-              "ui:animation": "rotateIn",
-              "ui:styles": {
-                "fontSize": "2.5rem",
-                "fontWeight": "800",
-                "color": "white",
-                "textAlign": "center"
-              }
-            },
-
-            {
-              "ui:widget": "paragraph",
-              "ui:text": "SmartWidget supports entry animations and hover animations powered by Framer Motion",
-              "ui:animation": "fadeInUp",
-              "ui:styles": {
-                "fontSize": "1.1rem",
-                "color": "rgba(255,255,255,0.9)",
-                "textAlign": "center",
-                "maxWidth": "700px",
-                "margin": "0 auto"
-              }
-            },
-
-            {
-              "ui:widget": "heading",
-              "ui:text": "Entry Animations",
-              "ui:level": "h3",
-              "ui:animation": "slideInLeft",
-              "ui:styles": {
-                "fontSize": "1.8rem",
-                "fontWeight": "700",
-                "color": "white",
-                "marginTop": "20px"
-              }
-            },
-
-            {
-              "ui:widget": "gridLayout",
-              "ui:columns": 3,
-              "ui:gap": "24px",
-              "ui:children": [
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Fade In",
-                  "ui:description": "Smooth fade in effect",
-                  "ui:animation": "fadeIn",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(255,255,255,0.1)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid rgba(255,255,255,0.2)",
-                    "color": "white"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Slide In Up",
-                  "ui:description": "Slides from bottom",
-                  "ui:animation": "slideInUp",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(255,255,255,0.1)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid rgba(255,255,255,0.2)",
-                    "color": "white"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Scale In",
-                  "ui:description": "Scales from small",
-                  "ui:animation": "scaleIn",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(255,255,255,0.1)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid rgba(255,255,255,0.2)",
-                    "color": "white"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Fade In Left",
-                  "ui:description": "Fades from left side",
-                  "ui:animation": "fadeInLeft",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(255,255,255,0.1)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid rgba(255,255,255,0.2)",
-                    "color": "white"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Fade In Right",
-                  "ui:description": "Fades from right side",
-                  "ui:animation": "fadeInRight",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(255,255,255,0.1)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid rgba(255,255,255,0.2)",
-                    "color": "white"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Rotate In",
-                  "ui:description": "Rotates while fading",
-                  "ui:animation": "rotateIn",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(255,255,255,0.1)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid rgba(255,255,255,0.2)",
-                    "color": "white"
-                  }
-                }
-              ]
-            },
-
-            {
-              "ui:widget": "divider",
-              "ui:variant": "dashed",
-              "ui:color": "rgba(255,255,255,0.3)",
-              "ui:spacing": "large"
-            },
-
-            {
-              "ui:widget": "heading",
-              "ui:text": "Hover Animations",
-              "ui:level": "h3",
-              "ui:animation": "slideInRight",
-              "ui:styles": {
-                "fontSize": "1.8rem",
-                "fontWeight": "700",
-                "color": "white",
-                "marginTop": "20px"
-              }
-            },
-
-            {
-              "ui:widget": "gridLayout",
-              "ui:columns": 4,
-              "ui:gap": "24px",
-              "ui:children": [
-                {
-                  "ui:widget": "button",
-                  "ui:label": "Lift",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-arrow-up"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:animateOnHover": "lift",
-                  "ui:animation": "fadeInUp",
-                  "ui:styles": {
-                    "padding": "20px 30px",
-                    "background": "rgba(167, 139, 250, 0.2)",
-                    "color": "white",
-                    "border": "2px solid #a78bfa",
-                    "borderRadius": "12px",
-                    "fontWeight": "600",
-                    "width": "100%"
-                  }
-                },
-                {
-                  "ui:widget": "button",
-                  "ui:label": "Grow",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-expand"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:animateOnHover": "grow",
-                  "ui:animation": "fadeInUp",
-                  "ui:styles": {
-                    "padding": "20px 30px",
-                    "background": "rgba(34, 197, 94, 0.2)",
-                    "color": "white",
-                    "border": "2px solid #22c55e",
-                    "borderRadius": "12px",
-                    "fontWeight": "600",
-                    "width": "100%"
-                  }
-                },
-                {
-                  "ui:widget": "button",
-                  "ui:label": "Tilt",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-undo"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:animateOnHover": "tilt",
-                  "ui:animation": "fadeInUp",
-                  "ui:styles": {
-                    "padding": "20px 30px",
-                    "background": "rgba(59, 130, 246, 0.2)",
-                    "color": "white",
-                    "border": "2px solid #3b82f6",
-                    "borderRadius": "12px",
-                    "fontWeight": "600",
-                    "width": "100%"
-                  }
-                },
-                {
-                  "ui:widget": "button",
-                  "ui:label": "Float",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-cloud"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:animateOnHover": "float",
-                  "ui:animation": "fadeInUp",
-                  "ui:styles": {
-                    "padding": "20px 30px",
-                    "background": "rgba(251, 191, 36, 0.2)",
-                    "color": "white",
-                    "border": "2px solid #fbbf24",
-                    "borderRadius": "12px",
-                    "fontWeight": "600",
-                    "width": "100%"
-                  }
-                }
-              ]
-            },
-
-            {
-              "ui:widget": "divider",
-              "ui:variant": "solid",
-              "ui:color": "rgba(255,255,255,0.2)",
-              "ui:spacing": "large"
-            },
-
-            {
-              "ui:widget": "heading",
-              "ui:text": "Continuous Animations",
-              "ui:level": "h3",
-              "ui:animation": "fadeInLeft",
-              "ui:styles": {
-                "fontSize": "1.8rem",
-                "fontWeight": "700",
-                "color": "white",
-                "marginTop": "20px"
-              }
-            },
-
-            {
-              "ui:widget": "flexLayout",
-              "ui:direction": "row",
-              "ui:gap": "30px",
-              "ui:justify": "center",
-              "ui:wrap": true,
-              "ui:children": [
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Pulse",
-                  "ui:description": "Continuous pulse animation",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-heart",
-                    "color": "#ef4444"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "pulse",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(239, 68, 68, 0.2)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid #ef4444",
-                    "color": "white",
-                    "minWidth": "200px"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Bounce",
-                  "ui:description": "Bouncing animation",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-basketball-ball",
-                    "color": "#f59e0b"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "bounce",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(245, 158, 11, 0.2)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid #f59e0b",
-                    "color": "white",
-                    "minWidth": "200px"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Float",
-                  "ui:description": "Floating up and down",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-feather",
-                    "color": "#8b5cf6"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "float",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "rgba(139, 92, 246, 0.2)",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid #8b5cf6",
-                    "color": "white",
-                    "minWidth": "200px"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-
-        "dataBindingSection": {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "50px",
-          "ui:id": "data-section",
-          "ui:styles": {
-            "padding": "80px 40px",
-            "maxWidth": "1400px",
-            "margin": "40px auto",
-            "background": "rgba(255,255,255,0.95)",
-            "backdropFilter": "blur(20px)",
-            "borderRadius": "24px",
-            "boxShadow": "0 8px 32px rgba(0,0,0,0.1)"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "Dynamic Data Binding",
-              "ui:level": "h2",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-database",
-                "color": "#667eea"
-              },
-              "ui:iconPosition": "left",
-              "ui:animation": "fadeInDown",
-              "ui:styles": {
-                "fontSize": "2.5rem",
-                "fontWeight": "800",
-                "color": "#1e293b",
-                "textAlign": "center"
-              }
-            },
-
-            {
-              "ui:widget": "paragraph",
-              "ui:text": "SmartWidget automatically resolves templates and binds data from DataStore",
-              "ui:animation": "fadeInUp",
-              "ui:styles": {
-                "fontSize": "1.1rem",
-                "color": "#64748b",
-                "textAlign": "center",
-                "maxWidth": "700px",
-                "margin": "0 auto"
-              }
-            },
-
-            {
-              "ui:widget": "heading",
-              "ui:text": "Template Examples",
-              "ui:level": "h3",
-              "ui:animation": "fadeInLeft",
-              "ui:styles": {
-                "fontSize": "1.8rem",
-                "fontWeight": "700",
-                "color": "#1e293b",
-                "marginTop": "20px"
-              }
-            },
-
-            {
-              "ui:widget": "gridLayout",
-              "ui:columns": 2,
-              "ui:gap": "24px",
-              "ui:children": [
-                {
-                  "ui:widget": "card",
-                  "ui:title": "User Email",
-                  "ui:description": "{{auth.user.email || 'guest@example.com'}}",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-envelope",
-                    "color": "#3b82f6"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "fadeInUp",
-                  "ui:animateOnHover": "lift",
-                  "ui:styles": {
-                    "padding": "30px",
-                    "background": "white",
-                    "borderRadius": "16px",
-                    "border": "2px solid #e2e8f0"
-                  },
-                  "ui:titleStyles": {
-                    "color": "#1e293b",
-                    "fontSize": "1.3rem",
-                    "fontWeight": "700"
-                  },
-                  "ui:descriptionStyles": {
-                    "color": "#3b82f6",
-                    "fontSize": "1.1rem",
-                    "fontFamily": "monospace"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Auth Status",
-                  "ui:description": "{{auth.isAuthenticated ? 'Logged In' : 'Guest'}}",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-user-shield",
-                    "color": "#10b981"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "fadeInUp",
-                  "ui:animateOnHover": "lift",
-                  "ui:styles": {
-                    "padding": "30px",
-                    "background": "white",
-                    "borderRadius": "16px",
-                    "border": "2px solid #e2e8f0"
-                  },
-                  "ui:titleStyles": {
-                    "color": "#1e293b",
-                    "fontSize": "1.3rem",
-                    "fontWeight": "700"
-                  },
-                  "ui:descriptionStyles": {
-                    "color": "#10b981",
-                    "fontSize": "1.1rem",
-                    "fontFamily": "monospace"
-                  }
-                }
-              ]
-            },
-
-            {
-              "ui:widget": "divider",
-              "ui:variant": "solid",
-              "ui:color": "#e2e8f0",
-              "ui:spacing": "large"
-            },
-
-            {
-              "ui:widget": "heading",
-              "ui:text": "Stats Dashboard (Mock Data)",
-              "ui:level": "h3",
-              "ui:animation": "slideInRight",
-              "ui:styles": {
-                "fontSize": "1.8rem",
-                "fontWeight": "700",
-                "color": "#1e293b",
-                "marginTop": "20px"
-              }
-            },
-
-            {
-              "ui:widget": "gridLayout",
-              "ui:columns": 4,
-              "ui:gap": "24px",
-              "ui:children": [
-                {
-                  "ui:widget": "statsCounter",
-                  "ui:value": "12,543",
-                  "ui:label": "Total Users",
-                  "ui:color": "#3b82f6",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-users",
-                    "color": "#3b82f6"
-                  },
-                  "ui:animation": "scaleIn",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "background": "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))",
-                    "borderRadius": "16px",
-                    "border": "2px solid #dbeafe",
-                    "padding": "30px"
-                  }
-                },
-                {
-                  "ui:widget": "statsCounter",
-                  "ui:value": "8,492",
-                  "ui:label": "Active Projects",
-                  "ui:color": "#10b981",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-project-diagram",
-                    "color": "#10b981"
-                  },
-                  "ui:animation": "scaleIn",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "background": "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))",
-                    "borderRadius": "16px",
-                    "border": "2px solid #d1fae5",
-                    "padding": "30px"
-                  }
-                },
-                {
-                  "ui:widget": "statsCounter",
-                  "ui:value": "95.4%",
-                  "ui:label": "Success Rate",
-                  "ui:color": "#8b5cf6",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-chart-line",
-                    "color": "#8b5cf6"
-                  },
-                  "ui:animation": "scaleIn",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "background": "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05))",
-                    "borderRadius": "16px",
-                    "border": "2px solid #ede9fe",
-                    "padding": "30px"
-                  }
-                },
-                {
-                  "ui:widget": "statsCounter",
-                  "ui:value": "$2.4M",
-                  "ui:label": "Revenue",
-                  "ui:color": "#f59e0b",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-dollar-sign",
-                    "color": "#f59e0b"
-                  },
-                  "ui:animation": "scaleIn",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "background": "linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05))",
-                    "borderRadius": "16px",
-                    "border": "2px solid #fef3c7",
-                    "padding": "30px"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-
-        "combinedFeaturesSection": {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "50px",
-          "ui:styles": {
-            "padding": "80px 40px",
-            "maxWidth": "1400px",
-            "margin": "40px auto",
-            "background": "rgba(30, 41, 59, 0.95)",
-            "backdropFilter": "blur(20px)",
-            "borderRadius": "24px",
-            "boxShadow": "0 8px 32px rgba(0,0,0,0.3)",
-            "color": "white"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "Combined Features",
-              "ui:level": "h2",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-layer-group",
-                "color": "#a78bfa"
-              },
-              "ui:iconPosition": "left",
-              "ui:animation": "fadeInDown",
-              "ui:styles": {
-                "fontSize": "2.5rem",
-                "fontWeight": "800",
-                "color": "white",
-                "textAlign": "center"
-              }
-            },
-
-            {
-              "ui:widget": "paragraph",
-              "ui:text": "Icons + Animations + Data Binding working together seamlessly",
-              "ui:animation": "fadeInUp",
-              "ui:styles": {
-                "fontSize": "1.1rem",
-                "color": "rgba(255,255,255,0.9)",
-                "textAlign": "center",
-                "maxWidth": "700px",
-                "margin": "0 auto"
-              }
-            },
-
-            {
-              "ui:widget": "gridLayout",
-              "ui:columns": 3,
-              "ui:gap": "24px",
-              "ui:children": [
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Premium User",
-                  "ui:description": "Animated card with icon and dynamic status",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-crown",
-                    "color": "#fbbf24"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "fadeInUp",
-                  "ui:animateOnHover": "float",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1))",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid #fbbf24",
-                    "color": "white"
-                  },
-                  "ui:titleStyles": {
-                    "color": "#fbbf24",
-                    "fontSize": "1.5rem",
-                    "fontWeight": "800"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Verified Badge",
-                  "ui:description": "Trust indicator with smooth animations",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-shield-check",
-                    "color": "#10b981"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "scaleIn",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1))",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid #10b981",
-                    "color": "white"
-                  },
-                  "ui:titleStyles": {
-                    "color": "#10b981",
-                    "fontSize": "1.5rem",
-                    "fontWeight": "800"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "Lightning Fast",
-                  "ui:description": "Performance optimized components",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-bolt",
-                    "color": "#f59e0b"
-                  },
-                  "ui:iconPosition": "top",
-                  "ui:animation": "rotateIn",
-                  "ui:animateOnHover": "tilt",
-                  "ui:styles": {
-                    "padding": "40px",
-                    "textAlign": "center",
-                    "background": "linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1))",
-                    "backdropFilter": "blur(10px)",
-                    "borderRadius": "16px",
-                    "border": "2px solid #f59e0b",
-                    "color": "white"
-                  },
-                  "ui:titleStyles": {
-                    "color": "#f59e0b",
-                    "fontSize": "1.5rem",
-                    "fontWeight": "800"
-                  }
-                }
-              ]
-            },
-
-            {
-              "ui:widget": "divider",
-              "ui:variant": "dashed",
-              "ui:color": "rgba(255,255,255,0.3)",
-              "ui:spacing": "large"
-            },
-
-            {
-              "ui:widget": "container",
-              "ui:direction": "row",
-              "ui:gap": "30px",
-              "ui:justify": "center",
-              "ui:wrap": true,
-              "ui:children": [
-                {
-                  "ui:widget": "button",
-                  "ui:label": "Start Building",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-rocket",
-                    "color": "white"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:action": "showDemo",
-                  "ui:actionParams": { "type": "Build" },
-                  "ui:animation": "fadeInLeft",
-                  "ui:animateOnHover": "float",
-                  "ui:styles": {
-                    "padding": "18px 40px",
-                    "fontSize": "1.2rem",
-                    "fontWeight": "700",
-                    "background": "white",
-                    "color": "#667eea",
-                    "border": "none",
-                    "borderRadius": "16px",
-                    "boxShadow": "0 8px 24px rgba(255,255,255,0.2)"
-                  }
-                },
-                {
-                  "ui:widget": "button",
-                  "ui:label": "View Documentation",
-                  "ui:icon": {
-                    "type": "fontawesome",
-                    "value": "fas fa-book",
-                    "color": "white"
-                  },
-                  "ui:iconPosition": "left",
-                  "ui:action": "showDemo",
-                  "ui:actionParams": { "type": "Docs" },
-                  "ui:animation": "fadeInRight",
-                  "ui:animateOnHover": "grow",
-                  "ui:styles": {
-                    "padding": "18px 40px",
-                    "fontSize": "1.2rem",
-                    "fontWeight": "700",
-                    "background": "rgba(255,255,255,0.1)",
-                    "color": "white",
-                    "border": "2px solid white",
-                    "borderRadius": "16px",
-                    "backdropFilter": "blur(10px)"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-
-        "footerCTA": {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "30px",
-          "ui:styles": {
-            "padding": "80px 40px",
-            "textAlign": "center",
-            "maxWidth": "900px",
-            "margin": "40px auto"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "Ready to Build Amazing UIs?",
-              "ui:level": "h2",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-sparkles",
-                "color": "#fbbf24"
-              },
-              "ui:iconPosition": "top",
-              "ui:iconGap": "20px",
-              "ui:animation": "pulse",
-              "ui:styles": {
-                "fontSize": "3rem",
-                "fontWeight": "900",
-                "color": "white",
-                "fontFamily": "'Poppins', sans-serif"
-              }
-            },
-            {
-              "ui:widget": "paragraph",
-              "ui:text": "SmartWidget makes it easy to create beautiful, animated, and data-driven interfaces",
-              "ui:animation": "fadeInUp",
-              "ui:styles": {
-                "fontSize": "1.3rem",
-                "color": "rgba(255,255,255,0.9)",
-                "marginBottom": "20px"
-              }
-            },
-            {
-              "ui:widget": "button",
-              "ui:label": "Get Started Now",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-arrow-right",
-                "color": "#667eea"
-              },
-              "ui:iconPosition": "right",
-              "ui:action": "showDemo",
-              "ui:actionParams": { "type": "Get Started" },
-              "ui:animation": "scaleUp",
-              "ui:animateOnHover": "float",
-              "ui:styles": {
-                "padding": "20px 50px",
-                "fontSize": "1.3rem",
-                "fontWeight": "700",
-                "background": "white",
-                "color": "#667eea",
-                "border": "none",
-                "borderRadius": "50px",
-                "boxShadow": "0 10px 40px rgba(255,255,255,0.3)"
-              }
-            }
-          ]
-        }
       },
-      "styles": {
-        "padding": "0",
-        "margin": "0"
-      }
+
+      main: {
+        uiSchema: {
+          heroSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "40px",
+            "ui:styles": {
+              padding: "140px 40px 80px",
+              textAlign: "center",
+              maxWidth: "1200px",
+              margin: "0 auto",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "SmartWidget Showcase",
+                "ui:level": "h1",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-star",
+                  color: "#fbbf24",
+                },
+                "ui:iconPosition": "top",
+                "ui:iconGap": "20px",
+                "ui:animation": "fadeInUp",
+                "ui:styles": {
+                  fontSize: "4rem",
+                  fontWeight: "900",
+                  color: "white",
+                  textShadow: "0 4px 20px rgba(0,0,0,0.5)",
+                  fontFamily: "'Poppins', sans-serif",
+                  marginBottom: "20px",
+                },
+              },
+
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "Explore the power of icons, animations, and dynamic data binding",
+                "ui:animation": "fadeInUp",
+                "ui:styles": {
+                  fontSize: "1.5rem",
+                  color: "rgba(255,255,255,0.9)",
+                  maxWidth: "800px",
+                  margin: "0 auto 40px",
+                },
+              },
+
+              {
+                "ui:widget": "container",
+                "ui:direction": "row",
+                "ui:gap": "20px",
+                "ui:justify": "center",
+                "ui:styles": {
+                  flexWrap: "wrap",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "Explore Icons",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-rocket",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:action": "scrollToSection",
+                    "ui:actionParams": { sectionId: "icons-section" },
+                    "ui:animation": "scaleIn",
+                    "ui:animateOnHover": "float",
+                    "ui:styles": {
+                      padding: "16px 32px",
+                      fontSize: "1.1rem",
+                      fontWeight: "700",
+                      background: "white",
+                      color: "#667eea",
+                      border: "none",
+                      borderRadius: "16px",
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "See Animations",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-bolt",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:action": "scrollToSection",
+                    "ui:actionParams": { sectionId: "animations-section" },
+                    "ui:animation": "scaleIn",
+                    "ui:animateOnHover": "float",
+                    "ui:styles": {
+                      padding: "16px 32px",
+                      fontSize: "1.1rem",
+                      fontWeight: "700",
+                      background: "rgba(255,255,255,0.2)",
+                      color: "white",
+                      border: "2px solid white",
+                      borderRadius: "16px",
+                      backdropFilter: "blur(10px)",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          iconsSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "50px",
+            "ui:id": "icons-section",
+            "ui:styles": {
+              padding: "80px 40px",
+              maxWidth: "1400px",
+              margin: "0 auto",
+              background: "rgba(255,255,255,0.95)",
+              backdropFilter: "blur(20px)",
+              borderRadius: "24px",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "Icon Showcase",
+                "ui:level": "h2",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-icons",
+                  color: "#667eea",
+                },
+                "ui:iconPosition": "left",
+                "ui:animation": "fadeInLeft",
+                "ui:styles": {
+                  fontSize: "2.5rem",
+                  fontWeight: "800",
+                  color: "#1e293b",
+                  textAlign: "center",
+                },
+              },
+
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "Icons can be positioned left, right, top, or bottom with customizable gaps and colors",
+                "ui:animation": "fadeInUp",
+                "ui:styles": {
+                  fontSize: "1.1rem",
+                  color: "#64748b",
+                  textAlign: "center",
+                  maxWidth: "700px",
+                  margin: "0 auto",
+                },
+              },
+
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 4,
+                "ui:gap": "24px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Heart Left",
+                    "ui:description": "Icon on the left side",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-heart",
+                      color: "#ef4444",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:animation": "fadeInUp",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "white",
+                      borderRadius: "16px",
+                      border: "2px solid #e2e8f0",
+                      transition: "all 0.3s",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Star Right",
+                    "ui:description": "Icon on the right side",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-star",
+                      color: "#fbbf24",
+                    },
+                    "ui:iconPosition": "right",
+                    "ui:animation": "fadeInUp",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "white",
+                      borderRadius: "16px",
+                      border: "2px solid #e2e8f0",
+                      transition: "all 0.3s",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Crown Top",
+                    "ui:description": "Icon on top",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-crown",
+                      color: "#f59e0b",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "fadeInUp",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "white",
+                      borderRadius: "16px",
+                      border: "2px solid #e2e8f0",
+                      transition: "all 0.3s",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Trophy Bottom",
+                    "ui:description": "Icon on bottom",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-trophy",
+                      color: "#8b5cf6",
+                    },
+                    "ui:iconPosition": "bottom",
+                    "ui:animation": "fadeInUp",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      padding: "30px",
+                      textAlign: "center",
+                      background: "white",
+                      borderRadius: "16px",
+                      border: "2px solid #e2e8f0",
+                      transition: "all 0.3s",
+                    },
+                  },
+                ],
+              },
+
+              {
+                "ui:widget": "divider",
+                "ui:variant": "solid",
+                "ui:color": "#e2e8f0",
+                "ui:spacing": "large",
+              },
+
+              {
+                "ui:widget": "heading",
+                "ui:text": "Input Icons (Prefix & Suffix)",
+                "ui:level": "h3",
+                "ui:animation": "fadeInLeft",
+                "ui:styles": {
+                  fontSize: "2rem",
+                  fontWeight: "700",
+                  color: "#1e293b",
+                  marginTop: "20px",
+                },
+              },
+
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "20px",
+                "ui:styles": {
+                  maxWidth: "600px",
+                  margin: "0 auto",
+                  width: "100%",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email with Prefix Icon",
+                    "ui:placeholder": "your.email@example.com",
+                    "ui:name": "email",
+                    "ui:prefixIcon": {
+                      type: "fontawesome",
+                      value: "fas fa-envelope",
+                      color: "#667eea",
+                    },
+                    "ui:animation": "fadeInLeft",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Search with Suffix Icon",
+                    "ui:placeholder": "Search anything...",
+                    "ui:name": "search",
+                    "ui:suffixIcon": {
+                      type: "fontawesome",
+                      value: "fas fa-search",
+                      color: "#10b981",
+                    },
+                    "ui:animation": "fadeInRight",
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Price with Both Icons",
+                    "ui:placeholder": "0.00",
+                    "ui:name": "price",
+                    "ui:prefixIcon": {
+                      type: "fontawesome",
+                      value: "fas fa-dollar-sign",
+                      color: "#059669",
+                    },
+                    "ui:suffixIcon": {
+                      type: "fontawesome",
+                      value: "fas fa-check-circle",
+                      color: "#10b981",
+                    },
+                    "ui:animation": "fadeInUp",
+                  },
+                ],
+              },
+            ],
+          },
+
+          animationsSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "50px",
+            "ui:id": "animations-section",
+            "ui:styles": {
+              padding: "80px 40px",
+              maxWidth: "1400px",
+              margin: "40px auto",
+              background: "rgba(30, 41, 59, 0.95)",
+              backdropFilter: "blur(20px)",
+              borderRadius: "24px",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              color: "white",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "Animation Showcase",
+                "ui:level": "h2",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-magic",
+                  color: "#a78bfa",
+                },
+                "ui:iconPosition": "left",
+                "ui:animation": "rotateIn",
+                "ui:styles": {
+                  fontSize: "2.5rem",
+                  fontWeight: "800",
+                  color: "white",
+                  textAlign: "center",
+                },
+              },
+
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "SmartWidget supports entry animations and hover animations powered by Framer Motion",
+                "ui:animation": "fadeInUp",
+                "ui:styles": {
+                  fontSize: "1.1rem",
+                  color: "rgba(255,255,255,0.9)",
+                  textAlign: "center",
+                  maxWidth: "700px",
+                  margin: "0 auto",
+                },
+              },
+
+              {
+                "ui:widget": "heading",
+                "ui:text": "Entry Animations",
+                "ui:level": "h3",
+                "ui:animation": "slideInLeft",
+                "ui:styles": {
+                  fontSize: "1.8rem",
+                  fontWeight: "700",
+                  color: "white",
+                  marginTop: "20px",
+                },
+              },
+
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "24px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Fade In",
+                    "ui:description": "Smooth fade in effect",
+                    "ui:animation": "fadeIn",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255,255,255,0.1)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid rgba(255,255,255,0.2)",
+                      color: "white",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Slide In Up",
+                    "ui:description": "Slides from bottom",
+                    "ui:animation": "slideInUp",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255,255,255,0.1)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid rgba(255,255,255,0.2)",
+                      color: "white",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Scale In",
+                    "ui:description": "Scales from small",
+                    "ui:animation": "scaleIn",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255,255,255,0.1)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid rgba(255,255,255,0.2)",
+                      color: "white",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Fade In Left",
+                    "ui:description": "Fades from left side",
+                    "ui:animation": "fadeInLeft",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255,255,255,0.1)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid rgba(255,255,255,0.2)",
+                      color: "white",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Fade In Right",
+                    "ui:description": "Fades from right side",
+                    "ui:animation": "fadeInRight",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255,255,255,0.1)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid rgba(255,255,255,0.2)",
+                      color: "white",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Rotate In",
+                    "ui:description": "Rotates while fading",
+                    "ui:animation": "rotateIn",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(255,255,255,0.1)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid rgba(255,255,255,0.2)",
+                      color: "white",
+                    },
+                  },
+                ],
+              },
+
+              {
+                "ui:widget": "divider",
+                "ui:variant": "dashed",
+                "ui:color": "rgba(255,255,255,0.3)",
+                "ui:spacing": "large",
+              },
+
+              {
+                "ui:widget": "heading",
+                "ui:text": "Hover Animations",
+                "ui:level": "h3",
+                "ui:animation": "slideInRight",
+                "ui:styles": {
+                  fontSize: "1.8rem",
+                  fontWeight: "700",
+                  color: "white",
+                  marginTop: "20px",
+                },
+              },
+
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 4,
+                "ui:gap": "24px",
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "Lift",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-arrow-up",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:animateOnHover": "lift",
+                    "ui:animation": "fadeInUp",
+                    "ui:styles": {
+                      padding: "20px 30px",
+                      background: "rgba(167, 139, 250, 0.2)",
+                      color: "white",
+                      border: "2px solid #a78bfa",
+                      borderRadius: "12px",
+                      fontWeight: "600",
+                      width: "100%",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "Grow",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-expand",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:animateOnHover": "grow",
+                    "ui:animation": "fadeInUp",
+                    "ui:styles": {
+                      padding: "20px 30px",
+                      background: "rgba(34, 197, 94, 0.2)",
+                      color: "white",
+                      border: "2px solid #22c55e",
+                      borderRadius: "12px",
+                      fontWeight: "600",
+                      width: "100%",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "Tilt",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-undo",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:animateOnHover": "tilt",
+                    "ui:animation": "fadeInUp",
+                    "ui:styles": {
+                      padding: "20px 30px",
+                      background: "rgba(59, 130, 246, 0.2)",
+                      color: "white",
+                      border: "2px solid #3b82f6",
+                      borderRadius: "12px",
+                      fontWeight: "600",
+                      width: "100%",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "Float",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-cloud",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:animateOnHover": "float",
+                    "ui:animation": "fadeInUp",
+                    "ui:styles": {
+                      padding: "20px 30px",
+                      background: "rgba(251, 191, 36, 0.2)",
+                      color: "white",
+                      border: "2px solid #fbbf24",
+                      borderRadius: "12px",
+                      fontWeight: "600",
+                      width: "100%",
+                    },
+                  },
+                ],
+              },
+
+              {
+                "ui:widget": "divider",
+                "ui:variant": "solid",
+                "ui:color": "rgba(255,255,255,0.2)",
+                "ui:spacing": "large",
+              },
+
+              {
+                "ui:widget": "heading",
+                "ui:text": "Continuous Animations",
+                "ui:level": "h3",
+                "ui:animation": "fadeInLeft",
+                "ui:styles": {
+                  fontSize: "1.8rem",
+                  fontWeight: "700",
+                  color: "white",
+                  marginTop: "20px",
+                },
+              },
+
+              {
+                "ui:widget": "flexLayout",
+                "ui:direction": "row",
+                "ui:gap": "30px",
+                "ui:justify": "center",
+                "ui:wrap": true,
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Pulse",
+                    "ui:description": "Continuous pulse animation",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-heart",
+                      color: "#ef4444",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "pulse",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(239, 68, 68, 0.2)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid #ef4444",
+                      color: "white",
+                      minWidth: "200px",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Bounce",
+                    "ui:description": "Bouncing animation",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-basketball-ball",
+                      color: "#f59e0b",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "bounce",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(245, 158, 11, 0.2)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid #f59e0b",
+                      color: "white",
+                      minWidth: "200px",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Float",
+                    "ui:description": "Floating up and down",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-feather",
+                      color: "#8b5cf6",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "float",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background: "rgba(139, 92, 246, 0.2)",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid #8b5cf6",
+                      color: "white",
+                      minWidth: "200px",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          dataBindingSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "50px",
+            "ui:id": "data-section",
+            "ui:styles": {
+              padding: "80px 40px",
+              maxWidth: "1400px",
+              margin: "40px auto",
+              background: "rgba(255,255,255,0.95)",
+              backdropFilter: "blur(20px)",
+              borderRadius: "24px",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "Dynamic Data Binding",
+                "ui:level": "h2",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-database",
+                  color: "#667eea",
+                },
+                "ui:iconPosition": "left",
+                "ui:animation": "fadeInDown",
+                "ui:styles": {
+                  fontSize: "2.5rem",
+                  fontWeight: "800",
+                  color: "#1e293b",
+                  textAlign: "center",
+                },
+              },
+
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "SmartWidget automatically resolves templates and binds data from DataStore",
+                "ui:animation": "fadeInUp",
+                "ui:styles": {
+                  fontSize: "1.1rem",
+                  color: "#64748b",
+                  textAlign: "center",
+                  maxWidth: "700px",
+                  margin: "0 auto",
+                },
+              },
+
+              {
+                "ui:widget": "heading",
+                "ui:text": "Template Examples",
+                "ui:level": "h3",
+                "ui:animation": "fadeInLeft",
+                "ui:styles": {
+                  fontSize: "1.8rem",
+                  fontWeight: "700",
+                  color: "#1e293b",
+                  marginTop: "20px",
+                },
+              },
+
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 2,
+                "ui:gap": "24px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "User Email",
+                    "ui:description":
+                      "{{auth.user.email || 'guest@example.com'}}",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-envelope",
+                      color: "#3b82f6",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "fadeInUp",
+                    "ui:animateOnHover": "lift",
+                    "ui:styles": {
+                      padding: "30px",
+                      background: "white",
+                      borderRadius: "16px",
+                      border: "2px solid #e2e8f0",
+                    },
+                    "ui:titleStyles": {
+                      color: "#1e293b",
+                      fontSize: "1.3rem",
+                      fontWeight: "700",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "#3b82f6",
+                      fontSize: "1.1rem",
+                      fontFamily: "monospace",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Auth Status",
+                    "ui:description":
+                      "{{auth.isAuthenticated ? 'Logged In' : 'Guest'}}",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-user-shield",
+                      color: "#10b981",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "fadeInUp",
+                    "ui:animateOnHover": "lift",
+                    "ui:styles": {
+                      padding: "30px",
+                      background: "white",
+                      borderRadius: "16px",
+                      border: "2px solid #e2e8f0",
+                    },
+                    "ui:titleStyles": {
+                      color: "#1e293b",
+                      fontSize: "1.3rem",
+                      fontWeight: "700",
+                    },
+                    "ui:descriptionStyles": {
+                      color: "#10b981",
+                      fontSize: "1.1rem",
+                      fontFamily: "monospace",
+                    },
+                  },
+                ],
+              },
+
+              {
+                "ui:widget": "divider",
+                "ui:variant": "solid",
+                "ui:color": "#e2e8f0",
+                "ui:spacing": "large",
+              },
+
+              {
+                "ui:widget": "heading",
+                "ui:text": "Stats Dashboard (Mock Data)",
+                "ui:level": "h3",
+                "ui:animation": "slideInRight",
+                "ui:styles": {
+                  fontSize: "1.8rem",
+                  fontWeight: "700",
+                  color: "#1e293b",
+                  marginTop: "20px",
+                },
+              },
+
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 4,
+                "ui:gap": "24px",
+                "ui:children": [
+                  {
+                    "ui:widget": "statsCounter",
+                    "ui:value": "12,543",
+                    "ui:label": "Total Users",
+                    "ui:color": "#3b82f6",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-users",
+                      color: "#3b82f6",
+                    },
+                    "ui:animation": "scaleIn",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      background:
+                        "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05))",
+                      borderRadius: "16px",
+                      border: "2px solid #dbeafe",
+                      padding: "30px",
+                    },
+                  },
+                  {
+                    "ui:widget": "statsCounter",
+                    "ui:value": "8,492",
+                    "ui:label": "Active Projects",
+                    "ui:color": "#10b981",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-project-diagram",
+                      color: "#10b981",
+                    },
+                    "ui:animation": "scaleIn",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      background:
+                        "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))",
+                      borderRadius: "16px",
+                      border: "2px solid #d1fae5",
+                      padding: "30px",
+                    },
+                  },
+                  {
+                    "ui:widget": "statsCounter",
+                    "ui:value": "95.4%",
+                    "ui:label": "Success Rate",
+                    "ui:color": "#8b5cf6",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-chart-line",
+                      color: "#8b5cf6",
+                    },
+                    "ui:animation": "scaleIn",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      background:
+                        "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05))",
+                      borderRadius: "16px",
+                      border: "2px solid #ede9fe",
+                      padding: "30px",
+                    },
+                  },
+                  {
+                    "ui:widget": "statsCounter",
+                    "ui:value": "$2.4M",
+                    "ui:label": "Revenue",
+                    "ui:color": "#f59e0b",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-dollar-sign",
+                      color: "#f59e0b",
+                    },
+                    "ui:animation": "scaleIn",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      background:
+                        "linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05))",
+                      borderRadius: "16px",
+                      border: "2px solid #fef3c7",
+                      padding: "30px",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          combinedFeaturesSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "50px",
+            "ui:styles": {
+              padding: "80px 40px",
+              maxWidth: "1400px",
+              margin: "40px auto",
+              background: "rgba(30, 41, 59, 0.95)",
+              backdropFilter: "blur(20px)",
+              borderRadius: "24px",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+              color: "white",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "Combined Features",
+                "ui:level": "h2",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-layer-group",
+                  color: "#a78bfa",
+                },
+                "ui:iconPosition": "left",
+                "ui:animation": "fadeInDown",
+                "ui:styles": {
+                  fontSize: "2.5rem",
+                  fontWeight: "800",
+                  color: "white",
+                  textAlign: "center",
+                },
+              },
+
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "Icons + Animations + Data Binding working together seamlessly",
+                "ui:animation": "fadeInUp",
+                "ui:styles": {
+                  fontSize: "1.1rem",
+                  color: "rgba(255,255,255,0.9)",
+                  textAlign: "center",
+                  maxWidth: "700px",
+                  margin: "0 auto",
+                },
+              },
+
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "24px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Premium User",
+                    "ui:description":
+                      "Animated card with icon and dynamic status",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-crown",
+                      color: "#fbbf24",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "fadeInUp",
+                    "ui:animateOnHover": "float",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background:
+                        "linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.1))",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid #fbbf24",
+                      color: "white",
+                    },
+                    "ui:titleStyles": {
+                      color: "#fbbf24",
+                      fontSize: "1.5rem",
+                      fontWeight: "800",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Verified Badge",
+                    "ui:description": "Trust indicator with smooth animations",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-shield-check",
+                      color: "#10b981",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "scaleIn",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background:
+                        "linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.1))",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid #10b981",
+                      color: "white",
+                    },
+                    "ui:titleStyles": {
+                      color: "#10b981",
+                      fontSize: "1.5rem",
+                      fontWeight: "800",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "Lightning Fast",
+                    "ui:description": "Performance optimized components",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-bolt",
+                      color: "#f59e0b",
+                    },
+                    "ui:iconPosition": "top",
+                    "ui:animation": "rotateIn",
+                    "ui:animateOnHover": "tilt",
+                    "ui:styles": {
+                      padding: "40px",
+                      textAlign: "center",
+                      background:
+                        "linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.1))",
+                      backdropFilter: "blur(10px)",
+                      borderRadius: "16px",
+                      border: "2px solid #f59e0b",
+                      color: "white",
+                    },
+                    "ui:titleStyles": {
+                      color: "#f59e0b",
+                      fontSize: "1.5rem",
+                      fontWeight: "800",
+                    },
+                  },
+                ],
+              },
+
+              {
+                "ui:widget": "divider",
+                "ui:variant": "dashed",
+                "ui:color": "rgba(255,255,255,0.3)",
+                "ui:spacing": "large",
+              },
+
+              {
+                "ui:widget": "container",
+                "ui:direction": "row",
+                "ui:gap": "30px",
+                "ui:justify": "center",
+                "ui:wrap": true,
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "Start Building",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-rocket",
+                      color: "white",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:action": "showDemo",
+                    "ui:actionParams": { type: "Build" },
+                    "ui:animation": "fadeInLeft",
+                    "ui:animateOnHover": "float",
+                    "ui:styles": {
+                      padding: "18px 40px",
+                      fontSize: "1.2rem",
+                      fontWeight: "700",
+                      background: "white",
+                      color: "#667eea",
+                      border: "none",
+                      borderRadius: "16px",
+                      boxShadow: "0 8px 24px rgba(255,255,255,0.2)",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "View Documentation",
+                    "ui:icon": {
+                      type: "fontawesome",
+                      value: "fas fa-book",
+                      color: "white",
+                    },
+                    "ui:iconPosition": "left",
+                    "ui:action": "showDemo",
+                    "ui:actionParams": { type: "Docs" },
+                    "ui:animation": "fadeInRight",
+                    "ui:animateOnHover": "grow",
+                    "ui:styles": {
+                      padding: "18px 40px",
+                      fontSize: "1.2rem",
+                      fontWeight: "700",
+                      background: "rgba(255,255,255,0.1)",
+                      color: "white",
+                      border: "2px solid white",
+                      borderRadius: "16px",
+                      backdropFilter: "blur(10px)",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          footerCTA: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "30px",
+            "ui:styles": {
+              padding: "80px 40px",
+              textAlign: "center",
+              maxWidth: "900px",
+              margin: "40px auto",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "Ready to Build Amazing UIs?",
+                "ui:level": "h2",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-sparkles",
+                  color: "#fbbf24",
+                },
+                "ui:iconPosition": "top",
+                "ui:iconGap": "20px",
+                "ui:animation": "pulse",
+                "ui:styles": {
+                  fontSize: "3rem",
+                  fontWeight: "900",
+                  color: "white",
+                  fontFamily: "'Poppins', sans-serif",
+                },
+              },
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "SmartWidget makes it easy to create beautiful, animated, and data-driven interfaces",
+                "ui:animation": "fadeInUp",
+                "ui:styles": {
+                  fontSize: "1.3rem",
+                  color: "rgba(255,255,255,0.9)",
+                  marginBottom: "20px",
+                },
+              },
+              {
+                "ui:widget": "button",
+                "ui:label": "Get Started Now",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-arrow-right",
+                  color: "#667eea",
+                },
+                "ui:iconPosition": "right",
+                "ui:action": "showDemo",
+                "ui:actionParams": { type: "Get Started" },
+                "ui:animation": "scaleUp",
+                "ui:animateOnHover": "float",
+                "ui:styles": {
+                  padding: "20px 50px",
+                  fontSize: "1.3rem",
+                  fontWeight: "700",
+                  background: "white",
+                  color: "#667eea",
+                  border: "none",
+                  borderRadius: "50px",
+                  boxShadow: "0 10px 40px rgba(255,255,255,0.3)",
+                },
+              },
+            ],
+          },
+        },
+        styles: {
+          padding: "0",
+          margin: "0",
+        },
+      },
+
+      footer: {
+        uiSchema: {
+          footerContent: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "20px",
+            "ui:styles": {
+              textAlign: "center",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "text",
+                "ui:content": "© 2024 SmartWidget Showcase",
+                "ui:icon": {
+                  type: "fontawesome",
+                  value: "fas fa-code",
+                  color: "rgba(255,255,255,0.7)",
+                },
+                "ui:iconPosition": "left",
+                "ui:styles": {
+                  color: "rgba(255,255,255,0.9)",
+                  fontSize: "1rem",
+                },
+              },
+              {
+                "ui:widget": "text",
+                "ui:content": "Built with SmartWidget & Framer Motion",
+                "ui:styles": {
+                  color: "rgba(255,255,255,0.7)",
+                  fontSize: "0.9rem",
+                },
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "rgba(30, 41, 59, 0.95)",
+          backdropFilter: "blur(20px)",
+          padding: "40px",
+          borderTop: "2px solid rgba(255,255,255,0.1)",
+        },
+      },
     },
 
-    "footer": {
-      "uiSchema": {
-        "footerContent": {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "20px",
-          "ui:styles": {
-            "textAlign": "center"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "text",
-              "ui:content": "© 2024 SmartWidget Showcase",
-              "ui:icon": {
-                "type": "fontawesome",
-                "value": "fas fa-code",
-                "color": "rgba(255,255,255,0.7)"
-              },
-              "ui:iconPosition": "left",
-              "ui:styles": {
-                "color": "rgba(255,255,255,0.9)",
-                "fontSize": "1rem"
-              }
-            },
-            {
-              "ui:widget": "text",
-              "ui:content": "Built with SmartWidget & Framer Motion",
-              "ui:styles": {
-                "color": "rgba(255,255,255,0.7)",
-                "fontSize": "0.9rem"
-              }
-            }
-          ]
-        }
-      },
-      "styles": {
-        "background": "rgba(30, 41, 59, 0.95)",
-        "backdropFilter": "blur(20px)",
-        "padding": "40px",
-        "borderTop": "2px solid rgba(255,255,255,0.1)"
-      }
-    }
+    resolvedAPIs: {},
   },
-
-  "resolvedAPIs": {}
-},
-{
-  title: "FitZen - Premium Fitness & Wellness",
-  slug: "fitzen",
-  projectUUID: "fitzen-wellness",
-  taskUUID: "fitzen001",
-  status: "Active",
-  isTemplate: true,
-   templateCategory: "E-commerce",
+  {
+    title: "FitZen - Premium Fitness & Wellness",
+    slug: "fitzen",
+    projectUUID: "fitzen-wellness",
+    taskUUID: "fitzen001",
+    status: "Active",
+    isTemplate: true,
+    templateCategory: "E-commerce",
     organizationId: "6981d54da9b6db6a9fd3cb5f",
-  createdBy: "000000000000000000000000",
-  accountValidation: true,
-  otpValidation: false,
-  isAnonymous: false,
-  requireAuth: false,
-  redirectIfNotAuth: "/fitzen/login",
+    createdBy: "000000000000000000000000",
+    accountValidation: true,
+    otpValidation: false,
+    isAnonymous: false,
+    requireAuth: false,
+    redirectIfNotAuth: "/fitzen/login",
 
-  initialization: {
-    globalCSS: `/* ============================================ */
+    initialization: {
+      globalCSS: `/* ============================================ */
 /* FITZEN - PREMIUM FITNESS & WELLNESS PLATFORM */
 /* Modern, Sophisticated UI with Advanced Animations */
 /* ============================================ */
@@ -1978,18 +1994,18 @@ textarea::placeholder {
   box-shadow: 0 20px 60px rgba(124, 58, 237, 0.6);
 }`,
 
-    resources: [
-      "global.enduser.signup",
-      "global.enduser.login",
-      "global.enduser.logout",
-      "fitzen.workouts.list",
-      "fitzen.classes.list",
-      "fitzen.stats.get",
-      "fitzen.workout.log",
-    ],
+      resources: [
+        "global.enduser.signup",
+        "global.enduser.login",
+        "global.enduser.logout",
+        "fitzen.workouts.list",
+        "fitzen.classes.list",
+        "fitzen.stats.get",
+        "fitzen.workout.log",
+      ],
 
-    actions: {
-      navigateToPage: `
+      actions: {
+        navigateToPage: `
   const url = context.actionParams?.url;
   if (!url) {
     console.error("❌ No URL provided");
@@ -1999,7 +2015,7 @@ textarea::placeholder {
   window.location.href = url;
 `,
 
-      handleLogin: `
+        handleLogin: `
   console.log("🔐 FitZen login action triggered");
   const email = context.formData?.email;
   const password = context.formData?.password;
@@ -2063,7 +2079,7 @@ textarea::placeholder {
   }
 `,
 
-      handleSignup: `
+        handleSignup: `
   console.log("📝 FitZen signup action triggered");
   const formData = context.formData || {};
   
@@ -2134,7 +2150,7 @@ textarea::placeholder {
   }
 `,
 
-      clearAuth: `
+        clearAuth: `
   console.log("🚪 FitZen logout...");
   
   try {
@@ -2172,7 +2188,7 @@ textarea::placeholder {
   }
 `,
 
-      openModal: `
+        openModal: `
   const modalName = context.actionParams?.modal || context.actionParams?.modalName;
   if (!modalName) {
     console.error("❌ No modal name provided");
@@ -2185,14 +2201,14 @@ textarea::placeholder {
   context.handlers.setActiveModal(modalName);
 `,
 
-      closeModal: `
+        closeModal: `
   console.log("❌ Closing modal");
   context.handlers.setModalFormData({});
   context.handlers.setFieldErrors({});
   context.handlers.setActiveModal(null);
 `,
 
-      logWorkout: `
+        logWorkout: `
   console.log("📝 Logging workout");
   const formData = context.modalFormData || {};
   
@@ -2219,1211 +2235,1249 @@ textarea::placeholder {
   context.handlers.setActiveModal(null);
   context.handlers.setModalFormData({});
 `,
-    },
-  },
-
-  pages: {
-    login: {
-      title: "Login - FitZen",
-      components: {
-        navbar: {
-          table: {},
-          modal: {},
-          uiSchema: {
-            logo: {
-              "ui:widget": "text",
-              "ui:content": "💪 FitZen",
-              "ui:styles": {
-                fontSize: "32px",
-                fontWeight: "900",
-                fontFamily: "'Poppins', sans-serif",
-                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                cursor: "pointer",
-                letterSpacing: "-1px"
-              }
-            },
-            links: {
-              "ui:widget": "navLinks",
-              "ui:theme": "dark",
-              "ui:links": [
-                {
-                  label: "Home",
-                  action: "navigateToPage",
-                  actionParams: { url: "/fitzen" },
-                  styles: { color: "#E8EAED", fontWeight: "600" }
-                },
-                {
-                  label: "Sign Up",
-                  action: "navigateToPage",
-                  actionParams: { url: "/fitzen/signup" },
-                  styles: { 
-                    color: "white",
-                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                    padding: "10px 24px",
-                    borderRadius: "12px",
-                    fontWeight: "600"
-                  }
-                }
-              ]
-            }
-          },
-          styles: {
-            background: "rgba(10, 14, 39, 0.8)",
-            backdropFilter: "blur(20px)",
-            borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
-            padding: "20px 50px",
-            position: "fixed",
-            width: "100%",
-            zIndex: "1000",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: "80px"
-          },
-          triggers: []
-        },
-        sidebar: {
-          table: {},
-          modal: {},
-          uiSchema: {},
-          styles: { display: "none" },
-          triggers: []
-        },
-        main: {
-          table: {},
-          modal: {},
-          uiSchema: {
-            loginForm: {
-              "ui:widget": "formContainer",
-              "ui:title": "🔐 Welcome Back",
-              "ui:description": "Sign in to continue your fitness journey",
-              "ui:id": "loginForm",
-              "ui:styles": {
-                maxWidth: "480px",
-                margin: "140px auto 0",
-                padding: "48px 40px",
-                background: "rgba(255, 255, 255, 0.05)",
-                backdropFilter: "blur(30px)",
-                borderRadius: "24px",
-                boxShadow: "0 20px 60px rgba(124, 58, 237, 0.3)",
-                border: "1px solid rgba(255, 255, 255, 0.1)"
-              },
-              "ui:fields": [
-                {
-                  "ui:widget": "inputField",
-                  "ui:label": "Email Address",
-                  "ui:placeholder": "your.email@example.com",
-                  "ui:type": "email",
-                  "ui:name": "email",
-                  "ui:required": true,
-                  "ui:labelStyles": {
-                    color: "#E8EAED",
-                    fontWeight: "600",
-                    marginBottom: "8px"
-                  }
-                },
-                {
-                  "ui:widget": "inputField",
-                  "ui:label": "Password",
-                  "ui:placeholder": "••••••••",
-                  "ui:type": "password",
-                  "ui:name": "password",
-                  "ui:required": true,
-                  "ui:labelStyles": {
-                    color: "#E8EAED",
-                    fontWeight: "600",
-                    marginBottom: "8px"
-                  }
-                }
-              ],
-              "ui:actions": [
-                {
-                  label: "Sign In →",
-                  action: "handleLogin",
-                  variant: "primary",
-                  styles: {
-                    width: "100%",
-                    padding: "16px 0",
-                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                    color: "white",
-                    fontSize: "16px",
-                    fontWeight: "700",
-                    borderRadius: "16px",
-                    border: "none",
-                    cursor: "pointer",
-                    marginTop: "8px"
-                  }
-                }
-              ],
-              "ui:titleStyles": {
-                color: "#E8EAED",
-                fontFamily: "'Poppins', sans-serif",
-                fontSize: "32px",
-                fontWeight: "800",
-                marginBottom: "12px",
-                textAlign: "center"
-              },
-              "ui:descriptionStyles": {
-                color: "rgba(232, 234, 237, 0.8)",
-                fontSize: "16px",
-                marginBottom: "36px",
-                textAlign: "center"
-              }
-            },
-            authLinks: {
-              "ui:widget": "authLinks",
-              "ui:alignment": "center",
-              "ui:direction": "column",
-              "ui:links": [
-                {
-                  prefix: "Don't have an account?",
-                  label: "Sign Up",
-                  action: "navigateToPage",
-                  actionParams: { url: "/fitzen/signup" }
-                }
-              ],
-              "ui:styles": {
-                maxWidth: "480px",
-                margin: "24px auto",
-                padding: "20px",
-                background: "rgba(124, 58, 237, 0.1)",
-                backdropFilter: "blur(10px)",
-                borderRadius: "16px",
-                border: "1px solid rgba(124, 58, 237, 0.2)"
-              },
-              "ui:linkStyles": {
-                color: "#EC4899",
-                fontWeight: "700"
-              }
-            }
-          },
-          styles: {
-            padding: "100px 40px 80px",
-            background: "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.15), transparent 50%), radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.15), transparent 50%), #0A0E27",
-            minHeight: "100vh"
-          },
-          triggers: []
-        },
-        footer: {
-          table: {},
-          modal: {},
-          uiSchema: {
-            footerText: {
-              "ui:widget": "text",
-              "ui:content": "© 2024 FitZen. Empowering your fitness journey. 💪",
-              "ui:styles": {
-                textAlign: "center",
-                color: "rgba(232, 234, 237, 0.6)",
-                fontSize: "14px"
-              }
-            }
-          },
-          styles: {
-            background: "rgba(10, 14, 39, 0.8)",
-            padding: "32px",
-            textAlign: "center",
-            borderTop: "1px solid rgba(124, 58, 237, 0.2)"
-          },
-          triggers: []
-        }
-      }
+      },
     },
 
-    signup: {
-      title: "Sign Up - FitZen",
-      components: {
-        navbar: {
-          table: {},
-          modal: {},
-          uiSchema: {
-            logo: {
-              "ui:widget": "text",
-              "ui:content": "💪 FitZen",
-              "ui:styles": {
-                fontSize: "32px",
-                fontWeight: "900",
-                fontFamily: "'Poppins', sans-serif",
-                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                cursor: "pointer",
-                letterSpacing: "-1px"
-              }
-            },
-            links: {
-              "ui:widget": "navLinks",
-              "ui:theme": "dark",
-              "ui:links": [
-                {
-                  label: "Home",
-                  action: "navigateToPage",
-                  actionParams: { url: "/fitzen" }
+    pages: {
+      login: {
+        title: "Login - FitZen",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "💪 FitZen",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "900",
+                  fontFamily: "'Poppins', sans-serif",
+                  background:
+                    "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                  letterSpacing: "-1px",
                 },
-                {
-                  label: "Login",
-                  action: "navigateToPage",
-                  actionParams: { url: "/fitzen/login" }
-                }
-              ]
-            }
-          },
-          styles: {
-            background: "rgba(10, 14, 39, 0.8)",
-            backdropFilter: "blur(20px)",
-            borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
-            padding: "20px 50px",
-            position: "fixed",
-            width: "100%",
-            zIndex: "1000",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: "80px"
-          },
-          triggers: []
-        },
-        sidebar: {
-          table: {},
-          modal: {},
-          uiSchema: {},
-          styles: { display: "none" },
-          triggers: []
-        },
-        main: {
-          table: {},
-          modal: {},
-          uiSchema: {
-            signupForm: {
-              "ui:widget": "formContainer",
-              "ui:title": "✨ Start Your Journey",
-              "ui:description": "Create your account and transform your fitness",
-              "ui:id": "signupForm",
-              "ui:styles": {
-                maxWidth: "480px",
-                margin: "140px auto 0",
-                padding: "48px 40px",
-                background: "rgba(255, 255, 255, 0.05)",
-                backdropFilter: "blur(30px)",
-                borderRadius: "24px",
-                boxShadow: "0 20px 60px rgba(124, 58, 237, 0.3)",
-                border: "1px solid rgba(255, 255, 255, 0.1)"
               },
-              "ui:fields": [
-                {
-                  "ui:widget": "inputField",
-                  "ui:label": "Full Name",
-                  "ui:placeholder": "John Doe",
-                  "ui:type": "text",
-                  "ui:name": "name",
-                  "ui:required": true,
-                  "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" }
-                },
-                {
-                  "ui:widget": "inputField",
-                  "ui:label": "Email Address",
-                  "ui:placeholder": "you@example.com",
-                  "ui:type": "email",
-                  "ui:name": "email",
-                  "ui:required": true,
-                  "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" }
-                },
-                {
-                  "ui:widget": "inputField",
-                  "ui:label": "Password",
-                  "ui:placeholder": "Create strong password",
-                  "ui:type": "password",
-                  "ui:name": "password",
-                  "ui:required": true,
-                  "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" }
-                },
-                {
-                  "ui:widget": "selectField",
-                  "ui:label": "Fitness Goal",
-                  "ui:name": "fitnessGoal",
-                  "ui:placeholder": "Select your goal",
-                  "ui:options": [
-                    { value: "weight_loss", label: "Weight Loss" },
-                    { value: "muscle_gain", label: "Muscle Gain" },
-                    { value: "endurance", label: "Build Endurance" },
-                    { value: "flexibility", label: "Flexibility" },
-                    { value: "general", label: "General Fitness" }
-                  ],
-                  "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" }
-                }
-              ],
-              "ui:actions": [
-                {
-                  label: "Create Account →",
-                  action: "handleSignup",
-                  variant: "primary",
-                  styles: {
-                    width: "100%",
-                    padding: "16px 0",
-                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                    color: "white",
-                    fontSize: "16px",
-                    fontWeight: "700",
-                    borderRadius: "16px",
-                    border: "none"
-                  }
-                }
-              ]
-            },
-            authLinks: {
-              "ui:widget": "authLinks",
-              "ui:alignment": "center",
-              "ui:links": [
-                {
-                  prefix: "Already have an account?",
-                  label: "Login",
-                  action: "navigateToPage",
-                  actionParams: { url: "/fitzen/login" }
-                }
-              ],
-              "ui:styles": {
-                maxWidth: "480px",
-                margin: "24px auto"
-              }
-            }
-          },
-          styles: {
-            padding: "100px 40px 80px",
-            background: "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.15), transparent 50%), #0A0E27",
-            minHeight: "100vh"
-          },
-          triggers: []
-        },
-        footer: {
-          table: {},
-          modal: {},
-          uiSchema: {
-            footerText: {
-              "ui:widget": "text",
-              "ui:content": "© 2024 FitZen. All rights reserved.",
-              "ui:styles": {
-                textAlign: "center",
-                color: "rgba(232, 234, 237, 0.6)"
-              }
-            }
-          },
-          styles: {
-            background: "rgba(10, 14, 39, 0.8)",
-            padding: "32px",
-            borderTop: "1px solid rgba(124, 58, 237, 0.2)"
-          },
-          triggers: []
-        }
-      }
-    },
-
-    dashboard: {
-      title: "Dashboard - FitZen",
-      requireAuth: true,
-      redirectIfNotAuth: "/fitzen/login",
-      components: {
-        navbar: {
-          table: {},
-          modal: {},
-          uiSchema: {
-            logo: {
-              "ui:widget": "text",
-              "ui:content": "💪 FitZen",
-              "ui:styles": {
-                fontSize: "28px",
-                fontWeight: "900",
-                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent"
-              }
-            },
-            userInfo: {
-              "ui:widget": "navLinks",
-              "ui:theme": "dark",
-              "ui:links": [
-                {
-                  label: "{{auth.user?.email || 'User'}}",
-                  action: "",
-                  styles: { color: "#E8EAED" }
-                },
-                {
-                  label: "Logout",
-                  action: "clearAuth",
-                  styles: { color: "#EC4899", fontWeight: "700" }
-                }
-              ]
-            }
-          },
-          styles: {
-            background: "rgba(10, 14, 39, 0.95)",
-            backdropFilter: "blur(20px)",
-            borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
-            padding: "18px 50px",
-            position: "fixed",
-            width: "100%",
-            zIndex: "1000",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: "75px"
-          },
-          triggers: []
-        },
-        sidebar: {
-          table: {},
-          modal: {},
-          uiSchema: {},
-          styles: { display: "none" },
-          triggers: []
-        },
-        main: {
-          table: {},
-          modal: {
-            logWorkout: {
-              "ui:title": "Log Workout",
-              "ui:theme": "dark",
-              "ui:styles": {
-                maxWidth: "500px",
-                background: "rgba(10, 14, 39, 0.95)",
-                padding: "40px"
-              },
-              "ui:fields": [
-                {
-                  name: "workoutType",
-                  label: "Workout Type",
-                  type: "text",
-                  placeholder: "e.g., Running, Weightlifting",
-                  required: true
-                },
-                {
-                  name: "duration",
-                  label: "Duration (minutes)",
-                  type: "number",
-                  placeholder: "30",
-                  required: true
-                },
-                {
-                  name: "caloriesBurned",
-                  label: "Calories Burned",
-                  type: "number",
-                  placeholder: "250",
-                  required: false
-                }
-              ],
-              "ui:actions": [
-                {
-                  label: "Log Workout",
-                  action: "logWorkout",
-                  variant: "primary"
-                },
-                {
-                  label: "Cancel",
-                  action: "closeModal",
-                  variant: "outline"
-                }
-              ]
-            }
-          },
-          uiSchema: {
-            welcomeCard: {
-              "ui:widget": "card",
-              "ui:title": "💪 Welcome Back, Champion!",
-              "ui:description": "Let's crush today's goals together",
-              "ui:styles": {
-                padding: "48px",
-                marginTop: "100px",
-                marginBottom: "40px",
-                background: "linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%)",
-                backdropFilter: "blur(30px)",
-                border: "1px solid rgba(124, 58, 237, 0.3)",
-                borderRadius: "24px",
-                textAlign: "center"
-              }
-            },
-            
-            statsGrid: {
-              "ui:widget": "gridLayout",
-              "ui:columns": 4,
-              "ui:gap": "24px",
-              "ui:styles": { marginBottom: "40px" },
-              "ui:children": [
-                {
-                  "ui:widget": "card",
-                  "ui:title": "🔥 245",
-                  "ui:description": "Calories Burned Today",
-                  "ui:styles": {
-                    padding: "32px 24px",
-                    textAlign: "center",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "20px"
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "dark",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/fitzen" },
+                    styles: { color: "#E8EAED", fontWeight: "600" },
                   },
-                  "ui:titleStyles": {
-                    fontSize: "2.5rem",
-                    fontWeight: "900",
-                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "💪 12",
-                  "ui:description": "Workouts This Week",
-                  "ui:styles": {
-                    padding: "32px 24px",
-                    textAlign: "center",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "20px"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "⏱️ 45m",
-                  "ui:description": "Average Duration",
-                  "ui:styles": {
-                    padding: "32px 24px",
-                    textAlign: "center",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "20px"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "🏆 28",
-                  "ui:description": "Day Streak",
-                  "ui:styles": {
-                    padding: "32px 24px",
-                    textAlign: "center",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "20px"
-                  }
-                }
-              ]
-            },
-
-            quickActions: {
-              "ui:widget": "flexLayout",
-              "ui:direction": "row",
-              "ui:gap": "16px",
-              "ui:styles": { marginBottom: "50px", justifyContent: "center" },
-              "ui:children": [
-                {
-                  "ui:widget": "button",
-                  "ui:label": "📝 Log Workout",
-                  "ui:action": "openModal",
-                  "ui:actionParams": { modal: "logWorkout" },
-                  "ui:styles": {
-                    padding: "16px 32px",
-                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                    color: "white",
-                    borderRadius: "16px",
-                    fontSize: "16px",
-                    fontWeight: "700"
-                  }
-                },
-                {
-                  "ui:widget": "button",
-                  "ui:label": "📊 View Progress",
-                  "ui:action": "navigateToPage",
-                  "ui:actionParams": { url: "/fitzen/progress" },
-                  "ui:styles": {
-                    padding: "16px 32px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    color: "white",
-                    border: "2px solid rgba(124, 58, 237, 0.5)",
-                    borderRadius: "16px",
-                    fontSize: "16px",
-                    fontWeight: "700"
-                  }
-                }
-              ]
-            }
-          },
-          styles: {
-            padding: "90px 40px 50px",
-            background: "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.1), transparent 70%), #0A0E27",
-            minHeight: "100vh"
-          },
-          triggers: []
-        },
-        footer: {
-          table: {},
-          modal: {},
-          uiSchema: {
-            footerText: {
-              "ui:widget": "text",
-              "ui:content": "© 2024 FitZen. All rights reserved.",
-              "ui:styles": {
-                textAlign: "center",
-                color: "rgba(232, 234, 237, 0.6)"
-              }
-            }
-          },
-          styles: {
-            background: "rgba(10, 14, 39, 0.8)",
-            padding: "32px",
-            borderTop: "1px solid rgba(124, 58, 237, 0.2)"
-          },
-          triggers: []
-        }
-      }
-    }
-  },
-
-  // HOME PAGE (Landing)
-  components: {
-    navbar: {
-      table: {},
-      modal: {},
-      uiSchema: {
-        logo: {
-          "ui:widget": "text",
-          "ui:content": "💪 FitZen",
-          "ui:styles": {
-            fontSize: "32px",
-            fontWeight: "900",
-            fontFamily: "'Poppins', sans-serif",
-            background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            cursor: "pointer",
-            letterSpacing: "-1px"
-          }
-        },
-        links: {
-          "ui:widget": "navLinks",
-          "ui:theme": "dark",
-          "ui:links": [
-            {
-              label: "Home",
-              action: "navigateToPage",
-              actionParams: { url: "/fitzen" },
-              styles: { color: "#E8EAED", fontWeight: "600" }
-            },
-            {
-              label: "Features",
-              action: "navigateToPage",
-              actionParams: { url: "/fitzen#features" },
-              styles: { color: "#E8EAED", fontWeight: "600" }
-            },
-            {
-              label: "Login",
-              action: "navigateToPage",
-              actionParams: { url: "/fitzen/login" },
-              styles: { color: "#E8EAED", fontWeight: "600" }
-            },
-            {
-              label: "Get Started",
-              action: "navigateToPage",
-              actionParams: { url: "/fitzen/signup" },
-              styles: {
-                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                color: "white",
-                padding: "12px 28px",
-                borderRadius: "14px",
-                fontWeight: "700",
-                border: "none"
-              }
-            }
-          ]
-        }
-      },
-      styles: {
-        background: "rgba(10, 14, 39, 0.8)",
-        backdropFilter: "blur(20px) saturate(180%)",
-        borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
-        padding: "20px 50px",
-        position: "fixed",
-        width: "100%",
-        zIndex: "1000",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        height: "80px",
-        boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)"
-      },
-      triggers: []
-    },
-    
-    sidebar: {
-      table: {},
-      modal: {},
-      uiSchema: {},
-      styles: { display: "none" },
-      triggers: []
-    },
-    
-    main: {
-      table: {},
-      modal: {},
-      uiSchema: {
-        heroSection: {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "40px",
-          "ui:styles": {
-            padding: "180px 40px 100px",
-            textAlign: "center",
-            background: "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.2), transparent 70%), radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.15), transparent 70%)",
-            minHeight: "100vh",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "Transform Your Body",
-              "ui:level": "h1",
-              "ui:styles": {
-                fontSize: "5rem",
-                fontWeight: "900",
-                fontFamily: "'Poppins', sans-serif",
-                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                marginBottom: "24px",
-                lineHeight: "1.1",
-                letterSpacing: "-2px"
-              }
-            },
-            {
-              "ui:widget": "paragraph",
-              "ui:text": "Join thousands of people achieving their fitness goals with our AI-powered training platform",
-              "ui:styles": {
-                fontSize: "1.5rem",
-                color: "rgba(232, 234, 237, 0.8)",
-                maxWidth: "800px",
-                lineHeight: "1.6",
-                marginBottom: "24px"
-              }
-            },
-            {
-              "ui:widget": "flexLayout",
-              "ui:direction": "row",
-              "ui:gap": "20px",
-              "ui:justify": "center",
-              "ui:children": [
-                {
-                  "ui:widget": "button",
-                  "ui:label": "Start Free Trial →",
-                  "ui:action": "navigateToPage",
-                  "ui:actionParams": { url: "/fitzen/signup" },
-                  "ui:styles": {
-                    padding: "20px 48px",
-                    fontSize: "1.2rem",
-                    fontWeight: "800",
-                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "16px",
-                    cursor: "pointer",
-                    boxShadow: "0 10px 40px rgba(124, 58, 237, 0.4)"
-                  }
-                },
-                {
-                  "ui:widget": "button",
-                  "ui:label": "Watch Demo",
-                  "ui:action": "navigateToPage",
-                  "ui:actionParams": { url: "#demo" },
-                  "ui:styles": {
-                    padding: "20px 48px",
-                    fontSize: "1.2rem",
-                    fontWeight: "800",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    color: "white",
-                    border: "2px solid rgba(124, 58, 237, 0.5)",
-                    borderRadius: "16px",
-                    cursor: "pointer",
-                    backdropFilter: "blur(10px)"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-
-        statsSection: {
-          "ui:widget": "container",
-          "ui:direction": "row",
-          "ui:gap": "60px",
-          "ui:styles": {
-            padding: "80px 40px",
-            background: "rgba(255, 255, 255, 0.02)",
-            backdropFilter: "blur(10px)",
-            borderTop: "1px solid rgba(124, 58, 237, 0.1)",
-            borderBottom: "1px solid rgba(124, 58, 237, 0.1)",
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "container",
-              "ui:direction": "column",
-              "ui:gap": "12px",
-              "ui:styles": { textAlign: "center", minWidth: "200px" },
-              "ui:children": [
-                {
-                  "ui:widget": "heading",
-                  "ui:text": "50K+",
-                  "ui:level": "h2",
-                  "ui:styles": {
-                    fontSize: "4rem",
-                    fontWeight: "900",
-                    background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent"
-                  }
-                },
-                {
-                  "ui:widget": "text",
-                  "ui:content": "Active Users",
-                  "ui:styles": {
-                    fontSize: "1.2rem",
-                    color: "rgba(232, 234, 237, 0.7)",
-                    fontWeight: "600",
-                    textTransform: "uppercase",
-                    letterSpacing: "1px"
-                  }
-                }
-              ]
-            },
-            {
-              "ui:widget": "container",
-              "ui:direction": "column",
-              "ui:gap": "12px",
-              "ui:styles": { textAlign: "center", minWidth: "200px" },
-              "ui:children": [
-                {
-                  "ui:widget": "heading",
-                  "ui:text": "200+",
-                  "ui:level": "h2",
-                  "ui:styles": {
-                    fontSize: "4rem",
-                    fontWeight: "900",
-                    background: "linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent"
-                  }
-                },
-                {
-                  "ui:widget": "text",
-                  "ui:content": "Workout Programs",
-                  "ui:styles": {
-                    fontSize: "1.2rem",
-                    color: "rgba(232, 234, 237, 0.7)",
-                    fontWeight: "600",
-                    textTransform: "uppercase",
-                    letterSpacing: "1px"
-                  }
-                }
-              ]
-            },
-            {
-              "ui:widget": "container",
-              "ui:direction": "column",
-              "ui:gap": "12px",
-              "ui:styles": { textAlign: "center", minWidth: "200px" },
-              "ui:children": [
-                {
-                  "ui:widget": "heading",
-                  "ui:text": "98%",
-                  "ui:level": "h2",
-                  "ui:styles": {
-                    fontSize: "4rem",
-                    fontWeight: "900",
-                    background: "linear-gradient(135deg, #10B981 0%, #34D399 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent"
-                  }
-                },
-                {
-                  "ui:widget": "text",
-                  "ui:content": "Success Rate",
-                  "ui:styles": {
-                    fontSize: "1.2rem",
-                    color: "rgba(232, 234, 237, 0.7)",
-                    fontWeight: "600",
-                    textTransform: "uppercase",
-                    letterSpacing: "1px"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-
-        featuresSection: {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "80px",
-          "ui:styles": {
-            padding: "120px 40px",
-            background: "transparent"
-          },
-          "ui:children": [
-            {
-              "ui:widget": "container",
-              "ui:direction": "column",
-              "ui:gap": "20px",
-              "ui:styles": { textAlign: "center", maxWidth: "800px", margin: "0 auto" },
-              "ui:children": [
-                {
-                  "ui:widget": "heading",
-                  "ui:text": "Everything You Need",
-                  "ui:level": "h2",
-                  "ui:styles": {
-                    fontSize: "3.5rem",
-                    fontWeight: "900",
-                    color: "#E8EAED",
-                    fontFamily: "'Poppins', sans-serif"
-                  }
-                },
-                {
-                  "ui:widget": "paragraph",
-                  "ui:text": "Powerful features to help you achieve your fitness goals faster",
-                  "ui:styles": {
-                    fontSize: "1.3rem",
-                    color: "rgba(232, 234, 237, 0.7)",
-                    lineHeight: "1.6"
-                  }
-                }
-              ]
-            },
-            {
-              "ui:widget": "gridLayout",
-              "ui:columns": 3,
-              "ui:gap": "32px",
-              "ui:children": [
-                {
-                  "ui:widget": "card",
-                  "ui:title": "🏋️ Personalized Plans",
-                  "ui:description": "AI-powered workout plans tailored to your fitness level and goals",
-                  "ui:styles": {
-                    padding: "40px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "24px",
-                    textAlign: "center"
+                  {
+                    label: "Sign Up",
+                    action: "navigateToPage",
+                    actionParams: { url: "/fitzen/signup" },
+                    styles: {
+                      color: "white",
+                      background:
+                        "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                      padding: "10px 24px",
+                      borderRadius: "12px",
+                      fontWeight: "600",
+                    },
                   },
-                  "ui:titleStyles": {
-                    fontSize: "1.8rem",
-                    marginBottom: "16px",
-                    color: "#E8EAED"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "📊 Progress Tracking",
-                  "ui:description": "Track your workouts, calories, and progress with detailed analytics",
-                  "ui:styles": {
-                    padding: "40px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "24px",
-                    textAlign: "center"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "👥 Community",
-                  "ui:description": "Connect with like-minded people and stay motivated together",
-                  "ui:styles": {
-                    padding: "40px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "24px",
-                    textAlign: "center"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "🎯 Goal Setting",
-                  "ui:description": "Set SMART goals and get guided step-by-step to achieve them",
-                  "ui:styles": {
-                    padding: "40px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "24px",
-                    textAlign: "center"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "🍎 Nutrition Plans",
-                  "ui:description": "Personalized meal plans and nutrition guidance from experts",
-                  "ui:styles": {
-                    padding: "40px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "24px",
-                    textAlign: "center"
-                  }
-                },
-                {
-                  "ui:widget": "card",
-                  "ui:title": "⚡ Live Classes",
-                  "ui:description": "Join live workout sessions with certified trainers daily",
-                  "ui:styles": {
-                    padding: "40px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(30px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "24px",
-                    textAlign: "center"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-
-        ctaSection: {
-          "ui:widget": "container",
-          "ui:direction": "column",
-          "ui:gap": "32px",
-          "ui:styles": {
-            padding: "120px 40px",
-            textAlign: "center",
-            background: "linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%)",
-            backdropFilter: "blur(20px)",
-            borderRadius: "32px",
-            margin: "80px 40px",
-            border: "1px solid rgba(124, 58, 237, 0.2)"
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(10, 14, 39, 0.8)",
+              backdropFilter: "blur(20px)",
+              borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              height: "80px",
+            },
+            triggers: [],
           },
-          "ui:children": [
-            {
-              "ui:widget": "heading",
-              "ui:text": "Ready to Transform?",
-              "ui:level": "h2",
-              "ui:styles": {
-                fontSize: "3.5rem",
-                fontWeight: "900",
-                color: "#E8EAED",
-                marginBottom: "16px",
-                fontFamily: "'Poppins', sans-serif"
-              }
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              loginForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "🔐 Welcome Back",
+                "ui:description": "Sign in to continue your fitness journey",
+                "ui:id": "loginForm",
+                "ui:styles": {
+                  maxWidth: "480px",
+                  margin: "140px auto 0",
+                  padding: "48px 40px",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  backdropFilter: "blur(30px)",
+                  borderRadius: "24px",
+                  boxShadow: "0 20px 60px rgba(124, 58, 237, 0.3)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "your.email@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:labelStyles": {
+                      color: "#E8EAED",
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                    },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "••••••••",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    "ui:labelStyles": {
+                      color: "#E8EAED",
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                    },
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Sign In →",
+                    action: "handleLogin",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "16px 0",
+                      background:
+                        "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "700",
+                      borderRadius: "16px",
+                      border: "none",
+                      cursor: "pointer",
+                      marginTop: "8px",
+                    },
+                  },
+                ],
+                "ui:titleStyles": {
+                  color: "#E8EAED",
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: "32px",
+                  fontWeight: "800",
+                  marginBottom: "12px",
+                  textAlign: "center",
+                },
+                "ui:descriptionStyles": {
+                  color: "rgba(232, 234, 237, 0.8)",
+                  fontSize: "16px",
+                  marginBottom: "36px",
+                  textAlign: "center",
+                },
+              },
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:direction": "column",
+                "ui:links": [
+                  {
+                    prefix: "Don't have an account?",
+                    label: "Sign Up",
+                    action: "navigateToPage",
+                    actionParams: { url: "/fitzen/signup" },
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "480px",
+                  margin: "24px auto",
+                  padding: "20px",
+                  background: "rgba(124, 58, 237, 0.1)",
+                  backdropFilter: "blur(10px)",
+                  borderRadius: "16px",
+                  border: "1px solid rgba(124, 58, 237, 0.2)",
+                },
+                "ui:linkStyles": {
+                  color: "#EC4899",
+                  fontWeight: "700",
+                },
+              },
             },
-            {
-              "ui:widget": "paragraph",
-              "ui:text": "Join FitZen today and start your journey to a healthier, stronger you",
-              "ui:styles": {
-                fontSize: "1.3rem",
-                color: "rgba(232, 234, 237, 0.8)",
-                marginBottom: "24px"
-              }
+            styles: {
+              padding: "100px 40px 80px",
+              background:
+                "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.15), transparent 50%), radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.15), transparent 50%), #0A0E27",
+              minHeight: "100vh",
             },
-            {
-              "ui:widget": "button",
-              "ui:label": "Get Started Free →",
-              "ui:action": "navigateToPage",
-              "ui:actionParams": { url: "/fitzen/signup" },
-              "ui:styles": {
-                padding: "20px 50px",
-                fontSize: "1.2rem",
-                fontWeight: "800",
-                background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: "16px",
-                cursor: "pointer",
-                boxShadow: "0 15px 50px rgba(124, 58, 237, 0.5)",
-                margin: "0 auto"
-              }
-            }
-          ]
-        }
-      },
-      styles: {
-        padding: "0",
-        background: "#0A0E27",
-        minHeight: "100vh"
-      },
-      triggers: []
-    },
-    
-    footer: {
-      table: {},
-      modal: {},
-      uiSchema: {
-        footerHeading: {
-          "ui:widget": "heading",
-          "ui:text": "💪 FitZen",
-          "ui:level": "h3",
-          "ui:styles": {
-            textAlign: "center",
-            fontSize: "2rem",
-            fontWeight: "900",
-            background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            marginBottom: "16px"
-          }
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content":
+                  "© 2024 FitZen. Empowering your fitness journey. 💪",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "rgba(232, 234, 237, 0.6)",
+                  fontSize: "14px",
+                },
+              },
+            },
+            styles: {
+              background: "rgba(10, 14, 39, 0.8)",
+              padding: "32px",
+              textAlign: "center",
+              borderTop: "1px solid rgba(124, 58, 237, 0.2)",
+            },
+            triggers: [],
+          },
         },
-        footerDesc: {
-          "ui:widget": "paragraph",
-          "ui:text": "Empowering your fitness journey with AI-powered training and community support",
-          "ui:styles": {
-            textAlign: "center",
-            color: "rgba(232, 234, 237, 0.6)",
-            maxWidth: "600px",
-            margin: "0 auto 32px"
-          }
-        },
-        socialIcons: {
-          "ui:widget": "socialIcons",
-          "ui:size": "large",
-          "ui:variant": "colored",
-          "ui:icons": [
-            { platform: "facebook", url: "https://facebook.com/fitzen" },
-            { platform: "twitter", url: "https://twitter.com/fitzen" },
-            { platform: "instagram", url: "https://instagram.com/fitzen" },
-            { platform: "youtube", url: "https://youtube.com/fitzen" }
-          ]
-        },
-        divider: {
-          "ui:widget": "divider",
-          "ui:spacing": "large",
-          "ui:color": "rgba(124, 58, 237, 0.2)"
-        },
-        footerText: {
-          "ui:widget": "text",
-          "ui:content": "© 2024 FitZen. Transforming lives through fitness. All rights reserved.",
-          "ui:styles": {
-            textAlign: "center",
-            color: "rgba(232, 234, 237, 0.5)",
-            fontSize: "14px"
-          }
-        }
       },
-      styles: {
-        background: "rgba(10, 14, 39, 0.8)",
-        backdropFilter: "blur(20px)",
-        padding: "60px 40px 40px",
-        borderTop: "1px solid rgba(124, 58, 237, 0.2)"
-      },
-      triggers: []
-    }
-  },
 
-  resolvedAPIs: {}
-},
+      signup: {
+        title: "Sign Up - FitZen",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "💪 FitZen",
+                "ui:styles": {
+                  fontSize: "32px",
+                  fontWeight: "900",
+                  fontFamily: "'Poppins', sans-serif",
+                  background:
+                    "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  cursor: "pointer",
+                  letterSpacing: "-1px",
+                },
+              },
+              links: {
+                "ui:widget": "navLinks",
+                "ui:theme": "dark",
+                "ui:links": [
+                  {
+                    label: "Home",
+                    action: "navigateToPage",
+                    actionParams: { url: "/fitzen" },
+                  },
+                  {
+                    label: "Login",
+                    action: "navigateToPage",
+                    actionParams: { url: "/fitzen/login" },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(10, 14, 39, 0.8)",
+              backdropFilter: "blur(20px)",
+              borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+              padding: "20px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              height: "80px",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              signupForm: {
+                "ui:widget": "formContainer",
+                "ui:title": "✨ Start Your Journey",
+                "ui:description":
+                  "Create your account and transform your fitness",
+                "ui:id": "signupForm",
+                "ui:styles": {
+                  maxWidth: "480px",
+                  margin: "140px auto 0",
+                  padding: "48px 40px",
+                  background: "rgba(255, 255, 255, 0.05)",
+                  backdropFilter: "blur(30px)",
+                  borderRadius: "24px",
+                  boxShadow: "0 20px 60px rgba(124, 58, 237, 0.3)",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                },
+                "ui:fields": [
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Full Name",
+                    "ui:placeholder": "John Doe",
+                    "ui:type": "text",
+                    "ui:name": "name",
+                    "ui:required": true,
+                    "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Email Address",
+                    "ui:placeholder": "you@example.com",
+                    "ui:type": "email",
+                    "ui:name": "email",
+                    "ui:required": true,
+                    "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" },
+                  },
+                  {
+                    "ui:widget": "inputField",
+                    "ui:label": "Password",
+                    "ui:placeholder": "Create strong password",
+                    "ui:type": "password",
+                    "ui:name": "password",
+                    "ui:required": true,
+                    "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" },
+                  },
+                  {
+                    "ui:widget": "selectField",
+                    "ui:label": "Fitness Goal",
+                    "ui:name": "fitnessGoal",
+                    "ui:placeholder": "Select your goal",
+                    "ui:options": [
+                      { value: "weight_loss", label: "Weight Loss" },
+                      { value: "muscle_gain", label: "Muscle Gain" },
+                      { value: "endurance", label: "Build Endurance" },
+                      { value: "flexibility", label: "Flexibility" },
+                      { value: "general", label: "General Fitness" },
+                    ],
+                    "ui:labelStyles": { color: "#E8EAED", fontWeight: "600" },
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Create Account →",
+                    action: "handleSignup",
+                    variant: "primary",
+                    styles: {
+                      width: "100%",
+                      padding: "16px 0",
+                      background:
+                        "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                      color: "white",
+                      fontSize: "16px",
+                      fontWeight: "700",
+                      borderRadius: "16px",
+                      border: "none",
+                    },
+                  },
+                ],
+              },
+              authLinks: {
+                "ui:widget": "authLinks",
+                "ui:alignment": "center",
+                "ui:links": [
+                  {
+                    prefix: "Already have an account?",
+                    label: "Login",
+                    action: "navigateToPage",
+                    actionParams: { url: "/fitzen/login" },
+                  },
+                ],
+                "ui:styles": {
+                  maxWidth: "480px",
+                  margin: "24px auto",
+                },
+              },
+            },
+            styles: {
+              padding: "100px 40px 80px",
+              background:
+                "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.15), transparent 50%), #0A0E27",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 FitZen. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "rgba(232, 234, 237, 0.6)",
+                },
+              },
+            },
+            styles: {
+              background: "rgba(10, 14, 39, 0.8)",
+              padding: "32px",
+              borderTop: "1px solid rgba(124, 58, 237, 0.2)",
+            },
+            triggers: [],
+          },
+        },
+      },
+
+      dashboard: {
+        title: "Dashboard - FitZen",
+        requireAuth: true,
+        redirectIfNotAuth: "/fitzen/login",
+        components: {
+          navbar: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              logo: {
+                "ui:widget": "text",
+                "ui:content": "💪 FitZen",
+                "ui:styles": {
+                  fontSize: "28px",
+                  fontWeight: "900",
+                  background:
+                    "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                },
+              },
+              userInfo: {
+                "ui:widget": "navLinks",
+                "ui:theme": "dark",
+                "ui:links": [
+                  {
+                    label: "{{auth.user?.email || 'User'}}",
+                    action: "",
+                    styles: { color: "#E8EAED" },
+                  },
+                  {
+                    label: "Logout",
+                    action: "clearAuth",
+                    styles: { color: "#EC4899", fontWeight: "700" },
+                  },
+                ],
+              },
+            },
+            styles: {
+              background: "rgba(10, 14, 39, 0.95)",
+              backdropFilter: "blur(20px)",
+              borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+              padding: "18px 50px",
+              position: "fixed",
+              width: "100%",
+              zIndex: "1000",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              height: "75px",
+            },
+            triggers: [],
+          },
+          sidebar: {
+            table: {},
+            modal: {},
+            uiSchema: {},
+            styles: { display: "none" },
+            triggers: [],
+          },
+          main: {
+            table: {},
+            modal: {
+              logWorkout: {
+                "ui:title": "Log Workout",
+                "ui:theme": "dark",
+                "ui:styles": {
+                  maxWidth: "500px",
+                  background: "rgba(10, 14, 39, 0.95)",
+                  padding: "40px",
+                },
+                "ui:fields": [
+                  {
+                    name: "workoutType",
+                    label: "Workout Type",
+                    type: "text",
+                    placeholder: "e.g., Running, Weightlifting",
+                    required: true,
+                  },
+                  {
+                    name: "duration",
+                    label: "Duration (minutes)",
+                    type: "number",
+                    placeholder: "30",
+                    required: true,
+                  },
+                  {
+                    name: "caloriesBurned",
+                    label: "Calories Burned",
+                    type: "number",
+                    placeholder: "250",
+                    required: false,
+                  },
+                ],
+                "ui:actions": [
+                  {
+                    label: "Log Workout",
+                    action: "logWorkout",
+                    variant: "primary",
+                  },
+                  {
+                    label: "Cancel",
+                    action: "closeModal",
+                    variant: "outline",
+                  },
+                ],
+              },
+            },
+            uiSchema: {
+              welcomeCard: {
+                "ui:widget": "card",
+                "ui:title": "💪 Welcome Back, Champion!",
+                "ui:description": "Let's crush today's goals together",
+                "ui:styles": {
+                  padding: "48px",
+                  marginTop: "100px",
+                  marginBottom: "40px",
+                  background:
+                    "linear-gradient(135deg, rgba(124, 58, 237, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%)",
+                  backdropFilter: "blur(30px)",
+                  border: "1px solid rgba(124, 58, 237, 0.3)",
+                  borderRadius: "24px",
+                  textAlign: "center",
+                },
+              },
+
+              statsGrid: {
+                "ui:widget": "gridLayout",
+                "ui:columns": 4,
+                "ui:gap": "24px",
+                "ui:styles": { marginBottom: "40px" },
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🔥 245",
+                    "ui:description": "Calories Burned Today",
+                    "ui:styles": {
+                      padding: "32px 24px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "20px",
+                    },
+                    "ui:titleStyles": {
+                      fontSize: "2.5rem",
+                      fontWeight: "900",
+                      background:
+                        "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "💪 12",
+                    "ui:description": "Workouts This Week",
+                    "ui:styles": {
+                      padding: "32px 24px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "20px",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "⏱️ 45m",
+                    "ui:description": "Average Duration",
+                    "ui:styles": {
+                      padding: "32px 24px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "20px",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🏆 28",
+                    "ui:description": "Day Streak",
+                    "ui:styles": {
+                      padding: "32px 24px",
+                      textAlign: "center",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "20px",
+                    },
+                  },
+                ],
+              },
+
+              quickActions: {
+                "ui:widget": "flexLayout",
+                "ui:direction": "row",
+                "ui:gap": "16px",
+                "ui:styles": { marginBottom: "50px", justifyContent: "center" },
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "📝 Log Workout",
+                    "ui:action": "openModal",
+                    "ui:actionParams": { modal: "logWorkout" },
+                    "ui:styles": {
+                      padding: "16px 32px",
+                      background:
+                        "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                      color: "white",
+                      borderRadius: "16px",
+                      fontSize: "16px",
+                      fontWeight: "700",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "📊 View Progress",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/fitzen/progress" },
+                    "ui:styles": {
+                      padding: "16px 32px",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      color: "white",
+                      border: "2px solid rgba(124, 58, 237, 0.5)",
+                      borderRadius: "16px",
+                      fontSize: "16px",
+                      fontWeight: "700",
+                    },
+                  },
+                ],
+              },
+            },
+            styles: {
+              padding: "90px 40px 50px",
+              background:
+                "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.1), transparent 70%), #0A0E27",
+              minHeight: "100vh",
+            },
+            triggers: [],
+          },
+          footer: {
+            table: {},
+            modal: {},
+            uiSchema: {
+              footerText: {
+                "ui:widget": "text",
+                "ui:content": "© 2024 FitZen. All rights reserved.",
+                "ui:styles": {
+                  textAlign: "center",
+                  color: "rgba(232, 234, 237, 0.6)",
+                },
+              },
+            },
+            styles: {
+              background: "rgba(10, 14, 39, 0.8)",
+              padding: "32px",
+              borderTop: "1px solid rgba(124, 58, 237, 0.2)",
+            },
+            triggers: [],
+          },
+        },
+      },
+    },
+
+    // HOME PAGE (Landing)
+    components: {
+      navbar: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          logo: {
+            "ui:widget": "text",
+            "ui:content": "💪 FitZen",
+            "ui:styles": {
+              fontSize: "32px",
+              fontWeight: "900",
+              fontFamily: "'Poppins', sans-serif",
+              background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              cursor: "pointer",
+              letterSpacing: "-1px",
+            },
+          },
+          links: {
+            "ui:widget": "navLinks",
+            "ui:theme": "dark",
+            "ui:links": [
+              {
+                label: "Home",
+                action: "navigateToPage",
+                actionParams: { url: "/fitzen" },
+                styles: { color: "#E8EAED", fontWeight: "600" },
+              },
+              {
+                label: "Features",
+                action: "navigateToPage",
+                actionParams: { url: "/fitzen#features" },
+                styles: { color: "#E8EAED", fontWeight: "600" },
+              },
+              {
+                label: "Login",
+                action: "navigateToPage",
+                actionParams: { url: "/fitzen/login" },
+                styles: { color: "#E8EAED", fontWeight: "600" },
+              },
+              {
+                label: "Get Started",
+                action: "navigateToPage",
+                actionParams: { url: "/fitzen/signup" },
+                styles: {
+                  background:
+                    "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                  color: "white",
+                  padding: "12px 28px",
+                  borderRadius: "14px",
+                  fontWeight: "700",
+                  border: "none",
+                },
+              },
+            ],
+          },
+        },
+        styles: {
+          background: "rgba(10, 14, 39, 0.8)",
+          backdropFilter: "blur(20px) saturate(180%)",
+          borderBottom: "1px solid rgba(124, 58, 237, 0.2)",
+          padding: "20px 50px",
+          position: "fixed",
+          width: "100%",
+          zIndex: "1000",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          height: "80px",
+          boxShadow: "0 4px 30px rgba(0, 0, 0, 0.5)",
+        },
+        triggers: [],
+      },
+
+      sidebar: {
+        table: {},
+        modal: {},
+        uiSchema: {},
+        styles: { display: "none" },
+        triggers: [],
+      },
+
+      main: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          heroSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "40px",
+            "ui:styles": {
+              padding: "180px 40px 100px",
+              textAlign: "center",
+              background:
+                "radial-gradient(ellipse at top, rgba(124, 58, 237, 0.2), transparent 70%), radial-gradient(ellipse at bottom, rgba(236, 72, 153, 0.15), transparent 70%)",
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "Transform Your Body",
+                "ui:level": "h1",
+                "ui:styles": {
+                  fontSize: "5rem",
+                  fontWeight: "900",
+                  fontFamily: "'Poppins', sans-serif",
+                  background:
+                    "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  marginBottom: "24px",
+                  lineHeight: "1.1",
+                  letterSpacing: "-2px",
+                },
+              },
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "Join thousands of people achieving their fitness goals with our AI-powered training platform",
+                "ui:styles": {
+                  fontSize: "1.5rem",
+                  color: "rgba(232, 234, 237, 0.8)",
+                  maxWidth: "800px",
+                  lineHeight: "1.6",
+                  marginBottom: "24px",
+                },
+              },
+              {
+                "ui:widget": "flexLayout",
+                "ui:direction": "row",
+                "ui:gap": "20px",
+                "ui:justify": "center",
+                "ui:children": [
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "Start Free Trial →",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "/fitzen/signup" },
+                    "ui:styles": {
+                      padding: "20px 48px",
+                      fontSize: "1.2rem",
+                      fontWeight: "800",
+                      background:
+                        "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "16px",
+                      cursor: "pointer",
+                      boxShadow: "0 10px 40px rgba(124, 58, 237, 0.4)",
+                    },
+                  },
+                  {
+                    "ui:widget": "button",
+                    "ui:label": "Watch Demo",
+                    "ui:action": "navigateToPage",
+                    "ui:actionParams": { url: "#demo" },
+                    "ui:styles": {
+                      padding: "20px 48px",
+                      fontSize: "1.2rem",
+                      fontWeight: "800",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      color: "white",
+                      border: "2px solid rgba(124, 58, 237, 0.5)",
+                      borderRadius: "16px",
+                      cursor: "pointer",
+                      backdropFilter: "blur(10px)",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          statsSection: {
+            "ui:widget": "container",
+            "ui:direction": "row",
+            "ui:gap": "60px",
+            "ui:styles": {
+              padding: "80px 40px",
+              background: "rgba(255, 255, 255, 0.02)",
+              backdropFilter: "blur(10px)",
+              borderTop: "1px solid rgba(124, 58, 237, 0.1)",
+              borderBottom: "1px solid rgba(124, 58, 237, 0.1)",
+              display: "flex",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "12px",
+                "ui:styles": { textAlign: "center", minWidth: "200px" },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "50K+",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "4rem",
+                      fontWeight: "900",
+                      background:
+                        "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    },
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content": "Active Users",
+                    "ui:styles": {
+                      fontSize: "1.2rem",
+                      color: "rgba(232, 234, 237, 0.7)",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "1px",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "12px",
+                "ui:styles": { textAlign: "center", minWidth: "200px" },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "200+",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "4rem",
+                      fontWeight: "900",
+                      background:
+                        "linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    },
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content": "Workout Programs",
+                    "ui:styles": {
+                      fontSize: "1.2rem",
+                      color: "rgba(232, 234, 237, 0.7)",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "1px",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "12px",
+                "ui:styles": { textAlign: "center", minWidth: "200px" },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "98%",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "4rem",
+                      fontWeight: "900",
+                      background:
+                        "linear-gradient(135deg, #10B981 0%, #34D399 100%)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                    },
+                  },
+                  {
+                    "ui:widget": "text",
+                    "ui:content": "Success Rate",
+                    "ui:styles": {
+                      fontSize: "1.2rem",
+                      color: "rgba(232, 234, 237, 0.7)",
+                      fontWeight: "600",
+                      textTransform: "uppercase",
+                      letterSpacing: "1px",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          featuresSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "80px",
+            "ui:styles": {
+              padding: "120px 40px",
+              background: "transparent",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:gap": "20px",
+                "ui:styles": {
+                  textAlign: "center",
+                  maxWidth: "800px",
+                  margin: "0 auto",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "heading",
+                    "ui:text": "Everything You Need",
+                    "ui:level": "h2",
+                    "ui:styles": {
+                      fontSize: "3.5rem",
+                      fontWeight: "900",
+                      color: "#E8EAED",
+                      fontFamily: "'Poppins', sans-serif",
+                    },
+                  },
+                  {
+                    "ui:widget": "paragraph",
+                    "ui:text":
+                      "Powerful features to help you achieve your fitness goals faster",
+                    "ui:styles": {
+                      fontSize: "1.3rem",
+                      color: "rgba(232, 234, 237, 0.7)",
+                      lineHeight: "1.6",
+                    },
+                  },
+                ],
+              },
+              {
+                "ui:widget": "gridLayout",
+                "ui:columns": 3,
+                "ui:gap": "32px",
+                "ui:children": [
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🏋️ Personalized Plans",
+                    "ui:description":
+                      "AI-powered workout plans tailored to your fitness level and goals",
+                    "ui:styles": {
+                      padding: "40px",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "24px",
+                      textAlign: "center",
+                    },
+                    "ui:titleStyles": {
+                      fontSize: "1.8rem",
+                      marginBottom: "16px",
+                      color: "#E8EAED",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "📊 Progress Tracking",
+                    "ui:description":
+                      "Track your workouts, calories, and progress with detailed analytics",
+                    "ui:styles": {
+                      padding: "40px",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "24px",
+                      textAlign: "center",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "👥 Community",
+                    "ui:description":
+                      "Connect with like-minded people and stay motivated together",
+                    "ui:styles": {
+                      padding: "40px",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "24px",
+                      textAlign: "center",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🎯 Goal Setting",
+                    "ui:description":
+                      "Set SMART goals and get guided step-by-step to achieve them",
+                    "ui:styles": {
+                      padding: "40px",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "24px",
+                      textAlign: "center",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "🍎 Nutrition Plans",
+                    "ui:description":
+                      "Personalized meal plans and nutrition guidance from experts",
+                    "ui:styles": {
+                      padding: "40px",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "24px",
+                      textAlign: "center",
+                    },
+                  },
+                  {
+                    "ui:widget": "card",
+                    "ui:title": "⚡ Live Classes",
+                    "ui:description":
+                      "Join live workout sessions with certified trainers daily",
+                    "ui:styles": {
+                      padding: "40px",
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(30px)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      borderRadius: "24px",
+                      textAlign: "center",
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+
+          ctaSection: {
+            "ui:widget": "container",
+            "ui:direction": "column",
+            "ui:gap": "32px",
+            "ui:styles": {
+              padding: "120px 40px",
+              textAlign: "center",
+              background:
+                "linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%)",
+              backdropFilter: "blur(20px)",
+              borderRadius: "32px",
+              margin: "80px 40px",
+              border: "1px solid rgba(124, 58, 237, 0.2)",
+            },
+            "ui:children": [
+              {
+                "ui:widget": "heading",
+                "ui:text": "Ready to Transform?",
+                "ui:level": "h2",
+                "ui:styles": {
+                  fontSize: "3.5rem",
+                  fontWeight: "900",
+                  color: "#E8EAED",
+                  marginBottom: "16px",
+                  fontFamily: "'Poppins', sans-serif",
+                },
+              },
+              {
+                "ui:widget": "paragraph",
+                "ui:text":
+                  "Join FitZen today and start your journey to a healthier, stronger you",
+                "ui:styles": {
+                  fontSize: "1.3rem",
+                  color: "rgba(232, 234, 237, 0.8)",
+                  marginBottom: "24px",
+                },
+              },
+              {
+                "ui:widget": "button",
+                "ui:label": "Get Started Free →",
+                "ui:action": "navigateToPage",
+                "ui:actionParams": { url: "/fitzen/signup" },
+                "ui:styles": {
+                  padding: "20px 50px",
+                  fontSize: "1.2rem",
+                  fontWeight: "800",
+                  background:
+                    "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "16px",
+                  cursor: "pointer",
+                  boxShadow: "0 15px 50px rgba(124, 58, 237, 0.5)",
+                  margin: "0 auto",
+                },
+              },
+            ],
+          },
+        },
+        styles: {
+          padding: "0",
+          background: "#0A0E27",
+          minHeight: "100vh",
+        },
+        triggers: [],
+      },
+
+      footer: {
+        table: {},
+        modal: {},
+        uiSchema: {
+          footerHeading: {
+            "ui:widget": "heading",
+            "ui:text": "💪 FitZen",
+            "ui:level": "h3",
+            "ui:styles": {
+              textAlign: "center",
+              fontSize: "2rem",
+              fontWeight: "900",
+              background: "linear-gradient(135deg, #7C3AED 0%, #EC4899 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              marginBottom: "16px",
+            },
+          },
+          footerDesc: {
+            "ui:widget": "paragraph",
+            "ui:text":
+              "Empowering your fitness journey with AI-powered training and community support",
+            "ui:styles": {
+              textAlign: "center",
+              color: "rgba(232, 234, 237, 0.6)",
+              maxWidth: "600px",
+              margin: "0 auto 32px",
+            },
+          },
+          socialIcons: {
+            "ui:widget": "socialIcons",
+            "ui:size": "large",
+            "ui:variant": "colored",
+            "ui:icons": [
+              { platform: "facebook", url: "https://facebook.com/fitzen" },
+              { platform: "twitter", url: "https://twitter.com/fitzen" },
+              { platform: "instagram", url: "https://instagram.com/fitzen" },
+              { platform: "youtube", url: "https://youtube.com/fitzen" },
+            ],
+          },
+          divider: {
+            "ui:widget": "divider",
+            "ui:spacing": "large",
+            "ui:color": "rgba(124, 58, 237, 0.2)",
+          },
+          footerText: {
+            "ui:widget": "text",
+            "ui:content":
+              "© 2024 FitZen. Transforming lives through fitness. All rights reserved.",
+            "ui:styles": {
+              textAlign: "center",
+              color: "rgba(232, 234, 237, 0.5)",
+              fontSize: "14px",
+            },
+          },
+        },
+        styles: {
+          background: "rgba(10, 14, 39, 0.8)",
+          backdropFilter: "blur(20px)",
+          padding: "60px 40px 40px",
+          borderTop: "1px solid rgba(124, 58, 237, 0.2)",
+        },
+        triggers: [],
+      },
+    },
+
+    resolvedAPIs: {},
+  },
   {
     title: "HotelHub - Reservation Management",
     slug: "hotelhub",
@@ -7383,6 +7437,7 @@ textarea::placeholder {
         "global.enduser.resetPassword",
         "global.enduser.verifyEmail",
         "chiyaz.reviews.list",
+        "chiyaz.metadata",
         // "chiyaz.tea.list",
         // "chiyaz.coffee.list",
         "chiyaz.reviews.submit",
@@ -7762,7 +7817,7 @@ try {
   });
 }`,
 
-handleSignup: `console.log('📝 Chiyaz signup action triggered');
+        handleSignup: `console.log('📝 Chiyaz signup action triggered');
 
 // ✅ Get ALL form data from context
 const formData = context.formData || {};
@@ -9429,79 +9484,81 @@ try {
     },
 
     components: {
-      navbar: {
-        uiSchema: {
-          logo: {
-            "ui:widget": "text",
-            "ui:content": "🍵 Chiyaz",
-            "ui:styles": {
-              fontSize: "28px",
-              fontWeight: "800",
-              fontFamily: "'Playfair Display', serif",
-              background: "linear-gradient(135deg, #F5E9D9 0%, #D2691E 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              cursor: "pointer",
-            },
-            "ui:action": "navigateToPage",
-            "ui:actionParams": { url: "/chiyaz" },
-          },
-          themeToggle: {
-            "ui:widget": "toggle",
-            "ui:label": "",
-            "ui:size": "medium",
-            "ui:onChange": "toggleTheme",
-            "ui:styles": {
-              marginLeft: "auto",
-              marginRight: "20px",
-            },
-          },
-          links: {
-            "ui:widget": "navLinks",
-            "ui:theme": "light",
-            "ui:links": [
-              {
-                label: "Login",
-                action: "navigateToPage",
-                actionParams: { url: "/chiyaz/login" },
-                styles: {
-                  color: "#F5E9D9",
-                  fontWeight: "600",
-                },
-              },
-              {
-                label: "Sign Up",
-                action: "navigateToPage",
-                actionParams: { url: "/chiyaz/signup" },
-                styles: {
-                  color: "#F5E9D9",
-                  fontWeight: "600",
-                },
-              },
-            ],
-          },
-        },
-        styles: {
-          background: "rgba(44, 24, 16, 0.95)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          borderBottom: "2px solid rgba(212, 185, 150, 0.3)",
-          padding: "18px 40px",
-          position: "fixed",
-          width: "100%",
-          zIndex: "1000",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          boxShadow: "0 8px 32px rgba(139, 69, 19, 0.25)",
-          height: "70px",
-        },
-        triggers: [
-          {
-            event: "load",
-            action: "loadTheme",
-          },
-        ],
+     navbar: {
+  uiSchema: {
+    logo: {
+      "ui:widget": "image",
+      "ui:src": "{{api.chiyaz.metadata.data.0.logo.url}}",
+      "ui:alt": "Chiyaz Logo",
+      "ui:width": "70px",
+      "ui:height": "70px",
+      "ui:objectFit": "contain", // ✅ Changed from "cover" to "contain"
+      "ui:styles": {
+        cursor: "pointer",
+        borderRadius: "50%",
+        marginTop:"20px",
+        boxShadow: "0 4px 12px rgba(139, 69, 19, 0.25)",
+        transition: "transform 0.3s ease",
       },
+      "ui:action": "navigateToPage",
+      "ui:actionParams": { url: "/chiyaz" },
+    },
+    themeToggle: {
+      "ui:widget": "toggle",
+      "ui:label": "",
+      "ui:size": "medium",
+      "ui:onChange": "toggleTheme",
+      "ui:styles": {
+        marginLeft: "auto",
+        marginRight: "20px",
+      },
+    },
+    links: {
+      "ui:widget": "navLinks",
+      "ui:theme": "light",
+      "ui:links": [
+        {
+          label: "Login",
+          action: "navigateToPage",
+          actionParams: { url: "/chiyaz/login" },
+          styles: {
+            color: "#F5E9D9",
+            fontWeight: "600",
+          },
+        },
+        {
+          label: "Sign Up",
+          action: "navigateToPage",
+          actionParams: { url: "/chiyaz/signup" },
+          styles: {
+            color: "#F5E9D9",
+            fontWeight: "600",
+          },
+        },
+      ],
+    },
+  },
+  styles: {
+    background: "rgba(44, 24, 16, 0.95)",
+    backdropFilter: "blur(20px) saturate(180%)",
+    borderBottom: "2px solid rgba(212, 185, 150, 0.3)",
+    padding: "18px 40px",
+    position: "fixed",
+    width: "100%",
+    zIndex: "1000",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    boxShadow: "0 8px 32px rgba(139, 69, 19, 0.25)",
+    height: "70px",
+  },
+  triggers: [
+    {
+      event: "load",
+      action: "loadTheme",
+    },
+  ],
+},
       sidebar: {
         table: {},
         modal: {},
@@ -10404,6 +10461,10 @@ try {
             event: "load",
             source: "chiyaz.reviews.list",
           },
+          {
+            event: "load",
+            source: "chiyaz.metadata",
+          },
         ],
       },
       footer: {
@@ -10431,7 +10492,7 @@ try {
 
     resolvedAPIs: {},
   },
- {
+  {
     title: "ShopZone - Modern E-commerce",
     slug: "shopzone",
     projectUUID: "ecom-shopzone",
@@ -17178,7 +17239,7 @@ context.handlers.setFormData({});`,
     `,
 
       actions: {
-      initAuthMode: `
+        initAuthMode: `
   console.log('🎬 Initializing authMode to login');
   context.handlers.setData('authMode', 'login');
 `,
@@ -18129,7 +18190,7 @@ try {
               // ========== LOGIN FORM ==========
               {
                 "ui:widget": "conditionalContent",
-                 "ui:condition": "{{api.authMode === 'login'}}",
+                "ui:condition": "{{api.authMode === 'login'}}",
                 "ui:content": {
                   "ui:widget": "container",
                   "ui:direction": "column",
@@ -18191,7 +18252,7 @@ try {
                             marginBottom: "20px",
                             width: "100%",
                             boxSizing: "border-box",
-                              textAlign: "left"
+                            textAlign: "left",
                           },
                           "ui:labelStyles": {
                             // Added labelStyles
@@ -18222,7 +18283,7 @@ try {
                             marginBottom: "30px", // Increased margin
                             width: "100%",
                             boxSizing: "border-box",
-                              "textAlign": "left"
+                            textAlign: "left",
                           },
                           "ui:labelStyles": {
                             // Added labelStyles
@@ -18296,7 +18357,7 @@ try {
               // ========== SIGNUP FORM ==========
               {
                 "ui:widget": "conditionalContent",
-               "ui:condition": "{{api.authMode === 'login'}}",
+                "ui:condition": "{{api.authMode === 'login'}}",
                 "ui:content": {
                   "ui:widget": "container",
                   "ui:direction": "column",
@@ -18592,7 +18653,7 @@ try {
               // ========== FORGOT PASSWORD FORM ==========
               {
                 "ui:widget": "conditionalContent",
-                 "ui:condition": "{{api.authMode === 'login'}}",
+                "ui:condition": "{{api.authMode === 'login'}}",
                 "ui:content": {
                   "ui:widget": "container",
                   "ui:direction": "column",
@@ -18725,10 +18786,10 @@ try {
           zIndex: 20,
         },
         triggers: [
-           {
-        event: "load",
-        action: "initAuthMode"  // ✅ Initialize authMode on page load
-      },
+          {
+            event: "load",
+            action: "initAuthMode", // ✅ Initialize authMode on page load
+          },
           {
             event: "load",
             action: "loadTheme",

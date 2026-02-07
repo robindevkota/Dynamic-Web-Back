@@ -372,111 +372,117 @@ class DynamicCrudController {
   }
 
   // ✅ DEFINE ENTITY (Enhanced with global support + params support)
-  static async defineEntity(req, res) {
-    try {
-      const { entityName, schema, operations, projectUUID, projectId, params } =
-        req.body;
-      const { organizationId, userId, role } = req.user; // ✅ Add role
+static async defineEntity(req, res) {
+  try {
+    const { 
+      entityName, 
+      schema, 
+      operations, 
+      projectUUID, 
+      projectId, 
+      params,
+      isPublic  // ✅ NEW: Get from request body
+    } = req.body;
+    
+    const { organizationId, userId, role } = req.user;
 
-      // ✅ Check if trying to create global entity
-      const isGlobal = req.body.isGlobal === true;
-      
-      if (isGlobal && role !== 'SUPER_ADMIN') {
-        return res.status(403).json({
-          error: "Only SUPER_ADMIN can create global entities",
-        });
-      }
-
-      const finalProjectId = projectId || req.user.projectId || null;
-      const finalProjectUUID = projectUUID || req.user.projectUUID || null;
-
-      if (
-        !entityName ||
-        typeof entityName !== "string" ||
-        !/^[a-z][a-z0-9_]*$/.test(entityName)
-      ) {
-        return res.status(400).json({
-          error: "Invalid entityName (lowercase, numbers, underscores only)",
-        });
-      }
-
-      // ✅ Generate slug (global entities use 'global-' prefix)
-      let slug;
-      if (isGlobal) {
-        slug = `global-${entityName}`;
-      } else if (finalProjectUUID) {
-        slug = `${organizationId}-${finalProjectUUID}-${entityName}`;
-      } else if (finalProjectId) {
-        slug = `${organizationId}-${finalProjectId}-${entityName}`;
-      } else {
-        slug = `${organizationId}-${entityName}`;
-      }
-
-      const existing = await DynamicEntity.findOne({ slug });
-      if (existing) {
-        return res.status(409).json({
-          error: `Entity "${entityName}" already exists`,
-          existingSlug: existing.slug,
-        });
-      }
-
-      // ✅ Create entity with global support
-      const entity = await DynamicEntity.create({
-        organizationId: isGlobal ? null : organizationId, // Global entities have no org
-        projectId: finalProjectId,
-        projectUUID: finalProjectUUID,
-        entityName,
-        slug,
-        schema: new Map(Object.entries(schema)),
-        operations: operations || [
-          "create",
-          "read",
-          "update",
-          "delete",
-          "list",
-        ],
-        params: params || [],
-        isGlobal: isGlobal, // ✅ NEW FIELD
-        createdBy: userId,
+    // ✅ Check if trying to create global entity
+    const isGlobal = req.body.isGlobal === true;
+    
+    if (isGlobal && role !== 'SUPER_ADMIN') {
+      return res.status(403).json({
+        error: "Only SUPER_ADMIN can create global entities",
       });
-
-      // Auto-register API config
-      const apiKey = `crud_${slug}`;
-      await APIConfig.findOneAndUpdate(
-        { key: apiKey },
-        {
-          key: apiKey,
-          name: `Dynamic CRUD: ${entityName}`,
-          description: `Auto-generated CRUD API for ${entityName}${isGlobal ? ' (Global)' : ''}`,
-          type: "dynamic",
-          baseUrl: `/api/crud/${organizationId || 'global'}/${entityName}`,
-          methods: entity.operations.map((op) => op.toUpperCase()),
-          isActive: true,
-          projectUUID: isGlobal ? 'global' : finalProjectUUID,
-          organizationId: isGlobal ? null : organizationId,
-          authRequired: true,
-          createdBy: userId,
-          tags: ["dynamic", "crud", entityName].concat(isGlobal ? ["global"] : []),
-        },
-        { upsert: true, new: true },
-      );
-
-      console.log(`✅ Entity created: ${entityName} | slug: ${slug} | global: ${isGlobal}`);
-
-      res.status(201).json({
-        success: true,
-        entity: {
-          ...entity.toObject(),
-          schema: Object.fromEntries(entity.schema),
-        },
-        apiEndpoint: `/api/crud/${organizationId || 'global'}/${entityName}`,
-        apiConfigKey: apiKey,
-      });
-    } catch (error) {
-      console.error("❌ defineEntity failed:", error);
-      res.status(500).json({ error: error.message });
     }
+
+    // Validation
+    if (!entityName || typeof entityName !== "string" || !/^[a-z][a-z0-9_]*$/.test(entityName)) {
+      return res.status(400).json({
+        error: "Invalid entityName (lowercase, numbers, underscores only)",
+      });
+    }
+
+    // ✅ NEW: Validate isPublic (must be boolean, defaults to true)
+    const publicAccess = typeof isPublic === 'boolean' ? isPublic : true;
+
+    const finalProjectId = projectId || req.user.projectId || null;
+    const finalProjectUUID = projectUUID || req.user.projectUUID || null;
+
+    // Generate slug
+    let slug;
+    if (isGlobal) {
+      slug = `global-${entityName}`;
+    } else if (finalProjectUUID) {
+      slug = `${organizationId}-${finalProjectUUID}-${entityName}`;
+    } else if (finalProjectId) {
+      slug = `${organizationId}-${finalProjectId}-${entityName}`;
+    } else {
+      slug = `${organizationId}-${entityName}`;
+    }
+
+    const existing = await DynamicEntity.findOne({ slug });
+    if (existing) {
+      return res.status(409).json({
+        error: `Entity "${entityName}" already exists`,
+        existingSlug: existing.slug,
+      });
+    }
+
+    // ✅ Create entity with isPublic
+    const entity = await DynamicEntity.create({
+      organizationId: isGlobal ? null : organizationId,
+      projectId: finalProjectId,
+      projectUUID: finalProjectUUID,
+      entityName,
+      slug,
+      schema: new Map(Object.entries(schema)),
+      operations: operations || ["create", "read", "update", "delete", "list"],
+      params: params || [],
+      isGlobal: isGlobal,
+      isPublic: publicAccess, // ✅ NEW: Set public access
+      createdBy: userId,
+    });
+
+    // Auto-register API config
+    const apiKey = `crud_${slug}`;
+    await APIConfig.findOneAndUpdate(
+      { key: apiKey },
+      {
+        key: apiKey,
+        name: `Dynamic CRUD: ${entityName}`,
+        description: `Auto-generated CRUD API for ${entityName}${isGlobal ? ' (Global)' : ''}${publicAccess ? ' - Public' : ' - Protected'}`,
+        type: "dynamic",
+        baseUrl: `/api/crud/${organizationId || 'global'}/${entityName}`,
+        methods: entity.operations.map((op) => op.toUpperCase()),
+        isActive: true,
+        projectUUID: isGlobal ? 'global' : finalProjectUUID,
+        organizationId: isGlobal ? null : organizationId,
+        authRequired: !publicAccess, // ✅ Set based on isPublic
+        createdBy: userId,
+        tags: ["dynamic", "crud", entityName]
+          .concat(isGlobal ? ["global"] : [])
+          .concat(publicAccess ? ["public"] : ["protected"]),
+      },
+      { upsert: true, new: true },
+    );
+
+    console.log(`✅ Entity created: ${entityName} | slug: ${slug} | global: ${isGlobal} | public: ${publicAccess}`);
+
+    res.status(201).json({
+      success: true,
+      entity: {
+        ...entity.toObject(),
+        schema: Object.fromEntries(entity.schema),
+      },
+      apiEndpoint: `/api/crud/${organizationId || 'global'}/${entityName}`,
+      apiConfigKey: apiKey,
+      accessLevel: publicAccess ? 'PUBLIC' : 'PROTECTED',
+    });
+  } catch (error) {
+    console.error("❌ defineEntity failed:", error);
+    res.status(500).json({ error: error.message });
   }
+}
 
   // ✅ CRUD HANDLER (Enhanced with permission checks + file array support + type conversion)
   static createCrudHandler(operation) {
@@ -998,111 +1004,123 @@ class DynamicCrudController {
   }
 
   // ✅ UPDATE ENTITY (Enhanced with permission check)
-  static async updateEntity(req, res) {
-    try {
-      const { entityId } = req.params;
-      const { entityName, schema, operations } = req.body;
-      const { organizationId, userId, role } = req.user;
+static async updateEntity(req, res) {
+  try {
+    const { entityId } = req.params;
+    const { 
+      entityName, 
+      schema, 
+      operations,
+      isPublic  // ✅ NEW: Allow updating public access
+    } = req.body;
+    const { organizationId, userId, role } = req.user;
 
-      if (!mongoose.isValidObjectId(entityId)) {
-        return res.status(400).json({ error: "Invalid entity ID" });
-      }
-
-      const entity = await DynamicEntity.findById(entityId);
-
-      if (!entity) {
-        return res.status(404).json({ error: "Entity not found" });
-      }
-
-      // ✅ Permission check
-      if (role !== 'SUPER_ADMIN') {
-        // Cannot edit global entities
-        if (entity.isGlobal) {
-          return res.status(403).json({
-            error: "Only SUPER_ADMIN can update global entities",
-          });
-        }
-        
-        // Can only edit own org's entities
-        if (entity.organizationId?.toString() !== organizationId) {
-          return res.status(403).json({
-            error: "You can only update entities from your organization",
-          });
-        }
-      }
-
-      if (entityName && entityName !== entity.entityName) {
-        if (!/^[a-z][a-z0-9_]*$/.test(entityName)) {
-          return res.status(400).json({
-            error: "Invalid entityName (lowercase, numbers, underscores only)",
-          });
-        }
-
-        const projectIdentifier =
-          entity.projectUUID || entity.projectId?.toString() || "";
-        const newSlug = entity.isGlobal 
-          ? `global-${entityName}`
-          : (projectIdentifier
-            ? `${organizationId}-${projectIdentifier}-${entityName}`
-            : `${organizationId}-${entityName}`);
-
-        const existing = await DynamicEntity.findOne({
-          slug: newSlug,
-          _id: { $ne: entityId },
-        });
-
-        if (existing) {
-          return res.status(409).json({
-            error: `Entity "${entityName}" already exists`,
-          });
-        }
-
-        entity.entityName = entityName;
-        entity.slug = newSlug;
-      }
-
-      if (schema) {
-        entity.schema = new Map(Object.entries(schema));
-      }
-
-      if (operations) {
-        entity.operations = operations;
-      }
-
-      entity.updatedBy = userId;
-      await entity.save();
-
-      if (modelCache.has(entity.slug)) {
-        modelCache.delete(entity.slug);
-        console.log(`🗑️ Cleared model cache for ${entity.slug}`);
-      }
-
-      const apiKey = `crud_${entity.slug}`;
-      await APIConfig.findOneAndUpdate(
-        { key: apiKey },
-        {
-          name: `Dynamic CRUD: ${entity.entityName}`,
-          baseUrl: `/api/crud/${entity.organizationId || 'global'}/${entity.entityName}`,
-          methods: entity.operations.map((op) => op.toUpperCase()),
-          updatedBy: userId,
-        },
-      );
-
-      console.log(`✅ Entity updated: ${entity.entityName}`);
-
-      res.json({
-        success: true,
-        entity: {
-          ...entity.toObject(),
-          schema: Object.fromEntries(entity.schema),
-        },
-        message: "Entity updated successfully",
-      });
-    } catch (error) {
-      console.error("❌ updateEntity failed:", error);
-      res.status(500).json({ error: error.message });
+    if (!mongoose.isValidObjectId(entityId)) {
+      return res.status(400).json({ error: "Invalid entity ID" });
     }
+
+    const entity = await DynamicEntity.findById(entityId);
+
+    if (!entity) {
+      return res.status(404).json({ error: "Entity not found" });
+    }
+
+    // ✅ Permission check
+    if (role !== 'SUPER_ADMIN') {
+      if (entity.isGlobal) {
+        return res.status(403).json({
+          error: "Only SUPER_ADMIN can update global entities",
+        });
+      }
+      
+      if (entity.organizationId?.toString() !== organizationId) {
+        return res.status(403).json({
+          error: "You can only update entities from your organization",
+        });
+      }
+    }
+
+    // Update fields
+    if (entityName && entityName !== entity.entityName) {
+      if (!/^[a-z][a-z0-9_]*$/.test(entityName)) {
+        return res.status(400).json({
+          error: "Invalid entityName (lowercase, numbers, underscores only)",
+        });
+      }
+
+      const projectIdentifier = entity.projectUUID || entity.projectId?.toString() || "";
+      const newSlug = entity.isGlobal 
+        ? `global-${entityName}`
+        : (projectIdentifier
+          ? `${organizationId}-${projectIdentifier}-${entityName}`
+          : `${organizationId}-${entityName}`);
+
+      const existing = await DynamicEntity.findOne({
+        slug: newSlug,
+        _id: { $ne: entityId },
+      });
+
+      if (existing) {
+        return res.status(409).json({
+          error: `Entity "${entityName}" already exists`,
+        });
+      }
+
+      entity.entityName = entityName;
+      entity.slug = newSlug;
+    }
+
+    if (schema) {
+      entity.schema = new Map(Object.entries(schema));
+    }
+
+    if (operations) {
+      entity.operations = operations;
+    }
+
+    // ✅ NEW: Update isPublic
+    if (typeof isPublic === 'boolean') {
+      entity.isPublic = isPublic;
+    }
+
+    entity.updatedBy = userId;
+    await entity.save();
+
+    if (modelCache.has(entity.slug)) {
+      modelCache.delete(entity.slug);
+      console.log(`🗑️ Cleared model cache for ${entity.slug}`);
+    }
+
+    // Update API config
+    const apiKey = `crud_${entity.slug}`;
+    await APIConfig.findOneAndUpdate(
+      { key: apiKey },
+      {
+        name: `Dynamic CRUD: ${entity.entityName}`,
+        description: `Auto-generated CRUD API for ${entity.entityName}${entity.isPublic ? ' - Public' : ' - Protected'}`,
+        baseUrl: `/api/crud/${entity.organizationId || 'global'}/${entity.entityName}`,
+        methods: entity.operations.map((op) => op.toUpperCase()),
+        authRequired: !entity.isPublic, // ✅ Update based on isPublic
+        updatedBy: userId,
+      },
+    );
+
+    console.log(`✅ Entity updated: ${entity.entityName} | public: ${entity.isPublic}`);
+
+    res.json({
+      success: true,
+      entity: {
+        ...entity.toObject(),
+        schema: Object.fromEntries(entity.schema),
+      },
+      message: "Entity updated successfully",
+      accessLevel: entity.isPublic ? 'PUBLIC' : 'PROTECTED',
+    });
+  } catch (error) {
+    console.error("❌ updateEntity failed:", error);
+    res.status(500).json({ error: error.message });
   }
+}
 
   // ✅ DELETE ENTITY (Enhanced with permission check)
   static async deleteEntity(req, res) {

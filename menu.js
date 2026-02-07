@@ -323,6 +323,71 @@ const configureAPIs = async (orgId, userId) => {
   console.log("\n🔧 === STEP 3: CONFIGURING API RESOURCES ===");
 
   const menuAPIConfigs = [
+   {
+  key: "chiyaz.metadata",
+  name: "Get Chiyaz Metadata",
+  description: "Fetches organization/project metadata including logo",
+  url: `/api/crud/${orgId}/meta_data`,
+  method: "GET",
+  headers: {},
+  transformResponse: `
+    (response) => {
+      console.log('📋 Metadata API raw response:', response);
+      
+      if (response && response.success && response.data && Array.isArray(response.data)) {
+        // Take the first item from data array
+        const metadata = response.data[0] || {};
+        console.log('→ Extracted metadata:', metadata._id);
+        
+        // Format logo URL for easier access
+        if (metadata.logo && metadata.logo.url) {
+          metadata.logoUrl = metadata.logo.url;
+          metadata.logoAlt = metadata.logo.originalName || 'Chiyaz Logo';
+        }
+        
+        // Return the entire metadata object for easy access
+        return metadata;
+      } else if (response && response.success && response.data) {
+        // Handle if data is not an array
+        const metadata = response.data;
+        console.log('→ Extracted single metadata item:', metadata._id);
+        
+        // Format logo
+        if (metadata.logo && metadata.logo.url) {
+          metadata.logoUrl = metadata.logo.url;
+          metadata.logoAlt = metadata.logo.originalName || 'Chiyaz Logo';
+        }
+        
+        return metadata;
+      } else {
+        console.warn('⚠️ Unexpected metadata response format');
+        // Return empty object to avoid errors
+        return {
+          logoUrl: '',
+          logoAlt: 'Chiyaz Logo',
+          title: 'Chiyaz Premium Tea & Coffee',
+          description: 'Discover the world\'s finest tea leaves and coffee beans'
+        };
+      }
+    }
+  `,
+  successNotification: { type: "none" },
+  errorNotification: { 
+    type: "toast", 
+    message: "Failed to load organization information", 
+    background: "#8B4513", 
+    duration: 3000 
+  },
+  storeResponse: true,
+  // ✅ Store at same level as menu
+  storeKey: "chiyaz.metadata",
+  onSuccess: [],
+  onError: ["console:Failed to fetch organization metadata"],
+  tags: ["chiyaz", "metadata", "organization", "logo"],
+  projectUUID: "chiyaz-tea-coffee",
+  organizationId: new mongoose.Types.ObjectId(orgId),
+  isActive: true,
+},
     {
       key: `${WEBSITE_SLUG}.menu.schema`,
       name: "Get Menu Schema",

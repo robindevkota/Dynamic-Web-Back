@@ -1,68 +1,54 @@
-
+// scripts/checkDatabase.js
+// Run this to see what's in your database
 
 const mongoose = require('mongoose');
+const PageConfig = require('./models/PageConfig');
+const Organization = require('./models/Organization');
 
-async function migrateEntities() {
+mongoose.connect(
+  process.env.MONGODB_URI || "mongodb+srv://admin:sjITV8nazkocOrCX@cluster0.sunkcl4.mongodb.net/",
+  { useNewUrlParser: true, useUnifiedTopology: true }
+);
+
+async function checkDatabase() {
   try {
-    // Connect to MongoDB
-    const MONGO_URI = process.env.MONGO_URI || 'your-mongo-connection-string';
-    await mongoose.connect("mongodb+srv://admin:sjITV8nazkocOrCX@cluster0.sunkcl4.mongodb.net/");
-    console.log('✅ Connected to MongoDB');
+    console.log('🔍 === DATABASE CHECK ===\n');
 
-    const DynamicEntity = mongoose.model('DynamicEntity', new mongoose.Schema({}, { strict: false }));
+    // 1. Check all pages
+    const allPages = await PageConfig.find({ status: { $ne: 'Deleted' } });
+    console.log(`📊 Total Pages: ${allPages.length}\n`);
 
-    // Count existing entities without isPublic field
-    const countBefore = await DynamicEntity.countDocuments({ isPublic: { $exists: false } });
-    console.log(`\n📊 Found ${countBefore} entities without isPublic flag`);
+    // 2. Group by type
+    const templates = allPages.filter(p => p.isTemplate);
+    const projects = allPages.filter(p => !p.isTemplate);
 
-    if (countBefore === 0) {
-      console.log('✅ All entities already migrated!');
-      await mongoose.disconnect();
-      return;
-    }
+    console.log(`📋 Templates: ${templates.length}`);
+    templates.forEach(t => {
+      console.log(`  ✨ ${t.title} (${t.slug}) - org: ${t.organizationId || 'NULL'}`);
+    });
 
-    // Update all entities to have public access (current behavior)
-    const result = await DynamicEntity.updateMany(
-      { isPublic: { $exists: false } },
-      { 
-        $set: { 
-          isPublic: true,
-          accessControl: {
-            readAccess: 'PUBLIC',
-            createAccess: 'PUBLIC',
-            updateAccess: 'END_USER_ADMIN',
-            deleteAccess: 'END_USER_ADMIN'
-          }
-        } 
-      }
-    );
+    console.log(`\n🏢 Projects: ${projects.length}`);
+    projects.forEach(p => {
+      console.log(`  📁 ${p.title} (${p.slug}) - org: ${p.organizationId}`);
+    });
 
-    console.log(`\n✅ Migration complete!`);
-    console.log(`   Updated: ${result.modifiedCount} entities`);
-    console.log(`   All entities now have:`);
-    console.log(`     - isPublic: true (anyone can access)`);
-    console.log(`     - readAccess: PUBLIC`);
-    console.log(`     - createAccess: PUBLIC`);
-    console.log(`     - updateAccess: END_USER_ADMIN`);
-    console.log(`     - deleteAccess: END_USER_ADMIN`);
+    // 3. Check organizations
+    console.log('\n🏢 === ORGANIZATIONS ===');
+    const orgs = await Organization.find();
+    console.log(`Total: ${orgs.length}\n`);
+    orgs.forEach(org => {
+      console.log(`  • ${org.name} (ID: ${org._id})`);
+      console.log(`    Plan: ${org.pricingPlan}`);
+      console.log(`    Projects: ${org.currentProjects}/${org.maxProjects}`);
+    });
 
-    // Verify
-    const countAfter = await DynamicEntity.countDocuments({ isPublic: { $exists: true } });
-    console.log(`\n📊 Verification: ${countAfter} entities now have isPublic flag`);
-
-    await mongoose.disconnect();
-    console.log('\n✅ Disconnected from MongoDB');
-
-  } catch (error) {
-    console.error('❌ Migration failed:', error);
-    await mongoose.disconnect();
-    process.exit(1);
+    console.log('\n✅ Check complete!');
+    mongoose.disconnect();
+    
+  } catch (err) {
+    console.error('❌ Error:', err);
+    mongoose.disconnect();
   }
 }
 
-// Run if called directly
-if (require.main === module) {
-  migrateEntities();
-}
-
-module.exports = migrateEntities;
+checkDatabase();
