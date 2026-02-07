@@ -725,7 +725,8 @@ static async defineEntity(req, res) {
               projectId: projectId || null,
               projectUUID: projectUUID || null,
               organizationId: entity.isGlobal ? null : entity.organizationId,
-              createdBy: userId,
+              // Only set createdBy if user is authenticated (not public)
+              ...(req.user?.isPublicAccess !== true && { createdBy: userId }),
             });
 
             await record.save();
@@ -829,9 +830,15 @@ static async defineEntity(req, res) {
             if (projectId) query.projectId = projectId;
             if (projectUUID) query.projectUUID = projectUUID;
 
+            const updatePayload = { ...updateData };
+            // Only set updatedBy if user is authenticated (not public)
+            if (req.user?.isPublicAccess !== true) {
+              updatePayload.updatedBy = userId;
+            }
+
             const updated = await Model.findOneAndUpdate(
               query,
-              { ...updateData, updatedBy: userId },
+              updatePayload,
               { new: true, runValidators: true, lean: true },
             );
 

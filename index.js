@@ -1,8 +1,10 @@
-// server.js - OPTIMIZED VERSION
+// server.js - SECURED VERSION WITH HELMET, RATE LIMITING, AND INPUT SANITIZATION
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 require("dotenv").config();
 
 const app = express();
@@ -11,6 +13,39 @@ const path = require('path');
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  🔧 MIDDLEWARE - ORDER MATTERS!
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// 🔒 SECURITY: Helmet - Set security HTTP headers
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+}));
+
+// 🔒 SECURITY: MongoDB Injection Protection (Express v5 Compatible)
+// Custom sanitization middleware to avoid Express v5 read-only req.query issue
+app.use((req, res, next) => {
+  // Sanitize body (writable in Express 5)
+  if (req.body) {
+    req.body = JSON.parse(JSON.stringify(req.body).replace(/\$/g, '_').replace(/\./g, '_'));
+  }
+  // Sanitize params (writable in Express 5)
+  if (req.params) {
+    Object.keys(req.params).forEach(key => {
+      if (typeof req.params[key] === 'string') {
+        req.params[key] = req.params[key].replace(/\$/g, '_').replace(/\./g, '_');
+      }
+    });
+  }
+  // Note: req.query is read-only in Express v5, so we skip it
+  // Express v5 sanitizes query params by default via the query parser
+  next();
+});
 
 // 1️⃣ CORS - MUST BE FIRST
 app.use(
@@ -47,11 +82,34 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // 3️⃣ Cookie Parser
 app.use(cookieParser());
 
-// 4️⃣ Request Logging (helpful for debugging)
+// 🔒 SECURITY: Rate Limiting - General
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(generalLimiter);
+
+// 🔒 SECURITY: Rate Limiting - Authentication (stricter)
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 login attempts per windowMs
+  message: "Too many login attempts, please try again after 15 minutes.",
+  skipSuccessfulRequests: true, // Don't count successful requests
+});
+
+// Apply strict rate limiting to auth routes
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/signup', authLimiter);
+app.use('/api/enduser-auth/login', authLimiter);
+app.use('/api/enduser-auth/signup', authLimiter);
+
+// 4️⃣ Request Logging (production-safe, no sensitive data)
 app.use((req, res, next) => {
-  console.log(`📍 ${req.method} ${req.path}`);
-  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-    console.log('📦 Body keys:', Object.keys(req.body || {}));
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`📍 ${req.method} ${req.path}`);
   }
   next();
 });
@@ -137,10 +195,19 @@ app.use((req, res, next) => {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 app.use((err, req, res, next) => {
-  console.error('🛑 GLOBAL ERROR:', err.message);
-  console.error('📍 Path:', req.path);
-  console.error('📦 Body:', req.body);
-  console.error('🔍 Stack:', err.stack);
+  // 🔒 SECURITY: Only log detailed errors in development
+  if (process.env.NODE_ENV !== 'production') {
+    console.error('🛑 GLOBAL ERROR:', err.message);
+    console.error('📍 Path:', req.path);
+    console.error('🔍 Stack:', err.stack);
+  } else {
+    // Production: Log error without sensitive data
+    console.error('ERROR:', {
+      message: err.message,
+      path: req.path,
+      timestamp: new Date().toISOString()
+    });
+  }
 
   // If headers already sent, delegate to Express
   if (res.headersSent) {
@@ -150,13 +217,19 @@ app.use((err, req, res, next) => {
   // Determine status code
   const statusCode = err.statusCode || err.status || 500;
 
-  // Send error response
-  res.status(statusCode).json({
+  // 🔒 SECURITY: Send sanitized error response
+  const response = {
     success: false,
-    error: err.message || 'Internal Server Error',
-    path: req.path,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
+    error: statusCode === 500 && process.env.NODE_ENV === 'production'
+      ? 'Internal Server Error'
+      : err.message || 'Internal Server Error',
+    ...(process.env.NODE_ENV === 'development' && {
+      stack: err.stack,
+      path: req.path
+    })
+  };
+
+  res.status(statusCode).json(response);
 });
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
