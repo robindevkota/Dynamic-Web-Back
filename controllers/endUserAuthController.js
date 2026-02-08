@@ -166,7 +166,7 @@ exports.signup = async (req, res) => {
     console.log(`   → Status: PENDING_VERIFICATION (will become ACTIVE after verify)`);
 
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${frontendUrl}/${websiteSlug}/verify-email?token=${verificationToken}`;
 
     await sendEndUserVerificationEmail({
       to: user.email,
@@ -286,7 +286,7 @@ exports.resendVerification = async (req, res) => {
 
     // Send email
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${frontendUrl}/${user.websiteSlug}/verify-email?token=${verificationToken}`;
 
     console.log('🔗 NEW End-User Verification URL:', verificationUrl);
 

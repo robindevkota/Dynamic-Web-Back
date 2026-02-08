@@ -51,12 +51,12 @@ exports.signup = async (req, res) => {
     const organization = await Organization.create({
       name: organizationName,
       slug: `${organizationName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}`,
-      pricingPlan,
+      pricingPlan: pricingPlan.toUpperCase(), // ✅ Convert to uppercase to match enum
       maxUsers: limits.maxUsers,
       maxProjects: limits.maxProjects,
       currentUsers: 1,
       currentProjects: 0,
-      status: "PENDING_PAYMENT",
+      status: "PENDING_VERIFICATION", // ✅ FIXED: Start with PENDING_VERIFICATION
       billing: {
         status: "TRIAL",
         trialStartDate: new Date(),
@@ -85,7 +85,7 @@ exports.signup = async (req, res) => {
     console.log(`✅ Organization created with owner: ${user._id}`);
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${frontendUrl}/auth/verify-email?token=${verificationToken}`; // ✅ FIXED: Add /auth prefix
 
     console.log('🔗 Verification URL:', verificationUrl);
 
@@ -196,6 +196,14 @@ exports.verifyEmail = async (req, res) => {
     user.status = "PENDING_PAYMENT"; // ✅ NOT ACTIVE - needs payment first
     await user.save();
 
+    // ✅ Update organization status to PENDING_PAYMENT
+    const organization = await Organization.findById(user.organizationId);
+    if (organization) {
+      organization.status = "PENDING_PAYMENT";
+      await organization.save();
+      console.log('✅ Organization status updated to PENDING_PAYMENT');
+    }
+
     console.log('✅ Email verified for CLIENT_ADMIN:', user.email);
     console.log('   → Status set to PENDING_PAYMENT (requires payment)');
 
@@ -257,7 +265,7 @@ exports.resendVerification = async (req, res) => {
 
     // Send email
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${frontendUrl}/auth/verify-email?token=${verificationToken}`; // ✅ FIXED: Add /auth prefix
 
     console.log('🔗 NEW Verification URL:', verificationUrl);
 
@@ -329,7 +337,10 @@ exports.handlePaymentSuccess = async (req, res) => {
     const customerId = 'cus_test_' + Date.now();
     const subscriptionId = 'sub_test_' + Date.now();
 
-    // ✅ Update organization billing
+    // ✅ Update organization billing - ensure billing object exists
+    if (!organization.billing) {
+      organization.billing = {};
+    }
     organization.billing.status = "ACTIVE";
     organization.billing.stripeCustomerId = customerId;
     organization.billing.stripeSubscriptionId = subscriptionId;

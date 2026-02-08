@@ -16803,7 +16803,7 @@ context.handlers.setFormData({});`,
     resolvedAPIs: {},
   },
 
-  {
+   {
     title: "BuilderPlatform - Create Websites Without Code",
     slug: "auth",
     projectUUID: "platform-auth-001",
@@ -17303,9 +17303,9 @@ try {
     duration: 4000
   });
 
-  // Redirect to check-email page with email parameter
+  // ✅ Redirect to check-email page (now in JSON config!)
   setTimeout(() => {
-    window.location.href = '/check-email?email=' + encodeURIComponent(email.trim().toLowerCase());
+    window.location.href = '/auth/check-email?email=' + encodeURIComponent(email.trim().toLowerCase());
   }, 1500);
 
 } catch (error) {
@@ -17619,6 +17619,231 @@ try {
     type: 'toast',
     message: '❌ Network error. Please try again.',
     background: '#ef4444'
+  });
+}
+`,
+
+        // ✅ FIXED: Email verification handler (matches static page behavior)
+        verifyEmailToken: `
+console.log('🔐 Email verification triggered');
+const { token } = context.queryParams || {};
+
+if (!token) {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ Invalid verification link - No token provided',
+    background: '#ef4444',
+    duration: 5000
+  });
+
+  setTimeout(() => {
+    window.location.href = '/auth';
+  }, 2000);
+  return;
+}
+
+try {
+  console.log('📡 Calling verify-email endpoint with token:', token);
+
+  // ✅ Use GET method with query param (matches backend route)
+  const response = await fetch('/api/auth/verify-email?token=' + encodeURIComponent(token), {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include'
+  });
+
+  const data = await response.json();
+  console.log('📦 Verification response:', data);
+
+  if (response.ok && data.success) {
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '✅ Email verified successfully! Redirecting to payment...',
+      background: '#10b981',
+      duration: 3000
+    });
+
+    // ✅ Redirect to payment page with organization ID
+    setTimeout(() => {
+      const paymentUrl = '/auth/payment?orgId=' + data.organization.id;
+      console.log('🔄 Redirecting to:', paymentUrl);
+      window.location.href = paymentUrl;
+    }, 3000);
+  } else {
+    throw new Error(data.error || 'Verification failed');
+  }
+} catch (error) {
+  console.error('❌ Email verification error:', error);
+
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ ' + (error.message || 'Verification failed. Link may be expired.'),
+    background: '#ef4444',
+    duration: 6000
+  });
+
+  setTimeout(() => {
+    window.location.href = '/auth';
+  }, 3000);
+}
+`,
+
+        // ✅ NEW: Stripe checkout handler
+        handleStripeCheckout: `
+console.log('💳 Stripe checkout triggered');
+const { plan, organizationId } = context.queryParams || {};
+
+if (!plan) {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ No plan selected',
+    background: '#ef4444'
+  });
+  return;
+}
+
+try {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '🔄 Creating checkout session...',
+    background: '#3b82f6',
+    duration: 3000
+  });
+
+  const response = await fetch('/api/payment/create-checkout-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ plan, organizationId })
+  });
+
+  const data = await response.json();
+
+  if (response.ok && data.url) {
+    // Redirect to Stripe checkout
+    window.location.href = data.url;
+  } else {
+    throw new Error(data.error || 'Failed to create checkout session');
+  }
+} catch (error) {
+  console.error('Stripe checkout error:', error);
+
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ ' + (error.message || 'Payment setup failed. Please try again.'),
+    background: '#ef4444',
+    duration: 5000
+  });
+}
+`,
+
+        // ✅ FIXED: Load payment data when payment page loads
+        loadPaymentData: `
+console.log('💳 Loading payment data...');
+const { orgId } = context.queryParams || {};
+
+if (!orgId) {
+  console.error('❌ No orgId in URL');
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ No organization ID provided',
+    background: '#ef4444',
+    duration: 5000
+  });
+  setTimeout(() => {
+    window.location.href = '/auth';
+  }, 2000);
+  return;
+}
+
+try {
+  const response = await fetch('/api/organizations/payment/' + orgId, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include'
+  });
+
+  const data = await response.json();
+
+  if (response.ok && data.organization) {
+    console.log('✅ Payment data loaded:', data.organization);
+    // Store org data for the activate button to use
+    window.__paymentOrgData = data.organization;
+  } else {
+    throw new Error(data.error || 'Failed to load organization');
+  }
+} catch (error) {
+  console.error('❌ Load payment data error:', error);
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ ' + (error.message || 'Failed to load organization details'),
+    background: '#ef4444',
+    duration: 5000
+  });
+  setTimeout(() => {
+    window.location.href = '/auth';
+  }, 3000);
+}
+`,
+
+        // ✅ FIXED: Activate free trial (matches static page)
+        activateFreeTrial: `
+console.log('🚀 Activating free trial...');
+const { orgId } = context.queryParams || {};
+
+if (!orgId) {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ No organization ID',
+    background: '#ef4444',
+    duration: 5000
+  });
+  return;
+}
+
+try {
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '⏳ Activating your account...',
+    background: '#3b82f6',
+    duration: 3000
+  });
+
+  const response = await fetch('/api/auth/payment-success', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({
+      organizationId: orgId,
+      stripeCustomerId: 'cus_test_' + Date.now(),
+      stripeSubscriptionId: 'sub_test_' + Date.now()
+    })
+  });
+
+  const data = await response.json();
+
+  if (response.ok && data.success) {
+    console.log('✅ Account activated!');
+    context.handlers.showNotification({
+      type: 'toast',
+      message: '🎉 Welcome! Your account is now active.',
+      background: '#10b981',
+      duration: 4000
+    });
+
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 1800);
+  } else {
+    throw new Error(data.error || 'Activation failed');
+  }
+} catch (error) {
+  console.error('❌ Activation error:', error);
+  context.handlers.showNotification({
+    type: 'toast',
+    message: '❌ ' + (error.message || 'Failed to activate account'),
+    background: '#ef4444',
+    duration: 5000
   });
 }
 `,
@@ -18831,6 +19056,290 @@ try {
           borderTop: "3px solid #1e40af",
           position: "relative",
           zIndex: 20,
+        },
+      },
+    },
+
+    // ✅ NEW: Auth flow sub-pages with query param support
+    pages: {
+      "check-email": {
+        title: "Check Your Email",
+        components: {
+          main: {
+            uiSchema: {
+              container: {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:align": "center",
+                "ui:justify": "center",
+                "ui:gap": "30px",
+                "ui:styles": {
+                  minHeight: "100vh",
+                  width: "100%",
+                  display: "flex",
+                  padding: "40px 20px",
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:align": "center",
+                    "ui:gap": "20px",
+                    "ui:styles": {
+                      background: "white",
+                      borderRadius: "16px",
+                      padding: "60px 40px",
+                      maxWidth: "500px",
+                      width: "100%",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "text",
+                        "ui:content": "📧",
+                        "ui:styles": {
+                          fontSize: "80px",
+                          marginBottom: "20px",
+                        },
+                      },
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "Check Your Email",
+                        "ui:level": "h1",
+                        "ui:styles": {
+                          fontSize: "2rem",
+                          fontWeight: "800",
+                          color: "#1e293b",
+                          marginBottom: "10px",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text": "We've sent a verification link to your email address. Please click the link to verify your account.",
+                        "ui:styles": {
+                          fontSize: "1.1rem",
+                          color: "#64748b",
+                          textAlign: "center",
+                          lineHeight: "1.6",
+                          marginBottom: "20px",
+                        },
+                      },
+                      {
+                        "ui:widget": "button",
+                        "ui:text": "Back to Login",
+                        "ui:action": "navigateToPage",
+                        "ui:actionParams": { url: "/auth" },
+                        "ui:styles": {
+                          padding: "14px 32px",
+                          fontSize: "1rem",
+                          fontWeight: "600",
+                          color: "white",
+                          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          border: "none",
+                          borderRadius: "10px",
+                          cursor: "pointer",
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+
+      "verify-email": {
+        title: "Verifying Email...",
+        queryParams: ["token", "email"],
+        requireParams: true,
+        components: {
+          main: {
+            uiSchema: {
+              container: {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:align": "center",
+                "ui:justify": "center",
+                "ui:gap": "30px",
+                "ui:styles": {
+                  minHeight: "100vh",
+                  width: "100%",
+                  display: "flex",
+                  padding: "40px 20px",
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:align": "center",
+                    "ui:gap": "20px",
+                    "ui:styles": {
+                      background: "white",
+                      borderRadius: "16px",
+                      padding: "60px 40px",
+                      maxWidth: "500px",
+                      width: "100%",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "text",
+                        "ui:content": "⏳",
+                        "ui:styles": {
+                          fontSize: "80px",
+                          marginBottom: "20px",
+                          animation: "pulse 2s infinite",
+                        },
+                      },
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "Verifying Your Email...",
+                        "ui:level": "h1",
+                        "ui:styles": {
+                          fontSize: "2rem",
+                          fontWeight: "800",
+                          color: "#1e293b",
+                          marginBottom: "10px",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text": "Please wait while we verify your email address.",
+                        "ui:styles": {
+                          fontSize: "1.1rem",
+                          color: "#64748b",
+                          textAlign: "center",
+                          lineHeight: "1.6",
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "verifyEmailToken",
+              },
+            ],
+          },
+        },
+      },
+
+      payment: {
+        title: "Activate Your Subscription",
+        queryParams: ["orgId"], // ✅ FIXED: Use orgId to match static page
+        requireParams: true,
+        components: {
+          main: {
+            uiSchema: {
+              container: {
+                "ui:widget": "container",
+                "ui:direction": "column",
+                "ui:align": "center",
+                "ui:justify": "center",
+                "ui:gap": "30px",
+                "ui:styles": {
+                  minHeight: "100vh",
+                  width: "100%",
+                  display: "flex",
+                  padding: "40px 20px",
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                },
+                "ui:children": [
+                  {
+                    "ui:widget": "container",
+                    "ui:direction": "column",
+                    "ui:align": "center",
+                    "ui:gap": "20px",
+                    "ui:styles": {
+                      background: "white",
+                      borderRadius: "16px",
+                      padding: "60px 40px",
+                      maxWidth: "600px",
+                      width: "100%",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+                    },
+                    "ui:children": [
+                      {
+                        "ui:widget": "text",
+                        "ui:content": "💳",
+                        "ui:styles": {
+                          fontSize: "80px",
+                          marginBottom: "20px",
+                        },
+                      },
+                      {
+                        "ui:widget": "heading",
+                        "ui:text": "Activate Your Subscription",
+                        "ui:level": "h1",
+                        "ui:styles": {
+                          fontSize: "2rem",
+                          fontWeight: "800",
+                          color: "#1e293b",
+                          marginBottom: "10px",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text": "Start your 14-day free trial — no charge today",
+                        "ui:styles": {
+                          fontSize: "1.1rem",
+                          color: "#64748b",
+                          textAlign: "center",
+                          lineHeight: "1.6",
+                          marginBottom: "10px",
+                        },
+                      },
+                      {
+                        "ui:widget": "paragraph",
+                        "ui:text": "✅ 14-Day Free Trial\n✅ No Payment Required Today\n✅ Cancel Anytime",
+                        "ui:styles": {
+                          fontSize: "1rem",
+                          color: "#10b981",
+                          textAlign: "center",
+                          lineHeight: "1.8",
+                          marginBottom: "30px",
+                          whiteSpace: "pre-line",
+                        },
+                      },
+                      {
+                        "ui:widget": "button",
+                        "ui:label": "→  Proceed to Activate Account",
+                        "ui:action": "activateFreeTrial",
+                        "ui:size": "large",
+                        "ui:styles": {
+                          padding: "18px 40px",
+                          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          borderRadius: "12px",
+                          cursor: "pointer",
+                          width: "100%",
+                          fontSize: "1.1rem",
+                          fontWeight: "600",
+                          color: "white",
+                          border: "none",
+                          boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
+                          transition: "all 0.3s ease",
+                        },
+                        "ui:hoverTransform": "translateY(-2px)",
+                        "ui:hoverShadow": "0 6px 20px rgba(102, 126, 234, 0.6)",
+                      },
+                    ],
+                  },
+                ],
+              },
+            },
+            triggers: [
+              {
+                event: "load",
+                action: "loadPaymentData",
+              },
+            ],
+          },
         },
       },
     },

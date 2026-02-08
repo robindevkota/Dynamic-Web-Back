@@ -18,8 +18,8 @@ const OrganizationSchema = new mongoose.Schema({
   // ✅ NEW: Organization-level status
   status: {
     type: String,
-    enum: ['ACTIVE', 'INACTIVE', 'SUSPENDED', 'TRIAL'],
-    default: 'ACTIVE',
+    enum: ['ACTIVE', 'INACTIVE', 'SUSPENDED', 'TRIAL', 'PENDING_VERIFICATION', 'PENDING_PAYMENT'], // ✅ Added PENDING_VERIFICATION
+    default: 'PENDING_VERIFICATION', // ✅ Changed default to PENDING_VERIFICATION
     index: true
   },
   
@@ -125,8 +125,35 @@ const OrganizationSchema = new mongoose.Schema({
       type: String,
       default: '#1890ff'
     }
+  },
+
+  // ✅ Billing Information
+  billing: {
+    status: {
+      type: String,
+      enum: ['TRIAL', 'ACTIVE', 'PAST_DUE', 'CANCELED'],
+      default: 'TRIAL'
+    },
+    stripeCustomerId: {
+      type: String
+    },
+    stripeSubscriptionId: {
+      type: String
+    },
+    subscriptionStartDate: {
+      type: Date
+    },
+    currentPeriodEnd: {
+      type: Date
+    },
+    trialStartDate: {
+      type: Date
+    },
+    trialEndDate: {
+      type: Date
+    }
   }
-  
+
 }, {
   timestamps: true
 });
